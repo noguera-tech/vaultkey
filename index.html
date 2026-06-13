@@ -335,31 +335,31 @@ select option { background:#000F24; color:var(--t1); }
    PIN
 ═══════════════════════════════════════ */
 .pinScreen {
-  align-items:center; justify-content:space-evenly;
-  text-align:center; padding:20px 22px;
+  align-items:center; justify-content:flex-start;
+  text-align:center; padding:34px 22px 20px;
   background:var(--grad-bg);
 }
 .pinAura  { display:none; }
 .pinInner { width:100%; display:flex; flex-direction:column; align-items:center; }
 
-.shield { width:clamp(160px, 45vw, 220px); margin:0 auto 2px; overflow:visible; padding:0; }
+.shield { width:min(86vw,350px); min-width:min(80vw,280px); margin:0 auto 8px; overflow:visible; padding:0; }
 .pinLogo   { width:100%; height:auto; object-fit:contain; object-position:center; }
 .pinTitle, .pinTag, .bioHint { display:none; }
 
 .pinSub {
-  font-size:15px; font-weight:700; color:var(--t1);
-  margin:6px 0 14px;
+  font-size:16px; font-weight:700; color:var(--t1);
+  margin:10px 0 24px;
   text-shadow:0 0 20px rgba(0,217,255,.5);
 }
 
 /* Dots */
-.dots { display:flex; justify-content:center; gap:12px; margin-bottom:16px; }
+.dots { display:flex; justify-content:center; gap:12px; margin-bottom:30px; }
 .dot  { width:13px; height:13px; border-radius:50%; border:2px solid rgba(0,160,255,.45); background:transparent; transition:all .15s; }
 .dot.on { background:var(--cyan); border-color:var(--cyan); box-shadow:0 0 16px rgba(0,217,255,.85); }
 .dots8 .dot { width:11px; height:11px; }
 
 /* Teclado PIN — spec exacta */
-.keys { display:grid; grid-template-columns:repeat(3,minmax(0,72px)); gap:clamp(8px,2vw,14px) clamp(16px,4vw,26px); justify-content:center; width:min(90vw,280px); margin:0 auto; }
+.keys { display:grid; grid-template-columns:repeat(3,78px); gap:14px 26px; justify-content:center; }
 .key  {
   width:78px; height:78px; border-radius:50%;
   background:var(--key-bg); border:1px solid var(--key-bdr);
@@ -585,14 +585,14 @@ select option { background:#000F24; color:var(--t1); }
 /* ═══════════════════════════════════════
    MODALES
 ═══════════════════════════════════════ */
-.modal { position:absolute; inset:0; z-index:60; background:rgba(0,7,18,.85); backdrop-filter:blur(14px); display:none; align-items:flex-end; }
+.modal { position:fixed; inset:0; z-index:60; background:rgba(0,7,18,.85); backdrop-filter:blur(14px); display:none; align-items:flex-end; justify-content:flex-end; flex-direction:column; }
 .modal.open { display:flex; }
-.sheet { position:relative; width:100%; max-height:92dvh; overflow-y:auto; background:linear-gradient(180deg,#001A34 0%,#000C1E 52%,#000812 100%); border:1px solid rgba(0,217,255,.20); border-radius:24px 24px 0 0; padding:20px 16px 28px; box-shadow:0 -18px 48px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06); }
+.sheet { position:relative; width:100%; max-height:92dvh; max-height:min(92dvh,92vh); overflow-y:auto; background:linear-gradient(180deg,#001A34 0%,#000C1E 52%,#000812 100%); border:1px solid rgba(0,217,255,.20); border-radius:24px 24px 0 0; padding:20px 16px 28px; box-shadow:0 -18px 48px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06); }
 .sheetHead  { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
 .sheetTitle { font-size:18px; font-weight:950; color:var(--t1); text-shadow:0 0 10px rgba(0,217,255,.16); }
 
 /* Nueva entrada fullscreen */
-#entryModal { position:absolute; inset:0; align-items:stretch; background:rgba(0,7,18,.96); backdrop-filter:none; }
+#entryModal { position:fixed; inset:0; align-items:stretch; background:rgba(0,7,18,.96); backdrop-filter:none; }
 #entryModal .sheet { min-height:100dvh; height:auto; max-height:none; border-radius:0; border:0; padding:0 14px calc(32px + env(safe-area-inset-bottom,0px)); background:var(--grad-bg); position:relative; }
 #entryModal .sheet::before { content:""; position:absolute; inset:0; background:var(--grad-glow); pointer-events:none; }
 
@@ -642,7 +642,7 @@ select option { background:#000F24; color:var(--t1); }
 .tiny { font-size:9px; color:var(--t3); max-width:64px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 /* Quick view fullscreen */
-#quickModal { position:absolute; inset:0; align-items:stretch; background:rgba(0,7,18,.96); }
+#quickModal { position:fixed; inset:0; align-items:stretch; background:rgba(0,7,18,.96); }
 #quickModal .sheet { height:100dvh; max-height:none; border-radius:0; border:0; padding:0; background:var(--grad-bg); display:flex; flex-direction:column; }
 #quickBody { flex:1; overflow-y:auto; padding:0 16px 24px; }
 
@@ -738,7 +738,9 @@ input[type=range]::-moz-range-thumb {
 
 
 /* Pulido final — entradas y generador */
+#genModal { position:fixed; inset:0; z-index:200; }
 #genModal .sheetTitle { color:#F4F8FF; font-size:20px; letter-spacing:-.2px; }
+#genModal .sheet { max-height:min(90dvh,90vh); overflow-y:auto; }
 #genModal .iconBtn { background:rgba(0,25,55,.72); border-color:rgba(0,217,255,.18); color:#DFF6FF; }
 #genModal .checkrow { color:#E7F3FF; font-weight:500; }
 #genModal .checkrow input { width:20px; height:20px; accent-color:var(--blue); filter:drop-shadow(0 0 7px rgba(0,123,255,.45)); }
@@ -1266,7 +1268,7 @@ function handleVisibilityChange(){
       hidePrivacyOverlay();
       const pinScreen=$('pin');
       if(pinScreen){
-        document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none';});
+        document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.cssText='';s.style.display='none';});
         pinScreen.style.display='flex';pinScreen.classList.add('active');
       }
       setTimeout(()=>initPin(),50);
@@ -1278,7 +1280,7 @@ function handleVisibilityChange(){
       hidePrivacyOverlay();
       const pinScreen=$('pin');
       if(pinScreen){
-        document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none';});
+        document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.cssText='';s.style.display='none';});
         pinScreen.style.display='flex';pinScreen.classList.add('active');
       }
       setTimeout(()=>initPin(),50);
@@ -2604,7 +2606,9 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
         if(e.data&&e.data.type==='SW_UPDATED'&&!unlocked)window.location.reload();
       });
     }
-    if(!localStorage.getItem('vaultkey_onboarding_v130')){
+    if(!localStorage.getItem('vaultkey_onboarding_v130') || !localStorage.getItem('vk_meta_v1')){
+      // Nuevo usuario: sin onboarding visto O sin PIN configurado → mostrar bienvenida
+      localStorage.removeItem('vaultkey_onboarding_v130'); // limpiar flag si no hay PIN
       openOnboardingHard();
     } else {
       initPin();
@@ -2613,7 +2617,8 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
   }
 
   window.addEventListener('load',()=>{
-    if(!localStorage.getItem(LS_SPLASH)){
+    const isNewUser = !localStorage.getItem('vk_meta_v1');
+    if(!localStorage.getItem(LS_SPLASH) || isNewUser){
       localStorage.setItem(LS_SPLASH,'1');
       runSplash(bootApp);
     } else {
