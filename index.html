@@ -335,31 +335,31 @@ select option { background:#000F24; color:var(--t1); }
    PIN
 ═══════════════════════════════════════ */
 .pinScreen {
-  align-items:center; justify-content:flex-start;
-  text-align:center; padding:34px 22px 20px;
+  align-items:center; justify-content:space-evenly;
+  text-align:center; padding:20px 22px;
   background:var(--grad-bg);
 }
 .pinAura  { display:none; }
 .pinInner { width:100%; display:flex; flex-direction:column; align-items:center; }
 
-.shield { width:min(86vw,350px); margin:0 auto 8px; overflow:visible; padding:0; }
+.shield { width:clamp(160px, 45vw, 220px); margin:0 auto 2px; overflow:visible; padding:0; }
 .pinLogo   { width:100%; height:auto; object-fit:contain; object-position:center; }
 .pinTitle, .pinTag, .bioHint { display:none; }
 
 .pinSub {
-  font-size:16px; font-weight:700; color:var(--t1);
-  margin:10px 0 24px;
+  font-size:15px; font-weight:700; color:var(--t1);
+  margin:6px 0 14px;
   text-shadow:0 0 20px rgba(0,217,255,.5);
 }
 
 /* Dots */
-.dots { display:flex; justify-content:center; gap:12px; margin-bottom:30px; }
+.dots { display:flex; justify-content:center; gap:12px; margin-bottom:16px; }
 .dot  { width:13px; height:13px; border-radius:50%; border:2px solid rgba(0,160,255,.45); background:transparent; transition:all .15s; }
 .dot.on { background:var(--cyan); border-color:var(--cyan); box-shadow:0 0 16px rgba(0,217,255,.85); }
 .dots8 .dot { width:11px; height:11px; }
 
 /* Teclado PIN — spec exacta */
-.keys { display:grid; grid-template-columns:repeat(3,78px); gap:14px 26px; justify-content:center; }
+.keys { display:grid; grid-template-columns:repeat(3,minmax(0,72px)); gap:clamp(8px,2vw,14px) clamp(16px,4vw,26px); justify-content:center; width:min(90vw,280px); margin:0 auto; }
 .key  {
   width:78px; height:78px; border-radius:50%;
   background:var(--key-bg); border:1px solid var(--key-bdr);
