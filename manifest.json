@@ -1,0 +1,30 @@
+{
+  "name": "VaultKey",
+  "short_name": "VaultKey",
+  "description": "VaultKey - B\u00f3veda digital privada. Gestiona tus contrase\u00f1as con cifrado AES-256 directamente en tu dispositivo.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#071428",
+  "theme_color": "#071428",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "id": "com.nogueratech.vaultkey",
+  "categories": [
+    "productivity",
+    "utilities"
+  ]
+}
