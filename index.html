@@ -883,6 +883,7 @@ input[type=range]::-moz-range-thumb {
   <div class="settingBlock"><div class="label">Preferencias</div><div class="settingsGrid">
     <div class="settingsRow" onclick="toggleVibration()"><div class="sico">📳</div><div class="stxt"><b>Vibración</b><span id="vibeSettingHint">Feedback háptico en botones y acciones</span></div><div id="vibeToggle">●</div></div>
     <div class="settingsRow" onclick="toggleSound()"><div class="sico">🔔</div><div class="stxt"><b>Sonidos</b><span id="soundSettingHint">Sonidos de confirmación y error</span></div><div id="soundToggle">○</div></div>
+    <div class="settingsRow" id="soundStyleRow" style="display:none"><div class="sico">🎵</div><div class="stxt"><b>Estilo de sonido</b><span id="soundStyleHint">Suave</span></div><div onclick="event.stopPropagation()"><select id="soundStyleSelect" onchange="setSoundStyle(this.value)" style="background:transparent;border:none;color:var(--cyan);font-weight:800;font-size:14px;text-align:right"><option value="suave">Suave</option><option value="cristal">Cristal</option><option value="retro">Retro</option><option value="minimo">Mínimo</option></select></div></div>
   </div></div>
   <div class="settingBlock"><div class="label">General</div><div class="settingsGrid">
     <div class="settingsRow" onclick="shareApp()"><div class="sico">📲</div><div class="stxt"><b>Compartir aplicación</b><span>Enviar enlace cuando esté publicada</span></div><div>›</div></div>
@@ -1083,6 +1084,60 @@ function vibe(ms=40){try{if(localStorage.getItem('vk_vibe')==='0')return;navigat
 let _actx=null;
 function getACtx(){if(!_actx)try{_actx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}return _actx;}
 function soundEnabled(){return localStorage.getItem('vk_sound')==='1';}
+function getSoundStyle(){return localStorage.getItem('vk_sound_style')||'suave';}
+
+// Estilos disponibles
+const SOUND_STYLES={
+  suave:{
+    pin:    [{freq:480,vol:0.10,decay:0.07}],
+    pinDel: [{freq:320,vol:0.08,decay:0.06}],
+    pinOk:  [{freq:520,vol:0.12,decay:0.08,t:0},{freq:660,vol:0.12,decay:0.10,t:90},{freq:880,vol:0.10,decay:0.14,t:180}],
+    pinErr: [{freq:300,vol:0.12,decay:0.10,t:0},{freq:260,vol:0.10,decay:0.14,t:120}],
+    copy:   [{freq:600,vol:0.10,decay:0.07,t:0},{freq:800,vol:0.09,decay:0.09,t:80}],
+    save:   [{freq:440,vol:0.10,decay:0.07,t:0},{freq:560,vol:0.10,decay:0.09,t:80},{freq:720,vol:0.09,decay:0.12,t:160}],
+    del:    [{freq:340,vol:0.10,decay:0.08,t:0},{freq:280,vol:0.09,decay:0.12,t:100}],
+    nav:    [{freq:500,vol:0.07,decay:0.05}],
+    gen:    [{freq:400,vol:0.09,decay:0.07,t:0},{freq:600,vol:0.09,decay:0.10,t:90}],
+    open:   [{freq:420,freq2:520,vol:0.08,decay:0.09}],
+  },
+  cristal:{
+    pin:    [{freq:1200,type:'sine',vol:0.08,attack:0.002,decay:0.08}],
+    pinDel: [{freq:900,type:'sine',vol:0.07,decay:0.06}],
+    pinOk:  [{freq:880,vol:0.10,decay:0.10,t:0},{freq:1100,vol:0.09,decay:0.12,t:80},{freq:1320,vol:0.08,decay:0.16,t:160}],
+    pinErr: [{freq:440,vol:0.10,decay:0.12,t:0},{freq:370,vol:0.09,decay:0.16,t:110}],
+    copy:   [{freq:1100,vol:0.08,decay:0.08,t:0},{freq:1400,vol:0.07,decay:0.10,t:70}],
+    save:   [{freq:660,vol:0.09,decay:0.08,t:0},{freq:880,vol:0.09,decay:0.10,t:70},{freq:1100,vol:0.08,decay:0.14,t:140}],
+    del:    [{freq:550,vol:0.09,decay:0.09,t:0},{freq:440,vol:0.08,decay:0.14,t:90}],
+    nav:    [{freq:1000,vol:0.06,attack:0.002,decay:0.05}],
+    gen:    [{freq:880,vol:0.08,decay:0.08,t:0},{freq:1100,vol:0.08,decay:0.12,t:80}],
+    open:   [{freq:800,freq2:1000,vol:0.07,decay:0.09}],
+  },
+  retro:{
+    pin:    [{freq:440,type:'square',vol:0.07,decay:0.05}],
+    pinDel: [{freq:280,type:'square',vol:0.06,decay:0.04}],
+    pinOk:  [{freq:392,type:'square',vol:0.08,decay:0.06,t:0},{freq:523,type:'square',vol:0.08,decay:0.06,t:80},{freq:659,type:'square',vol:0.07,decay:0.08,t:160}],
+    pinErr: [{freq:196,type:'square',vol:0.08,decay:0.10,t:0},{freq:185,type:'square',vol:0.07,decay:0.12,t:100}],
+    copy:   [{freq:523,type:'square',vol:0.07,decay:0.06,t:0},{freq:659,type:'square',vol:0.07,decay:0.07,t:70}],
+    save:   [{freq:330,type:'square',vol:0.07,decay:0.05,t:0},{freq:440,type:'square',vol:0.07,decay:0.06,t:70},{freq:523,type:'square',vol:0.06,decay:0.08,t:140}],
+    del:    [{freq:220,type:'square',vol:0.07,decay:0.08,t:0},{freq:196,type:'square',vol:0.06,decay:0.10,t:90}],
+    nav:    [{freq:392,type:'square',vol:0.05,decay:0.04}],
+    gen:    [{freq:440,type:'square',vol:0.07,decay:0.06,t:0},{freq:523,type:'square',vol:0.07,decay:0.08,t:80}],
+    open:   [{freq:330,freq2:440,type:'square',vol:0.06,decay:0.07}],
+  },
+  minimo:{
+    pin:    [{freq:440,vol:0.06,attack:0.001,decay:0.04}],
+    pinDel: [{freq:330,vol:0.05,decay:0.03}],
+    pinOk:  [{freq:600,vol:0.08,decay:0.06,t:0},{freq:800,vol:0.07,decay:0.10,t:100}],
+    pinErr: [{freq:250,vol:0.08,decay:0.12,t:0}],
+    copy:   [{freq:700,vol:0.07,decay:0.06}],
+    save:   [{freq:500,vol:0.07,decay:0.05,t:0},{freq:700,vol:0.07,decay:0.09,t:90}],
+    del:    [{freq:280,vol:0.07,decay:0.10}],
+    nav:    [{freq:480,vol:0.05,decay:0.03}],
+    gen:    [{freq:550,vol:0.07,decay:0.08}],
+    open:   [{freq:460,vol:0.06,decay:0.06}],
+  },
+};
+
 function playTone({freq=440,freq2=null,type='sine',vol=0.18,attack=0.01,decay=0.08,duration=0.12}={}){
   if(!soundEnabled())return;
   const ctx=getACtx();if(!ctx)return;
@@ -1090,42 +1145,27 @@ function playTone({freq=440,freq2=null,type='sine',vol=0.18,attack=0.01,decay=0.
   g.gain.setValueAtTime(0,ctx.currentTime);
   g.gain.linearRampToValueAtTime(vol,ctx.currentTime+attack);
   g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+attack+decay);
-  const o=ctx.createOscillator();o.type=type;o.frequency.setValueAtTime(freq,ctx.currentTime);
+  const o=ctx.createOscillator();o.type=type||'sine';o.frequency.setValueAtTime(freq,ctx.currentTime);
   if(freq2)o.frequency.linearRampToValueAtTime(freq2,ctx.currentTime+duration);
   o.connect(g);o.start(ctx.currentTime);o.stop(ctx.currentTime+duration);
 }
 
-// Sonidos específicos por acción
-function soundPin()    { playTone({freq:480,type:'sine',vol:0.10,attack:0.005,decay:0.07}); }
-function soundPinDel() { playTone({freq:320,type:'sine',vol:0.08,attack:0.005,decay:0.06}); }
-function soundPinOk()  { 
-  playTone({freq:520,type:'sine',vol:0.12,decay:0.08});
-  setTimeout(()=>playTone({freq:660,type:'sine',vol:0.12,decay:0.10}),90);
-  setTimeout(()=>playTone({freq:880,type:'sine',vol:0.10,decay:0.14}),180);
+function playStyle(action){
+  const style=SOUND_STYLES[getSoundStyle()]||SOUND_STYLES.suave;
+  const tones=style[action];if(!tones)return;
+  tones.forEach(t=>setTimeout(()=>playTone(t),t.t||0));
 }
-function soundPinErr() { 
-  playTone({freq:300,type:'sine',vol:0.12,decay:0.10});
-  setTimeout(()=>playTone({freq:260,type:'sine',vol:0.10,decay:0.14}),120);
-}
-function soundCopy()   { 
-  playTone({freq:600,type:'sine',vol:0.10,decay:0.07});
-  setTimeout(()=>playTone({freq:800,type:'sine',vol:0.09,decay:0.09}),80);
-}
-function soundSave()   { 
-  playTone({freq:440,type:'sine',vol:0.10,decay:0.07});
-  setTimeout(()=>playTone({freq:560,type:'sine',vol:0.10,decay:0.09}),80);
-  setTimeout(()=>playTone({freq:720,type:'sine',vol:0.09,decay:0.12}),160);
-}
-function soundDelete() { 
-  playTone({freq:340,type:'sine',vol:0.10,decay:0.08});
-  setTimeout(()=>playTone({freq:280,type:'sine',vol:0.09,decay:0.12}),100);
-}
-function soundNav()    { playTone({freq:500,type:'sine',vol:0.07,attack:0.005,decay:0.05}); }
-function soundGen()    { 
-  playTone({freq:400,type:'sine',vol:0.09,decay:0.07});
-  setTimeout(()=>playTone({freq:600,type:'sine',vol:0.09,decay:0.10}),90);
-}
-function soundOpen()   { playTone({freq:420,freq2:520,type:'sine',vol:0.08,decay:0.09}); }
+
+function soundPin()    { playStyle('pin'); }
+function soundPinDel() { playStyle('pinDel'); }
+function soundPinOk()  { playStyle('pinOk'); }
+function soundPinErr() { playStyle('pinErr'); }
+function soundCopy()   { playStyle('copy'); }
+function soundSave()   { playStyle('save'); }
+function soundDelete() { playStyle('del'); }
+function soundNav()    { playStyle('nav'); }
+function soundGen()    { playStyle('gen'); }
+function soundOpen()   { playStyle('open'); }
 // ────────────────────────────────────────────────────────────
 function toggleVibration(){
   const on=localStorage.getItem('vk_vibe')!=='0';
@@ -1138,13 +1178,23 @@ function toggleSound(){
   localStorage.setItem('vk_sound',on?'0':'1');
   syncPreferencesUI();
 }
+function setSoundStyle(v){
+  localStorage.setItem('vk_sound_style',v);
+  syncPreferencesUI();
+  setTimeout(()=>soundPinOk(),100);
+}
 function syncPreferencesUI(){
   const vibeOn=localStorage.getItem('vk_vibe')!=='0';
   const soundOn=localStorage.getItem('vk_sound')==='1';
+  const style=getSoundStyle();
+  const styleNames={suave:'Suave',cristal:'Cristal',retro:'Retro',minimo:'Mínimo'};
   const vt=$('vibeToggle'); if(vt){vt.textContent=vibeOn?'●':'○';vt.style.color=vibeOn?'var(--cyan)':'var(--t4)';}
   const st=$('soundToggle'); if(st){st.textContent=soundOn?'●':'○';st.style.color=soundOn?'var(--cyan)':'var(--t4)';}
   const vh=$('vibeSettingHint'); if(vh)vh.textContent=vibeOn?'Feedback háptico activado':'Feedback háptico desactivado';
   const sh=$('soundSettingHint'); if(sh)sh.textContent=soundOn?'Sonidos activados':'Sonidos desactivados';
+  const sr=$('soundStyleRow'); if(sr)sr.style.display=soundOn?'flex':'none';
+  const ss=$('soundStyleSelect'); if(ss)ss.value=style;
+  const ssh=$('soundStyleHint'); if(ssh)ssh.textContent=styleNames[style]||style;
 }
 function vkConfirm(title,msg){return new Promise(res=>{confirmResolver=res;$('confirmTitle').textContent=title;$('confirmMsg').textContent=msg;$('confirmModal').classList.add('open')})}
 function resolveConfirm(ok){$('confirmModal').classList.remove('open');if(confirmResolver){confirmResolver(!!ok);confirmResolver=null}}
@@ -1179,9 +1229,11 @@ async function tryBioRegister(pinKey){
     const iv=crypto.getRandomValues(new Uint8Array(12));
     const enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},aesKey,new TextEncoder().encode(pinKey));
     localStorage.setItem(LS_BIO_BLOB,JSON.stringify({iv:b64e(iv),data:b64e(enc)}));
+    vibe([30,20,60,20,80]);soundPinOk();
     toast('✓ Huella activada. Úsala la próxima vez que abras la app.');
   }catch(e){
     localStorage.removeItem(LS_BIO_CRED);
+    vibe([40,30,40]);soundPinErr();
     if(e.name==='NotAllowedError')toast('Registro de huella cancelado.');
     else toast('No se pudo activar la huella: '+e.message);
   }
