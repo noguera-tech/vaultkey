@@ -2274,7 +2274,7 @@ function iconForEntry(e){
   if(byName)return byName;
   return serviceIcon([e?.service,e?.url,e?.type].filter(Boolean).join(' '));
 }
-function vkLogoHTML(ic,cls='logo'){ic=ic&&ic.svg?ic:vk128Shield();const svg=ic.svg.replace(/<svg ([^>]*?)width="[^"]*"\s*/,'<svg $1').replace(/<svg ([^>]*?)height="[^"]*"\s*/,'<svg $1').replace(/<svg /,'<svg style="width:100%;height:100%;display:block" ');return `<div class="${cls}" style="background:${ic.bg};padding:0;overflow:hidden">${svg}</div>`}
+function vkLogoHTML(ic,cls='logo',sz=null){ic=ic&&ic.svg?ic:vk128Shield();const svg=ic.svg.replace(/<svg ([^>]*?)width="[^"]*"\s*/,'<svg $1').replace(/<svg ([^>]*?)height="[^"]*"\s*/,'<svg $1').replace(/<svg /,'<svg style="width:100%;height:100%;display:block" ');const sizeStyle=sz?`width:${sz}px;height:${sz}px;`:'' ;return `<div class="${cls}" style="background:${ic.bg};padding:0;overflow:hidden;${sizeStyle}">${svg}</div>`}
 let currentIconCat='todos';
 window._setIconCat=function(cat,btn){currentIconCat=cat;document.querySelectorAll('.iconCat').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');const s=$('eIconSearch');if(s)s.value='';if(typeof renderIconPicker==='function')renderIconPicker();};
 function setIconCat(cat,btn){window._setIconCat(cat,btn);}
@@ -2350,7 +2350,7 @@ function renderFav(){
     row.className='favRow';
     row.onclick=()=>quick(e.id);
     const userVal=e.user||e.email||'';
-    row.innerHTML=`<div class="favRowIco">${vkLogoHTML(ic,'logo')}</div><div class="favRowInfo"><div class="favRowName">${esc(e.service)}${weak?'<span class="favRowWeak">DÉBIL</span>':''}</div>${identity?'<div class="favRowId">'+esc(identity)+'</div>':''}</div><div class="favRowBtns"><button class="favRowBtn2" onclick="event.stopPropagation();vibe(25);soundCopy();copyText(${JSON.stringify(userVal)});toast('Usuario copiado')">👤</button><button class="favRowBtn" onclick="event.stopPropagation();vibe(25);soundCopy();copyText(${JSON.stringify(e.pass||'')});toast('Contraseña copiada')">🔑</button></div>`;
+    row.innerHTML=`<div class="favRowIco">${vkLogoHTML(ic,'logo',48)}</div><div class="favRowInfo"><div class="favRowName">${esc(e.service)}${weak?'<span class="favRowWeak">DÉBIL</span>':''}</div>${identity?'<div class="favRowId">'+esc(identity)+'</div>':''}</div><div class="favRowBtns"><button class="favRowBtn2" onclick="event.stopPropagation();vibe(25);soundCopy();copyText(${JSON.stringify(userVal)});toast('Usuario copiado')">👤</button><button class="favRowBtn" onclick="event.stopPropagation();vibe(25);soundCopy();copyText(${JSON.stringify(e.pass||'')});toast('Contraseña copiada')">🔑</button></div>`;
     grid.appendChild(row);
   });
 }
