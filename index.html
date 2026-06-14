@@ -336,7 +336,7 @@ select option { background:#000F24; color:var(--t1); }
 ═══════════════════════════════════════ */
 .pinScreen {
   align-items:center; justify-content:flex-start;
-  text-align:center; padding:34px 22px 20px;
+  text-align:center; padding:34px 22px calc(var(--nav-h) + 12px);
   background:var(--grad-bg);
 }
 .pinAura  { display:none; }
@@ -791,6 +791,7 @@ input[type=range]::-moz-range-thumb {
   .key  { width:68px; height:68px; font-size:24px; }
   .homeBrand.targetHero { height:37vh; min-height:240px; }
   .heroShield { width:min(86vw,316px); }
+  .pinScreen { padding-top:18px; }
 }
 
 /* Temas desactivados: el mockup debe ser exacto y estable.
@@ -2623,9 +2624,14 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
 
   window.addEventListener('load',()=>{
     const isNewUser = !localStorage.getItem('vk_meta_v1');
-    if(!localStorage.getItem(LS_SPLASH) || isNewUser){
+    if(!localStorage.getItem(LS_SPLASH)){
       localStorage.setItem(LS_SPLASH,'1');
       runSplash(bootApp);
+    } else if(isNewUser) {
+      runSplash(() => {
+        if(!localStorage.getItem('vaultkey_onboarding_v130')) openOnboardingHard();
+        else { initPin(); show('pin'); }
+      });
     } else {
       bootApp();
     }
