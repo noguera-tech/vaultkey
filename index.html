@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:">
 <title>VaultKey</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 
 <style>
 /*
@@ -332,11 +332,13 @@ select option { background:#000F24; color:var(--t1); }
 @keyframes obPulse  { 0%,100%{opacity:1} 50%{opacity:.6} }
 
 /* ═══════════════════════════════════════
-   PIN
+   PIN — ajustado para Android sin corte inferior
 ═══════════════════════════════════════ */
 .pinScreen {
   align-items:center; justify-content:flex-start;
-  text-align:center; padding:34px 22px calc(var(--nav-h) + 12px);
+  text-align:center;
+  /* Pantalla PIN sin navbar: menos padding para que el teclado no se corte en Android */
+  padding:20px 22px calc(18px + env(safe-area-inset-bottom,0px));
   background:var(--grad-bg);
 }
 .pinAura  { display:none; }
@@ -348,23 +350,23 @@ select option { background:#000F24; color:var(--t1); }
 
 .pinSub {
   font-size:16px; font-weight:700; color:var(--t1);
-  margin:10px 0 24px;
+  margin:6px 0 18px;
   text-shadow:0 0 20px rgba(0,217,255,.5);
 }
 
 /* Dots */
-.dots { display:flex; justify-content:center; gap:12px; margin-bottom:30px; }
+.dots { display:flex; justify-content:center; gap:10px; margin-bottom:18px; }
 .dot  { width:13px; height:13px; border-radius:50%; border:2px solid rgba(0,160,255,.45); background:transparent; transition:all .15s; }
 .dot.on { background:var(--cyan); border-color:var(--cyan); box-shadow:0 0 16px rgba(0,217,255,.85); }
 .dots8 .dot { width:11px; height:11px; }
 
 /* Teclado PIN — spec exacta */
-.keys { display:grid; grid-template-columns:repeat(3,78px); gap:14px 26px; justify-content:center; }
+.keys { display:grid; grid-template-columns:repeat(3,66px); gap:10px 20px; justify-content:center; }
 .key  {
-  width:78px; height:78px; border-radius:50%;
+  width:66px; height:66px; border-radius:50%;
   background:var(--key-bg); border:1px solid var(--key-bdr);
   box-shadow:var(--key-shd);
-  color:var(--t1); font-size:28px; font-weight:800;
+  color:var(--t1); font-size:24px; font-weight:800;
   display:grid; place-items:center; transition:all .1s;
 }
 .key:active { transform:scale(.92); background:rgba(0,100,255,.4); border-color:var(--cyan); box-shadow:0 0 22px rgba(0,217,255,.55); }
@@ -800,8 +802,8 @@ input[type=range]::-moz-range-thumb {
   .shield { width:min(78vw,300px); }
   .onboardHeroImg { width:min(68vw,246px); }
   .onboardTitle { font-size:22px; margin:14px 0 8px; }
-  .keys { grid-template-columns:repeat(3,68px); gap:10px 22px; }
-  .key  { width:68px; height:68px; font-size:24px; }
+  .keys { grid-template-columns:repeat(3,60px); gap:8px 18px; }
+  .key  { width:60px; height:60px; font-size:22px; }
   .homeBrand.targetHero { height:37vh; min-height:240px; }
   .heroShield { width:min(86vw,316px); }
   .pinScreen { padding-top:18px; }
@@ -815,27 +817,6 @@ input[type=range]::-moz-range-thumb {
   html, body { background:linear-gradient(180deg,#001B38 0%,#000F24 45%,#00070D 100%); }
   body { background-attachment:fixed; }
 }
-
-/* === PATCH VAULTKEY: arranque limpio sin salto blanco / sin marco del escudo === */
-html, body, .app, .screen, #vkSplash, #onboardingModal .sheet {
-  background-color:#020b18 !important;
-}
-.vkSplashImg, .pinLogo, .heroShield, .onboardHeroImg {
-  -webkit-mask-image: radial-gradient(ellipse at center, #000 0%, #000 70%, rgba(0,0,0,.88) 82%, transparent 100%) !important;
-  mask-image: radial-gradient(ellipse at center, #000 0%, #000 70%, rgba(0,0,0,.88) 82%, transparent 100%) !important;
-  -webkit-mask-size:100% 100%;
-  mask-size:100% 100%;
-  background:transparent !important;
-}
-#vkSplash {
-  background:
-    radial-gradient(circle at 50% 28%, rgba(0,95,210,.24) 0%, rgba(0,38,92,.12) 34%, rgba(0,5,15,0) 64%),
-    linear-gradient(180deg, #00142B 0%, #000C1B 48%, #00060B 100%) !important;
-}
-#vkSplash.vkSplashVisible {
-  display:flex !important;
-}
-
 </style>
 
 
@@ -1053,7 +1034,7 @@ html, body, .app, .screen, #vkSplash, #onboardingModal .sheet {
 <div id="toast" style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(10,30,60,.97);color:#f5f9ff;padding:11px 22px;border-radius:12px;font-size:14px;font-weight:600;pointer-events:none;opacity:0;transition:opacity .25s;z-index:9999;max-width:88vw;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.4);border:1px solid rgba(0,210,255,.2)"></div>
 
 <!-- SPLASH SCREEN -->
-<div id="vkSplash" class="vkSplashVisible">
+<div id="vkSplash">
   <div class="vkSplashShield">
     <img src="vaultkey-shield-scene.png?v=221" alt="VaultKey" class="vkSplashImg">
   </div>
@@ -2967,7 +2948,7 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     splash.classList.add('vkSplashVisible');
     splash.style.opacity='1';
     let li=0;
-    const totalMs=1700;
+    const totalMs=2800;
     const stepMs=totalMs/lines.length;
     let pct=0;
     const pctStep=100/lines.length;
@@ -3024,24 +3005,16 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     }
   }
 
-  function startVaultKeyBoot(){
+  window.addEventListener('load',()=>{
+    const isNewUser = !localStorage.getItem('vk_meta_v1');
     const splashSeen = localStorage.getItem(LS_SPLASH);
     localStorage.setItem(LS_SPLASH,'1');
-
-    // Arranca al tener el DOM listo, no esperamos window.load.
-    // Esto evita el salto blanco entre el splash nativo de Android y la app web.
     if(!splashSeen){
       runSplash(bootApp);
     } else {
       bootApp();
     }
-  }
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded', startVaultKeyBoot, {once:true});
-  } else {
-    startVaultKeyBoot();
-  }
+  });
 
   // visibilitychange gestionado por handleVisibilityChange arriba
 })();
