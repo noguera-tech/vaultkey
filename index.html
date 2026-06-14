@@ -880,6 +880,10 @@ input[type=range]::-moz-range-thumb {
     <div class="securityNote">En aplicaciones recientes se mostrará una pantalla privada: 🔐 VaultKey — Bóveda protegida.</div>
   </div></div>
   
+  <div class="settingBlock"><div class="label">Preferencias</div><div class="settingsGrid">
+    <div class="settingsRow" onclick="toggleVibration()"><div class="sico">📳</div><div class="stxt"><b>Vibración</b><span id="vibeSettingHint">Feedback háptico en botones y acciones</span></div><div id="vibeToggle">●</div></div>
+    <div class="settingsRow" onclick="toggleSound()"><div class="sico">🔔</div><div class="stxt"><b>Sonidos</b><span id="soundSettingHint">Sonidos de confirmación y error</span></div><div id="soundToggle">○</div></div>
+  </div></div>
   <div class="settingBlock"><div class="label">General</div><div class="settingsGrid">
     <div class="settingsRow" onclick="shareApp()"><div class="sico">📲</div><div class="stxt"><b>Compartir aplicación</b><span>Enviar enlace cuando esté publicada</span></div><div>›</div></div>
     <div class="settingsRow" onclick="toast('Política de privacidad local: tus datos no salen del dispositivo')"><div class="sico">📋</div><div class="stxt"><b>Privacidad</b><span>Datos locales y respaldo cifrado</span></div><div>›</div></div>
@@ -1073,7 +1077,26 @@ function lockRemaining(){
   return m.lockedUntil>now?Math.ceil((m.lockedUntil-now)/1000):0;
 }
 function toast(t){const el=$('toast');if(!el)return;el.textContent=t;el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>{el.style.opacity='0'},2200)}
-function vibe(ms=40){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+function vibe(ms=40){try{if(localStorage.getItem('vk_vibe')==='0')return;navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+function toggleVibration(){
+  const on=localStorage.getItem('vk_vibe')!=='0';
+  localStorage.setItem('vk_vibe',on?'0':'1');
+  syncPreferencesUI();
+  if(!on)navigator.vibrate&&navigator.vibrate(40);
+}
+function toggleSound(){
+  const on=localStorage.getItem('vk_sound')==='1';
+  localStorage.setItem('vk_sound',on?'0':'1');
+  syncPreferencesUI();
+}
+function syncPreferencesUI(){
+  const vibeOn=localStorage.getItem('vk_vibe')!=='0';
+  const soundOn=localStorage.getItem('vk_sound')==='1';
+  const vt=$('vibeToggle'); if(vt){vt.textContent=vibeOn?'●':'○';vt.style.color=vibeOn?'var(--cyan)':'var(--t4)';}
+  const st=$('soundToggle'); if(st){st.textContent=soundOn?'●':'○';st.style.color=soundOn?'var(--cyan)':'var(--t4)';}
+  const vh=$('vibeSettingHint'); if(vh)vh.textContent=vibeOn?'Feedback háptico activado':'Feedback háptico desactivado';
+  const sh=$('soundSettingHint'); if(sh)sh.textContent=soundOn?'Sonidos activados':'Sonidos desactivados';
+}
 function vkConfirm(title,msg){return new Promise(res=>{confirmResolver=res;$('confirmTitle').textContent=title;$('confirmMsg').textContent=msg;$('confirmModal').classList.add('open')})}
 function resolveConfirm(ok){$('confirmModal').classList.remove('open');if(confirmResolver){confirmResolver(!!ok);confirmResolver=null}}
 function initPin(){let m=defaultSecurity(meta());mode=(m&&m.hash)?'unlock':'setup1';let left=lockRemaining();const plen=getPinLen();$('pinMsg').className='pinSub';$('pinMsg').textContent=mode==='unlock'?(left?'Bóveda bloqueada. Espera '+left+' s':'Introduce tu PIN'):'Crea un PIN de '+plen+' dígitos';if(left)$('pinMsg').classList.add('pinLocked');renderDots();renderKeys();syncSettingsUI();updateLockCountdown()}
@@ -1193,6 +1216,7 @@ function updateLockCountdown(){clearInterval(lockCountdownTimer);let left=lockRe
 function getAutoLockMs(){let m=defaultSecurity(meta());return m?Number(m.autoLockMs||0):0}
 function setAutoLock(v){let m=defaultSecurity(meta());if(!m)return;m.autoLockMs=Number(v);saveMeta(m);syncSettingsUI();toast(m.autoLockMs===0?'Bloqueo inmediato al salir activado':'Autobloqueo inteligente actualizado');resetAutoLockTimer()}
 function syncSettingsUI(){
+  syncPreferencesUI();
   let sel=$('autoLockSelect');let m=meta();
   if(sel&&m){defaultSecurity(m);const ms=Number(m.autoLockMs||0);sel.value=String(ms);// Forzar opción visible
   if(!sel.querySelector('option[value="'+ms+'"]'))sel.value='30000';}
@@ -1573,13 +1597,24 @@ function renderIconStrip(){
 function updateEntryIconPreview(){renderIconStrip();}
 function entryShowStep(n){$('entryStep1').style.display=n===1?'block':'none';$('entryStep2').style.display=n===2?'block':'none';$('dot1').style.width=n===1?'32px':'8px';$('dot1').style.background=n===1?'var(--cyan)':'rgba(255,255,255,.2)';$('dot1').style.boxShadow=n===1?'0 0 14px rgba(0,210,255,.7)':'none';$('dot2').style.width=n===2?'32px':'8px';$('dot2').style.background=n===2?'var(--cyan)':'rgba(255,255,255,.2)';$('dot2').style.boxShadow=n===2?'0 0 14px rgba(0,210,255,.7)':'none';$('entryBackBtn').textContent=n===1?'Cancelar':'\u2190 Atr\xe1s';$('entryNextBtn').textContent=n===2?'Guardar':'Siguiente \u2192';if(n===2){updateEntryStep2Header();renderIconStrip();}$('entryModal')?.querySelector('.sheet')?.scrollTo({top:0,behavior:'smooth'});}
 $('ePass')?.addEventListener('input',updateStrength);
+
+// Vibración al enfocar campos del formulario de entrada
+['eService','eUser','eEmail','ePass'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('focus',()=>vibe(15));
+});
+
+// Vibración en botones de acción de entradas
+document.getElementById('entryModal')?.addEventListener('click',e=>{
+  const btn=e.target.closest('button');
+  if(btn && !btn.classList.contains('key')) vibe(20);
+},true);
 function score(p=''){let s=0;if(p.length>=6)s++;if(p.length>=8)s++;if(p.length>=14)s++;if(/[A-Z]/.test(p)&&/[a-z]/.test(p))s++;if(/\d/.test(p))s++;if(/[^A-Za-z0-9]/.test(p))s++;return Math.min(s,5)}
 function updateStrength(){let p=$('ePass').value,s=score(p),w=s*20;$('strBar').style.width=w+'%';$('strBar').style.background=s<2?'var(--red)':s<5?'var(--yellow)':'var(--green)';$('strTxt').textContent=!p?'Mínimo 6 caracteres. Se permite guardar PIN y códigos cortos.':p.length<6?'Demasiado corta: mínimo 6 caracteres':p.length<8?'Débil, pero permitida':'Buena'}
 function isValidEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||'').trim())}
 function serviceRequiresEmail(){return true}
 function toggleQvPass(){let el=$('qvPass');el.textContent=el.textContent.startsWith('•')?current.pass:'••••••••••••'}
 async function toggleFav(id){let e=vault.find(x=>x.id===id);if(e){e.fav=!e.fav;await persist();closeModals();render();toast('Actualizado')}}
-async function delEntry(id){if(await vkConfirm('Eliminar entrada','¿Eliminar esta entrada de la bóveda?')){vault=vault.filter(e=>e.id!==id);await persist();closeModals();render();toast('Entrada eliminada')}}
+async function delEntry(id){vibe([40,20,40]);if(await vkConfirm('Eliminar entrada','¿Eliminar esta entrada de la bóveda?')){vault=vault.filter(e=>e.id!==id);await persist();closeModals();render();toast('Entrada eliminada')}}
 function copyText(t='',btn=null){
   navigator.clipboard?.writeText(t).then(()=>{
     vibe(35);
@@ -1596,7 +1631,7 @@ function copyText(t='',btn=null){
   }).catch(()=>toast('No se pudo copiar'))
 }
 function scheduleClipboardClear(value){setTimeout(async()=>{try{const txt=await navigator.clipboard.readText?.();if(txt===value)await navigator.clipboard.writeText('');}catch(e){}},30000)}
-function openUrl(u){if(!/^https?:\/\//.test(u))u='https://'+u;window.open(u,'_blank')}
+function openUrl(u){vibe(20);if(!/^https?:\/\//.test(u))u='https://'+u;window.open(u,'_blank')}
 function openGen(target=false){useGenTarget=target;$('genModal').classList.add('open');syncRanges(false);if($('genOut').textContent==='Pulsa generar')markGeneratorDirty()}
 function setGenLen(n){$('gLen').value=n;syncRanges(true)}
 function markGeneratorDirty(){syncRanges(false);$('genOut').textContent='Pulsa generar';}
@@ -1643,6 +1678,7 @@ function generatePass(){
 }
 
 function useGen(){
+  vibe(35);
   let v=$('genOut').textContent;
   if(!v || v==='Pulsa generar'){generatePass();v=$('genOut').textContent;}
   if(useGenTarget){
