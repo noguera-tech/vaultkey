@@ -666,7 +666,7 @@ select option { background:#000F24; color:var(--t1); }
 /* ═══════════════════════════════════════
    GENERADOR
 ═══════════════════════════════════════ */
-.genOut, .recCode {
+.genOut {
   font-family:ui-monospace,Consolas,monospace;
   background:rgba(0,14,32,.92); border:1.5px solid rgba(0,190,255,.35);
   border-radius:14px; padding:16px; word-break:break-all; margin:10px 0;
@@ -674,7 +674,14 @@ select option { background:#000F24; color:var(--t1); }
   min-height:54px; display:flex; align-items:center; justify-content:center; text-align:center;
   box-shadow:0 0 20px rgba(0,190,255,.08);
 }
-.recCode { color:var(--t2); font-size:14px; letter-spacing:.4px; }
+.recCode {
+  font-family:ui-monospace,Consolas,monospace;
+  background:rgba(0,14,32,.92); border:1.5px solid rgba(0,190,255,.35);
+  border-radius:14px; padding:16px; word-break:break-all; margin:10px 0;
+  color:var(--t2); font-size:14px; font-weight:700; letter-spacing:.4px;
+  min-height:54px; display:flex; align-items:center; justify-content:center; text-align:center;
+  box-shadow:0 0 20px rgba(0,190,255,.08);
+}
 
 .rangeField {
   background:linear-gradient(135deg,rgba(0,78,150,.48),rgba(0,20,52,.92));
