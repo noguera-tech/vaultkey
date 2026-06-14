@@ -1078,6 +1078,35 @@ function lockRemaining(){
 }
 function toast(t){const el=$('toast');if(!el)return;el.textContent=t;el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>{el.style.opacity='0'},2200)}
 function vibe(ms=40){try{if(localStorage.getItem('vk_vibe')==='0')return;navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+
+// ── SISTEMA DE SONIDOS ──────────────────────────────────────
+let _actx=null;
+function getACtx(){if(!_actx)try{_actx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}return _actx;}
+function soundEnabled(){return localStorage.getItem('vk_sound')==='1';}
+function playTone({freq=440,freq2=null,type='sine',vol=0.18,attack=0.01,decay=0.08,duration=0.12}={}){
+  if(!soundEnabled())return;
+  const ctx=getACtx();if(!ctx)return;
+  const g=ctx.createGain();g.connect(ctx.destination);
+  g.gain.setValueAtTime(0,ctx.currentTime);
+  g.gain.linearRampToValueAtTime(vol,ctx.currentTime+attack);
+  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+attack+decay);
+  const o=ctx.createOscillator();o.type=type;o.frequency.setValueAtTime(freq,ctx.currentTime);
+  if(freq2)o.frequency.linearRampToValueAtTime(freq2,ctx.currentTime+duration);
+  o.connect(g);o.start(ctx.currentTime);o.stop(ctx.currentTime+duration);
+}
+
+// Sonidos específicos por acción
+function soundPin()    { playTone({freq:600,type:'sine',vol:0.12,decay:0.06}); }
+function soundPinDel() { playTone({freq:380,type:'sine',vol:0.10,decay:0.05}); }
+function soundPinOk()  { playTone({freq:520,decay:0.08});setTimeout(()=>playTone({freq:780,decay:0.12}),90); }
+function soundPinErr() { playTone({freq:220,freq2:180,type:'sawtooth',vol:0.15,decay:0.18}); }
+function soundCopy()   { playTone({freq:660,freq2:880,vol:0.14,decay:0.10}); }
+function soundSave()   { playTone({freq:480,decay:0.07});setTimeout(()=>playTone({freq:640,decay:0.10}),80);setTimeout(()=>playTone({freq:820,decay:0.14}),160); }
+function soundDelete() { playTone({freq:280,freq2:220,type:'sawtooth',vol:0.14,decay:0.20}); }
+function soundNav()    { playTone({freq:520,vol:0.08,decay:0.05}); }
+function soundGen()    { playTone({freq:440,freq2:660,vol:0.14,decay:0.15}); }
+function soundOpen()   { playTone({freq:400,freq2:500,vol:0.10,decay:0.08}); }
+// ────────────────────────────────────────────────────────────
 function toggleVibration(){
   const on=localStorage.getItem('vk_vibe')!=='0';
   localStorage.setItem('vk_vibe',on?'0':'1');
@@ -1103,8 +1132,8 @@ function initPin(){let m=defaultSecurity(meta());mode=(m&&m.hash)?'unlock':'setu
 function getPinLen(){const m=meta();return(m&&m.pinLen===8)?8:6;}
 function renderDots(){const len=getPinLen();let d=$('dots');d.innerHTML='';d.className='dots'+(len===8?' dots8':'');for(let i=0;i<len;i++){let x=document.createElement('div');x.className='dot'+(i<pin.length?' on':'');d.appendChild(x)}}
 function renderKeys(){let k=$('keys');k.innerHTML='';['1','2','3','4','5','6','7','8','9','bio','0','del'].forEach(n=>{let b=document.createElement('button');b.className='key';if(n==='bio'){b.innerHTML='<svg class="fingerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 11c0 5-2 7-2 10"/><path d="M16 8a4 4 0 0 0-8 0c0 1.3.5 2.7 1 4"/><path d="M6 12c.5 2.5 1.5 4 3 5"/><path d="M18 12c-.4 3.2-1.4 5.4-3.2 7"/><path d="M8 6.5A6 6 0 0 1 18 11"/><path d="M5 9a8 8 0 0 1 14.5-4"/><path d="M20 14c-.4 2.4-1.2 4.4-2.5 6"/></svg>';b.classList.add('bioKey');b.onclick=tryBio;b.title='Huella / biometría';b.setAttribute('aria-label','Biometría')}else if(n==='del'){b.innerHTML='<svg class="delIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13z"/><path d="M18 9l-6 6M12 9l6 6"/></svg>';b.onclick=delPin;b.setAttribute('aria-label','Borrar')}else{b.textContent=n;b.onclick=()=>pressPin(n)}k.appendChild(b)})}
-async function pressPin(n){vibe(28);let left=lockRemaining();if(left){$('pinMsg').textContent='Bóveda bloqueada. Espera '+left+' s';$('pinMsg').className='pinSub pinLocked';updateLockCountdown();return;}const len=getPinLen();if(pin.length>=len)return;pin+=n;renderDots();if(pin.length===len)await handlePin()}
-function delPin(){vibe(18);pin=pin.slice(0,-1);renderDots()}
+async function pressPin(n){vibe(28);soundPin();let left=lockRemaining();if(left){$('pinMsg').textContent='Bóveda bloqueada. Espera '+left+' s';$('pinMsg').className='pinSub pinLocked';updateLockCountdown();return;}const len=getPinLen();if(pin.length>=len)return;pin+=n;renderDots();if(pin.length===len)await handlePin()}
+function delPin(){vibe(18);soundPinDel();pin=pin.slice(0,-1);renderDots()}
 async function handlePin(){return window.handlePin?window.handlePin():undefined;}
 async function unlockOk(p){return window.unlockOk?window.unlockOk(p):undefined;}
 async function tryBioRegister(pinKey){
@@ -1140,7 +1169,7 @@ async function tryBioRegister(pinKey){
 async function persist(p=lastKey){if(!p)return;localStorage.setItem(LS_DATA,JSON.stringify(await encryptData(vault,p)))}
 const NAV_ORDER=['vault','fav','home','settings'];
 function show(id,dir){
-  vibe(18);
+  vibe(18);soundNav();
   const current=document.querySelector('.screen.active');
   const next=$(id);
   if(!next||current===next)return;
@@ -1210,7 +1239,7 @@ function confirmRecoverySaved(){
   closeModals();
 }
 
-function registerFailedPin(){vibe([40,30,40]);let m=defaultSecurity(meta());if(!m){$('pinMsg').textContent='PIN incorrecto';pin='';renderDots();return}m.failedAttempts=(m.failedAttempts||0)+1;m.totalFailed=(m.totalFailed||0)+1;m.lastFail=Date.now();let msg='PIN incorrecto';const remaining=m.autoWipe?Math.max(0,10-m.totalFailed):null;if(m.autoWipe&&remaining<=3&&remaining>0)msg='PIN incorrecto. '+(remaining===1?'⚠️ Último intento antes del borrado':'⚠️ Quedan '+remaining+' intentos antes del borrado');if(m.autoWipe&&m.totalFailed>=10){saveMeta(m);localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];$('pinMsg').className='pinSub pinWarn';$('pinMsg').textContent='Demasiados intentos. Bóveda borrada.';pin='';renderDots();setTimeout(()=>lock(),1800);return;}if(m.failedAttempts===4&&!m.autoWipe)msg='PIN incorrecto. Te quedan 2 intentos';if(m.failedAttempts===5&&!m.autoWipe)msg='PIN incorrecto. Te queda 1 intento';if(m.failedAttempts>=6){const levels=[30000,60000,300000,900000];let idx=Math.min(m.lockLevel||0,levels.length-1);let ms=levels[idx];m.lockedUntil=Date.now()+ms;m.lockLevel=Math.min(idx+1,levels.length-1);m.failedAttempts=0;if(!m.autoWipe)msg='Demasiados intentos. Bóveda bloqueada '+Math.ceil(ms/1000)+' s';else msg='Bóveda bloqueada '+Math.ceil(ms/1000)+' s · Quedan '+(Math.max(0,10-m.totalFailed))+' intentos antes del borrado';}
+function registerFailedPin(){vibe([40,30,40]);soundPinErr();let m=defaultSecurity(meta());if(!m){$('pinMsg').textContent='PIN incorrecto';pin='';renderDots();return}m.failedAttempts=(m.failedAttempts||0)+1;m.totalFailed=(m.totalFailed||0)+1;m.lastFail=Date.now();let msg='PIN incorrecto';const remaining=m.autoWipe?Math.max(0,10-m.totalFailed):null;if(m.autoWipe&&remaining<=3&&remaining>0)msg='PIN incorrecto. '+(remaining===1?'⚠️ Último intento antes del borrado':'⚠️ Quedan '+remaining+' intentos antes del borrado');if(m.autoWipe&&m.totalFailed>=10){saveMeta(m);localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];$('pinMsg').className='pinSub pinWarn';$('pinMsg').textContent='Demasiados intentos. Bóveda borrada.';pin='';renderDots();setTimeout(()=>lock(),1800);return;}if(m.failedAttempts===4&&!m.autoWipe)msg='PIN incorrecto. Te quedan 2 intentos';if(m.failedAttempts===5&&!m.autoWipe)msg='PIN incorrecto. Te queda 1 intento';if(m.failedAttempts>=6){const levels=[30000,60000,300000,900000];let idx=Math.min(m.lockLevel||0,levels.length-1);let ms=levels[idx];m.lockedUntil=Date.now()+ms;m.lockLevel=Math.min(idx+1,levels.length-1);m.failedAttempts=0;if(!m.autoWipe)msg='Demasiados intentos. Bóveda bloqueada '+Math.ceil(ms/1000)+' s';else msg='Bóveda bloqueada '+Math.ceil(ms/1000)+' s · Quedan '+(Math.max(0,10-m.totalFailed))+' intentos antes del borrado';}
 saveMeta(m);$('pinMsg').className='pinSub '+(m.lockedUntil>Date.now()?'pinLocked':'pinWarn');$('pinMsg').textContent=msg;pin='';renderDots();updateLockCountdown();}
 function updateLockCountdown(){clearInterval(lockCountdownTimer);let left=lockRemaining();if(!left)return;lockCountdownTimer=setInterval(()=>{let s=lockRemaining();if(!s){clearInterval(lockCountdownTimer);$('pinMsg').className='pinSub';$('pinMsg').textContent='Introduce tu PIN';return}$('pinMsg').textContent='Bóveda bloqueada. Espera '+s+' s';},1000)}
 function getAutoLockMs(){let m=defaultSecurity(meta());return m?Number(m.autoLockMs||0):0}
@@ -1614,10 +1643,10 @@ function isValidEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||'
 function serviceRequiresEmail(){return true}
 function toggleQvPass(){let el=$('qvPass');el.textContent=el.textContent.startsWith('•')?current.pass:'••••••••••••'}
 async function toggleFav(id){let e=vault.find(x=>x.id===id);if(e){e.fav=!e.fav;await persist();closeModals();render();toast('Actualizado')}}
-async function delEntry(id){vibe([40,20,40]);if(await vkConfirm('Eliminar entrada','¿Eliminar esta entrada de la bóveda?')){vault=vault.filter(e=>e.id!==id);await persist();closeModals();render();toast('Entrada eliminada')}}
+async function delEntry(id){vibe([40,20,40]);soundDelete();if(await vkConfirm('Eliminar entrada','¿Eliminar esta entrada de la bóveda?')){vault=vault.filter(e=>e.id!==id);await persist();closeModals();render();toast('Entrada eliminada')}}
 function copyText(t='',btn=null){
   navigator.clipboard?.writeText(t).then(()=>{
-    vibe(35);
+    vibe(35);soundCopy();
     scheduleClipboardClear(t);
     if(btn){
       const orig=btn.textContent;
@@ -1636,7 +1665,7 @@ function openGen(target=false){useGenTarget=target;$('genModal').classList.add('
 function setGenLen(n){$('gLen').value=n;syncRanges(true)}
 function markGeneratorDirty(){syncRanges(false);$('genOut').textContent='Pulsa generar';}
 function generatePass(){
-  vibe(40);
+  vibe(40);soundGen();
   syncRanges();
   let up='ABCDEFGHIJKLMNOPQRSTUVWXYZ',lo='abcdefghijklmnopqrstuvwxyz',nu='0123456789',sy=($('gSymbols')?.value||'!@#$%&*-_+=?/');
   if($('gNoSimilar')?.checked){up=up.replace(/[IO]/g,'');lo=lo.replace(/[lo]/g,'');nu=nu.replace(/[01]/g,'')}
@@ -1967,7 +1996,7 @@ function entrySearchText(e){return [e.service,userFromEntry(e),legacyEmailFromEn
 function clearEntryErrors(){document.querySelectorAll('.fieldErrorNote').forEach(x=>x.remove());['eService','eUser','eEmail','eUrl','ePass'].forEach(id=>$(id)?.classList.remove('fieldError'))}
 document.addEventListener('input',ev=>{if(ev.target&&['eService','eUser','eEmail','eUrl','ePass'].includes(ev.target.id))clearFieldError(ev.target.id)},true);
 function openEntry(e=null){
-  vibe(28);
+  vibe(28);soundOpen();
   // Restaurar borrador si es nueva entrada y existe borrador
   if(!e){
     const draftStr=sessionStorage.getItem('vk_entry_draft');
@@ -2008,7 +2037,7 @@ function openEntry(e=null){
   resetAutoLockTimer();
 }
 async function saveEntry(){
-  vibe([30,20,60]);
+  vibe([30,20,60]);soundSave();
   // Auto-detectar icono desde busqueda si no hay seleccionado
   const _sv=(($('eIconSearch'))?.value||'').trim();
   if(!selectedEntryIcon && _sv){
@@ -2799,7 +2828,7 @@ function rankIcon(ic){
   window.unlockOk=async function(p){
     let m=defaultSecurity(meta());
     if(m){m.failedAttempts=0;m.totalFailed=0;m.lockedUntil=0;m.lockLevel=0;m.lastOk=Date.now();saveMeta(m)}
-    try{vibe([30,20,60])}catch(e){}
+    try{vibe([30,20,60]);soundPinOk()}catch(e){}
     lastKey=p;unlocked=true;pin='';renderDots();hidePrivacyOverlay();show('home');render();syncSettingsUI();resetAutoLockTimer();
     if(localStorage.getItem(REC_PENDING)==='1' || (localStorage.getItem(LS_REC)&&localStorage.getItem(REC_SAVED)!=='1')){
       setTimeout(()=>showRecoveryCode(true),120);
