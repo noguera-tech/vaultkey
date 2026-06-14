@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:">
 <title>VaultKey</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 
 <style>
 /*
@@ -815,6 +815,27 @@ input[type=range]::-moz-range-thumb {
   html, body { background:linear-gradient(180deg,#001B38 0%,#000F24 45%,#00070D 100%); }
   body { background-attachment:fixed; }
 }
+
+/* === PATCH VAULTKEY: arranque limpio sin salto blanco / sin marco del escudo === */
+html, body, .app, .screen, #vkSplash, #onboardingModal .sheet {
+  background-color:#020b18 !important;
+}
+.vkSplashImg, .pinLogo, .heroShield, .onboardHeroImg {
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 0%, #000 70%, rgba(0,0,0,.88) 82%, transparent 100%) !important;
+  mask-image: radial-gradient(ellipse at center, #000 0%, #000 70%, rgba(0,0,0,.88) 82%, transparent 100%) !important;
+  -webkit-mask-size:100% 100%;
+  mask-size:100% 100%;
+  background:transparent !important;
+}
+#vkSplash {
+  background:
+    radial-gradient(circle at 50% 28%, rgba(0,95,210,.24) 0%, rgba(0,38,92,.12) 34%, rgba(0,5,15,0) 64%),
+    linear-gradient(180deg, #00142B 0%, #000C1B 48%, #00060B 100%) !important;
+}
+#vkSplash.vkSplashVisible {
+  display:flex !important;
+}
+
 </style>
 
 
@@ -1032,7 +1053,7 @@ input[type=range]::-moz-range-thumb {
 <div id="toast" style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(10,30,60,.97);color:#f5f9ff;padding:11px 22px;border-radius:12px;font-size:14px;font-weight:600;pointer-events:none;opacity:0;transition:opacity .25s;z-index:9999;max-width:88vw;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.4);border:1px solid rgba(0,210,255,.2)"></div>
 
 <!-- SPLASH SCREEN -->
-<div id="vkSplash">
+<div id="vkSplash" class="vkSplashVisible">
   <div class="vkSplashShield">
     <img src="vaultkey-shield-scene.png?v=221" alt="VaultKey" class="vkSplashImg">
   </div>
@@ -2946,7 +2967,7 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     splash.classList.add('vkSplashVisible');
     splash.style.opacity='1';
     let li=0;
-    const totalMs=2800;
+    const totalMs=1700;
     const stepMs=totalMs/lines.length;
     let pct=0;
     const pctStep=100/lines.length;
@@ -3003,16 +3024,24 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     }
   }
 
-  window.addEventListener('load',()=>{
-    const isNewUser = !localStorage.getItem('vk_meta_v1');
+  function startVaultKeyBoot(){
     const splashSeen = localStorage.getItem(LS_SPLASH);
     localStorage.setItem(LS_SPLASH,'1');
+
+    // Arranca al tener el DOM listo, no esperamos window.load.
+    // Esto evita el salto blanco entre el splash nativo de Android y la app web.
     if(!splashSeen){
       runSplash(bootApp);
     } else {
       bootApp();
     }
-  });
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', startVaultKeyBoot, {once:true});
+  } else {
+    startVaultKeyBoot();
+  }
 
   // visibilitychange gestionado por handleVisibilityChange arriba
 })();
