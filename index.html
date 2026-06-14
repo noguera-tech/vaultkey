@@ -1180,6 +1180,7 @@ function closeModals(){
   editId=null;useGenTarget=false;selectedEntryIcon='';
 }
 function confirmRecoverySaved(){
+  vibe([30,20,60]);
   const btn=$('recoveryCloseBtn');
   if(btn)btn.style.display='';
   localStorage.setItem('vk_recovery_saved','1');
@@ -1725,6 +1726,7 @@ async function regenerateRecoveryCode(){
   await showRecoveryCode(true);
 }
 async function tryBio(){
+  vibe(25);
   const LS_BIO_CRED='vk_bio_cred_id';
   const LS_BIO_BLOB='vk_bio_blob';
   const b64e=buf=>btoa(String.fromCharCode(...new Uint8Array(buf)));
@@ -1816,6 +1818,7 @@ function setGeneratorRangeFill(el){
   el.style.setProperty('--fill', Math.max(0,Math.min(100,pct)).toFixed(1)+'%');
 }
 function syncRanges(dirty=false){
+  if(dirty) vibe(12);
   const lenEl=$('gLen'); if(!lenEl)return;
   const len=Math.max(6,Math.min(64,+lenEl.value||12)); lenEl.value=len;
   const keys=['Upper','Lower','Num','Sym'];
@@ -1888,6 +1891,7 @@ function showFieldError(id,msg){
 }
 function manualIconLabel(id){const ic=MANUAL_ICONS.find(x=>x.id===id&&x.id!=='auto');return ic?(ic.label||ic.id):''}
 function selectEntryIcon(id){
+  vibe(18);
   selectedEntryIcon=(id==='auto'||id==='custom')?'':id;
   if(selectedEntryIcon){
     const label=serviceLabel(selectedEntryIcon)||manualIconLabel(selectedEntryIcon);
