@@ -95,13 +95,12 @@ input, textarea, select { cursor:text; }
    APP SHELL
 ═══════════════════════════════════════ */
 .app {
-  position:fixed; /* fixed so it's always full viewport height */
-  left:50%; transform:translateX(-50%); /* centered horizontally */
+  position:relative;
   width:100%; max-width:430px;
-  top:0; bottom:0;
+  height:100dvh;
+  margin:0 auto;
   overflow:hidden;
   background:var(--grad-bg);
-  /* position:absolute children will be relative to .app bounds */
 }
 .app::before {
   content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
@@ -585,14 +584,14 @@ select option { background:#000F24; color:var(--t1); }
 /* ═══════════════════════════════════════
    MODALES
 ═══════════════════════════════════════ */
-.modal { position:fixed; inset:0; z-index:60; background:rgba(0,7,18,.85); backdrop-filter:blur(14px); display:none; align-items:flex-end; justify-content:flex-end; flex-direction:column; }
+.modal { position:absolute; inset:0; z-index:60; background:rgba(0,7,18,.85); backdrop-filter:blur(14px); display:none; align-items:flex-end; }
 .modal.open { display:flex; }
-.sheet { position:relative; width:100%; max-height:92dvh; max-height:min(92dvh,92vh); overflow-y:auto; background:linear-gradient(180deg,#001A34 0%,#000C1E 52%,#000812 100%); border:1px solid rgba(0,217,255,.20); border-radius:24px 24px 0 0; padding:20px 16px 28px; box-shadow:0 -18px 48px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06); }
+.sheet { position:relative; width:100%; max-height:92dvh; overflow-y:auto; background:linear-gradient(180deg,#001A34 0%,#000C1E 52%,#000812 100%); border:1px solid rgba(0,217,255,.20); border-radius:24px 24px 0 0; padding:20px 16px 28px; box-shadow:0 -18px 48px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06); }
 .sheetHead  { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
 .sheetTitle { font-size:18px; font-weight:950; color:var(--t1); text-shadow:0 0 10px rgba(0,217,255,.16); }
 
 /* Nueva entrada fullscreen */
-#entryModal { position:fixed; inset:0; align-items:stretch; background:rgba(0,7,18,.96); backdrop-filter:none; }
+#entryModal { position:absolute; inset:0; align-items:stretch; background:rgba(0,7,18,.96); backdrop-filter:none; }
 #entryModal .sheet { min-height:100dvh; height:auto; max-height:none; border-radius:0; border:0; padding:0 14px calc(32px + env(safe-area-inset-bottom,0px)); background:var(--grad-bg); position:relative; }
 #entryModal .sheet::before { content:""; position:absolute; inset:0; background:var(--grad-glow); pointer-events:none; }
 
@@ -642,7 +641,7 @@ select option { background:#000F24; color:var(--t1); }
 .tiny { font-size:9px; color:var(--t3); max-width:64px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 /* Quick view fullscreen */
-#quickModal { position:fixed; inset:0; align-items:stretch; background:rgba(0,7,18,.96); }
+#quickModal { position:absolute; inset:0; align-items:stretch; background:rgba(0,7,18,.96); }
 #quickModal .sheet { height:100dvh; max-height:none; border-radius:0; border:0; padding:0; background:var(--grad-bg); display:flex; flex-direction:column; }
 #quickBody { flex:1; overflow-y:auto; padding:0 16px 24px; }
 
@@ -738,7 +737,6 @@ input[type=range]::-moz-range-thumb {
 
 
 /* Pulido final — entradas y generador */
-#genModal { position:fixed; inset:0; z-index:200; }
 #genModal .sheetTitle { color:#F4F8FF; font-size:20px; letter-spacing:-.2px; }
 #genModal .sheet { max-height:min(90dvh,90vh); overflow-y:auto; }
 #genModal .iconBtn { background:rgba(0,25,55,.72); border-color:rgba(0,217,255,.18); color:#DFF6FF; }
