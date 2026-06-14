@@ -1117,6 +1117,7 @@ async function tryBioRegister(pinKey){
 async function persist(p=lastKey){if(!p)return;localStorage.setItem(LS_DATA,JSON.stringify(await encryptData(vault,p)))}
 const NAV_ORDER=['vault','fav','home','settings'];
 function show(id,dir){
+  vibe(18);
   const current=document.querySelector('.screen.active');
   const next=$(id);
   if(!next||current===next)return;
@@ -1166,7 +1167,7 @@ function show(id,dir){
     else if(dx>0&&idx>0)show(SWIPEABLE[idx-1],'left');
   },{passive:true});
 })();
-function lock(){unlocked=false;lastKey=null;pin='';clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay()}
+function lock(){vibe(30);unlocked=false;lastKey=null;pin='';clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay()}
 async function wipe(){if(await vkConfirm('Borrar todos los datos','⚠️ Se eliminarán el PIN, todas las contraseñas y el código de recuperación. Esta acción es irreversible. ¿Continuar?')){localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];lock()}}
 function closeModals(){
   document.querySelectorAll('.modal').forEach(m=>{
@@ -1599,6 +1600,7 @@ function openGen(target=false){useGenTarget=target;$('genModal').classList.add('
 function setGenLen(n){$('gLen').value=n;syncRanges(true)}
 function markGeneratorDirty(){syncRanges(false);$('genOut').textContent='Pulsa generar';}
 function generatePass(){
+  vibe(40);
   syncRanges();
   let up='ABCDEFGHIJKLMNOPQRSTUVWXYZ',lo='abcdefghijklmnopqrstuvwxyz',nu='0123456789',sy=($('gSymbols')?.value||'!@#$%&*-_+=?/');
   if($('gNoSimilar')?.checked){up=up.replace(/[IO]/g,'');lo=lo.replace(/[lo]/g,'');nu=nu.replace(/[01]/g,'')}
@@ -1925,6 +1927,7 @@ function entrySearchText(e){return [e.service,userFromEntry(e),legacyEmailFromEn
 function clearEntryErrors(){document.querySelectorAll('.fieldErrorNote').forEach(x=>x.remove());['eService','eUser','eEmail','eUrl','ePass'].forEach(id=>$(id)?.classList.remove('fieldError'))}
 document.addEventListener('input',ev=>{if(ev.target&&['eService','eUser','eEmail','eUrl','ePass'].includes(ev.target.id))clearFieldError(ev.target.id)},true);
 function openEntry(e=null){
+  vibe(28);
   // Restaurar borrador si es nueva entrada y existe borrador
   if(!e){
     const draftStr=sessionStorage.getItem('vk_entry_draft');
@@ -1965,6 +1968,7 @@ function openEntry(e=null){
   resetAutoLockTimer();
 }
 async function saveEntry(){
+  vibe([30,20,60]);
   // Auto-detectar icono desde busqueda si no hay seleccionado
   const _sv=(($('eIconSearch'))?.value||'').trim();
   if(!selectedEntryIcon && _sv){
