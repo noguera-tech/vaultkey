@@ -531,13 +531,19 @@ select option { background:#000F24; color:var(--t1); }
    FAVORITOS
 ═══════════════════════════════════════ */
 .favGrid { padding:0; }
-.favRow { display:flex; align-items:center; gap:10px; background:var(--card-bg); border:1px solid var(--card-bdr); border-radius:14px; margin-bottom:8px; padding:12px; box-shadow:var(--card-shd); }
-.favRowIco  { width:42px; height:42px; border-radius:12px; overflow:hidden; flex-shrink:0; }
+.favRow { display:flex; align-items:center; gap:12px; background:var(--card-bg); border:1px solid var(--card-bdr); border-radius:16px; margin-bottom:9px; padding:13px 12px; box-shadow:var(--card-shd); cursor:pointer; transition:border-color .15s; }
+.favRow:active { border-color:var(--cyan-a20); }
+.favRowIco  { width:48px; height:48px; border-radius:14px; overflow:hidden; flex-shrink:0; box-shadow:0 0 0 1px rgba(0,190,255,.18); }
+.favRowIco .logo { width:48px; height:48px; border-radius:14px; }
 .favRowInfo { flex:1; min-width:0; }
 .favRowName { font-size:15px; font-weight:800; color:var(--t1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .favRowId   { font-size:12px; color:var(--t3); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.favRowCopy { flex-shrink:0; height:34px; padding:0 12px; border:1px solid var(--border); border-radius:10px; background:rgba(0,91,255,.2); color:var(--cyan); font-size:12px; font-weight:900; }
-.favRowArr  { font-size:18px; color:rgba(0,190,255,.4); padding:0 4px; cursor:pointer; }
+.favRowBtns { display:flex; gap:6px; flex-shrink:0; }
+.favRowBtn  { height:32px; padding:0 10px; border-radius:9px; font-size:11px; font-weight:900; border:1px solid rgba(0,190,255,.22); background:rgba(0,91,255,.18); color:var(--cyan); cursor:pointer; white-space:nowrap; transition:background .12s; }
+.favRowBtn:active { background:rgba(0,91,255,.35); }
+.favRowBtn2 { height:32px; padding:0 10px; border-radius:9px; font-size:11px; font-weight:900; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.06); color:var(--t2); cursor:pointer; white-space:nowrap; transition:background .12s; }
+.favRowBtn2:active { background:rgba(255,255,255,.12); }
+.favRowWeak { font-size:9px; font-weight:900; color:#ff6b6b; background:rgba(255,80,80,.12); border:1px solid rgba(255,80,80,.25); border-radius:5px; padding:1px 5px; margin-left:5px; vertical-align:middle; letter-spacing:.3px; }
 
 /* ═══════════════════════════════════════
    AJUSTES — mismo sistema visual
@@ -2342,7 +2348,9 @@ function renderFav(){
     const identity=entryMainIdentity(e);
     const row=document.createElement('div');
     row.className='favRow';
-    row.innerHTML=`<div class="favRowIco">${vkLogoHTML(ic,'logo')}</div><div class="favRowInfo"><div class="favRowName">${esc(e.service)}${weak?'<span class="fcWeak">DÉBIL</span>':''}</div>${identity?'<div class="favRowId">'+esc(identity)+'</div>':''}</div><button class="favRowCopy" onclick="event.stopPropagation();copyText(${JSON.stringify(e.pass||'')});toast('Contraseña copiada')">Copiar</button><div class="favRowArr" onclick="event.stopPropagation();quick('${e.id}')">›</div>`;
+    row.onclick=()=>quick(e.id);
+    const userVal=e.user||e.email||'';
+    row.innerHTML=`<div class="favRowIco">${vkLogoHTML(ic,'logo')}</div><div class="favRowInfo"><div class="favRowName">${esc(e.service)}${weak?'<span class="favRowWeak">DÉBIL</span>':''}</div>${identity?'<div class="favRowId">'+esc(identity)+'</div>':''}</div><div class="favRowBtns"><button class="favRowBtn2" onclick="event.stopPropagation();vibe(25);soundCopy();copyText(${JSON.stringify(userVal)});toast('Usuario copiado')">👤</button><button class="favRowBtn" onclick="event.stopPropagation();vibe(25);soundCopy();copyText(${JSON.stringify(e.pass||'')});toast('Contraseña copiada')">🔑</button></div>`;
     grid.appendChild(row);
   });
 }
