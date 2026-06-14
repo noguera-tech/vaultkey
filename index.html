@@ -1096,16 +1096,36 @@ function playTone({freq=440,freq2=null,type='sine',vol=0.18,attack=0.01,decay=0.
 }
 
 // Sonidos específicos por acción
-function soundPin()    { playTone({freq:600,type:'sine',vol:0.12,decay:0.06}); }
-function soundPinDel() { playTone({freq:380,type:'sine',vol:0.10,decay:0.05}); }
-function soundPinOk()  { playTone({freq:520,decay:0.08});setTimeout(()=>playTone({freq:780,decay:0.12}),90); }
-function soundPinErr() { playTone({freq:220,freq2:180,type:'sawtooth',vol:0.15,decay:0.18}); }
-function soundCopy()   { playTone({freq:660,freq2:880,vol:0.14,decay:0.10}); }
-function soundSave()   { playTone({freq:480,decay:0.07});setTimeout(()=>playTone({freq:640,decay:0.10}),80);setTimeout(()=>playTone({freq:820,decay:0.14}),160); }
-function soundDelete() { playTone({freq:280,freq2:220,type:'sawtooth',vol:0.14,decay:0.20}); }
-function soundNav()    { playTone({freq:520,vol:0.08,decay:0.05}); }
-function soundGen()    { playTone({freq:440,freq2:660,vol:0.14,decay:0.15}); }
-function soundOpen()   { playTone({freq:400,freq2:500,vol:0.10,decay:0.08}); }
+function soundPin()    { playTone({freq:480,type:'sine',vol:0.10,attack:0.005,decay:0.07}); }
+function soundPinDel() { playTone({freq:320,type:'sine',vol:0.08,attack:0.005,decay:0.06}); }
+function soundPinOk()  { 
+  playTone({freq:520,type:'sine',vol:0.12,decay:0.08});
+  setTimeout(()=>playTone({freq:660,type:'sine',vol:0.12,decay:0.10}),90);
+  setTimeout(()=>playTone({freq:880,type:'sine',vol:0.10,decay:0.14}),180);
+}
+function soundPinErr() { 
+  playTone({freq:300,type:'sine',vol:0.12,decay:0.10});
+  setTimeout(()=>playTone({freq:260,type:'sine',vol:0.10,decay:0.14}),120);
+}
+function soundCopy()   { 
+  playTone({freq:600,type:'sine',vol:0.10,decay:0.07});
+  setTimeout(()=>playTone({freq:800,type:'sine',vol:0.09,decay:0.09}),80);
+}
+function soundSave()   { 
+  playTone({freq:440,type:'sine',vol:0.10,decay:0.07});
+  setTimeout(()=>playTone({freq:560,type:'sine',vol:0.10,decay:0.09}),80);
+  setTimeout(()=>playTone({freq:720,type:'sine',vol:0.09,decay:0.12}),160);
+}
+function soundDelete() { 
+  playTone({freq:340,type:'sine',vol:0.10,decay:0.08});
+  setTimeout(()=>playTone({freq:280,type:'sine',vol:0.09,decay:0.12}),100);
+}
+function soundNav()    { playTone({freq:500,type:'sine',vol:0.07,attack:0.005,decay:0.05}); }
+function soundGen()    { 
+  playTone({freq:400,type:'sine',vol:0.09,decay:0.07});
+  setTimeout(()=>playTone({freq:600,type:'sine',vol:0.09,decay:0.10}),90);
+}
+function soundOpen()   { playTone({freq:420,freq2:520,type:'sine',vol:0.08,decay:0.09}); }
 // ────────────────────────────────────────────────────────────
 function toggleVibration(){
   const on=localStorage.getItem('vk_vibe')!=='0';
