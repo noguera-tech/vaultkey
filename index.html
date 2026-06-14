@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#020b18">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:">
 <title>VaultKey</title>
@@ -65,7 +65,7 @@
   --key-shd: inset 0 0 12px rgba(0,90,180,.18), 0 0 10px rgba(0,120,255,.10);
 
   /* Nav */
-  --nav-h: calc(116px + env(safe-area-inset-bottom, 0px));
+  --nav-h: calc(84px + env(safe-area-inset-bottom, 0px));
 
   /* Legado JS */
   --panel: var(--bg-mid);
@@ -85,6 +85,7 @@
 ═══════════════════════════════════════ */
 *, *::before, *::after { box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0; }
 html, body { width:100%; height:100%; overflow:hidden; background:var(--grad-bg); color:var(--t1);
+  position:relative;
   font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif; font-size:15px; -webkit-font-smoothing:antialiased; }
 button, input, textarea, select { font:inherit; cursor:pointer; }
 input, textarea, select { cursor:text; }
@@ -428,28 +429,28 @@ select option { background:#000F24; color:var(--t1); }
 ═══════════════════════════════════════ */
 .vkNav {
   position:absolute; left:0; right:0; bottom:0;
-  height:calc(116px + env(safe-area-inset-bottom,0px));
-  padding:10px 4px calc(30px + env(safe-area-inset-bottom,0px));
-  display:flex; align-items:flex-start; justify-content:space-around; overflow:visible;
+  height:calc(84px + env(safe-area-inset-bottom,0px));
+  padding:7px 4px calc(8px + env(safe-area-inset-bottom,0px));
+  display:flex; align-items:center; justify-content:space-around; overflow:visible;
   background:rgba(0,11,28,.96); border-top:1px solid rgba(0,150,200,.18);
   backdrop-filter:blur(24px); z-index:20;
   box-shadow:0 -4px 24px rgba(0,0,0,.7);
 }
 .vkNav button {
-  flex:1; min-width:0; height:72px; border:0; background:transparent;
-  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
-  gap:5px; padding:0 2px; font-size:10.5px; line-height:1; font-weight:800; letter-spacing:.1px;
+  flex:1; min-width:0; height:64px; border:0; background:transparent;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px; padding:0 2px; font-size:10px; line-height:1; font-weight:800; letter-spacing:.1px;
   color:rgba(255,255,255,.52); transition:color .15s; overflow:visible;
 }
 .vkNav button.active { color:var(--cyan); }
 .vkNav .ico { width:40px; height:40px; border-radius:13px; display:grid; place-items:center; border:1.5px solid transparent; transition:all .15s; flex-shrink:0; }
-.vkNav button:nth-child(3) { transform:translateY(-15px); }
+.vkNav button:nth-child(3) { transform:translateY(-10px); }
 .vkNav button:nth-child(3)::after { content:''; display:none; }
 .vkNav button:nth-child(3) .ico {
-  width:64px; height:64px; border-radius:50%;
+  width:58px; height:58px; border-radius:50%;
   background:linear-gradient(135deg,#005BFF,#128CFF);
   border:1px solid rgba(0,217,255,.35);
-  box-shadow:0 0 0 6px rgba(0,123,255,.18), 0 8px 24px rgba(0,123,255,.5);
+  box-shadow:0 0 0 4px rgba(0,123,255,.18), 0 6px 18px rgba(0,123,255,.5);
 }
 .vkNav button:nth-child(3) .ico svg { width:32px!important; height:32px!important; stroke:#fff!important; }
 
@@ -584,9 +585,9 @@ select option { background:#000F24; color:var(--t1); }
 /* ═══════════════════════════════════════
    MODALES
 ═══════════════════════════════════════ */
-.modal { position:absolute; inset:0; z-index:60; background:rgba(0,7,18,.85); backdrop-filter:blur(14px); display:none; align-items:flex-end; }
+.modal { position:absolute; inset:0 0 var(--nav-h) 0; z-index:60; background:rgba(0,7,18,.85); backdrop-filter:blur(14px); display:none; align-items:flex-end; }
 .modal.open { display:flex; }
-.sheet { position:relative; width:100%; max-height:92dvh; overflow-y:auto; background:linear-gradient(180deg,#001A34 0%,#000C1E 52%,#000812 100%); border:1px solid rgba(0,217,255,.20); border-radius:24px 24px 0 0; padding:20px 16px 28px; box-shadow:0 -18px 48px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06); }
+.sheet { position:relative; width:100%; max-height:calc(92dvh - var(--nav-h)); overflow-y:auto; background:linear-gradient(180deg,#001A34 0%,#000C1E 52%,#000812 100%); border:1px solid rgba(0,217,255,.20); border-radius:24px 24px 0 0; padding:20px 16px 28px; box-shadow:0 -18px 48px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06); }
 .sheetHead  { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
 .sheetTitle { font-size:18px; font-weight:950; color:var(--t1); text-shadow:0 0 10px rgba(0,217,255,.16); }
 
@@ -737,8 +738,14 @@ input[type=range]::-moz-range-thumb {
 
 
 /* Pulido final — entradas y generador */
+#genModal { align-items:stretch; }
 #genModal .sheetTitle { color:#F4F8FF; font-size:20px; letter-spacing:-.2px; }
-#genModal .sheet { max-height:min(90dvh,90vh); overflow-y:auto; }
+#genModal .sheet {
+  width:100%; height:100dvh; max-height:100dvh;
+  border-radius:0; border:0;
+  padding:18px 16px calc(24px + env(safe-area-inset-bottom,0px));
+  overflow-y:auto;
+}
 #genModal .iconBtn { background:rgba(0,25,55,.72); border-color:rgba(0,217,255,.18); color:#DFF6FF; }
 #genModal .checkrow { color:#E7F3FF; font-weight:500; }
 #genModal .checkrow input { width:20px; height:20px; accent-color:var(--blue); filter:drop-shadow(0 0 7px rgba(0,123,255,.45)); }
