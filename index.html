@@ -1663,8 +1663,10 @@ function vkInitials(label,id){
 function vkFontSize(text){const l=String(text||'').length;return l>=4?13:l===3?16:l===2?20:24;}
 function vkIsShield(v){return!v||!v.svg||String(v.bg||'').toLowerCase()==='#061a33';}
 let vkIconMap=null;
+const VK_ICON_VER='v4b';
 function vkBuildIconMap(){
-  if(vkIconMap)return;
+  if(vkIconMap&&window._vkIconVer===VK_ICON_VER)return;
+  window._vkIconVer=VK_ICON_VER;
   vkIconMap={};
   // IDs que deben usar iniciales propias (no el icono genérico de banco de VK128)
   const FORCE_INITIALS=new Set(['bank','bank_es','bbva','santander','caixa','ing','revolut','wise','n26','banesco','mercantil','bancovenezuela','zelle','sabadell','bankinter','unicaja','kutxabank','abanca','monzo','starling','bunq','stripe','klarna','transferwise','cashapp','venmo','game','stream','shopping','apple','appletv']);
