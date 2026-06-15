@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VaultKey — Test de Iconos</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #060d1a; color: #e0f0ff; font-family: Arial, sans-serif; padding: 16px; }
+h1 { color: #00e5ff; font-size: 18px; margin-bottom: 4px; }
+p { color: #4a7090; font-size: 12px; margin-bottom: 16px; }
+.stats { background: #0a1628; border: 1px solid #1a3a5c; border-radius: 10px; padding: 12px; margin-bottom: 16px; font-size: 13px; }
+.stats span { color: #00e5ff; font-weight: bold; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
+.ic { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ic .box { width: 48px; height: 48px; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.ic .box svg { width: 100%; height: 100%; display: block; }
+.ic .lbl { font-size: 9px; color: #4a7090; text-align: center; max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ic.shield .box { border: 2px solid #ff4444; }
+.ic.initials .box { border: 2px solid #f59e0b; }
+.ic.brand .box { border: 2px solid #22c55e; }
+.legend { display: flex; gap: 12px; margin-bottom: 12px; font-size: 11px; }
+.legend span { display: flex; align-items: center; gap: 4px; }
+.dot { width: 10px; height: 10px; border-radius: 2px; }
+input { width: 100%; padding: 10px; background: #0a1628; border: 1px solid #1a3a5c; border-radius: 8px; color: #e0f0ff; font-size: 14px; margin-bottom: 12px; outline: none; }
+input:focus { border-color: #00e5ff; }
+</style>
+</head>
+<body>
+<h1>⚡ VaultKey — Test de Iconos</h1>
+<p>Verde = icono de marca | Amarillo = iniciales | Rojo = escudo genérico (falla)</p>
+<div class="stats" id="stats">Cargando...</div>
+<div class="legend">
+  <span><div class="dot" style="background:#22c55e"></div> Marca (brand SVG)</span>
+  <span><div class="dot" style="background:#f59e0b"></div> Iniciales (fallback)</span>
+  <span><div class="dot" style="background:#ff4444"></div> Escudo (error)</span>
+</div>
+<input type="text" id="search" placeholder="Buscar icono..." oninput="filterIcons(this.value)">
+<div class="grid" id="grid"></div>
+
+<script>
+function safeEsc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function byId(id){return document.getElementById(id);}
+function $(id){return document.getElementById(id);}
+let selectedEntryIcon='auto';
+function selectEntryIcon(id){selectedEntryIcon=id;}
+function vibe(){}
+function esc(s){return safeEsc(s);}
+function normService(s){return String(s||'').toLowerCase().trim();}
+function iconMatches(ic,q){return normService([ic.id,ic.label,ic.emoji||''].join(' ')).includes(q);}
+
+const MANUAL_ICONS=[
+ {id:'auto',label:'Auto',emoji:'✨',bg:'#0a84ff'},
+ {id:'mail',label:'Correo',emoji:'📧',bg:'#EA4335'},
+ {id:'bank',label:'Banco',emoji:'🏦',bg:'#1d4ed8'},
+ {id:'card',label:'Tarjeta',emoji:'💳',bg:'#0f766e'},
+ {id:'wifi',label:'Wi‑Fi',emoji:'📶',bg:'#7c3aed'},
+ {id:'cloud',label:'Cloud',emoji:'☁️',bg:'#0284c7'},
+ {id:'shopping',label:'Compras',emoji:'🛒',bg:'#16a34a'},
+ {id:'social',label:'Social',emoji:'💬',bg:'#db2777'},
+ {id:'work',label:'Trabajo',emoji:'💼',bg:'#475569'},
+ {id:'game',label:'Gaming',emoji:'🎮',bg:'#9333ea'},
+ {id:'stream',label:'Streaming',emoji:'▶️',bg:'#dc2626'},
+ {id:'note',label:'Nota',emoji:'📝',bg:'#ca8a04'},
+ {id:'key',label:'Clave',emoji:'🔑',bg:'#0891b2'},
+ {id:'safe',label:'Bóveda',emoji:'🛡️',bg:'#0a84ff'},
+ {id:'google',label:'Google',emoji:'G',bg:'#4285F4'},
+ {id:'facebook',label:'Facebook',emoji:'f',bg:'#1877F2'},
+ {id:'instagram',label:'Instagram',emoji:'📸',bg:'#C13584'},
+ {id:'whatsapp',label:'WhatsApp',emoji:'☎️',bg:'#25D366'},
+ {id:'telegram',label:'Telegram',emoji:'✈️',bg:'#229ED9'},
+ {id:'youtube',label:'YouTube',emoji:'▶️',bg:'#FF0000'},
+ {id:'netflix',label:'Netflix',emoji:'N',bg:'#E50914'},
+ {id:'spotify',label:'Spotify',emoji:'🎵',bg:'#1DB954'},
+ {id:'paypal',label:'PayPal',emoji:'P',bg:'#003087'},
+ {id:'amazon',label:'Amazon',emoji:'a',bg:'#FF9900'},
+ {id:'github',label:'GitHub',emoji:'🐙',bg:'#24292F'},
+ {id:'discord',label:'Discord',emoji:'🎧',bg:'#5865F2'},
+ {id:'reddit',label:'Reddit',emoji:'👽',bg:'#FF4500'},
+ {id:'x',label:'X / Twitter',emoji:'𝕏',bg:'#000'},
+ {id:'linkedin',label:'LinkedIn',emoji:'in',bg:'#0A66C2'},
+ {id:'binance',label:'Binance',emoji:'₿',bg:'#F3BA2F'},
+ {id:'crypto',label:'Crypto',emoji:'₿',bg:'#f59e0b'},
+ {id:'wallet',label:'Wallet',emoji:'👛',bg:'#7c3aed'},
+ {id:'mercadolibre',label:'MercadoLibre',emoji:'📦',bg:'#FFE600'},
+ {id:'aliexpress',label:'AliExpress',emoji:'🛍️',bg:'#E62E04'},
+ {id:'apple',label:'Apple',emoji:'',bg:'#111827'},
+ {id:'microsoft',label:'Microsoft',emoji:'⊞',bg:'#00A4EF'},
+ {id:'drive',label:'Drive',emoji:'📁',bg:'#0F9D58'},
+ {id:'dropbox',label:'Dropbox',emoji:'📦',bg:'#0061FF'},
+ {id:'school',label:'Estudio',emoji:'🎓',bg:'#2563eb'},
+ {id:'health',label:'Salud',emoji:'🏥',bg:'#dc2626'},
+ {id:'home',label:'Casa',emoji:'🏠',bg:'#16a34a'},
+ {id:'car',label:'Coche',emoji:'🚗',bg:'#334155'},
+ {id:'travel',label:'Viajes',emoji:'✈️',bg:'#0284c7'},
+ {id:'music',label:'Música',emoji:'🎧',bg:'#9333ea'},
+ {id:'photo',label:'Fotos',emoji:'🖼️',bg:'#db2777'}
+];
+
+MANUAL_ICONS.push(
+
+ {id:'gmail',label:'Gmail',emoji:'M',bg:'#EA4335'}, {id:'outlook',label:'Outlook',emoji:'O',bg:'#0078D4'}, {id:'hotmail',label:'Hotmail',emoji:'O',bg:'#0078D4'}, {id:'wallapop',label:'Wallapop',emoji:'W',bg:'#13C1AC'},
+ {id:'yahoo_mail',label:'Yahoo Mail',emoji:'Y!',bg:'#6001D2'}, {id:'x_twitter',label:'X / Twitter',emoji:'𝕏',bg:'#000'}, {id:'googlephotos',label:'Google Photos',emoji:'✹',bg:'#4285F4'}, {id:'googledrive2',label:'Google Drive',emoji:'▶',bg:'#0F9D58'},
+ {id:'chrome',label:'Chrome',emoji:'🌐',bg:'#4285F4'}, {id:'safari',label:'Safari',emoji:'🧭',bg:'#0A84FF'}, {id:'firefox',label:'Firefox',emoji:'🦊',bg:'#FF7139'}, {id:'edge',label:'Edge',emoji:'🌊',bg:'#0078D7'},
+ {id:'opera',label:'Opera',emoji:'O',bg:'#FF1B2D'}, {id:'proton',label:'Proton',emoji:'✉️',bg:'#6D4AFF'}, {id:'icloud',label:'iCloud',emoji:'☁️',bg:'#0A84FF'}, {id:'yahoo',label:'Yahoo',emoji:'Y!',bg:'#6001D2'},
+ {id:'bank_es',label:'Banco España',emoji:'🏦',bg:'#0f3b70'}, {id:'bbva',label:'BBVA',emoji:'B',bg:'#004481'}, {id:'santander',label:'Santander',emoji:'S',bg:'#EC0000'}, {id:'caixa',label:'CaixaBank',emoji:'★',bg:'#0066A1'},
+ {id:'ing',label:'ING',emoji:'ING',bg:'#FF6200'}, {id:'revolut',label:'Revolut',emoji:'R',bg:'#191C1F'}, {id:'wise',label:'Wise',emoji:'W',bg:'#9FE870'}, {id:'n26',label:'N26',emoji:'N26',bg:'#48AC98'},
+ {id:'banesco',label:'Banesco',emoji:'B',bg:'#00853E'}, {id:'mercantil',label:'Mercantil',emoji:'M',bg:'#005BAC'}, {id:'bancovenezuela',label:'Banco Venezuela',emoji:'BV',bg:'#B91C1C'}, {id:'zelle',label:'Zelle',emoji:'Z',bg:'#6D1ED4'},
+ {id:'coinbase',label:'Coinbase',emoji:'C',bg:'#0052FF'}, {id:'kraken',label:'Kraken',emoji:'K',bg:'#5841D8'}, {id:'metamask',label:'MetaMask',emoji:'🦊',bg:'#F6851B'}, {id:'trustwallet',label:'Trust Wallet',emoji:'🛡️',bg:'#3375BB'},
+ {id:'chatgpt',label:'ChatGPT',emoji:'◎',bg:'#10A37F'}, {id:'openai',label:'OpenAI',emoji:'AI',bg:'#111827'}, {id:'claude',label:'Claude',emoji:'C',bg:'#D97757'}, {id:'gemini',label:'Gemini',emoji:'✦',bg:'#4285F4'},
+ {id:'datadog',label:'Datadog',emoji:'DD',bg:'#632CA6'}, {id:'github2',label:'GitHub 2',emoji:'GH',bg:'#24292F'}, {id:'gitlab',label:'GitLab',emoji:'🦊',bg:'#FC6D26'}, {id:'bitbucket',label:'Bitbucket',emoji:'B',bg:'#0052CC'},
+ {id:'netlify',label:'Netlify',emoji:'N',bg:'#00C7B7'}, {id:'vercel',label:'Vercel',emoji:'▲',bg:'#000000'}, {id:'wordpress',label:'WordPress',emoji:'W',bg:'#21759B'}, {id:'shopify',label:'Shopify',emoji:'S',bg:'#7AB55C'},
+ {id:'canva',label:'Canva',emoji:'C',bg:'#00C4CC'}, {id:'figma',label:'Figma',emoji:'F',bg:'#A259FF'}, {id:'adobe',label:'Adobe',emoji:'A',bg:'#FF0000'}, {id:'notion',label:'Notion',emoji:'N',bg:'#111827'},
+ {id:'trello',label:'Trello',emoji:'T',bg:'#0079BF'}, {id:'slack',label:'Slack',emoji:'#',bg:'#4A154B'}, {id:'zoom',label:'Zoom',emoji:'Z',bg:'#2D8CFF'}, {id:'meet',label:'Google Meet',emoji:'🎥',bg:'#00897B'},
+ {id:'uber',label:'Uber',emoji:'U',bg:'#000000'}, {id:'airbnb',label:'Airbnb',emoji:'A',bg:'#FF5A5F'}, {id:'booking',label:'Booking',emoji:'B',bg:'#003B95'}, {id:'ryanair',label:'Ryanair',emoji:'✈️',bg:'#073590'},
+ {id:'shein',label:'Shein',emoji:'S',bg:'#111827'}, {id:'temu',label:'Temu',emoji:'T',bg:'#F97316'}, {id:'ebay',label:'eBay',emoji:'e',bg:'#86B817'}, {id:'etsy',label:'Etsy',emoji:'E',bg:'#F1641E'},
+ {id:'playstation',label:'PlayStation',emoji:'PS',bg:'#003791'}, {id:'xbox',label:'Xbox',emoji:'X',bg:'#107C10'}, {id:'epic',label:'Epic Games',emoji:'E',bg:'#313131'}, {id:'riot',label:'Riot',emoji:'R',bg:'#D13639'},
+ {id:'disney',label:'Disney+',emoji:'D+',bg:'#113CCF'}, {id:'primevideo',label:'Prime Video',emoji:'PV',bg:'#00A8E1'}, {id:'hbo',label:'HBO Max',emoji:'HBO',bg:'#5A31F4'}, {id:'tiktok2',label:'TikTok 2',emoji:'♪',bg:'#010101'},
+ {id:'phone',label:'Teléfono',emoji:'📱',bg:'#0ea5e9'}, {id:'pin',label:'PIN',emoji:'•••',bg:'#334155'}, {id:'license',label:'Licencia',emoji:'📄',bg:'#475569'}, {id:'server',label:'Servidor',emoji:'🖥️',bg:'#2563eb'},
+ {id:'database',label:'Base de datos',emoji:'🗄️',bg:'#0f766e'}, {id:'router',label:'Router',emoji:'📡',bg:'#7c3aed'}, {id:'camera',label:'Cámara',emoji:'📷',bg:'#db2777'}, {id:'alarm',label:'Alarma',emoji:'🚨',bg:'#dc2626'},
+ {id:'insurance',label:'Seguro',emoji:'🛡️',bg:'#0a84ff'}, {id:'tax',label:'Impuestos',emoji:'🧾',bg:'#ca8a04'}, {id:'medical',label:'Médico',emoji:'⚕️',bg:'#dc2626'}, {id:'family',label:'Familia',emoji:'👨‍👩‍👧',bg:'#16a34a'},
+ // ── Redes sociales ──
+ {id:'pinterest',label:'Pinterest',emoji:'P',bg:'#E60023'},
+ {id:'snapchat',label:'Snapchat',emoji:'👻',bg:'#FFFC00'},
+ {id:'threads',label:'Threads',emoji:'@',bg:'#000000'},
+ {id:'bluesky',label:'Bluesky',emoji:'🦋',bg:'#0085FF'},
+ {id:'mastodon',label:'Mastodon',emoji:'🐘',bg:'#6364FF'},
+ {id:'bereal',label:'BeReal',emoji:'BR',bg:'#000000'},
+ {id:'tumblr',label:'Tumblr',emoji:'t',bg:'#35465C'},
+ {id:'vimeo',label:'Vimeo',emoji:'V',bg:'#1AB7EA'},
+ {id:'flickr',label:'Flickr',emoji:'f',bg:'#FF0084'},
+ {id:'quora',label:'Quora',emoji:'Q',bg:'#B92B27'},
+ {id:'medium',label:'Medium',emoji:'M',bg:'#000000'},
+ {id:'devto',label:'Dev.to',emoji:'DEV',bg:'#0A0A0A'},
+ // ── Bancos España / Europa ──
+ {id:'sabadell',label:'Sabadell',emoji:'S',bg:'#007ABF'},
+ {id:'bankinter',label:'Bankinter',emoji:'bk',bg:'#FF6600'},
+ {id:'unicaja',label:'Unicaja',emoji:'U',bg:'#004A99'},
+ {id:'kutxabank',label:'Kutxabank',emoji:'K',bg:'#E30613'},
+ {id:'abanca',label:'Abanca',emoji:'A',bg:'#009B3A'},
+ {id:'monzo',label:'Monzo',emoji:'M',bg:'#FF4F64'},
+ {id:'starling',label:'Starling',emoji:'S',bg:'#6935D3'},
+ {id:'bunq',label:'Bunq',emoji:'b',bg:'#00A0DF'},
+ {id:'bizum',label:'Bizum',emoji:'Bz',bg:'#0073CE'},
+ {id:'stripe',label:'Stripe',emoji:'S',bg:'#635BFF'},
+ {id:'klarna',label:'Klarna',emoji:'K',bg:'#FFB3C7'},
+ {id:'transferwise',label:'TransferWise',emoji:'TW',bg:'#9FE870'},
+ {id:'cashapp',label:'Cash App',emoji:'$',bg:'#00D632'},
+ {id:'venmo',label:'Venmo',emoji:'V',bg:'#008CFF'},
+ // ── Crypto ampliado ──
+ {id:'ethereum',label:'Ethereum',emoji:'Ξ',bg:'#627EEA'},
+ {id:'ledger',label:'Ledger',emoji:'L',bg:'#000000'},
+ {id:'phantom',label:'Phantom',emoji:'👻',bg:'#AB9FF2'},
+ {id:'kucoin',label:'KuCoin',emoji:'KCS',bg:'#23AF91'},
+ {id:'bybit',label:'Bybit',emoji:'B',bg:'#F7A600'},
+ {id:'okx',label:'OKX',emoji:'OKX',bg:'#000000'},
+ // ── Streaming / Entretenimiento ──
+ {id:'appletv',label:'Apple TV+',emoji:'🍎',bg:'#000000'},
+ {id:'crunchyroll',label:'Crunchyroll',emoji:'CR',bg:'#F47521'},
+ {id:'plex',label:'Plex',emoji:'▶',bg:'#E5A00D'},
+ {id:'dazn',label:'DAZN',emoji:'D',bg:'#F8FF00'},
+ {id:'mubi',label:'MUBI',emoji:'M',bg:'#2C2C2C'},
+ {id:'movistar',label:'Movistar+',emoji:'M+',bg:'#019DF4'},
+ {id:'atresplayer',label:'Atresplayer',emoji:'A3',bg:'#E30613'},
+ {id:'rtve',label:'RTVE Play',emoji:'RTVE',bg:'#0056A2'},
+ {id:'filmin',label:'Filmin',emoji:'f',bg:'#FF6B35'},
+ {id:'rakuten',label:'Rakuten TV',emoji:'R',bg:'#BF0000'},
+ {id:'skyshowtime',label:'SkyShowtime',emoji:'Sky',bg:'#003DA5'},
+ // ── Gaming ampliado ──
+ {id:'steam',label:'Steam',emoji:'S',bg:'#1B2838'},
+   {id:'nintendo',label:'Nintendo',emoji:'N',bg:'#E4000F'},
+ {id:'gog',label:'GOG',emoji:'GOG',bg:'#5C2D91'},
+ {id:'battlenet',label:'Battle.net',emoji:'B',bg:'#009AE4'},
+ {id:'ea',label:'EA',emoji:'EA',bg:'#FF6600'},
+ {id:'ubisoft',label:'Ubisoft',emoji:'U',bg:'#0070D1'},
+ {id:'roblox',label:'Roblox',emoji:'R',bg:'#E53935'},
+ {id:'minecraft',label:'Minecraft',emoji:'⛏',bg:'#4CAF50'},
+ // ── Tecnología / Dev ──
+ {id:'jira',label:'Jira',emoji:'J',bg:'#0052CC'},
+ {id:'confluence',label:'Confluence',emoji:'C',bg:'#0052CC'},
+ {id:'linear',label:'Linear',emoji:'L',bg:'#5E6AD2'},
+ {id:'asana',label:'Asana',emoji:'A',bg:'#FC636B'},
+ {id:'monday',label:'Monday',emoji:'M',bg:'#FF3D57'},
+ {id:'clickup',label:'ClickUp',emoji:'C',bg:'#7B68EE'},
+ {id:'salesforce',label:'Salesforce',emoji:'SF',bg:'#00A1E0'},
+ {id:'hubspot',label:'HubSpot',emoji:'HS',bg:'#FF7A59'},
+ {id:'airtable',label:'Airtable',emoji:'AT',bg:'#2D7FF9'},
+ {id:'miro',label:'Miro',emoji:'M',bg:'#FFD02F'},
+ {id:'loom',label:'Loom',emoji:'L',bg:'#625DF5'},
+ {id:'intercom',label:'Intercom',emoji:'i',bg:'#1F8DED'},
+ {id:'aws',label:'AWS',emoji:'AWS',bg:'#FF9900'},
+ {id:'azure',label:'Azure',emoji:'Az',bg:'#0078D4'},
+ {id:'gcloud',label:'Google Cloud',emoji:'GC',bg:'#4285F4'},
+ {id:'docker',label:'Docker',emoji:'🐳',bg:'#2496ED'},
+ {id:'heroku',label:'Heroku',emoji:'H',bg:'#430098'},
+ {id:'railway',label:'Railway',emoji:'R',bg:'#0B0D0E'},
+ {id:'supabase',label:'Supabase',emoji:'S',bg:'#3ECF8E'},
+ {id:'firebase',label:'Firebase',emoji:'🔥',bg:'#FFCA28'},
+ {id:'mongodb',label:'MongoDB',emoji:'M',bg:'#47A248'},
+ {id:'planetscale',label:'PlanetScale',emoji:'PS',bg:'#000000'},
+ {id:'sentry',label:'Sentry',emoji:'S',bg:'#362D59'},
+ {id:'postman',label:'Postman',emoji:'P',bg:'#FF6C37'},
+ {id:'vscode',label:'VS Code',emoji:'</>',bg:'#007ACC'},
+ // ── Compras / Retail ──
+ {id:'zalando',label:'Zalando',emoji:'Z',bg:'#FF6900'},
+ {id:'zara',label:'Zara',emoji:'Z',bg:'#000000'},
+ {id:'hm',label:'H&M',emoji:'H&M',bg:'#CC0000'},
+ {id:'ikea',label:'IKEA',emoji:'IKEA',bg:'#0058A3'},
+ {id:'elcorteingles',label:'El Corte Inglés',emoji:'ECI',bg:'#006633'},
+ {id:'fnac',label:'Fnac',emoji:'f',bg:'#F0A500'},
+ {id:'mediamarkt',label:'MediaMarkt',emoji:'MM',bg:'#CC0000'},
+ {id:'pccomponentes',label:'PcComponentes',emoji:'PC',bg:'#FF6600'},
+ {id:'lidl',label:'Lidl',emoji:'L',bg:'#0050AA'},
+ {id:'decathlon',label:'Decathlon',emoji:'D',bg:'#0082C8'},
+ {id:'leroy',label:'Leroy Merlin',emoji:'LM',bg:'#78BE20'},
+ {id:'wish',label:'Wish',emoji:'W',bg:'#2FB7EC'},
+ {id:'vinted',label:'Vinted',emoji:'V',bg:'#09B1BA'},
+ {id:'depop',label:'Depop',emoji:'D',bg:'#FF2300'},
+ // ── Utilidades / Genéricos ──
+ {id:'vpn',label:'VPN',emoji:'🔒',bg:'#0f766e'},
+ {id:'ssh',label:'SSH',emoji:'SSH',bg:'#1e293b'},
+ {id:'ftp',label:'FTP',emoji:'FTP',bg:'#334155'},
+ {id:'nas',label:'NAS',emoji:'NAS',bg:'#2563eb'},
+ {id:'token',label:'Token 2FA',emoji:'🔐',bg:'#7c3aed'},
+ {id:'api',label:'API Key',emoji:'API',bg:'#0891b2'},
+ {id:'printer',label:'Impresora',emoji:'🖨️',bg:'#475569'},
+ {id:'smarttv',label:'Smart TV',emoji:'📺',bg:'#1e293b'},
+ {id:'gym',label:'Gimnasio',emoji:'💪',bg:'#dc2626'},
+ {id:'sport',label:'Deporte',emoji:'⚽',bg:'#16a34a'},
+ {id:'pet',label:'Mascota',emoji:'🐾',bg:'#ca8a04'},
+ {id:'bike',label:'Bicicleta',emoji:'🚴',bg:'#16a34a'},
+ {id:'electric',label:'Electricidad',emoji:'⚡',bg:'#f59e0b'},
+ {id:'gas',label:'Gas',emoji:'🔥',bg:'#f97316'},
+ {id:'water',label:'Agua',emoji:'💧',bg:'#0284c7'},
+ {id:'internet',label:'Internet',emoji:'🌐',bg:'#0ea5e9'},
+ {id:'mobile',label:'Móvil/Tarifa',emoji:'📶',bg:'#7c3aed'},
+ {id:'rent',label:'Alquiler',emoji:'🏘️',bg:'#475569'},
+ {id:'mortgage',label:'Hipoteca',emoji:'🏠',bg:'#1d4ed8'},
+ {id:'pension',label:'Pensión',emoji:'👴',bg:'#0f766e'},
+ {id:'kids',label:'Niños',emoji:'👶',bg:'#db2777'},
+ {id:'charity',label:'Donación',emoji:'❤️',bg:'#e11d48'}
+);
+
+
+function vk128SvgText(label,bg,fg='#fff',fs=18){return {bg,svg:`<svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="${bg}"/><text x="24" y="31" font-size="${fs}" font-weight="900" fill="${fg}" text-anchor="middle" font-family="Arial, sans-serif">${label}</text></svg>`}}
+function vk128Match(n,k){k=(k||'').toLowerCase().trim();if(!k)return false;if(k.length<=2)return n===k;return n===k||n.includes(k)}
+function vk128Icon(label,bg,fg='#fff',fs=18){return vk128SvgText(label,bg,fg,fs)}
+function vk128Shield(){return {bg:'#061a33',svg:'<svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true"><defs><linearGradient id="vk128shield" x1="0" x2="1"><stop stop-color="#00d5ff"/><stop offset="1" stop-color="#0a84ff"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="#061a33"/><path d="M24 5.5l16.5 6.2v11.1c0 10.5-7 17.4-16.5 20.7C14.5 40.2 7.5 33.3 7.5 22.8V11.7z" fill="none" stroke="url(#vk128shield)" stroke-width="3"/><path d="M18.7 23.8a5.3 5.3 0 0 1 10.6 0v2h1.6v10.5H17.1V25.8h1.6z" fill="#dff6ff"/><path d="M21.2 25.8v-2a2.8 2.8 0 1 1 5.6 0v2z" fill="#061a33"/></svg>'}}
+const VK128_BRAND_ICONS=[
+ {k:['google'],v:{bg:'#fff',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="24" fill="#fff"/><path fill="#EA4335" d="M24 9.4c3.6 0 6.4 1.4 8.5 3.3l6-6C34.7 3.2 29.7 1 24 1 14.7 1 6.7 6.4 3 14.2l7.3 5.6C12 13.9 17.5 9.4 24 9.4z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.6h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.7c4.3-4 7.2-9.8 7.2-17z"/><path fill="#FBBC05" d="M10.3 28.2A14.7 14.7 0 0 1 9.5 24c0-1.5.3-2.9.8-4.2L3 14.2a23 23 0 0 0 0 19.6z"/><path fill="#34A853" d="M24 47c6.2 0 11.4-2 15.3-5.5l-7.4-5.7c-2 1.3-4.6 2.1-7.9 2.1-6.5 0-12-4.4-13.7-10.3L3 33.8C6.7 41.6 14.7 47 24 47z"/></svg>'}},
+ {k:['gmail','mail','correo'],v:{bg:'#fff',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#fff"/><path fill="#4285F4" d="M6 39h8V23L4 15v22a2 2 0 0 0 2 2z"/><path fill="#34A853" d="M34 39h8a2 2 0 0 0 2-2V15l-10 8z"/><path fill="#FBBC05" d="M34 10L24 18 14 10H6l18 14 18-14z"/><path fill="#EA4335" d="M4 15l10 8V10H7a3 3 0 0 0-3 5z"/><path fill="#C5221F" d="M44 15l-10 8V10h7a3 3 0 0 1 3 5z"/></svg>'}},
+ {k:['facebook','fb'],v:vk128Icon('f','#1877F2','#fff',28)},
+ {k:['instagram','insta'],v:{bg:'#C13584',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><defs><radialGradient id="vk128ig" cx="30%" cy="107%" r="150%"><stop stop-color="#fdf497"/><stop offset=".45" stop-color="#fd5949"/><stop offset=".68" stop-color="#d6249f"/><stop offset="1" stop-color="#285AEB"/></radialGradient></defs><rect width="48" height="48" rx="12" fill="url(#vk128ig)"/><rect x="12" y="12" width="24" height="24" rx="7" fill="none" stroke="#fff" stroke-width="3"/><circle cx="24" cy="24" r="6" fill="none" stroke="#fff" stroke-width="3"/><circle cx="33" cy="15" r="2" fill="#fff"/></svg>'}},
+ {k:['whatsapp','whats app'],v:{bg:'#25D366',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><circle cx="24" cy="24" r="22" fill="#25D366"/><path d="M34 14a13 13 0 0 0-22 13l-2 7 7-2a13 13 0 0 0 17-18zm-10 18a9 9 0 0 1-5-1.5L15 31l1-4a9 9 0 1 1 8 5z" fill="#fff"/><path d="M19 19c1 5 5 8 10 10l2-3-3-2-1.5 1.2c-2.2-1.1-3.7-2.6-4.8-4.8L23 19l-2.8-2z" fill="#25D366"/></svg>'}},
+ {k:['telegram'],v:{bg:'#229ED9',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><circle cx="24" cy="24" r="22" fill="#229ED9"/><path d="M9 23.5l29-11.3c1.4-.5 2.5.4 2.1 2L35.5 37c-.3 1.6-1.4 2-2.8 1.2l-7.7-5.7-3.7 3.6c-.4.4-.8.8-1.6.8l.6-8.3 15.1-13.7c.7-.6-.1-.9-1-.4L15.7 26.3 8 23.9c-1.6-.5-1.6-1.6 1-.4z" fill="#fff"/></svg>'}},
+ {k:['youtube'],v:{bg:'#FF0000',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#FF0000"/><path d="M20 15.5l15 8.5-15 8.5z" fill="#fff"/></svg>'}},
+ {k:['netflix'],v:vk128Icon('N','#141414','#E50914',28)},
+ {k:['amazon'],v:vk128Icon('a','#FF9900','#131921',27)},
+ {k:['paypal'],v:vk128Icon('P','#009CDE','#fff',25)},
+ {k:['tiktok'],v:vk128Icon('♪','#010101','#fff',27)},
+ {k:['spotify'],v:{bg:'#1DB954',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><circle cx="24" cy="24" r="22" fill="#1DB954"/><path d="M14 18c7-2 15-1.6 21.5 2" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M15.5 25c5.8-1.6 12.4-1.3 17.5 1.7" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M17 31.5c4.4-1.2 9.2-1 13 1.2" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/></svg>'}},
+ {k:['discord'],v:vk128Icon('☯','#5865F2','#fff',25)},
+ {k:['reddit'],v:{bg:'#FF4500',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><circle cx="24" cy="24" r="22" fill="#FF4500"/><circle cx="17" cy="25" r="3" fill="#fff"/><circle cx="31" cy="25" r="3" fill="#fff"/><path d="M17 32c4 3 10 3 14 0" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/></svg>'}},
+ {k:['github','github2','git'],v:{bg:'#24292F',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><circle cx="24" cy="24" r="22" fill="#24292F"/><path d="M24 8a16 16 0 0 0-5 31c1 0 1-1 1-1v-4c-6 1-7-2-7-2-1-3-3-3-3-3-2-2 0-2 0-2 3 0 4 2 4 2 2 3 5 2 6 2 0-1 1-2 2-3-5 0-10-2-10-10 0-2 1-4 2-6-1-1-2-4 0-7 0 0 2-1 7 2a21 21 0 0 1 12 0c5-3 7-2 7-2 2 3 1 6 0 7 1 2 2 4 2 6 0 8-5 10-10 10 1 1 2 3 2 5v7s0 1 1 1A16 16 0 0 0 24 8z" fill="#fff"/></svg>'}},
+ {k:['linkedin'],v:vk128Icon('in','#0A66C2','#fff',20)},
+ {k:['dropbox'],v:vk128Icon('◆','#0061FF','#fff',25)},
+ {k:['banco','bank','bbva','santander','caixa','mercantil','banesco','venezuela','revolut','wise','n26','ing','zelle','bancovenezuela'],v:{bg:'#1A3A6B',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#1A3A6B"/><polygon points="5,20 24,8 43,20" fill="#FFD700"/><rect x="9" y="21" width="5" height="15" fill="#FFD700"/><rect x="18" y="21" width="5" height="15" fill="#FFD700"/><rect x="27" y="21" width="5" height="15" fill="#FFD700"/><rect x="36" y="21" width="5" height="15" fill="#FFD700"/><rect x="6" y="37" width="36" height="4" fill="#FFD700"/></svg>'}},
+ {k:['wifi','wi-fi','router'],v:{bg:'#00B4D8',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#00B4D8"/><path d="M8 20c9-9 23-9 32 0M13 27c6-6 16-6 22 0M19 34c3-3 7-3 10 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="39" r="2.5" fill="#fff"/></svg>'}},
+ {k:['cloud','icloud','drive','google drive','respaldo','backup'],v:{bg:'#0A84FF',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#0A84FF"/><path d="M17 34h18a7 7 0 0 0 0-14 11 11 0 0 0-21-2A8 8 0 0 0 17 34z" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'}},
+ {k:['compras','shopping','shop','tienda'],v:{bg:'#16A34A',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#16A34A"/><path d="M15 18h26l-4 13H18z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/><path d="M15 18l-2-6H8" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="20" cy="37" r="2.5" fill="#fff"/><circle cx="35" cy="37" r="2.5" fill="#fff"/></svg>'}},
+ {k:['trabajo','work','empresa','office'],v:vk128Icon('💼','#475569','#fff',22)},
+ {k:['boveda','bóveda','safe','vault','vaultkey'],v:vk128Shield()},
+ {k:['binance','crypto','bitcoin','cripto','coinbase','kraken','metamask','trustwallet','solana','ethereum','wallet'],v:{bg:'#F3BA2F',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#F3BA2F"/><path d="M24 8l4 4-4 4-4-4zM14 18l4 4-4 4-4-4zM34 18l4 4-4 4-4-4zM24 28l4 4-4 4-4-4z" fill="#fff"/><rect x="20" y="20" width="8" height="8" transform="rotate(45 24 24)" fill="#fff"/></svg>'}},
+ {k:['proton','protonmail'],v:{bg:'#6D4AFF',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#6D4AFF"/><path d="M10 12h16a12 12 0 0 1 0 24H10z" fill="#fff" fill-opacity=".9"/><rect x="10" y="24" width="8" height="12" rx="2" fill="#fff"/></svg>'}},
+ {k:['card','tarjeta','visa','mastercard'],v:{bg:'#0f766e',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#0f766e"/><rect x="6" y="14" width="36" height="20" rx="3" fill="none" stroke="#fff" stroke-width="2.5"/><rect x="6" y="21" width="36" height="6" fill="#FFD700" opacity=".7"/><rect x="10" y="27" width="10" height="3" rx="1" fill="#fff"/></svg>'}}
+];
+serviceIcon=function(s){const n=(s||'').toLowerCase().trim();if(!n)return vk128Shield();for(const item of VK128_BRAND_ICONS){if(item.k.some(k=>vk128Match(n,k)))return item.v;}return vk128Shield();}
+function iconFromKey(id){
+  if(!id||id==='auto')return null;
+  const ic=MANUAL_ICONS.find(x=>x.id===id);
+  if(!ic)return null;
+  return {bg:ic.bg||'#0a84ff',label:ic.label||ic.id,id:ic.id};
+}
+function _iconByServiceName(s){
+  if(!s)return null;
+  return null; // superseded by serviceIcon()
+}
+function iconForEntry(e){
+  if(e?.icon&&e.icon!=='auto'){const m=iconFromKey(e.icon);if(m&&m.svg)return m;}
+  const byName=_iconByServiceName(e?.service);
+  if(byName)return byName;
+  return serviceIcon([e?.service,e?.url,e?.type].filter(Boolean).join(' '));
+}
+function vkLogoHTML(ic,cls='logo',sz=null){ic=ic&&ic.svg?ic:vk128Shield();const svg=ic.svg.replace(/<svg ([^>]*?)width="[^"]*"\s*/,'<svg $1').replace(/<svg ([^>]*?)height="[^"]*"\s*/,'<svg $1').replace(/<svg /,'<svg style="width:100%;height:100%;display:block" ');const sizeStyle=sz?`width:${sz}px;height:${sz}px;`:'' ;return `<div class="${cls}" style="background:${ic.bg};padding:0;overflow:hidden;${sizeStyle}">${svg}</div>`}
+let currentIconCat='todos';
+window._setIconCat=function(cat,btn){currentIconCat=cat;document.querySelectorAll('.iconCat').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');const s=$('eIconSearch');if(s)s.value='';if(typeof renderIconPicker==='function')renderIconPicker();};
+function setIconCat(cat,btn){window._setIconCat(cat,btn);}
+document.addEventListener('click',function(e){const btn=e.target.closest('[data-cat]');if(btn&&btn.classList.contains('iconCat')){e.stopPropagation();window._setIconCat(btn.dataset.cat,btn);}});
+
+
+function row(e){let div=document.createElement('div');div.className='entry';div.onclick=()=>quick(e.id);let ic=iconForEntry(e);const weak=score(e.pass)<3;div.innerHTML=`${vkLogoHTML(ic)}<div style="flex:1;min-width:0"><h3 style="display:flex;align-items:center;gap:6px">${esc(e.service)}${e.fav?'<span style="font-size:11px">⭐</span>':''}${weak?'<span style="font-size:9px;background:rgba(255,77,85,.2);color:#ff8c94;border:1px solid rgba(255,77,85,.3);border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.3px">DÉBIL</span>':''}</h3><p style="color:#7a9ec0">${esc(entryMainIdentity(e))}</p></div><div class="go" style="color:rgba(0,210,255,.4);font-size:18px">›</div>`;return div}
+
+function renderFav(){
+  const grid=$('favGrid');
+  const countEl=$('favCount');
+  if(!grid)return;
+  const favs=vault.filter(e=>e.fav);
+  if(countEl)countEl.textContent=favs.length?favs.length+' favorito'+(favs.length===1?'':'s'):'';
+  if(!favs.length){
+    grid.innerHTML='<div class="empty" style="padding:40px 0 20px;text-align:center"><div style="margin:0 auto 14px;filter:drop-shadow(0 0 18px rgba(0,180,255,.5))"><svg viewBox="0 0 80 80" width="80" height="80" fill="none"><polygon points="40,10 48,30 70,32 54,47 58,68 40,57 22,68 26,47 10,32 32,30" stroke="#00d4ff" stroke-width="2.5" stroke-linejoin="round" fill="rgba(0,180,255,.08)"/><polygon points="40,18 46,32 62,34 51,44 54,60 40,52 26,60 29,44 18,34 34,32" fill="rgba(0,210,255,.12)"/></svg></div><b style="color:#e0f0ff;font-size:16px;display:block;margin-bottom:6px">Sin favoritos aún</b><p style="color:#3a6888;margin:0 0 16px;font-size:13px">Marca entradas como favoritas para acceder más rápido</p><button class="primary" onclick="show(\'vault\')" style="width:auto;padding:10px 24px">Ver entradas</button></div>';
+    return;
+  }
+  grid.innerHTML='';
+  favs.forEach(e=>{
+    const ic=iconForEntry(e);
+    const weak=score(e.pass)<3;
+    const identity=entryMainIdentity(e);
+    const row=document.createElement('div');
+    row.className='favRow';
+    row.onclick=()=>quick(e.id);
+    const userVal=e.user||e.email||'';
+    row.innerHTML=`<div class="favRowIco">${vkLogoHTML(ic,'logo',48)}</div><div class="favRowInfo"><div class="favRowName">${esc(e.service)}${weak?'<span class="favRowWeak">DÉBIL</span>':''}</div>${identity?'<div class="favRowId">'+esc(identity)+'</div>':''}</div><div class="favRowBtns"><button class="favRowBtn2" onclick="event.stopPropagation();vibe(25);soundCopy();copyText(${JSON.stringify(userVal)});toast('Usuario copiado')">👤</button><button class="favRowBtn" onclick="event.stopPropagation();vibe(25);soundCopy();copyText(${JSON.stringify(e.pass||'')});toast('Contraseña copiada')">🔑</button></div>`;
+    grid.appendChild(row);
+  });
+}
+function quick(id){let e=vault.find(x=>x.id===id);if(!e)return;e.used=Date.now();persist();current=e;let ic=iconForEntry(e);const u=userFromEntry(e);const em=legacyEmailFromEntry(e);
+
+/* ── Top bar ── */
+let h='<div style="height:58px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 4px">';
+h+='<button class="linkBtn" onclick="closeModals()" style="text-align:left;padding:8px 12px">\u2190 Atr\u00e1s</button>';
+h+='<span style="font-size:16px;font-weight:900;color:#fff">Detalle</span>';
+h+='<button class="linkBtn" onclick="closeModals();openEntry(current)" style="text-align:right;padding:8px 12px;color:var(--cyan);font-weight:900">Editar</button></div>';
+
+/* ── Hero ── */
+h+='<div style="display:flex;flex-direction:column;align-items:center;padding:28px 0 30px;position:relative">';
+h+='<div class="qvHeroGlow"></div>';
+h+='<div style="position:relative;margin-bottom:18px">';
+h+='<div style="width:100px;height:100px;border-radius:28px;overflow:hidden;box-shadow:0 0 0 3px rgba(0,210,255,.22),0 16px 48px rgba(0,0,0,.7),0 0 40px rgba(0,130,255,.15)">'+vkLogoHTML(ic,'logo',100)+'</div>';
+if(e.fav)h+='<div style="position:absolute;bottom:-7px;right:-7px;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#ffd447,#ffb020);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 10px rgba(0,0,0,.5)">\u2b50</div>';
+h+='</div>';
+h+='<div style="font-size:26px;font-weight:950;color:#fff;letter-spacing:-.5px;margin-bottom:8px">'+esc(e.service)+'</div>';
+h+='<div style="font-size:11px;color:#4a7898;font-weight:800;letter-spacing:.8px;text-transform:uppercase;background:rgba(0,150,255,.08);border:1px solid rgba(0,150,255,.15);border-radius:20px;padding:4px 12px">'+esc(e.type||'Cuenta')+'</div>';
+h+='</div>';
+
+/* ── Campo helper ── */
+function qvRow(label,icon,value,actions,last){
+  return '<div class="qvFieldRow'+(last?' qvFieldRowLast':'')+'"><div class="qvFieldIcon">'+icon+'</div><div style="flex:1;min-width:0"><div class="qvFieldLabel">'+label+'</div><div class="qvFieldValue">'+value+'</div></div>'+(actions?'<div style="display:flex;gap:6px;margin-left:8px">'+actions+'</div>':'')+'</div>';
+}
+function qvBtn(label,onclick){
+  return '<button onclick="'+onclick+'" class="qvActionBtn">'+label+'</button>';
+}
+
+/* ── Campos ── */
+h+='<div style="border-radius:20px;overflow:hidden;border:1px solid rgba(0,180,255,.14);margin-bottom:6px;box-shadow:0 4px 24px rgba(0,0,0,.35)">';
+if(u)h+=qvRow('Usuario','\ud83d\udc64',esc(u),qvBtn('Copiar','copyText(userFromEntry(current),this)'));
+if(em)h+=qvRow('Correo','\u2709\ufe0f',esc(em),qvBtn('Copiar','copyText(legacyEmailFromEntry(current),this)'));
+h+=qvRow('Contrase\u00f1a','\ud83d\udd11','<span id="qvPass" style="font-family:ui-monospace,monospace;letter-spacing:.5px">\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022</span>',qvBtn('Ver','toggleQvPass()')+qvBtn('Copiar','copyText(current.pass,this)'));
+if(e.url)h+=qvRow('Sitio web','\ud83c\udf10','<span style="color:#00d4ff;font-size:14px">'+esc(e.url)+'</span>',qvBtn('Abrir','openUrl(current.url)'));
+if(e.note)h+=qvRow('Nota','\ud83d\udcdd','<span style="color:#b0cce8;font-size:14px;line-height:1.4">'+esc(e.note)+'</span>','',true);
+h+='</div>';
+
+/* ── Timestamp ── */
+const updated=e.updated?new Date(e.updated).toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'}):'--';
+h+='<div class="qvTimestamp">Actualizado el '+updated+'</div>';
+
+/* ── Boton editar principal ── */
+h+='<button class="qvBotEdit" onclick="closeModals();openEntry(current)" style="width:100%;margin-bottom:10px">\u270e Editar entrada</button>';
+
+/* ── Acciones secundarias ── */
+h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+h+='<button class="qvBotBtn '+(e.fav?'qvBotFavActive':'qvBotFav')+'" onclick="toggleFav(current.id)">'+(e.fav?'\u2736 Quitar fav':'\u2606 Favorito')+'</button>';
+h+='<button class="qvBotBtn qvBotDel" onclick="delEntry(current.id)">\ud83d\uddd1 Eliminar</button>';
+h+='</div>';
+
+$('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
+
+(function(){
+  function normVK(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();}
+  const extraBrands=[
+    ['outlook,hotmail,live mail,microsoft mail', vk128Icon('O','#0078D4','#fff',25)],
+    ['yahoo,yahoo mail', vk128Icon('Y!','#6001D2','#fff',20)],
+    ['icloud,apple cloud', vk128Icon('☁','#6DB8FF','#fff',25)],
+    ['google drive,drive', vk128Icon('D','#0F9D58','#fff',25)],
+    ['onedrive,one drive', vk128Icon('☁','#0078D4','#fff',25)],
+    ['mega,mega nz', vk128Icon('M','#D9272E','#fff',25)],
+    ['microsoft,office,outlook office', vk128Icon('MS','#F25022','#fff',17)],
+    ['apple,apple id,app store', vk128Icon('','#111827','#fff',25)],
+    ['adobe', vk128Icon('A','#FA0F00','#fff',25)],
+    ['canva', vk128Icon('C','#00C4CC','#fff',25)],
+    ['notion', vk128Icon('N','#ffffff','#111827',25)],
+    ['slack', vk128Icon('S','#4A154B','#fff',25)],
+    ['trello', vk128Icon('T','#0079BF','#fff',25)],
+    ['zoom', vk128Icon('Z','#2D8CFF','#fff',25)],
+    ['chatgpt,openai', vk128Icon('AI','#10A37F','#fff',18)],
+    ['x,twitter,x.com', vk128Icon('X','#000000','#fff',25)],
+    ['snapchat,snap', vk128Icon('S','#FFFC00','#111827',25)],
+    ['pinterest', vk128Icon('P','#E60023','#fff',25)],
+    ['threads', vk128Icon('@','#000000','#fff',25)],
+    ['messenger,facebook messenger', vk128Icon('M','#00B2FF','#fff',25)],
+    ['signal', vk128Icon('S','#3A76F0','#fff',25)],
+    ['twitch', vk128Icon('T','#9146FF','#fff',25)],
+    ['gitlab', vk128Icon('GL','#FC6D26','#fff',16)],
+    ['bitbucket', vk128Icon('BB','#0052CC','#fff',16)],
+    ['steam', vk128Icon('S','#1B2838','#C7D5E0',25)],
+    ['epic games,epic', vk128Icon('EP','#313131','#fff',18)],
+    ['playstation,psn,ps plus', vk128Icon('PS','#003791','#fff',18)],
+    ['xbox', vk128Icon('X','#107C10','#fff',25)],
+    ['nintendo', vk128Icon('N','#E60012','#fff',25)],
+    ['roblox', vk128Icon('R','#111827','#fff',25)],
+    ['minecraft', vk128Icon('MC','#62B541','#fff',17)],
+    ['disney,disney plus,disney+', vk128Icon('D+','#113CCF','#fff',18)],
+    ['hbo,max,hbo max', vk128Icon('MAX','#5822B4','#fff',14)],
+    ['prime video,amazon prime', vk128Icon('PV','#00A8E1','#fff',16)],
+    ['hulu', vk128Icon('H','#1CE783','#111827',25)],
+    ['crunchyroll', vk128Icon('CR','#F47521','#fff',16)],
+    ['revolut', vk128Icon('R','#111827','#fff',25)],
+    ['wise,transferwise', vk128Icon('W','#9FE870','#111827',25)],
+    ['zelle', vk128Icon('Z','#6D1ED4','#fff',25)],
+    ['payoneer', vk128Icon('PY','#FF4800','#fff',17)],
+    ['binance', vk128Icon('BN','#F3BA2F','#111827',17)],
+    ['coinbase', vk128Icon('C','#0052FF','#fff',25)],
+    ['mercado pago,mercadopago', vk128Icon('MP','#00AEEF','#fff',16)],
+    ['mercado libre,mercadolibre', vk128Icon('ML','#FFE600','#2D3277',17)],
+    ['bbva', vk128Icon('BBVA','#004481','#fff',13)],
+    ['santander', vk128Icon('S','#EC0000','#fff',25)],
+    ['banesco', vk128Icon('B','#00843D','#fff',25)],
+    ['chase', vk128Icon('C','#117ACA','#fff',25)],
+    ['bank of america,boa', vk128Icon('BOA','#E31837','#fff',14)],
+    ['wells fargo', vk128Icon('WF','#D71E28','#FFD200',17)],
+    ['aliexpress,ali express', vk128Icon('Ali','#E62E04','#fff',18)],
+    ['shein', vk128Icon('SH','#111827','#fff',18)],
+    ['temu', vk128Icon('T','#FF6A00','#fff',25)],
+    ['ebay', vk128Icon('eB','#E53238','#fff',18)],
+    ['wallapop', vk128Icon('W','#13C1AC','#fff',25)],
+    ['uber', vk128Icon('U','#000000','#fff',25)],
+    ['uber eats,ubereats', vk128Icon('UE','#06C167','#111827',17)],
+    ['glovo', vk128Icon('G','#F2CC38','#111827',25)],
+    ['pedidosya,pedidos ya', vk128Icon('PY','#E31B23','#fff',17)],
+    ['rappi', vk128Icon('R','#FF441F','#fff',25)],
+    ['booking,booking.com', vk128Icon('B','#003B95','#fff',25)],
+    ['airbnb', vk128Icon('A','#FF5A5F','#fff',25)],
+    ['skype', vk128Icon('S','#00AFF0','#fff',25)],
+    ['wordpress', vk128Icon('W','#21759B','#fff',25)],
+    ['wix', vk128Icon('W','#111827','#fff',25)],
+    ['shopify', vk128Icon('S','#7AB55C','#fff',25)]
+  ];
+  const brandSeen=new Set();
+  try{VK128_BRAND_ICONS.forEach(b=>(b.k||[]).forEach(k=>brandSeen.add(normVK(k))));}catch(e){}
+  extraBrands.forEach(([keys,v])=>{
+    const k=keys.split(',').map(x=>x.trim()).filter(Boolean);
+    if(!k.some(x=>brandSeen.has(normVK(x)))){
+      VK128_BRAND_ICONS.push({k,v});
+      k.forEach(x=>brandSeen.add(normVK(x)));
+    }
+  });
+  const manualExtras=[
+    ['outlook','Outlook'],['yahoo','Yahoo'],['icloud','iCloud'],['drive','Google Drive'],['onedrive','OneDrive'],['mega','Mega'],
+    ['microsoft','Microsoft'],['apple','Apple'],['adobe','Adobe'],['canva','Canva'],['notion','Notion'],['slack','Slack'],['trello','Trello'],['zoom','Zoom'],['chatgpt','ChatGPT'],
+    ['x','X / Twitter'],['snapchat','Snapchat'],['pinterest','Pinterest'],['threads','Threads'],['messenger','Messenger'],['signal','Signal'],['twitch','Twitch'],
+    ['gitlab','GitLab'],['bitbucket','Bitbucket'],['steam','Steam'],['epic','Epic Games'],['playstation','PlayStation'],['xbox','Xbox'],['nintendo','Nintendo'],['roblox','Roblox'],['minecraft','Minecraft'],
+    ['disney','Disney+'],['max','HBO Max'],['primevideo','Prime Video'],['hulu','Hulu'],['crunchyroll','Crunchyroll'],
+    ['revolut','Revolut'],['wise','Wise'],['zelle','Zelle'],['payoneer','Payoneer'],['binance','Binance'],['coinbase','Coinbase'],['mercadopago','Mercado Pago'],['mercadolibre','Mercado Libre'],['bbva','BBVA'],['santander','Santander'],['banesco','Banesco'],['chase','Chase'],['boa','Bank of America'],['wellsfargo','Wells Fargo'],
+    ['aliexpress','AliExpress'],['shein','Shein'],['temu','Temu'],['ebay','eBay'],['wallapop','Wallapop'],['uber','Uber'],['ubereats','Uber Eats'],['glovo','Glovo'],['pedidosya','PedidosYa'],['rappi','Rappi'],['booking','Booking'],['airbnb','Airbnb'],
+    ['skype','Skype'],['wordpress','WordPress'],['wix','Wix'],['shopify','Shopify']
+  ];
+  const iconSeen=new Set(MANUAL_ICONS.map(x=>String(x.id)));
+  manualExtras.forEach(([id,label])=>{if(!iconSeen.has(id)){MANUAL_ICONS.push({id,label,emoji:'',bg:'#0a84ff'});iconSeen.add(id);}});
+})();
+(function(){
+  function normVK94(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();}
+  function isShieldVK94(v){return !v || !v.svg || String(v.bg||'').toLowerCase()==='#061a33' || String(v.svg||'').includes('vk128shield');}
+  function initialsVK94(label,id){
+    const raw=String(label||id||'').replace(/\+/g,' plus').trim();
+    const parts=raw.split(/\s+|\/|-/).filter(Boolean);
+    let txt=parts.length>=2 ? (parts[0][0]+parts[1][0]) : raw.slice(0,3);
+    txt=txt.replace(/[^a-zA-Z0-9+]/g,'').toUpperCase();
+    return txt || 'VK';
+  }
+  const brandFixes=[
+    ['datadog,datadog dd', vk128Icon('DD','#632CA6','#fff',18)],
+    ['edge,microsoft edge', vk128Icon('e','#0078D7','#fff',27)],
+    ['etsy', vk128Icon('E','#F1641E','#fff',27)],
+    ['figma', vk128Icon('F','#A259FF','#fff',27)],
+    ['family,familia', vk128Icon('FAM','#16a34a','#fff',15)],
+    ['crypto,criptomoneda,cripto', vk128Icon('₿','#F7931A','#fff',25)],
+    ['school,estudio', vk128Icon('EDU','#2563eb','#fff',14)],
+    ['bank,banco', vk128Icon('BANK','#1d4ed8','#fff',12)],
+    ['wifi,wi-fi', vk128Icon('WiFi','#7c3aed','#fff',12)],
+    ['safe,boveda,bóveda,vault', vk128Icon('VK','#0a84ff','#fff',20)]
+  ];
+  try{
+    const seen=new Set();
+    VK128_BRAND_ICONS.forEach(x=>(x.k||[]).forEach(k=>seen.add(normVK94(k))));
+    brandFixes.forEach(([keys,v])=>{
+      const ks=keys.split(',').map(x=>x.trim()).filter(Boolean);
+      if(!ks.some(k=>seen.has(normVK94(k)))) VK128_BRAND_ICONS.push({k:ks,v});
+    });
+  }catch(e){}
+  window.logoForManualIconVK94=function(ic){
+    if(!ic) return vk128Icon('VK','#0a84ff','#fff',20);
+    if(ic.id==='auto') return {bg:'#0a84ff',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#0a84ff"/><path d="M17 12l2 6 6 2-6 2-2 6-2-6-6-2 6-2zM31 21l1.5 4.5L37 27l-4.5 1.5L31 33l-1.5-4.5L25 27l4.5-1.5z" fill="#fff"/></svg>'};
+    let v=serviceIcon((ic.id||'')+' '+(ic.label||''));
+    if(isShieldVK94(v)){
+      const label=ic.emoji && String(ic.emoji).trim() ? String(ic.emoji).trim() : initialsVK94(ic.label,ic.id);
+      const fs=label.length>3?12:(label.length===3?15:22);
+      v=vk128Icon(label, ic.bg || '#0a84ff', '#fff', fs);
+    }
+    return v;
+  };
+  renderIconPicker=function(){
+    const box=$('eIconPicker'); if(!box)return;
+    const q=normVK94($('eIconSearch')?.value||'');
+    let list=[...MANUAL_ICONS];
+    if(q){list=list.filter(ic=>normVK94([ic.id,ic.label,ic.emoji].join(' ')).includes(q));}
+    const order=['auto','google','gmail','outlook','yahoo','icloud','drive','onedrive','dropbox','facebook','instagram','whatsapp','telegram','youtube','netflix','amazon','paypal','spotify','discord','github','linkedin','x','microsoft','apple','adobe','canva','figma','notion','slack','trello','zoom','chatgpt','datadog','edge','ebay','etsy','binance','coinbase','bank','bbva','santander','banesco','zelle','wifi','cloud','safe','family'];
+    list.sort((a,b)=>{const ia=order.indexOf(a.id),ib=order.indexOf(b.id);return (ia<0?999:ia)-(ib<0?999:ib)||String(a.label||a.id).localeCompare(String(b.label||b.id));});
+    const total=list.length;
+    box.innerHTML=list.map(ic=>{
+      const safeId=String(ic.id||'').replace(/'/g,"\\'");
+      return `<button type="button" class="iconChoice ${((selectedEntryIcon||'auto')===ic.id)?'active':''}" onclick="selectEntryIcon('${safeId}')">${vkLogoHTML(logoForManualIconVK94(ic),'logo')}<span class="tiny">${esc(ic.label||ic.id)}</span></button>`;
+    }).join('') + `<div class="tiny" style="grid-column:1/-1;text-align:center;opacity:.72;padding:8px 0">${total} iconos disponibles</div>`;
+  };
+  iconFromKey=function(id){const ic=MANUAL_ICONS.find(x=>x.id===id&&x.id!=='auto'); if(!ic)return null; return {...ic,...logoForManualIconVK94(ic),emoji:null};};
+  try{document.addEventListener('DOMContentLoaded',()=>{renderIconPicker();});}catch(e){}
+})();
+
+
+
+/* init gestionado por splash screen */
+
+
+
+(function(){
+  function normVK(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();}
+  const extraBrands=[
+    ['outlook,hotmail,live mail,microsoft mail', vk128Icon('O','#0078D4','#fff',25)],
+    ['yahoo,yahoo mail', vk128Icon('Y!','#6001D2','#fff',20)],
+    ['icloud,apple cloud', vk128Icon('☁','#6DB8FF','#fff',25)],
+    ['google drive,drive', vk128Icon('D','#0F9D58','#fff',25)],
+    ['onedrive,one drive', vk128Icon('☁','#0078D4','#fff',25)],
+    ['mega,mega nz', vk128Icon('M','#D9272E','#fff',25)],
+    ['microsoft,office,outlook office', vk128Icon('MS','#F25022','#fff',17)],
+    ['apple,apple id,app store', vk128Icon('','#111827','#fff',25)],
+    ['adobe', vk128Icon('A','#FA0F00','#fff',25)],
+    ['canva', vk128Icon('C','#00C4CC','#fff',25)],
+    ['notion', vk128Icon('N','#ffffff','#111827',25)],
+    ['slack', vk128Icon('S','#4A154B','#fff',25)],
+    ['trello', vk128Icon('T','#0079BF','#fff',25)],
+    ['zoom', vk128Icon('Z','#2D8CFF','#fff',25)],
+    ['chatgpt,openai', vk128Icon('AI','#10A37F','#fff',18)],
+    ['x,twitter,x.com', vk128Icon('X','#000000','#fff',25)],
+    ['snapchat,snap', vk128Icon('S','#FFFC00','#111827',25)],
+    ['pinterest', vk128Icon('P','#E60023','#fff',25)],
+    ['threads', vk128Icon('@','#000000','#fff',25)],
+    ['messenger,facebook messenger', vk128Icon('M','#00B2FF','#fff',25)],
+    ['signal', vk128Icon('S','#3A76F0','#fff',25)],
+    ['twitch', vk128Icon('T','#9146FF','#fff',25)],
+    ['gitlab', vk128Icon('GL','#FC6D26','#fff',16)],
+    ['bitbucket', vk128Icon('BB','#0052CC','#fff',16)],
+    ['steam', vk128Icon('S','#1B2838','#C7D5E0',25)],
+    ['epic games,epic', vk128Icon('EP','#313131','#fff',18)],
+    ['playstation,psn,ps plus', vk128Icon('PS','#003791','#fff',18)],
+    ['xbox', vk128Icon('X','#107C10','#fff',25)],
+    ['nintendo', vk128Icon('N','#E60012','#fff',25)],
+    ['roblox', vk128Icon('R','#111827','#fff',25)],
+    ['minecraft', vk128Icon('MC','#62B541','#fff',17)],
+    ['disney,disney plus,disney+', vk128Icon('D+','#113CCF','#fff',18)],
+    ['hbo,max,hbo max', vk128Icon('MAX','#5822B4','#fff',14)],
+    ['prime video,amazon prime', vk128Icon('PV','#00A8E1','#fff',16)],
+    ['hulu', vk128Icon('H','#1CE783','#111827',25)],
+    ['crunchyroll', vk128Icon('CR','#F47521','#fff',16)],
+    ['revolut', vk128Icon('R','#111827','#fff',25)],
+    ['wise,transferwise', vk128Icon('W','#9FE870','#111827',25)],
+    ['zelle', vk128Icon('Z','#6D1ED4','#fff',25)],
+    ['payoneer', vk128Icon('PY','#FF4800','#fff',17)],
+    ['binance', vk128Icon('BN','#F3BA2F','#111827',17)],
+    ['coinbase', vk128Icon('C','#0052FF','#fff',25)],
+    ['mercado pago,mercadopago', vk128Icon('MP','#00AEEF','#fff',16)],
+    ['mercado libre,mercadolibre', vk128Icon('ML','#FFE600','#2D3277',17)],
+    ['bbva', vk128Icon('BBVA','#004481','#fff',13)],
+    ['santander', vk128Icon('S','#EC0000','#fff',25)],
+    ['banesco', vk128Icon('B','#00843D','#fff',25)],
+    ['chase', vk128Icon('C','#117ACA','#fff',25)],
+    ['bank of america,boa', vk128Icon('BOA','#E31837','#fff',14)],
+    ['wells fargo', vk128Icon('WF','#D71E28','#FFD200',17)],
+    ['aliexpress,ali express', vk128Icon('Ali','#E62E04','#fff',18)],
+    ['shein', vk128Icon('SH','#111827','#fff',18)],
+    ['temu', vk128Icon('T','#FF6A00','#fff',25)],
+    ['ebay', vk128Icon('eB','#E53238','#fff',18)],
+    ['wallapop', vk128Icon('W','#13C1AC','#fff',25)],
+    ['uber', vk128Icon('U','#000000','#fff',25)],
+    ['uber eats,ubereats', vk128Icon('UE','#06C167','#111827',17)],
+    ['glovo', vk128Icon('G','#F2CC38','#111827',25)],
+    ['pedidosya,pedidos ya', vk128Icon('PY','#E31B23','#fff',17)],
+    ['rappi', vk128Icon('R','#FF441F','#fff',25)],
+    ['booking,booking.com', vk128Icon('B','#003B95','#fff',25)],
+    ['airbnb', vk128Icon('A','#FF5A5F','#fff',25)],
+    ['skype', vk128Icon('S','#00AFF0','#fff',25)],
+    ['wordpress', vk128Icon('W','#21759B','#fff',25)],
+    ['wix', vk128Icon('W','#111827','#fff',25)],
+    ['shopify', vk128Icon('S','#7AB55C','#fff',25)]
+  ];
+  const brandSeen=new Set();
+  try{VK128_BRAND_ICONS.forEach(b=>(b.k||[]).forEach(k=>brandSeen.add(normVK(k))));}catch(e){}
+  extraBrands.forEach(([keys,v])=>{
+    const k=keys.split(',').map(x=>x.trim()).filter(Boolean);
+    if(!k.some(x=>brandSeen.has(normVK(x)))){
+      VK128_BRAND_ICONS.push({k,v});
+      k.forEach(x=>brandSeen.add(normVK(x)));
+    }
+  });
+  const manualExtras=[
+    ['outlook','Outlook'],['yahoo','Yahoo'],['icloud','iCloud'],['drive','Google Drive'],['onedrive','OneDrive'],['mega','Mega'],
+    ['microsoft','Microsoft'],['apple','Apple'],['adobe','Adobe'],['canva','Canva'],['notion','Notion'],['slack','Slack'],['trello','Trello'],['zoom','Zoom'],['chatgpt','ChatGPT'],
+    ['x','X / Twitter'],['snapchat','Snapchat'],['pinterest','Pinterest'],['threads','Threads'],['messenger','Messenger'],['signal','Signal'],['twitch','Twitch'],
+    ['gitlab','GitLab'],['bitbucket','Bitbucket'],['steam','Steam'],['epic','Epic Games'],['playstation','PlayStation'],['xbox','Xbox'],['nintendo','Nintendo'],['roblox','Roblox'],['minecraft','Minecraft'],
+    ['disney','Disney+'],['max','HBO Max'],['primevideo','Prime Video'],['hulu','Hulu'],['crunchyroll','Crunchyroll'],
+    ['revolut','Revolut'],['wise','Wise'],['zelle','Zelle'],['payoneer','Payoneer'],['binance','Binance'],['coinbase','Coinbase'],['mercadopago','Mercado Pago'],['mercadolibre','Mercado Libre'],['bbva','BBVA'],['santander','Santander'],['banesco','Banesco'],['chase','Chase'],['boa','Bank of America'],['wellsfargo','Wells Fargo'],
+    ['aliexpress','AliExpress'],['shein','Shein'],['temu','Temu'],['ebay','eBay'],['wallapop','Wallapop'],['uber','Uber'],['ubereats','Uber Eats'],['glovo','Glovo'],['pedidosya','PedidosYa'],['rappi','Rappi'],['booking','Booking'],['airbnb','Airbnb'],
+    ['skype','Skype'],['wordpress','WordPress'],['wix','Wix'],['shopify','Shopify']
+  ];
+  const iconSeen=new Set(MANUAL_ICONS.map(x=>String(x.id)));
+  manualExtras.forEach(([id,label])=>{if(!iconSeen.has(id)){MANUAL_ICONS.push({id,label,emoji:'',bg:'#0a84ff'});iconSeen.add(id);}});
+})();
+
+(function(){
+  function normVK94(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();}
+  function isShieldVK94(v){return !v || !v.svg || String(v.bg||'').toLowerCase()==='#061a33' || String(v.svg||'').includes('vk128shield');}
+  function initialsVK94(label,id){
+    const raw=String(label||id||'').replace(/\+/g,' plus').trim();
+    const parts=raw.split(/\s+|\/|-/).filter(Boolean);
+    let txt=parts.length>=2 ? (parts[0][0]+parts[1][0]) : raw.slice(0,3);
+    txt=txt.replace(/[^a-zA-Z0-9+]/g,'').toUpperCase();
+    return txt || 'VK';
+  }
+  const brandFixes=[
+    ['datadog,datadog dd', vk128Icon('DD','#632CA6','#fff',18)],
+    ['edge,microsoft edge', vk128Icon('e','#0078D7','#fff',27)],
+    ['etsy', vk128Icon('E','#F1641E','#fff',27)],
+    ['figma', vk128Icon('F','#A259FF','#fff',27)],
+    ['family,familia', vk128Icon('FAM','#16a34a','#fff',15)],
+    ['crypto,criptomoneda,cripto', vk128Icon('₿','#F7931A','#fff',25)],
+    ['school,estudio', vk128Icon('EDU','#2563eb','#fff',14)],
+    ['bank,banco', vk128Icon('BANK','#1d4ed8','#fff',12)],
+    ['wifi,wi-fi', vk128Icon('WiFi','#7c3aed','#fff',12)],
+    ['safe,boveda,bóveda,vault', vk128Icon('VK','#0a84ff','#fff',20)]
+  ];
+  try{
+    const seen=new Set();
+    VK128_BRAND_ICONS.forEach(x=>(x.k||[]).forEach(k=>seen.add(normVK94(k))));
+    brandFixes.forEach(([keys,v])=>{
+      const ks=keys.split(',').map(x=>x.trim()).filter(Boolean);
+      if(!ks.some(k=>seen.has(normVK94(k)))) VK128_BRAND_ICONS.push({k:ks,v});
+    });
+  }catch(e){}
+  window.logoForManualIconVK94=function(ic){
+    if(!ic) return vk128Icon('VK','#0a84ff','#fff',20);
+    if(ic.id==='auto') return {bg:'#0a84ff',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#0a84ff"/><path d="M17 12l2 6 6 2-6 2-2 6-2-6-6-2 6-2zM31 21l1.5 4.5L37 27l-4.5 1.5L31 33l-1.5-4.5L25 27l4.5-1.5z" fill="#fff"/></svg>'};
+    let v=serviceIcon((ic.id||'')+' '+(ic.label||''));
+    if(isShieldVK94(v)){
+      const label=ic.emoji && String(ic.emoji).trim() ? String(ic.emoji).trim() : initialsVK94(ic.label,ic.id);
+      const fs=label.length>3?12:(label.length===3?15:22);
+      v=vk128Icon(label, ic.bg || '#0a84ff', '#fff', fs);
+    }
+    return v;
+  };
+  renderIconPicker=function(){
+    const box=$('eIconPicker'); if(!box)return;
+    const q=normVK94($('eIconSearch')?.value||'');
+    let list=[...MANUAL_ICONS];
+    if(q){list=list.filter(ic=>normVK94([ic.id,ic.label,ic.emoji].join(' ')).includes(q));}
+    const order=['auto','google','gmail','outlook','yahoo','icloud','drive','onedrive','dropbox','facebook','instagram','whatsapp','telegram','youtube','netflix','amazon','paypal','spotify','discord','github','linkedin','x','microsoft','apple','adobe','canva','figma','notion','slack','trello','zoom','chatgpt','datadog','edge','ebay','etsy','binance','coinbase','bank','bbva','santander','banesco','zelle','wifi','cloud','safe','family'];
+    list.sort((a,b)=>{const ia=order.indexOf(a.id),ib=order.indexOf(b.id);return (ia<0?999:ia)-(ib<0?999:ib)||String(a.label||a.id).localeCompare(String(b.label||b.id));});
+    const total=list.length;
+    box.innerHTML=list.map(ic=>{
+      const safeId=String(ic.id||'').replace(/'/g,"\\'");
+      return `<button type="button" class="iconChoice ${((selectedEntryIcon||'auto')===ic.id)?'active':''}" onclick="selectEntryIcon('${safeId}')">${vkLogoHTML(logoForManualIconVK94(ic),'logo')}<span class="tiny">${esc(ic.label||ic.id)}</span></button>`;
+    }).join('') + `<div class="tiny" style="grid-column:1/-1;text-align:center;opacity:.72;padding:8px 0">${total} iconos disponibles</div>`;
+  };
+  iconFromKey=function(id){const ic=MANUAL_ICONS.find(x=>x.id===id&&x.id!=='auto'); if(!ic)return null; return {...ic,...logoForManualIconVK94(ic),emoji:null};};
+  try{document.addEventListener('DOMContentLoaded',()=>{renderIconPicker();});}catch(e){}
+})();
+
+
+
+/* init gestionado por splash screen */
+
+
+
+// ── NEW ICON ENGINE ──────────────────────────────────────────
+function vkMakeIconSvg(bg, text, fontSize){
+  const s=String(text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return {bg, type:'initials', svg:`<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="${bg}"/><text x="24" y="32" font-size="${fontSize||20}" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial,sans-serif">${s}</text></svg>`};
+}
+function vkInitials(label, id){
+  const s=String(label||id||'').trim();
+  const parts=s.split(/[\s\-_\/]+/).filter(Boolean);
+  if(parts.length>=2) return (parts[0][0]+parts[1][0]).toUpperCase();
+  return s.slice(0,2).toUpperCase()||'VK';
+}
+function vkFontSize(text){ const l=String(text||'').length; return l>=4?13:l===3?16:l===2?20:24; }
+function vkIsShield(v){ return !v||!v.svg||String(v.bg||'').toLowerCase()==='#061a33'; }
+
+let vkIconMap = null;
+function vkBuildIconMap(){
+  if(vkIconMap) return;
+  vkIconMap = {};
+  let brands=0, initials=0, shields=0;
+  (MANUAL_ICONS||[]).forEach(function(ic){
+    if(!ic||!ic.id||ic.id==='auto') return;
+    // Try VK128 with id
+    let v=serviceIcon(ic.id);
+    if(!vkIsShield(v)){v.type='brand';vkIconMap[ic.id]=v;brands++;return;}
+    // Try with label
+    v=serviceIcon(String(ic.label||'').toLowerCase());
+    if(!vkIsShield(v)){v.type='brand';vkIconMap[ic.id]=v;brands++;return;}
+    // Try combined
+    v=serviceIcon(ic.id+' '+(ic.label||''));
+    if(!vkIsShield(v)){v.type='brand';vkIconMap[ic.id]=v;brands++;return;}
+    // Emoji fallback
+    const emoji=String(ic.emoji||'').trim();
+    if(emoji&&emoji.length<=4&&!/^[A-Za-z]+$/.test(emoji)){
+      vkIconMap[ic.id]=vkMakeIconSvg(ic.bg||'#0a84ff',emoji,24);
+      initials++;return;
+    }
+    // Initials fallback
+    const txt=vkInitials(ic.label,ic.id);
+    vkIconMap[ic.id]=vkMakeIconSvg(ic.bg||'#0a84ff',txt,vkFontSize(txt));
+    initials++;
+  });
+  vkIconMap['auto']={bg:'#0a84ff',type:'brand',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#0a84ff"/><path d="M17 12l2 6 6 2-6 2-2 6-2-6-6-2 6-2zM31 21l1.5 4.5L37 27l-4.5 1.5L31 33l-1.5-4.5L25 27l4.5-1.5z" fill="#fff"/></svg>'};
+  const total=Object.keys(vkIconMap).length;
+  byId('stats').innerHTML=`Total: <span>${total}</span> iconos | Marca: <span style="color:#22c55e">${brands}</span> | Iniciales: <span style="color:#f59e0b">${initials}</span> | Escudos: <span style="color:#ff4444">${shields}</span>`;
+  return {brands,initials,shields};
+}
+
+function renderTestGrid(filter){
+  vkBuildIconMap();
+  const grid=byId('grid');
+  const q=(filter||'').toLowerCase().trim();
+  const list=(MANUAL_ICONS||[]).filter(ic=>!q||[ic.id,ic.label,ic.emoji||''].join(' ').toLowerCase().includes(q));
+  grid.innerHTML=list.map(ic=>{
+    const obj=vkIconMap[ic.id]||{bg:'#061a33',type:'shield',svg:vk128Shield().svg};
+    const type=obj.type||'shield';
+    const svgStr=obj.svg.replace(/<svg ([^>]*?)width="[^"]*"\s*/g,'<svg $1').replace(/<svg ([^>]*?)height="[^"]*"\s*/g,'<svg $1').replace(/<svg /g,'<svg style="width:100%;height:100%;display:block" ');
+    return `<div class="ic ${type}">
+      <div class="box" style="background:${obj.bg}">${svgStr}</div>
+      <div class="lbl">${safeEsc(ic.label)}</div>
+    </div>`;
+  }).join('');
+}
+function filterIcons(q){ renderTestGrid(q); }
+
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    try{ renderTestGrid(); } catch(e){ byId('stats').textContent='ERROR: '+e.message; }
+  }, 100);
+});
+</script>
+</body>
+</html>
