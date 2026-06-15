@@ -1666,9 +1666,22 @@ let vkIconMap=null;
 function vkBuildIconMap(){
   if(vkIconMap)return;
   vkIconMap={};
+  // IDs que deben usar iniciales propias (no el icono genérico de banco de VK128)
+  const FORCE_INITIALS=new Set(['bank','bank_es','bbva','santander','caixa','ing','revolut','wise','n26','banesco','mercantil','bancovenezuela','zelle','sabadell','bankinter','unicaja','kutxabank','abanca','monzo','starling','bunq','stripe','klarna','transferwise','cashapp','venmo','game','stream','shopping']);
+  const CUSTOM_TEXT={'bbva':'BBVA','santander':'SAN','caixa':'CX','ing':'ING','revolut':'REV','wise':'WISE','n26':'N26','banesco':'BAN','mercantil':'MER','bancovenezuela':'BdV','zelle':'ZL','sabadell':'SAB','bankinter':'BKI','unicaja':'UNI','kutxabank':'KUT','abanca':'ABA','monzo':'MON','starling':'STL','bunq':'BQ','stripe':'STR','klarna':'KL','transferwise':'TW','cashapp':'CA','venmo':'VM'};
   try{
     (MANUAL_ICONS||[]).forEach(function(ic){
       if(!ic||!ic.id||ic.id==='auto')return;
+      // Forzar iniciales para IDs que matchean el icono genérico de banco
+      if(FORCE_INITIALS.has(ic.id)){
+        const customTxt=CUSTOM_TEXT[ic.id];
+        const emoji=String(ic.emoji||'').trim();
+        if(!customTxt&&emoji&&emoji.length<=4&&!/^[A-Za-z]+$/.test(emoji)){
+          vkIconMap[ic.id]=vkMakeIconSvg(ic.bg||'#0a84ff',emoji,24);return;
+        }
+        const txt=customTxt||vkInitials(ic.label,ic.id);
+        vkIconMap[ic.id]=vkMakeIconSvg(ic.bg||'#0a84ff',txt,vkFontSize(txt));return;
+      }
       let v=serviceIcon(ic.id);
       if(!vkIsShield(v)){v.type='brand';vkIconMap[ic.id]=v;return;}
       v=serviceIcon(String(ic.label||'').toLowerCase());
