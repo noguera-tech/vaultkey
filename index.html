@@ -1667,7 +1667,7 @@ function vkBuildIconMap(){
   if(vkIconMap)return;
   vkIconMap={};
   // IDs que deben usar iniciales propias (no el icono genérico de banco de VK128)
-  const FORCE_INITIALS=new Set(['bank','bank_es','bbva','santander','caixa','ing','revolut','wise','n26','banesco','mercantil','bancovenezuela','zelle','sabadell','bankinter','unicaja','kutxabank','abanca','monzo','starling','bunq','stripe','klarna','transferwise','cashapp','venmo','game','stream','shopping']);
+  const FORCE_INITIALS=new Set(['bank','bank_es','bbva','santander','caixa','ing','revolut','wise','n26','banesco','mercantil','bancovenezuela','zelle','sabadell','bankinter','unicaja','kutxabank','abanca','monzo','starling','bunq','stripe','klarna','transferwise','cashapp','venmo','game','stream','shopping','apple','appletv']);
   const CUSTOM_TEXT={'bbva':'BBVA','santander':'SAN','caixa':'CX','ing':'ING','revolut':'REV','wise':'WISE','n26':'N26','banesco':'BAN','mercantil':'MER','bancovenezuela':'BdV','zelle':'ZL','sabadell':'SAB','bankinter':'BKI','unicaja':'UNI','kutxabank':'KUT','abanca':'ABA','monzo':'MON','starling':'STL','bunq':'BQ','stripe':'STR','klarna':'KL','transferwise':'TW','cashapp':'CA','venmo':'VM'};
   try{
     (MANUAL_ICONS||[]).forEach(function(ic){
@@ -1854,7 +1854,7 @@ function renderIconStrip(){
   const q=normService(byId('eIconSearch')?.value||'');
   let list=(MANUAL_ICONS||[]).filter(ic=>ic&&ic.id);
   if(!q){
-    const pri=['auto','bank','gmail','google','outlook','yahoo','facebook','instagram','whatsapp','telegram','youtube','netflix','spotify','amazon','paypal','tiktok','github','discord','linkedin','x','microsoft','apple','chatgpt','claude','bbva','santander','caixa','ing','zelle','revolut','wise','binance','coinbase','wifi','cloud','shopping','work','card','vpn','token','safe'];
+    const pri=['auto','gmail','google','facebook','instagram','whatsapp','telegram','youtube','netflix','spotify','amazon','paypal','github','discord','linkedin','x','microsoft','apple','chatgpt','bank','bbva','santander','caixa','ing','tiktok','revolut','wise','binance','coinbase','wifi','cloud','card','shopping','work','vpn','token','safe','zelle','stripe','outlook','yahoo','drive','dropbox','chrome','safari','firefox','twitch','reddit','pinterest','snapchat','signal'];
     const priSet=new Set(pri);
     list=[...pri.map(id=>list.find(ic=>ic.id===id)).filter(Boolean),...list.filter(ic=>!priSet.has(ic.id))].slice(0,120);
   }else{
