@@ -1386,7 +1386,9 @@ async function bioSettingsAction(){
 function clearAutoLockTimer(){if(autoLockTimer){clearTimeout(autoLockTimer);autoLockTimer=null}}
 function resetAutoLockTimer(){clearAutoLockTimer();if(!unlocked||document.hidden)return;let ms=getAutoLockMs();if(ms>0){autoLockTimer=setTimeout(()=>{if(unlocked&&!document.hidden)lock()},ms)}}
 function toggleHomeMenu(){const m=$('homeMenu');if(m)m.style.display=m.style.display==='none'?'block':'none';}
-document.addEventListener('click',e=>{const m=$('homeMenu');if(m&&m.style.display==='block'&&!e.target.closest('#homeMenu')&&!e.target.closest('[onclick*="toggleHomeMenu"]'))m.style.display='none';});function markActivity(){if(unlocked){hidePrivacyOverlay();resetAutoLockTimer()}}
+document.addEventListener('click',e=>{const m=$('homeMenu');if(m&&m.style.display==='block'&&!e.target.closest('#homeMenu')&&!e.target.closest('[onclick*="toggleHomeMenu"]'))m.style.display='none';});
+function openBackup(){show('settings');setTimeout(()=>{document.querySelector('[onclick*="exportBackup"]')?.closest('.settingsRow')?.scrollIntoView({behavior:'smooth',block:'center'})},200)}
+function markActivity(){if(unlocked){hidePrivacyOverlay();resetAutoLockTimer()}}
 function showPrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.add('show');document.body.classList.add('vk-locked')}
 function hidePrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.remove('show');document.body.classList.remove('vk-locked')}
 function handleVisibilityChange(){
@@ -1643,7 +1645,9 @@ MANUAL_ICONS.push(
  {id:'pension',label:'Pensión',emoji:'👴',bg:'#0f766e'},
  {id:'kids',label:'Niños',emoji:'👶',bg:'#db2777'},
  {id:'charity',label:'Donación',emoji:'❤️',bg:'#e11d48'}
-);let onboardStep=0;
+);
+function iconObjHTML(ic,cls='logo'){return `<div class="${cls}" style="background:${ic.bg};${ic.svg?'padding:0':''}">${ic.svg||ic.emoji||''}</div>`}
+let onboardStep=0;
 function renderOnboarding(){document.querySelectorAll('.onboardSlide').forEach((x,i)=>x.classList.toggle('active',i===onboardStep));document.querySelectorAll('.onDot').forEach((x,i)=>x.classList.toggle('on',i===onboardStep));let b=$('onboardBtn');if(b)b.textContent=onboardStep>=3?'Comenzar':'Siguiente'}
 function nextOnboarding(){if(onboardStep<3){onboardStep++;renderOnboarding();startOnboardAnim(onboardStep);return}finishOnboarding()}
 function startOnboardAnim(step){
@@ -1762,7 +1766,9 @@ function finishOnboarding(){
 {k:['decathlon'],bg:'#0082C8',svg:'<svg viewBox="0 0 48 48" width="28" height="28"><rect width="48" height="48" rx="10" fill="#0082C8"/><text x="24" y="28" font-size="9" font-weight="900" fill="#fff" text-anchor="middle">DECATHLON</text></svg>'},
 {k:['leroy','leroy merlin'],bg:'#78BE20',svg:'<svg viewBox="0 0 48 48" width="28" height="28"><rect width="48" height="48" rx="10" fill="#78BE20"/><text x="24" y="28" font-size="9" font-weight="900" fill="#fff" text-anchor="middle">LEROY</text></svg>'}
 ];
-for(const m of map){if(m.k.some(k=>n.includes(k))){return{bg:m.bg,svg:m.svg};}}const manualHit=MANUAL_ICONS.find(ic=>ic.id!=='auto' && (n.includes(ic.id)||n.includes((ic.label||'').toLowerCase())));if(manualHit)return{bg:manualHit.bg,svg:null,emoji:manualHit.emoji};const colors=['#e11d48','#f97316','#0ea5e9','#2563eb','#16a34a','#9333ea','#334155','#f59e0b'];const sum=[...s].reduce((a,c)=>a+c.charCodeAt(0),0);return{bg:colors[sum%colors.length],svg:null};}function esc(s=''){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+for(const m of map){if(m.k.some(k=>n.includes(k))){return{bg:m.bg,svg:m.svg};}}const manualHit=MANUAL_ICONS.find(ic=>ic.id!=='auto' && (n.includes(ic.id)||n.includes((ic.label||'').toLowerCase())));if(manualHit)return{bg:manualHit.bg,svg:null,emoji:manualHit.emoji};const colors=['#e11d48','#f97316','#0ea5e9','#2563eb','#16a34a','#9333ea','#334155','#f59e0b'];const sum=[...s].reduce((a,c)=>a+c.charCodeAt(0),0);return{bg:colors[sum%colors.length],svg:null};}
+function serviceColor(s){return serviceIcon(s).bg;}
+function esc(s=''){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 let _entryFav=false;
 function toggleFavEntry(){_entryFav=!_entryFav;const btn=$('favToggleBtn');const thumb=$('favThumb');if(btn){btn.style.background=_entryFav?'var(--cyan)':'rgba(255,255,255,.15)';}if(thumb){thumb.style.left=_entryFav?'25px':'3px';}if($('eFav'))$('eFav').value=String(_entryFav);}
 function openUrlModal(){$('urlModal')?.classList.add('open');}
@@ -1788,7 +1794,9 @@ function renderIconStrip(){
       return `<button type="button" class="vkStripIconBtn ${active?'active':''}" title="${safeEsc(ic.label||ic.id)}" onclick="selectEntryIcon('${safeId}');renderIconStrip()">${(v&&v.svg)?v.svg:logoForIcon(ic).svg}</button>`;
     }).join('');
   }
-function updateEntryIconPreview(){renderIconStrip();}$('ePass')?.addEventListener('input',updateStrength);
+function updateEntryIconPreview(){renderIconStrip();}
+function entryShowStep(n){$('entryStep1').style.display=n===1?'block':'none';$('entryStep2').style.display=n===2?'block':'none';$('dot1').style.width=n===1?'32px':'8px';$('dot1').style.background=n===1?'var(--cyan)':'rgba(255,255,255,.2)';$('dot1').style.boxShadow=n===1?'0 0 14px rgba(0,210,255,.7)':'none';$('dot2').style.width=n===2?'32px':'8px';$('dot2').style.background=n===2?'var(--cyan)':'rgba(255,255,255,.2)';$('dot2').style.boxShadow=n===2?'0 0 14px rgba(0,210,255,.7)':'none';$('entryBackBtn').textContent=n===1?'Cancelar':'\u2190 Atr\xe1s';$('entryNextBtn').textContent=n===2?'Guardar':'Siguiente \u2192';if(n===2){updateEntryStep2Header();renderIconStrip();}$('entryModal')?.querySelector('.sheet')?.scrollTo({top:0,behavior:'smooth'});}
+$('ePass')?.addEventListener('input',updateStrength);
 
 // Vibración al enfocar campos del formulario de entrada
 ['eService','eUser','eEmail','ePass'].forEach(id=>{
@@ -2072,6 +2080,10 @@ function syncRanges(dirty=false){
   if(dirty) $('genOut').textContent='Pulsa generar';
 }
 
+function vkSvgBrand(label,bg,fg='#fff'){return {bg,svg:`<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="10" fill="${bg}"/><text x="24" y="31" font-size="18" font-weight="900" fill="${fg}" text-anchor="middle" font-family="Arial, sans-serif">${label}</text></svg>`}}
+function vkGenericServiceIcon(){return {bg:'#06213f',svg:'<svg class="vkGenericLogo" viewBox="0 0 48 48" width="48" height="48"><defs><linearGradient id="vkg" x1="0" x2="1"><stop stop-color="#00c8ff"/><stop offset="1" stop-color="#0a84ff"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="#061a33"/><path d="M24 6l16 6v11c0 10-6.7 16.7-16 20-9.3-3.3-16-10-16-20V12z" fill="none" stroke="url(#vkg)" stroke-width="3"/><path d="M19 23a5 5 0 1 1 10 0v2h1.5v10h-13V25H19z" fill="#dff6ff"/><path d="M21 25v-2a3 3 0 1 1 6 0v2z" fill="#061a33"/></svg>'}}
+
+
 
 
 
@@ -2082,6 +2094,17 @@ function clearFieldError(id){
   el.classList.remove('fieldError');
   const next=el.nextElementSibling;
   if(next&&next.classList&&next.classList.contains('fieldErrorNote'))next.remove();
+}
+function firstScrollableEntrySheet(){return $('entryModal')?.querySelector('.sheet')||null}
+function showFieldError(id,msg){
+  const el=$(id); if(!el)return;
+  clearFieldError(id);
+  el.classList.add('fieldError');
+  el.insertAdjacentHTML('afterend',`<span class="fieldErrorNote">${esc(msg)}</span>`);
+  setTimeout(()=>{
+    try{el.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}
+    try{el.focus({preventScroll:true});}catch(e){try{el.focus();}catch(_){}}
+  },30);
 }
 function manualIconLabel(id){const ic=MANUAL_ICONS.find(x=>x.id===id&&x.id!=='auto');return ic?(ic.label||ic.id):''}
 function selectEntryIcon(id){
@@ -2121,7 +2144,9 @@ function entryMainIdentity(e){
   const em=legacyEmailFromEntry(e);
   return u || em || e?.type || 'Sin usuario';
 }
-function entrySearchText(e){return [e.service,userFromEntry(e),legacyEmailFromEntry(e),e.url,e.note,e.type].join(' ').toLowerCase()}document.addEventListener('input',ev=>{if(ev.target&&['eService','eUser','eEmail','eUrl','ePass'].includes(ev.target.id))clearFieldError(ev.target.id)},true);
+function entrySearchText(e){return [e.service,userFromEntry(e),legacyEmailFromEntry(e),e.url,e.note,e.type].join(' ').toLowerCase()}
+function clearEntryErrors(){document.querySelectorAll('.fieldErrorNote').forEach(x=>x.remove());['eService','eUser','eEmail','eUrl','ePass'].forEach(id=>$(id)?.classList.remove('fieldError'))}
+document.addEventListener('input',ev=>{if(ev.target&&['eService','eUser','eEmail','eUrl','ePass'].includes(ev.target.id))clearFieldError(ev.target.id)},true);
 function openEntry(e=null){
   vibe(28);soundOpen();
   // Restaurar borrador si es nueva entrada y existe borrador
@@ -2303,15 +2328,8 @@ const VK128_BRAND_ICONS=[
 serviceIcon=function(s){const n=(s||'').toLowerCase().trim();if(!n)return vk128Shield();for(const item of VK128_BRAND_ICONS){if(item.k.some(k=>vk128Match(n,k)))return item.v;}return vk128Shield();}
 function iconFromKey(id){
   if(!id||id==='auto')return null;
-  // Try VK128 brand icons first (have full SVG)
-  let v=serviceIcon(id);
-  if(v&&v.svg&&!isShieldVK94(v))return v;
-  // Fall back to MANUAL_ICONS metadata
   const ic=MANUAL_ICONS.find(x=>x.id===id);
   if(!ic)return null;
-  // Try serviceIcon with label for better match
-  const v2=serviceIcon((ic.id||'')+' '+(ic.label||''));
-  if(v2&&v2.svg&&!isShieldVK94(v2))return v2;
   return {bg:ic.bg||'#0a84ff',label:ic.label||ic.id,id:ic.id};
 }
 function _iconByServiceName(s){
@@ -2324,9 +2342,12 @@ function iconForEntry(e){
   if(byName)return byName;
   return serviceIcon([e?.service,e?.url,e?.type].filter(Boolean).join(' '));
 }
-function vkSvgBrand(label,bg,fg='#fff'){return {bg,svg:`<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="10" fill="${bg}"/><text x="24" y="31" font-size="18" font-weight="900" fill="${fg}" text-anchor="middle" font-family="Arial, sans-serif">${label}</text></svg>`}}
-function vkGenericServiceIcon(){return {bg:'#06213f',svg:'<svg class="vkGenericLogo" viewBox="0 0 48 48" width="48" height="48"><defs><linearGradient id="vkg" x1="0" x2="1"><stop stop-color="#00c8ff"/><stop offset="1" stop-color="#0a84ff"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="#061a33"/><path d="M24 6l16 6v11c0 10-6.7 16.7-16 20-9.3-3.3-16-10-16-20V12z" fill="none" stroke="url(#vkg)" stroke-width="3"/><path d="M19 23a5 5 0 1 1 10 0v2h1.5v10h-13V25H19z" fill="#dff6ff"/><path d="M21 25v-2a3 3 0 1 1 6 0v2z" fill="#061a33"/></svg>'}}
 function vkLogoHTML(ic,cls='logo',sz=null){ic=ic&&ic.svg?ic:vk128Shield();const svg=ic.svg.replace(/<svg ([^>]*?)width="[^"]*"\s*/,'<svg $1').replace(/<svg ([^>]*?)height="[^"]*"\s*/,'<svg $1').replace(/<svg /,'<svg style="width:100%;height:100%;display:block" ');const sizeStyle=sz?`width:${sz}px;height:${sz}px;`:'' ;return `<div class="${cls}" style="background:${ic.bg};padding:0;overflow:hidden;${sizeStyle}">${svg}</div>`}
+let currentIconCat='todos';
+window._setIconCat=function(cat,btn){currentIconCat=cat;document.querySelectorAll('.iconCat').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');const s=$('eIconSearch');if(s)s.value='';if(typeof renderIconPicker==='function')renderIconPicker();};
+function setIconCat(cat,btn){window._setIconCat(cat,btn);}
+document.addEventListener('click',function(e){const btn=e.target.closest('[data-cat]');if(btn&&btn.classList.contains('iconCat')){e.stopPropagation();window._setIconCat(btn.dataset.cat,btn);}});
+
 
 function row(e){let div=document.createElement('div');div.className='entry';div.onclick=()=>quick(e.id);let ic=iconForEntry(e);const weak=score(e.pass)<3;div.innerHTML=`${vkLogoHTML(ic)}<div style="flex:1;min-width:0"><h3 style="display:flex;align-items:center;gap:6px">${esc(e.service)}${e.fav?'<span style="font-size:11px">⭐</span>':''}${weak?'<span style="font-size:9px;background:rgba(255,77,85,.2);color:#ff8c94;border:1px solid rgba(255,77,85,.3);border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.3px">DÉBIL</span>':''}</h3><p style="color:#7a9ec0">${esc(entryMainIdentity(e))}</p></div><div class="go" style="color:rgba(0,210,255,.4);font-size:18px">›</div>`;return div}
 
@@ -2704,16 +2725,13 @@ function serviceLabel(id){
 }
 function logoForIcon(ic){
   if(!ic) return {bg:'#0a84ff',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#0a84ff"/><text x="24" y="31" font-size="17" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">VK</text></svg>'};
-  // Try VK128 brand icons — reject generic shield
+  // Buscar SVG en VK128 via serviceIcon
   const v=serviceIcon((ic.id||'')+' '+(ic.label||''));
-  const isShield=!v||!v.svg||String(v.bg||'').toLowerCase()==='#061a33'||String(v.svg||'').includes('vk128shield');
-  if(v&&v.svg&&!isShield)return v;
-  // Fallback: iniciales con el color específico del icono
+  if(v&&v.svg)return v;
+  // Fallback: iniciales con color de la entrada
   const label=String(ic.label||ic.id||'VK').trim();
-  const parts=label.split(/\s+|-/).filter(Boolean);
-  const txt=(parts.length>=2?(parts[0][0]+parts[1][0]):label.slice(0,3)).replace(/[^a-zA-Z0-9+]/g,'').toUpperCase()||'VK';
-  const bg=ic.bg||'#0a84ff';
-  return {bg,svg:`<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="${bg}"/><text x="24" y="31" font-size="${txt.length>2?14:20}" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">${safeEsc(txt)}</text></svg>`};
+  const txt=label.split(/\s+|-/).filter(Boolean).map(x=>x[0]).join('').slice(0,3).toUpperCase()||'VK';
+  return {bg:ic.bg||'#0a84ff',svg:`<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="${ic.bg||'#0a84ff'}"/><text x="24" y="31" font-size="${txt.length>2?14:20}" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">${safeEsc(txt)}</text></svg>`};
 }
 function allIcons(){
   let arr=[];
@@ -2878,5 +2896,8 @@ function rankIcon(ic){
     setTimeout(()=>{try{window.renderIconStrip()}catch(e){}},300);
   });
 })();
+</script>
+<script>
+
 </script></body>
 </html>
