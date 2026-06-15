@@ -807,32 +807,6 @@ input[type=range]::-moz-range-thumb {
 
 </head>
 <body>
-<div id="vkDiag" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#000;color:#0f0;font-family:monospace;font-size:11px;padding:10px;z-index:99999;overflow:auto;white-space:pre-wrap">
-<div style="color:#ff0;font-size:14px;margin-bottom:8px">⚡ VaultKey Diagnóstico</div>
-<div id="vkDiagLog"></div>
-<button onclick="document.getElementById('vkDiag').style.display='none'" style="margin-top:10px;padding:8px 16px;background:#333;color:#fff;border:1px solid #0f0;border-radius:6px">Cerrar</button>
-</div>
-<script>
-(function(){
-  var log = [];
-  function vkLog(msg, color){
-    log.push('<span style="color:'+(color||'#0f0')+'">'+(new Date().toISOString().slice(11,19))+' '+msg+'</span>');
-    var el=document.getElementById('vkDiagLog');
-    if(el) el.innerHTML=log.join('<br>');
-  }
-  window.vkLog = vkLog;
-  // Capturar todos los errores JS
-  window.addEventListener('error', function(e){
-    vkLog('❌ ERROR: '+e.message+' (L'+e.lineno+')', '#f55');
-    document.getElementById('vkDiag').style.display='block';
-  });
-  window.addEventListener('unhandledrejection', function(e){
-    vkLog('❌ PROMISE: '+(e.reason&&e.reason.message||e.reason), '#f55');
-    document.getElementById('vkDiag').style.display='block';
-  });
-  vkLog('✅ Diagnóstico activo');
-})();
-</script>
 <div class="app">
 <div id="privacyOverlay" class="privacyOverlay"><div class="privacyBox"><div class="privacyIcon">🔐</div><h2>VaultKey</h2><p>Bóveda protegida</p></div></div>
 <section id="pin" class="screen pinScreen">
@@ -2751,10 +2725,41 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
   }
   window.hideSplashHard=hideSplashHard;
 
-  function bootApp(){
-  try{vkLog&&vkLog("bootApp iniciado");}catch(_){}
+  let onboardStep=0;
+function renderOnboarding(){document.querySelectorAll('.onboardSlide').forEach((x,i)=>x.classList.toggle('active',i===onboardStep));document.querySelectorAll('.onDot').forEach((x,i)=>x.classList.toggle('on',i===onboardStep));let b=$('onboardBtn');if(b)b.textContent=onboardStep>=3?'Comenzar':'Siguiente'}
+
+function nextOnboarding(){if(onboardStep<3){onboardStep++;renderOnboarding();startOnboardAnim(onboardStep);return}finishOnboarding()}
+
+function finishOnboarding(){
+  localStorage.setItem('vaultkey_onboarding_v130','1');
+  const modal=$('onboardingModal');
+  if(modal){modal.classList.remove('open');modal.style.display='none';}
+  resetScreensForBoot();
+  initPin();
+  show('pin');
+}
+
+function openOnboardingHard(){
+  if(window.hideSplashHard) window.hideSplashHard();
+  hidePrivacyOverlay&&hidePrivacyOverlay();
+  resetScreensForBoot();
+  onboardStep=0;
+  renderOnboarding();
+  const modal=$('onboardingModal');
+  if(modal){
+    modal.classList.add('open');
+    modal.style.display='flex';
+  }
+}
+
+function maybeShowOnboarding(){
+  if(!localStorage.getItem('vaultkey_onboarding_v130')) openOnboardingHard();
+}
+
+
+function bootApp(){
   // Construir mapa de iconos ahora que serviceIcon ya está definida
-  try { vkBuildIconMap(); vkLog&&vkLog("vkBuildIconMap OK - "+Object.keys(vkIconMap||{}).length+" iconos"); } catch(e) { vkLog&&vkLog("❌ vkBuildIconMap: "+e.message,"#f55"); }
+  try { vkBuildIconMap(); } catch(e) { console.warn('vkBuildIconMap:', e); }
     hideSplashHard();
     if(window.resetScreensForBoot) window.resetScreensForBoot();
     if(window.applyVisualLook) window.applyVisualLook();
@@ -2776,7 +2781,6 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
   }
 
   window.addEventListener('load',()=>{
-  try{vkLog&&vkLog('window.load disparado');}catch(_){}
     const isNewUser = !localStorage.getItem('vk_meta_v1');
     const splashSeen = localStorage.getItem(LS_SPLASH);
     localStorage.setItem(LS_SPLASH,'1');
