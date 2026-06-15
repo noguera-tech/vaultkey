@@ -3027,8 +3027,24 @@ function driveSyncUI(connected) {
 // Conectar con Google
 function driveConnect() {
   if(!window.google || !google.accounts) {
-    toast('Cargando Google... inténtalo en unos segundos'); return;
+    // Esperar hasta 5 segundos a que cargue el script de Google
+    let attempts = 0;
+    const wait = setInterval(() => {
+      attempts++;
+      if(window.google && google.accounts) {
+        clearInterval(wait);
+        driveConnectNow();
+      } else if(attempts > 10) {
+        clearInterval(wait);
+        toast('No se pudo conectar con Google. Comprueba tu conexión.');
+      }
+    }, 500);
+    toast('Conectando con Google...');
+    return;
   }
+  driveConnectNow();
+}
+function driveConnectNow() {
   const client = google.accounts.oauth2.initTokenClient({
     client_id: DRIVE_CLIENT_ID,
     scope: DRIVE_SCOPE,
