@@ -863,8 +863,8 @@ input[type=range]::-moz-range-thumb {
   <button class="mockIconBtn" onclick="document.getElementById('search').focus()" style="font-size:22px;color:#b0cfe8">⌕</button>
 </div>
 <div class="search targetSearch"><input id="search" placeholder="Buscar entradas..." oninput="render()"></div>
-<div class="vaultTabs"><button class="active">Todas <span id="vaultSub">0 entradas</span></button><button onclick="show('fav')">Favoritos</button><button>Recientes</button></div>
-<div class="content targetListContent" style="padding-top:0"><div id="entryList"></div></div><nav class="vkNav"><button class="active" onclick="show('vault')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="9" x2="12" y2="7"/><line x1="12" y1="15" x2="12" y2="17"/><line x1="9" y1="12" x2="7" y2="12"/><line x1="15" y1="12" x2="17" y2="12"/></svg></span>Entradas</button><button onclick="show('fav')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>Favoritos</button><button onclick="openEntry()"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24" style="stroke-width:2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><button onclick="show('home')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><polyline points="9,21 9,12 15,12 15,21"/></svg></span>Inicio</button><button onclick="show('settings')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Ajustes</button></nav></section>
+<div class="vaultTabs"><button class="active" id="tabTodas" onclick="switchVaultTab('todas',this)">Todas <span id="vaultSub">0 entradas</span></button><button id="tabFav" onclick="show('fav')">Favoritos</button><button id="tabRecientes" onclick="switchVaultTab('recientes',this)">Recientes</button></div>
+<div class="content targetListContent" style="padding-top:0"><div id="entryList"></div><div id="recentListVault" style="display:none"></div></div><nav class="vkNav"><button class="active" onclick="show('vault')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="9" x2="12" y2="7"/><line x1="12" y1="15" x2="12" y2="17"/><line x1="9" y1="12" x2="7" y2="12"/><line x1="15" y1="12" x2="17" y2="12"/></svg></span>Entradas</button><button onclick="show('fav')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>Favoritos</button><button onclick="openEntry()"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24" style="stroke-width:2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><button onclick="show('home')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><polyline points="9,21 9,12 15,12 15,21"/></svg></span>Inicio</button><button onclick="show('settings')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Ajustes</button></nav></section>
 <section id="fav" class="screen"><div class="vaultHeader"><button style="opacity:0;pointer-events:none;width:36px;height:36px;border:0;background:transparent">☰</button><span class="vaultTitle">Favoritos</span><span id="favCount" style="font-size:12px;color:var(--muted);font-weight:700;background:rgba(0,210,255,.1);border:1px solid rgba(0,210,255,.2);border-radius:20px;padding:3px 10px"></span></div><div class="content" style="padding-top:8px"><div id="favGrid" class="favGrid"></div></div><nav class="vkNav"><button onclick="show('vault')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="9" x2="12" y2="7"/><line x1="12" y1="15" x2="12" y2="17"/><line x1="9" y1="12" x2="7" y2="12"/><line x1="15" y1="12" x2="17" y2="12"/></svg></span>Entradas</button><button class="active" onclick="show('fav')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>Favoritos</button><button onclick="openEntry()"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24" style="stroke-width:2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><button onclick="show('home')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><polyline points="9,21 9,12 15,12 15,21"/></svg></span>Inicio</button><button onclick="show('settings')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Ajustes</button></nav></section>
 <section id="settings" class="screen"><div class="top"><div><div class="title">Ajustes</div><div class="sub">Seguridad, respaldos y apariencia</div></div></div><div class="content">
   <div class="settingBlock"><div class="label">Seguridad</div><div class="settingsGrid">
@@ -916,7 +916,7 @@ input[type=range]::-moz-range-thumb {
 <!-- BARRA DE ICONOS DESLIZABLE -->
 <div style="margin-bottom:14px">
   <div id="iconStripRow" style="display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch"></div>
-  <input class="inp" id="eIconSearch" placeholder="Buscar icono..." oninput="renderIconStrip()" style="margin-top:4px;font-size:13px">
+  <input class="inp" id="eIconSearch" placeholder="Buscar icono..." oninput="renderIconStrip()" onkeydown="if(event.key==='Enter'){event.preventDefault();event.stopPropagation();}" style="margin-top:4px;font-size:13px">
 </div>
 <!-- NOMBRE -->
 <div class="field"><div class="label">Nombre del servicio *</div><input class="inp" id="eService" placeholder="Gmail, Banco, Netflix..." oninput="renderIconStrip()" autocomplete="off"></div>
@@ -1409,6 +1409,8 @@ function showPrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.add('sh
 function hidePrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.remove('show');document.body.classList.remove('vk-locked')}
 function handleVisibilityChange(){
   if(!appBooted)return;
+  // BUG5 FIX: ignorar si estamos en medio de compartir app
+  if(window._vkSharing)return;
   if(document.hidden){
     if(unlocked){
       // Guardar borrador del formulario si está abierto
@@ -2024,26 +2026,32 @@ function useGen(){
 async function exportBackup(){let pack=localStorage.getItem(LS_DATA);if(!pack){vibe([30,30]);soundError();toast('No hay datos');return}let data={app:'VaultKey',version:1,exported:Date.now(),payload:JSON.parse(pack)};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='VaultKey-respaldo-cifrado.json';a.click();let m=meta();m.lastBackup=Date.now();localStorage.setItem(LS_META,JSON.stringify(m));render();soundSuccess();toast('Respaldo cifrado exportado. Solo se restaura con tu PIN')}
 async function importBackup(file){
   if(!file)return;
+  // BUG2 FIX: Pedir PIN al usuario para descifrar el respaldo (puede ser PIN diferente al actual)
+  const pinForImport=prompt('Introduce el PIN con el que se cifró este respaldo:');
+  if(pinForImport===null)return; // cancelado
+  if(!pinForImport.trim()){soundError();toast('PIN vacío. Importación cancelada.');return;}
   try{
     const text=await file.text();
     let data=JSON.parse(text);
     if(!data.payload)throw Error('Sin payload');
-    const decrypted=await decryptData(data.payload,lastKey);
+    // Intentar descifrar con el PIN introducido por el usuario
+    const decrypted=await decryptData(data.payload,pinForImport);
     if(!decrypted||!Array.isArray(decrypted))throw Error('Datos inválidos');
     const count=decrypted.length;
-    const current=vault.length;
-    const msg=current>0
-      ? 'Tienes '+current+' entrada'+(current!==1?'s':'')+' actuales. El respaldo contiene '+count+'. ¿Reemplazar todo?'
+    const currentCount=vault.length;
+    const msg=currentCount>0
+      ? 'Tienes '+currentCount+' entrada'+(currentCount!==1?'s':'')+' actuales. El respaldo contiene '+count+'. ¿Reemplazar todo?'
       : 'El respaldo contiene '+count+' entrada'+(count!==1?'s':'')+'. ¿Importar?';
     if(!confirm(msg))return;
-    localStorage.setItem(LS_DATA,JSON.stringify(data.payload));
+    // Re-cifrar los datos importados con el PIN actual de la bóveda (lastKey)
     vault=decrypted;
+    await persist(); // guarda con lastKey (PIN actual)
     render();
     soundSuccess();vibe([30,20,60]);
     toast('✓ Respaldo importado — '+count+' entradas restauradas');
   }catch(e){
     soundError();vibe([40,30,40]);
-    toast('Respaldo inválido o PIN diferente');
+    toast('Respaldo inválido o PIN incorrecto');
   }
 }
 
@@ -2134,7 +2142,16 @@ async function tryBio(){
     else{toast('Huella no reconocida. Usa el PIN.');localStorage.removeItem(LS_BIO_CRED);localStorage.removeItem(LS_BIO_BLOB);}
   }
 }
-function shareApp(){const url=location.origin&&location.origin!=='null'?location.origin:location.href;if(navigator.share){navigator.share({title:'VaultKey',text:'VaultKey - Tu bóveda digital privada',url}).catch(()=>{})}else toast('Enlace de VaultKey: '+url)}
+function shareApp(){
+  const url=location.origin&&location.origin!=='null'?location.origin:location.href;
+  if(navigator.share){
+    // BUG5 FIX: marcar que estamos compartiendo para ignorar visibilitychange
+    window._vkSharing=true;
+    navigator.share({title:'VaultKey',text:'VaultKey - Tu bóveda digital privada',url})
+      .catch(()=>{})
+      .finally(()=>{setTimeout(()=>{window._vkSharing=false;},500);});
+  }else toast('Enlace de VaultKey: '+url)
+}
 function showAppInfo(){
   const m=meta();
   const creado=m&&m.created?new Date(m.created).toLocaleDateString('es-ES'):'—';
@@ -2411,7 +2428,36 @@ async function saveEntry(){
   if(i>=0)vault[i]=entry;else vault.unshift(entry);
   await persist();closeModals();show('vault');render();toast('Guardado \u2713');
 }
-function render(){let q=($('search')?.value||'').toLowerCase();let list=vault.filter(e=>entrySearchText(e).includes(q));$('entryList')&&( $('entryList').innerHTML='', list.length?list.forEach(e=>$('entryList').appendChild(row(e))):$('entryList').innerHTML='<div class="empty"><div class="emptyVault"><svg viewBox="0 0 80 80" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="16" width="64" height="52" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,80,200,.08)"/><rect x="8" y="16" width="64" height="14" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,100,255,.15)"/><circle cx="40" cy="50" r="11" stroke="#00d4ff" stroke-width="2.5" fill="rgba(0,210,255,.06)"/><circle cx="40" cy="50" r="4" fill="#00d4ff" opacity=".7"/><line x1="40" y1="39" x2="40" y2="43" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="57" x2="40" y2="61" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="29" y1="50" x2="33" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="47" y1="50" x2="51" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="62" y="40" width="8" height="16" rx="4" stroke="#1a6fff" stroke-width="2" fill="rgba(0,80,200,.1)"/></svg></div><b style="color:#e0f0ff;font-size:16px">Tu bóveda está vacía</b><p style="color:#4a7090;margin-top:6px;font-size:13px">Crea tu primera credencial con el botón +</p></div>');renderFav();let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);$('recentList')&&( $('recentList').innerHTML='', recent.length?recent.forEach(e=>$('recentList').appendChild(row(e))):$('recentList').innerHTML='<p class="sub">Todavía no has usado entradas.</p>');$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
+// BUG4 FIX: Tab switcher para Recientes
+let _vaultTab='todas';
+function switchVaultTab(tab, btn){
+  _vaultTab=tab;
+  document.querySelectorAll('.vaultTabs button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  render();
+}
+function render(){let q=($('search')?.value||'').toLowerCase();
+  const rvault=$('recentListVault');
+  const elist=$('entryList');
+  // Mostrar/ocultar listas según tab activo
+  if(_vaultTab==='recientes'){
+    if(elist) elist.style.display='none';
+    if(rvault) rvault.style.display='';
+    const recents=[...vault].filter(e=>(e.used||0)>0).sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,20);
+    if(rvault){
+      rvault.innerHTML='';
+      if(recents.length){
+        recents.forEach(e=>rvault.appendChild(row(e)));
+      } else {
+        rvault.innerHTML='<div class="empty"><b>Sin recientes todavía</b><p>Abre una entrada para que aparezca aquí</p></div>';
+      }
+    }
+  } else {
+    if(elist) elist.style.display='';
+    if(rvault) rvault.style.display='none';
+    let list=vault.filter(e=>entrySearchText(e).includes(q));$('entryList')&&( $('entryList').innerHTML='', list.length?list.forEach(e=>$('entryList').appendChild(row(e))):$('entryList').innerHTML='<div class="empty"><div class="emptyVault"><svg viewBox="0 0 80 80" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="16" width="64" height="52" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,80,200,.08)"/><rect x="8" y="16" width="64" height="14" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,100,255,.15)"/><circle cx="40" cy="50" r="11" stroke="#00d4ff" stroke-width="2.5" fill="rgba(0,210,255,.06)"/><circle cx="40" cy="50" r="4" fill="#00d4ff" opacity=".7"/><line x1="40" y1="39" x2="40" y2="43" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="57" x2="40" y2="61" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="29" y1="50" x2="33" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="47" y1="50" x2="51" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="62" y="40" width="8" height="16" rx="4" stroke="#1a6fff" stroke-width="2" fill="rgba(0,80,200,.1)"/></svg></div><b style="color:#e0f0ff;font-size:16px">Tu bóveda está vacía</b><p style="color:#4a7090;margin-top:6px;font-size:13px">Crea tu primera credencial con el botón +</p></div>');
+  }
+  renderFav();let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);$('recentList')&&( $('recentList').innerHTML='', recent.length?recent.forEach(e=>$('recentList').appendChild(row(e))):$('recentList').innerHTML='<p class="sub">Todavía no has usado entradas.</p>');$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
 
 function vk128SvgText(label,bg,fg='#fff',fs=18){return {bg,svg:`<svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="${bg}"/><text x="24" y="31" font-size="${fs}" font-weight="900" fill="${fg}" text-anchor="middle" font-family="Arial, sans-serif">${label}</text></svg>`}}
 function vk128Match(n,k){k=(k||'').toLowerCase().trim();if(!k)return false;if(k.length<=2)return n===k;return n===k||n.includes(k)}
@@ -3158,13 +3204,26 @@ function rankIcon(ic){
       if(mode==='setup2'){
         if(typedPin!==tempPin){pin='';mode='setup1';tempPin='';$('pinMsg').className='pinSub pinWarn';$('pinMsg').textContent='No coincide. Crea un PIN de '+getPinLen()+' dígitos';renderDots();return;}
         const hp=await makeHashedPin(typedPin);
-        saveMeta({hash:hp.hash,pinSalt:hp.salt,pinLen:getPinLen(),created:Date.now(),lastBackup:null,autoLockMs:30000,failedAttempts:0,lockLevel:0,lockedUntil:0,lastOk:null,lastFail:null,autoWipe:false,totalFailed:0});
+        // Preservar metadatos existentes (respaldo, autoLock, etc.) si los hay
+        const existingMeta=meta()||{};
+        saveMeta({...existingMeta,hash:hp.hash,pinSalt:hp.salt,pinLen:getPinLen(),created:existingMeta.created||Date.now(),lastBackup:existingMeta.lastBackup||null,autoLockMs:existingMeta.autoLockMs||30000,failedAttempts:0,lockLevel:0,lockedUntil:0,lastOk:null,lastFail:null,autoWipe:existingMeta.autoWipe||false,totalFailed:0});
+        // BUG1 FIX: Si ya había datos cifrados con otra clave (cambio de PIN),
+        // re-cifrar la vault existente con el nuevo PIN en lugar de borrarla.
+        const existingData=localStorage.getItem(LS_DATA);
+        if(existingData && vault && vault.length>0){
+          // vault ya está en memoria (cargada antes del cambio de PIN), re-cifrar con nuevo PIN
+          await persist(typedPin);
+        } else if(existingData && (!vault || vault.length===0)){
+          // vault vacía en memoria pero hay datos — podría ser primer setup real
+          vault=[];await persist(typedPin);
+        } else {
+          vault=[];await persist(typedPin);
+        }
         const rec=makeRecoveryCode();
         const recEnc=await encryptRec(rec,typedPin);
         localStorage.setItem(LS_REC,JSON.stringify(recEnc));
         localStorage.removeItem(REC_SAVED);
         localStorage.setItem(REC_PENDING,'1');
-        vault=[];await persist(typedPin);
         // Entramos a la bóveda solo para presentar el recovery como paso bloqueante. No se ofrece huella todavía.
         lastKey=typedPin;unlocked=true;pin='';renderDots();hidePrivacyOverlay();show('home');render();syncSettingsUI();resetAutoLockTimer();
         await showRecoveryCode(true);
