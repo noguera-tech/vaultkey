@@ -1646,93 +1646,69 @@ MANUAL_ICONS.push(
  {id:'kids',label:'Niños',emoji:'👶',bg:'#db2777'},
  {id:'charity',label:'Donación',emoji:'❤️',bg:'#e11d48'}
 );
-
-// ============================================================
-// VKICONS — Sistema de iconos limpio V3
-// Un solo punto de verdad. Sin cadenas, sin parches.
-// ============================================================
-
-// Genera un SVG de cuadrado coloreado con texto centrado
-function vkMakeIconSvg(bg, text, fontSize) {
-  const s = String(text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  return {bg, svg:`<svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="${bg}"/><text x="24" y="32" font-size="${fontSize||20}" font-weight="900" fill="#fff" text-anchor="middle" dominant-baseline="auto" font-family="Arial,sans-serif">${s}</text></svg>`};
-}
-
-// Genera iniciales a partir de un label
-function vkInitials(label, id) {
-  const s = String(label||id||'').trim();
-  const parts = s.split(/[\s\-_\/]+/).filter(Boolean);
-  if(parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-  return s.slice(0,2).toUpperCase() || 'VK';
-}
-
-// Función de tamaño de fuente según longitud del texto
-function vkFontSize(text) {
-  const l = String(text||'').length;
-  return l >= 4 ? 13 : l === 3 ? 16 : l === 2 ? 20 : 24;
-}
-
-// Detecta si un resultado de serviceIcon es el escudo genérico (sin match real)
-function vkIsShield(v) {
-  return !v || !v.svg || String(v.bg||'').toLowerCase() === '#061a33' || String(v.svg||'').includes('vk128shield');
-}
-
-// Convierte un objeto icono {bg, svg} a HTML div
-// MAP PRINCIPAL: id → {bg, svg}
-// Se construye una sola vez al cargar, sin cadenas ni parches
-let vkIconMap = null;
-
-function vkBuildIconMap() {
-  if(vkIconMap) return;
-  vkIconMap = {};
-  try {
-    (MANUAL_ICONS||[]).forEach(function(ic) {
-      if(!ic || !ic.id || ic.id === 'auto') return;
-      // 1. Intentar match en VK128 con id exacto
-      let v = serviceIcon(ic.id);
-      if(!vkIsShield(v)) { vkIconMap[ic.id] = v; return; }
-      // 2. Intentar match con label
-      v = serviceIcon(String(ic.label||'').toLowerCase());
-      if(!vkIsShield(v)) { vkIconMap[ic.id] = v; return; }
-      // 3. Intentar match combinado
-      v = serviceIcon(ic.id + ' ' + (ic.label||''));
-      if(!vkIsShield(v)) { vkIconMap[ic.id] = v; return; }
-      // 4. Usar emoji si tiene uno real (no vacío ni solo espacios)
-      const emoji = String(ic.emoji||'').trim();
-      if(emoji && emoji.length <= 4 && !/^[A-Za-z]+$/.test(emoji)) {
-        vkIconMap[ic.id] = vkMakeIconSvg(ic.bg||'#0a84ff', emoji, 24);
-        return;
+function iconObjHTML(ic,cls='logo'){return `<div class="${cls}" style="background:${ic.bg};${ic.svg?'padding:0':''}">${ic.svg||ic.emoji||''}</div>`}
+let onboardStep=0;
+function renderOnboarding(){document.querySelectorAll('.onboardSlide').forEach((x,i)=>x.classList.toggle('active',i===onboardStep));document.querySelectorAll('.onDot').forEach((x,i)=>x.classList.toggle('on',i===onboardStep));let b=$('onboardBtn');if(b)b.textContent=onboardStep>=3?'Comenzar':'Siguiente'}
+function nextOnboarding(){if(onboardStep<3){onboardStep++;renderOnboarding();startOnboardAnim(onboardStep);return}finishOnboarding()}
+function startOnboardAnim(step){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789#@$!&*%';
+  function randStr(len){let s='';for(let i=0;i<len;i++)s+=chars[Math.floor(Math.random()*chars.length)];return s;}
+  if(step===1){
+    const el=document.getElementById('obPassValue');
+    const fill=document.getElementById('obStrengthFill');
+    const lbl=document.getElementById('obStrengthLabel');
+    const final='K#9mP$xL2@nQ8vR!';
+    if(!el)return;
+    el.style.opacity='1';
+    let t=0;
+    const iv=setInterval(()=>{
+      t++;
+      if(t<18)el.textContent=randStr(16);
+      else{el.textContent=final;clearInterval(iv);
+        if(fill){fill.style.transition='width 1s ease';fill.style.width='100%';}
+        setTimeout(()=>{if(lbl){lbl.style.opacity='1';}},1000);
       }
-      // 5. Iniciales del label con el color del icono
-      const txt = vkInitials(ic.label, ic.id);
-      vkIconMap[ic.id] = vkMakeIconSvg(ic.bg||'#0a84ff', txt, vkFontSize(txt));
-    });
-    // Siempre añadir auto
-    vkIconMap['auto'] = {bg:'#0a84ff', svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#0a84ff"/><path d="M17 12l2 6 6 2-6 2-2 6-2-6-6-2 6-2zM31 21l1.5 4.5L37 27l-4.5 1.5L31 33l-1.5-4.5L25 27l4.5-1.5z" fill="#fff"/></svg>'};
-  } catch(e) { console.warn('vkBuildIconMap error', e); }
-}
-
-// Obtener icono para cualquier id — nunca falla, nunca devuelve escudo
-function vkGetIcon(id, label, bg) {
-  vkBuildIconMap();
-  if(id && vkIconMap[id]) return vkIconMap[id];
-  // Intentar por label/service en VK128
-  if(label) {
-    const v = serviceIcon(String(label).toLowerCase());
-    if(!vkIsShield(v)) return v;
+    },80);
   }
-  // Generar iniciales con color
-  const useBg = bg || '#0a84ff';
-  const txt = vkInitials(label||id||'VK', id);
-  return vkMakeIconSvg(useBg, txt, vkFontSize(txt));
+  if(step===2){
+    const e1=document.getElementById('obCipherEnc1');
+    const e2=document.getElementById('obCipherEnc2');
+    const badge=document.getElementById('obCipherBadge');
+    const v1=document.getElementById('obCipherVal1');
+    const v2=document.getElementById('obCipherVal2');
+    if(!e1)return;
+    let t=0;
+    const iv=setInterval(()=>{
+      t++;
+      if(t<12){if(v1)v1.style.opacity=String(1-(t/14));}
+      else{if(v1){v1.style.opacity='0';}
+        if(e1){e1.textContent=randStr(12);e1.style.opacity='1';}
+        if(t<24){if(v2)v2.style.opacity=String(1-((t-12)/14));}
+        else{if(v2)v2.style.opacity='0';
+          if(e2){e2.textContent=randStr(12);e2.style.opacity='1';}
+          if(t>28){clearInterval(iv);if(badge)badge.style.opacity='1';}
+        }
+      }
+    },80);
+  }
+  if(step===3){
+    const checks=[
+      document.getElementById('obCheck1'),
+      document.getElementById('obCheck2'),
+      document.getElementById('obCheck3')
+    ];
+    const badge=document.getElementById('obCheckBadge');
+    checks.forEach((c,i)=>{
+      if(!c)return;
+      setTimeout(()=>{
+        c.style.opacity='1';c.style.transition='opacity .4s';
+        const ico=c.querySelector('.obCheckIco');
+        setTimeout(()=>{if(ico)ico.textContent='✓';c.style.color='#2ee66f';},400);
+      },i*700);
+    });
+    setTimeout(()=>{if(badge)badge.style.opacity='1';},2800);
+  }
 }
-
-// iconForEntry — punto de entrada desde row() y quick()
-// iconFromKey — para compatibilidad con código existente
-// logoForIcon — compatibilidad con strip y picker
-// vkIconMap se construye la primera vez que se necesita (lazy)
-// No llamar aquí — serviceIcon aún no está definida en este punto del script
-
 function resetScreensForBoot(){
   document.querySelectorAll('.screen').forEach(s=>{
     s.classList.remove('active','slide-in-right','slide-in-left','slide-out-right','slide-out-left');
@@ -1807,38 +1783,21 @@ function closeNoteModal(){$('noteModal')?.classList.remove('open');}
 
 
 function renderIconStrip(){
-  const strip = byId('iconStripRow');
-  if(!strip) return;
-  vkBuildIconMap();
-  const q = normService(byId('eIconSearch')?.value||'');
-  let list = (MANUAL_ICONS||[]).filter(ic=>ic&&ic.id);
-  // Default list (no search): show the most useful icons first
-  if(!q) {
-    const priority = ['auto','bank','gmail','google','outlook','yahoo','facebook','instagram','whatsapp','telegram','youtube','netflix','spotify','amazon','paypal','tiktok','github','discord','linkedin','x','microsoft','apple','chatgpt','claude','bbva','santander','caixa','ing','zelle','revolut','wise','binance','coinbase','wifi','cloud','shopping','work','card','vpn','ssh','token','api','safe'];
-    const prioritySet = new Set(priority);
-    const pList = priority.map(id => list.find(ic=>ic.id===id)).filter(Boolean);
-    const rest = list.filter(ic=>!prioritySet.has(ic.id)).slice(0, 80);
-    list = [...pList, ...rest];
-  } else {
-    list = list.filter(ic => {
-      const hay = normService([ic.id, ic.label, ic.emoji||''].join(' '));
-      return hay.includes(q);
-    });
-    if(!list.length) list = [{id:'custom', label: byId('eIconSearch')?.value||'Servicio', bg:'#0a84ff'}];
+    const strip=byId('iconStripRow');
+    if(!strip) return;
+    const q=normService(byId('eIconSearch')?.value||'');
+    let list=allIcons().filter(ic=>iconMatches(ic,q));
+    if(!q) list=list.filter(ic=>['auto','bank','gmail','outlook','google','facebook','instagram','whatsapp','youtube','netflix','amazon','paypal','spotify','tiktok','tiktok2','github','apple','microsoft','chatgpt','claude','bbva','santander','caixa','ing','sabadell','bankinter','zelle','revolut','wise','bizum','stripe','klarna','monzo','cashapp','venmo','binance','ethereum','coinbase','metamask','wifi','safe','discord','reddit','linkedin','x','telegram','twitch','pinterest','snapchat','threads','bluesky','mastodon','tumblr','vimeo','dropbox','notion','slack','zoom','figma','canva','uber','airbnb','ebay','disney','primevideo','hbo','crunchyroll','plex','dazn','movistar','playstation','xbox','nintendo','steam','docker','supabase','firebase','icloud','proton','drive','onedrive','mega','zalando','vinted','ikea','decathlon','vpn','ssh','token','api','zara','shein','n26','kraken'].includes(String(ic.id)));
+    list.sort((a,b)=>rankIcon(a)-rankIcon(b)||String(a.label||a.id).localeCompare(String(b.label||b.id)));
+    list=list.slice(0,120);
+    if(!list.length) list=[{id:'custom',label:byId('eIconSearch')?.value||'Servicio',bg:'#0a84ff'}];
+    strip.innerHTML=list.map(ic=>{
+      const active=(selectedEntryIcon||'auto')===ic.id;
+      const v=logoForIcon(ic);
+      const safeId=String(ic.id||'').replace(/'/g,"\\'");
+      return `<button type="button" class="vkStripIconBtn ${active?'active':''}" title="${safeEsc(ic.label||ic.id)}" onclick="selectEntryIcon('${safeId}');renderIconStrip()">${(v&&v.svg)?v.svg:logoForIcon(ic).svg}</button>`;
+    }).join('');
   }
-  list = list.slice(0, 120);
-  strip.innerHTML = list.map(ic => {
-    const active = (selectedEntryIcon||'auto') === ic.id;
-    const iconObj = vkGetIcon(ic.id, ic.label, ic.bg);
-    const safeId = String(ic.id||'').replace(/'/g, "\'");
-    const svgStr = iconObj.svg
-      .replace(/<svg ([^>]*?)width="[^"]*"\s*/g, '<svg $1')
-      .replace(/<svg ([^>]*?)height="[^"]*"\s*/g, '<svg $1')
-      .replace(/<svg /g, '<svg style="width:100%;height:100%;display:block" ');
-    return `<button type="button" class="vkStripIconBtn ${active?'active':''}" title="${safeEsc(ic.label||ic.id)}" onclick="selectEntryIcon('${safeId}');renderIconStrip()">${svgStr}</button>`;
-  }).join('');
-}
-
 function updateEntryIconPreview(){renderIconStrip();}
 function entryShowStep(n){$('entryStep1').style.display=n===1?'block':'none';$('entryStep2').style.display=n===2?'block':'none';$('dot1').style.width=n===1?'32px':'8px';$('dot1').style.background=n===1?'var(--cyan)':'rgba(255,255,255,.2)';$('dot1').style.boxShadow=n===1?'0 0 14px rgba(0,210,255,.7)':'none';$('dot2').style.width=n===2?'32px':'8px';$('dot2').style.background=n===2?'var(--cyan)':'rgba(255,255,255,.2)';$('dot2').style.boxShadow=n===2?'0 0 14px rgba(0,210,255,.7)':'none';$('entryBackBtn').textContent=n===1?'Cancelar':'\u2190 Atr\xe1s';$('entryNextBtn').textContent=n===2?'Guardar':'Siguiente \u2192';if(n===2){updateEntryStep2Header();renderIconStrip();}$('entryModal')?.querySelector('.sheet')?.scrollTo({top:0,behavior:'smooth'});}
 $('ePass')?.addEventListener('input',updateStrength);
@@ -2380,7 +2339,12 @@ function iconFromKey(id){
   const ic=MANUAL_ICONS.find(x=>x.id===id);
   if(!ic)return null;
   return {bg:ic.bg||'#0a84ff',label:ic.label||ic.id,id:ic.id};
-}function iconForEntry(e){
+}
+function _iconByServiceName(s){
+  if(!s)return null;
+  return null; // superseded by serviceIcon()
+}
+function iconForEntry(e){
   if(e?.icon&&e.icon!=='auto'){const m=iconFromKey(e.icon);if(m&&m.svg)return m;}
   const byName=_iconByServiceName(e?.service);
   if(byName)return byName;
@@ -2591,8 +2555,17 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
       if(!ks.some(k=>seen.has(normVK94(k)))) VK128_BRAND_ICONS.push({k:ks,v});
     });
   }catch(e){}
-    window.logoForManualIconVK94=function(ic){ return vkGetIcon(ic&&ic.id, ic&&ic.label, ic&&ic.bg); };
-;
+  window.logoForManualIconVK94=function(ic){
+    if(!ic) return vk128Icon('VK','#0a84ff','#fff',20);
+    if(ic.id==='auto') return {bg:'#0a84ff',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#0a84ff"/><path d="M17 12l2 6 6 2-6 2-2 6-2-6-6-2 6-2zM31 21l1.5 4.5L37 27l-4.5 1.5L31 33l-1.5-4.5L25 27l4.5-1.5z" fill="#fff"/></svg>'};
+    let v=serviceIcon((ic.id||'')+' '+(ic.label||''));
+    if(isShieldVK94(v)){
+      const label=ic.emoji && String(ic.emoji).trim() ? String(ic.emoji).trim() : initialsVK94(ic.label,ic.id);
+      const fs=label.length>3?12:(label.length===3?15:22);
+      v=vk128Icon(label, ic.bg || '#0a84ff', '#fff', fs);
+    }
+    return v;
+  };
   renderIconPicker=function(){
     const box=$('eIconPicker'); if(!box)return;
     const q=normVK94($('eIconSearch')?.value||'');
@@ -2725,103 +2698,7 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
   }
   window.hideSplashHard=hideSplashHard;
 
-  let onboardStep=0;
-function renderOnboarding(){document.querySelectorAll('.onboardSlide').forEach((x,i)=>x.classList.toggle('active',i===onboardStep));document.querySelectorAll('.onDot').forEach((x,i)=>x.classList.toggle('on',i===onboardStep));let b=$('onboardBtn');if(b)b.textContent=onboardStep>=3?'Comenzar':'Siguiente'}
-
-
-function startOnboardAnim(step){
-  const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789#@$!&*%';
-  function randStr(len){let s='';for(let i=0;i<len;i++)s+=chars[Math.floor(Math.random()*chars.length)];return s;}
-  if(step===1){
-    const el=document.getElementById('obPassValue');
-    const fill=document.getElementById('obStrengthFill');
-    const lbl=document.getElementById('obStrengthLabel');
-    const final='K#9mP$xL2@nQ8vR!';
-    if(!el)return;
-    el.style.opacity='1';
-    let t=0;
-    const iv=setInterval(()=>{
-      t++;
-      if(t<18)el.textContent=randStr(16);
-      else{el.textContent=final;clearInterval(iv);
-        if(fill){fill.style.transition='width 1s ease';fill.style.width='100%';}
-        setTimeout(()=>{if(lbl){lbl.style.opacity='1';}},1000);
-      }
-    },80);
-  }
-  if(step===2){
-    const e1=document.getElementById('obCipherEnc1');
-    const e2=document.getElementById('obCipherEnc2');
-    const badge=document.getElementById('obCipherBadge');
-    const v1=document.getElementById('obCipherVal1');
-    const v2=document.getElementById('obCipherVal2');
-    if(!e1)return;
-    let t=0;
-    const iv=setInterval(()=>{
-      t++;
-      if(t<12){if(v1)v1.style.opacity=String(1-(t/14));}
-      else{if(v1){v1.style.opacity='0';}
-        if(e1){e1.textContent=randStr(12);e1.style.opacity='1';}
-        if(t<24){if(v2)v2.style.opacity=String(1-((t-12)/14));}
-        else{if(v2)v2.style.opacity='0';
-          if(e2){e2.textContent=randStr(12);e2.style.opacity='1';}
-          if(t>28){clearInterval(iv);if(badge)badge.style.opacity='1';}
-        }
-      }
-    },80);
-  }
-  if(step===3){
-    const checks=[
-      document.getElementById('obCheck1'),
-      document.getElementById('obCheck2'),
-      document.getElementById('obCheck3')
-    ];
-    const badge=document.getElementById('obCheckBadge');
-    checks.forEach((c,i)=>{
-      if(!c)return;
-      setTimeout(()=>{
-        c.style.opacity='1';c.style.transition='opacity .4s';
-        const ico=c.querySelector('.obCheckIco');
-        setTimeout(()=>{if(ico)ico.textContent='✓';c.style.color='#2ee66f';},400);
-      },i*700);
-    });
-    setTimeout(()=>{if(badge)badge.style.opacity='1';},2800);
-  }
-}
-
-
-function nextOnboarding(){if(onboardStep<3){onboardStep++;renderOnboarding();startOnboardAnim(onboardStep);return}finishOnboarding()}
-
-function finishOnboarding(){
-  localStorage.setItem('vaultkey_onboarding_v130','1');
-  const modal=$('onboardingModal');
-  if(modal){modal.classList.remove('open');modal.style.display='none';}
-  resetScreensForBoot();
-  initPin();
-  show('pin');
-}
-
-function openOnboardingHard(){
-  if(window.hideSplashHard) window.hideSplashHard();
-  hidePrivacyOverlay&&hidePrivacyOverlay();
-  resetScreensForBoot();
-  onboardStep=0;
-  renderOnboarding();
-  const modal=$('onboardingModal');
-  if(modal){
-    modal.classList.add('open');
-    modal.style.display='flex';
-  }
-}
-
-function maybeShowOnboarding(){
-  if(!localStorage.getItem('vaultkey_onboarding_v130')) openOnboardingHard();
-}
-
-
-function bootApp(){
-  // Construir mapa de iconos ahora que serviceIcon ya está definida
-  try { vkBuildIconMap(); } catch(e) { console.warn('vkBuildIconMap:', e); }
+  function bootApp(){
     hideSplashHard();
     if(window.resetScreensForBoot) window.resetScreensForBoot();
     if(window.applyVisualLook) window.applyVisualLook();
