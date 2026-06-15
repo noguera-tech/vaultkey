@@ -868,7 +868,7 @@ input[type=range]::-moz-range-thumb {
   </div></div>
 
   <div class="settingBlock"><div class="label">Google Drive</div><div class="settingsGrid">
-    <div class="settingsRow" id="driveConnectRow" onclick="driveConnect()" style="display:none"><div class="sico">☁️</div><div class="stxt"><b>Conectar Google Drive</b><span>Sincronización automática activada por defecto</span></div><div>›</div></div>
+    <div class="settingsRow" id="driveConnectRow" onclick="driveConnect()"><div class="sico">☁️</div><div class="stxt"><b>Conectar Google Drive</b><span>Sincronización automática activada por defecto</span></div><div>›</div></div>
     <div class="settingsRow" id="driveStatusRow" style="display:none"><div class="sico" id="driveStatusIco">✅</div><div class="stxt"><b id="driveStatusTxt">Drive conectado</b><span id="driveStatusSub">Última sync: nunca</span></div><div id="driveStatusArrow">›</div></div>
     <div class="settingsRow" id="driveSyncRow" onclick="driveSyncNow()" style="display:none"><div class="sico">🔄</div><div class="stxt"><b>Sincronizar ahora</b><span>Subir respaldo cifrado a Drive</span></div><div>›</div></div>
     <div class="settingsRow" id="driveRestoreRow" onclick="driveRestore()" style="display:none"><div class="sico">⬇️</div><div class="stxt"><b>Restaurar desde Drive</b><span>Descargar y restaurar último respaldo</span></div><div>›</div></div>
@@ -1271,6 +1271,7 @@ async function persist(p=lastKey){if(!p)return;localStorage.setItem(LS_DATA,JSON
 const NAV_ORDER=['vault','fav','home','settings'];
 function show(id,dir){
   vibe(18);soundNav();
+  if(id==='settings') try{driveInit();}catch(e){}
   const current=document.querySelector('.screen.active');
   const next=$(id);
   if(!next||current===next)return;
