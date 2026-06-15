@@ -1730,12 +1730,8 @@ function vkGetIcon(id, label, bg) {
 // iconForEntry — punto de entrada desde row() y quick()
 // iconFromKey — para compatibilidad con código existente
 // logoForIcon — compatibilidad con strip y picker
-// Inicializar el mapa lo antes posible
-if(document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', vkBuildIconMap);
-} else {
-  try { vkBuildIconMap(); } catch(e) {}
-}
+// vkIconMap se construye la primera vez que se necesita (lazy)
+// No llamar aquí — serviceIcon aún no está definida en este punto del script
 
 function resetScreensForBoot(){
   document.querySelectorAll('.screen').forEach(s=>{
@@ -2730,6 +2726,8 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
   window.hideSplashHard=hideSplashHard;
 
   function bootApp(){
+  // Construir mapa de iconos ahora que serviceIcon ya está definida
+  try { vkBuildIconMap(); } catch(e) { console.warn('vkBuildIconMap:', e); }
     hideSplashHard();
     if(window.resetScreensForBoot) window.resetScreensForBoot();
     if(window.applyVisualLook) window.applyVisualLook();
