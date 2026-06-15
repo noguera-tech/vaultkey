@@ -2728,6 +2728,68 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
   let onboardStep=0;
 function renderOnboarding(){document.querySelectorAll('.onboardSlide').forEach((x,i)=>x.classList.toggle('active',i===onboardStep));document.querySelectorAll('.onDot').forEach((x,i)=>x.classList.toggle('on',i===onboardStep));let b=$('onboardBtn');if(b)b.textContent=onboardStep>=3?'Comenzar':'Siguiente'}
 
+
+function startOnboardAnim(step){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789#@$!&*%';
+  function randStr(len){let s='';for(let i=0;i<len;i++)s+=chars[Math.floor(Math.random()*chars.length)];return s;}
+  if(step===1){
+    const el=document.getElementById('obPassValue');
+    const fill=document.getElementById('obStrengthFill');
+    const lbl=document.getElementById('obStrengthLabel');
+    const final='K#9mP$xL2@nQ8vR!';
+    if(!el)return;
+    el.style.opacity='1';
+    let t=0;
+    const iv=setInterval(()=>{
+      t++;
+      if(t<18)el.textContent=randStr(16);
+      else{el.textContent=final;clearInterval(iv);
+        if(fill){fill.style.transition='width 1s ease';fill.style.width='100%';}
+        setTimeout(()=>{if(lbl){lbl.style.opacity='1';}},1000);
+      }
+    },80);
+  }
+  if(step===2){
+    const e1=document.getElementById('obCipherEnc1');
+    const e2=document.getElementById('obCipherEnc2');
+    const badge=document.getElementById('obCipherBadge');
+    const v1=document.getElementById('obCipherVal1');
+    const v2=document.getElementById('obCipherVal2');
+    if(!e1)return;
+    let t=0;
+    const iv=setInterval(()=>{
+      t++;
+      if(t<12){if(v1)v1.style.opacity=String(1-(t/14));}
+      else{if(v1){v1.style.opacity='0';}
+        if(e1){e1.textContent=randStr(12);e1.style.opacity='1';}
+        if(t<24){if(v2)v2.style.opacity=String(1-((t-12)/14));}
+        else{if(v2)v2.style.opacity='0';
+          if(e2){e2.textContent=randStr(12);e2.style.opacity='1';}
+          if(t>28){clearInterval(iv);if(badge)badge.style.opacity='1';}
+        }
+      }
+    },80);
+  }
+  if(step===3){
+    const checks=[
+      document.getElementById('obCheck1'),
+      document.getElementById('obCheck2'),
+      document.getElementById('obCheck3')
+    ];
+    const badge=document.getElementById('obCheckBadge');
+    checks.forEach((c,i)=>{
+      if(!c)return;
+      setTimeout(()=>{
+        c.style.opacity='1';c.style.transition='opacity .4s';
+        const ico=c.querySelector('.obCheckIco');
+        setTimeout(()=>{if(ico)ico.textContent='✓';c.style.color='#2ee66f';},400);
+      },i*700);
+    });
+    setTimeout(()=>{if(badge)badge.style.opacity='1';},2800);
+  }
+}
+
+
 function nextOnboarding(){if(onboardStep<3){onboardStep++;renderOnboarding();startOnboardAnim(onboardStep);return}finishOnboarding()}
 
 function finishOnboarding(){
