@@ -2704,13 +2704,16 @@ function serviceLabel(id){
 }
 function logoForIcon(ic){
   if(!ic) return {bg:'#0a84ff',svg:'<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="#0a84ff"/><text x="24" y="31" font-size="17" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">VK</text></svg>'};
-  // Buscar SVG en VK128 via serviceIcon
+  // Try VK128 brand icons — reject generic shield
   const v=serviceIcon((ic.id||'')+' '+(ic.label||''));
-  if(v&&v.svg)return v;
-  // Fallback: iniciales con color de la entrada
+  const isShield=!v||!v.svg||String(v.bg||'').toLowerCase()==='#061a33'||String(v.svg||'').includes('vk128shield');
+  if(v&&v.svg&&!isShield)return v;
+  // Fallback: iniciales con el color específico del icono
   const label=String(ic.label||ic.id||'VK').trim();
-  const txt=label.split(/\s+|-/).filter(Boolean).map(x=>x[0]).join('').slice(0,3).toUpperCase()||'VK';
-  return {bg:ic.bg||'#0a84ff',svg:`<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="${ic.bg||'#0a84ff'}"/><text x="24" y="31" font-size="${txt.length>2?14:20}" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">${safeEsc(txt)}</text></svg>`};
+  const parts=label.split(/\s+|-/).filter(Boolean);
+  const txt=(parts.length>=2?(parts[0][0]+parts[1][0]):label.slice(0,3)).replace(/[^a-zA-Z0-9+]/g,'').toUpperCase()||'VK';
+  const bg=ic.bg||'#0a84ff';
+  return {bg,svg:`<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="12" fill="${bg}"/><text x="24" y="31" font-size="${txt.length>2?14:20}" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">${safeEsc(txt)}</text></svg>`};
 }
 function allIcons(){
   let arr=[];
