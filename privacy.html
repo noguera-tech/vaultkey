@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Política de Privacidad — VaultKey</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #060d1a; color: #e0f0ff; padding: 24px 20px; max-width: 720px; margin: 0 auto; line-height: 1.7; }
+h1 { font-size: 24px; font-weight: 900; color: #00e5ff; margin-bottom: 4px; }
+.subtitle { color: #4a7090; font-size: 13px; margin-bottom: 32px; }
+h2 { font-size: 16px; font-weight: 700; color: #00e5ff; margin: 28px 0 10px; border-left: 3px solid #00e5ff; padding-left: 10px; }
+p { color: #c0d8f0; margin-bottom: 12px; font-size: 15px; }
+ul { padding-left: 20px; margin-bottom: 12px; }
+li { color: #c0d8f0; margin-bottom: 6px; font-size: 15px; }
+.logo { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.logo svg { width: 40px; height: 40px; }
+.footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(0,229,255,.15); color: #4a7090; font-size: 13px; }
+a { color: #00e5ff; }
+</style>
+</head>
+<body>
+
+<div class="logo">
+  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="48" height="48" rx="12" fill="#061a33"/>
+    <path d="M24 6l16 6v11c0 10-6.7 16.7-16 20-9.3-3.3-16-10-16-20V12z" fill="none" stroke="#00e5ff" stroke-width="2.5"/>
+    <path d="M19 23a5 5 0 1 1 10 0v2h1.5v10h-13V25H19z" fill="#dff6ff"/>
+    <path d="M21 25v-2a3 3 0 1 1 6 0v2z" fill="#061a33"/>
+  </svg>
+  <div>
+    <div style="font-size:20px;font-weight:900;color:#fff">Vault<span style="color:#00e5ff">Key</span></div>
+    <div style="font-size:12px;color:#4a7090">Tu bóveda digital privada</div>
+  </div>
+</div>
+
+<h1>Política de Privacidad</h1>
+<p class="subtitle">Última actualización: Junio 2026</p>
+
+<h2>Introducción</h2>
+<p>VaultKey es una aplicación diseñada para almacenar de forma segura contraseñas, notas, tarjetas y otra información privada directamente en el dispositivo del usuario.</p>
+<p>La privacidad y la seguridad son principios fundamentales de VaultKey.</p>
+
+<h2>Información que recopilamos</h2>
+<p>VaultKey <strong>no recopila información personal identificable</strong>. La aplicación no solicita:</p>
+<ul>
+  <li>Nombre completo</li>
+  <li>Dirección</li>
+  <li>Correo electrónico</li>
+  <li>Número de teléfono</li>
+  <li>Información bancaria</li>
+</ul>
+
+<h2>Almacenamiento de datos</h2>
+<p>Toda la información almacenada por VaultKey permanece <strong>exclusivamente en el dispositivo del usuario</strong>.</p>
+<ul>
+  <li>Los datos no son enviados a servidores externos</li>
+  <li>Los datos no son compartidos con terceros</li>
+</ul>
+
+<h2>Sincronización con Google Drive</h2>
+<p>VaultKey ofrece sincronización opcional con Google Drive. Si el usuario activa esta función:</p>
+<ul>
+  <li>Solo se sube un archivo de respaldo <strong>cifrado con AES-256-GCM</strong> a la carpeta privada de la app en Drive</li>
+  <li>Google no puede leer el contenido — solo el usuario con su PIN puede descifrar el archivo</li>
+  <li>El usuario puede desconectar Drive en cualquier momento desde Ajustes</li>
+  <li>El archivo se almacena en la carpeta <em>appDataFolder</em> de Drive, no visible en la carpeta principal</li>
+</ul>
+
+<h2>Respaldos</h2>
+<p>VaultKey permite al usuario exportar e importar respaldos de sus datos. Estos respaldos son generados únicamente bajo acción del usuario y permanecen bajo su control. Los respaldos están cifrados y solo pueden abrirse con el PIN correcto.</p>
+
+<h2>Acceso al dispositivo</h2>
+<p>VaultKey puede utilizar funcionalidades del dispositivo para mejorar la seguridad y la experiencia de usuario:</p>
+<ul>
+  <li><strong>Almacenamiento local</strong> — para guardar la bóveda cifrada</li>
+  <li><strong>Biometría</strong> — huella dactilar para desbloqueo rápido (opcional)</li>
+  <li><strong>Acceso a archivos</strong> — para importar o exportar respaldos</li>
+  <li><strong>Conexión a internet</strong> — únicamente si el usuario activa la sync con Google Drive</li>
+</ul>
+<p>Estas funciones se utilizan únicamente para el funcionamiento de la aplicación.</p>
+
+<h2>Compartición de datos</h2>
+<p>VaultKey <strong>no vende, alquila ni comparte</strong> información personal con terceros.</p>
+
+<h2>Seguridad</h2>
+<p>VaultKey utiliza cifrado <strong>AES-256-GCM</strong> con derivación de clave <strong>PBKDF2</strong> para proteger toda la información del usuario. El PIN nunca se almacena — solo se usa para derivar la clave de cifrado.</p>
+<p>No obstante, ningún sistema puede garantizar una seguridad absoluta. El usuario es responsable de mantener la confidencialidad de su PIN y de sus respaldos cifrados.</p>
+
+<h2>Menores de edad</h2>
+<p>VaultKey no está dirigida específicamente a menores de 13 años.</p>
+
+<h2>Cambios en esta política</h2>
+<p>Esta política puede actualizarse ocasionalmente para reflejar mejoras o cambios en la aplicación. Las modificaciones se publicarán en esta misma página.</p>
+
+<h2>Contacto</h2>
+<p>Para cualquier consulta relacionada con privacidad o seguridad:</p>
+<p><a href="mailto:apps.nogueratech@gmail.com">apps.nogueratech@gmail.com</a></p>
+
+<div class="footer">
+  <p>© 2026 Noguera Technologies · VaultKey · Todos los derechos reservados</p>
+</div>
+
+</body>
+</html>
