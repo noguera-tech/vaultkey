@@ -801,6 +801,9 @@ input[type=range]::-moz-range-thumb {
   html, body { background:linear-gradient(180deg,#001B38 0%,#000F24 45%,#00070D 100%); }
   body { background-attachment:fixed; }
 }
+.catChip{border:1px solid rgba(0,210,255,.2);background:rgba(0,14,32,.6);color:#7aa0c8;font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;white-space:nowrap;cursor:pointer;transition:.2s;flex-shrink:0}
+.catChip.active{background:var(--cyan);color:#000;border-color:var(--cyan)}
+#catFilterRow::-webkit-scrollbar{display:none}
 </style>
 
 
@@ -848,6 +851,18 @@ input[type=range]::-moz-range-thumb {
   <button class="mockIconBtn" onclick="document.getElementById('search').focus()" style="font-size:22px;color:#b0cfe8">⌕</button>
 </div>
 <div class="search targetSearch"><input id="search" placeholder="Buscar entradas..." oninput="render()"></div>
+<div id="catFilterRow" style="display:flex;gap:6px;overflow-x:auto;padding:8px 0 4px;scrollbar-width:none;-ms-overflow-style:none">
+  <button class="catChip active" onclick="setCatFilter('',this)">Todas</button>
+  <button class="catChip" onclick="setCatFilter('banco',this)">🏦 Banco</button>
+  <button class="catChip" onclick="setCatFilter('correo',this)">📧 Correo</button>
+  <button class="catChip" onclick="setCatFilter('social',this)">💬 Social</button>
+  <button class="catChip" onclick="setCatFilter('streaming',this)">🎬 Stream</button>
+  <button class="catChip" onclick="setCatFilter('compras',this)">🛒 Compras</button>
+  <button class="catChip" onclick="setCatFilter('trabajo',this)">💼 Trabajo</button>
+  <button class="catChip" onclick="setCatFilter('gaming',this)">🎮 Gaming</button>
+  <button class="catChip" onclick="setCatFilter('cripto',this)">₿ Cripto</button>
+  <button class="catChip" onclick="setCatFilter('otros',this)">📁 Otros</button>
+</div>
 <div class="vaultTabs"><button class="active" id="tabTodas" onclick="switchVaultTab('todas',this)">Todas <span id="vaultSub">0 entradas</span></button><button id="tabFav" onclick="show('fav')">Favoritos</button><button id="tabRecientes" onclick="switchVaultTab('recientes',this)">Recientes</button></div>
 <div class="content targetListContent" style="padding-top:0"><div id="entryList"></div><div id="recentListVault" style="display:none"></div></div><nav class="vkNav"><button class="active" onclick="show('vault')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="9" x2="12" y2="7"/><line x1="12" y1="15" x2="12" y2="17"/><line x1="9" y1="12" x2="7" y2="12"/><line x1="15" y1="12" x2="17" y2="12"/></svg></span>Entradas</button><button onclick="show('fav')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>Favoritos</button><button onclick="openEntry()"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24" style="stroke-width:2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><button onclick="show('home')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><polyline points="9,21 9,12 15,12 15,21"/></svg></span>Inicio</button><button onclick="show('settings')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Ajustes</button></nav></section>
 <section id="fav" class="screen"><div class="vaultHeader"><button style="opacity:0;pointer-events:none;width:36px;height:36px;border:0;background:transparent">☰</button><span class="vaultTitle">Favoritos</span><span id="favCount" style="font-size:12px;color:var(--muted);font-weight:700;background:rgba(0,210,255,.1);border:1px solid rgba(0,210,255,.2);border-radius:20px;padding:3px 10px"></span></div><div class="content" style="padding-top:8px"><div id="favGrid" class="favGrid"></div></div><nav class="vkNav"><button onclick="show('vault')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="9" x2="12" y2="7"/><line x1="12" y1="15" x2="12" y2="17"/><line x1="9" y1="12" x2="7" y2="12"/><line x1="15" y1="12" x2="17" y2="12"/></svg></span>Entradas</button><button class="active" onclick="show('fav')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>Favoritos</button><button onclick="openEntry()"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24" style="stroke-width:2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><button onclick="show('home')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><polyline points="9,21 9,12 15,12 15,21"/></svg></span>Inicio</button><button onclick="show('settings')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Ajustes</button></nav></section>
@@ -931,6 +946,23 @@ input[type=range]::-moz-range-thumb {
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
   <button type="button" onclick="openUrlModal()" style="padding:12px;border:1px solid rgba(0,210,255,.15);border-radius:14px;background:rgba(255,255,255,.03);color:#7aa0c8;font-size:13px;font-weight:700">🔗 URL</button>
   <button type="button" onclick="openNoteModal()" style="padding:12px;border:1px solid rgba(0,210,255,.15);border-radius:14px;background:rgba(255,255,255,.03);color:#7aa0c8;font-size:13px;font-weight:700">📝 Nota</button>
+</div>
+<div class="field" style="margin-bottom:12px">
+  <div class="label">CATEGORÍA</div>
+  <select id="eCategory" class="inp" style="width:100%;padding:10px 12px;border-radius:10px;appearance:none;-webkit-appearance:none;cursor:pointer">
+    <option value="general">🗂️ General</option>
+    <option value="banco">🏦 Banco y finanzas</option>
+    <option value="correo">📧 Correo electrónico</option>
+    <option value="social">💬 Redes sociales</option>
+    <option value="streaming">🎬 Streaming</option>
+    <option value="compras">🛒 Compras</option>
+    <option value="trabajo">💼 Trabajo</option>
+    <option value="gaming">🎮 Gaming</option>
+    <option value="cripto">₿ Cripto</option>
+    <option value="wifi">📶 WiFi y routers</option>
+    <option value="servidor">🖥️ Servidores y hosting</option>
+    <option value="otros">📁 Otros</option>
+  </select>
 </div>
 <div id="eIconPicker" style="display:none"></div>
 </div></div>
@@ -2437,7 +2469,7 @@ async function saveEntry(){
     $('ePass')?.focus();updateStrength();return;
   }
   let urlVal=normalizeUrl?normalizeUrl(urlRaw):urlRaw;
-  let entry={id:editId||crypto.randomUUID(),service:serviceVal,type:'Cuenta',user:userVal,email:emailVal,pass,url:urlVal,note:($('eNote')?.value||'').trim(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0};
+  let entry={id:editId||crypto.randomUUID(),service:serviceVal,type:'Cuenta',category:($('eCategory')?.value||'general'),user:userVal,email:emailVal,pass,url:urlVal,note:($('eNote')?.value||'').trim(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0};
   let i=vault.findIndex(x=>x.id===entry.id);
   if(i>=0)vault[i]=entry;else vault.unshift(entry);
   await persist();closeModals();show('vault');render();try{driveAutoSync();}catch(e){}toast('Guardado \u2713');
@@ -2469,7 +2501,7 @@ function render(){let q=($('search')?.value||'').toLowerCase();
   } else {
     if(elist) elist.style.display='';
     if(rvault) rvault.style.display='none';
-    let list=vault.filter(e=>entrySearchText(e).includes(q));$('entryList')&&( $('entryList').innerHTML='', list.length?list.forEach(e=>$('entryList').appendChild(row(e))):$('entryList').innerHTML='<div class="empty"><div class="emptyVault"><svg viewBox="0 0 80 80" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="16" width="64" height="52" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,80,200,.08)"/><rect x="8" y="16" width="64" height="14" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,100,255,.15)"/><circle cx="40" cy="50" r="11" stroke="#00d4ff" stroke-width="2.5" fill="rgba(0,210,255,.06)"/><circle cx="40" cy="50" r="4" fill="#00d4ff" opacity=".7"/><line x1="40" y1="39" x2="40" y2="43" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="57" x2="40" y2="61" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="29" y1="50" x2="33" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="47" y1="50" x2="51" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="62" y="40" width="8" height="16" rx="4" stroke="#1a6fff" stroke-width="2" fill="rgba(0,80,200,.1)"/></svg></div><b style="color:#e0f0ff;font-size:16px">Tu bóveda está vacía</b><p style="color:#4a7090;margin-top:6px;font-size:13px">Crea tu primera credencial con el botón +</p></div>');
+    let list=vault.filter(e=>entrySearchText(e).includes(q)&&(!_catFilter||(e.category||'general')===_catFilter));$('entryList')&&( $('entryList').innerHTML='', list.length?list.forEach(e=>$('entryList').appendChild(row(e))):$('entryList').innerHTML='<div class="empty"><div class="emptyVault"><svg viewBox="0 0 80 80" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="16" width="64" height="52" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,80,200,.08)"/><rect x="8" y="16" width="64" height="14" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,100,255,.15)"/><circle cx="40" cy="50" r="11" stroke="#00d4ff" stroke-width="2.5" fill="rgba(0,210,255,.06)"/><circle cx="40" cy="50" r="4" fill="#00d4ff" opacity=".7"/><line x1="40" y1="39" x2="40" y2="43" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="57" x2="40" y2="61" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="29" y1="50" x2="33" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="47" y1="50" x2="51" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="62" y="40" width="8" height="16" rx="4" stroke="#1a6fff" stroke-width="2" fill="rgba(0,80,200,.1)"/></svg></div><b style="color:#e0f0ff;font-size:16px">Tu bóveda está vacía</b><p style="color:#4a7090;margin-top:6px;font-size:13px">Crea tu primera credencial con el botón +</p></div>');
   }
   renderFav();let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);$('recentList')&&( $('recentList').innerHTML='', recent.length?recent.forEach(e=>$('recentList').appendChild(row(e))):$('recentList').innerHTML='<p class="sub">Todavía no has usado entradas.</p>');$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
 
@@ -3283,6 +3315,15 @@ async function driveAutoSync() {
 function showSecurityInfo(){
   const m = document.getElementById('securityModal');
   if(m){ m.classList.add('open'); }
+}
+
+// Category filter
+let _catFilter = '';
+function setCatFilter(cat, btn) {
+  _catFilter = cat;
+  document.querySelectorAll('.catChip').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  render();
 }
 </script>
 <div class="modal" id="securityModal">
