@@ -2477,7 +2477,16 @@ async function saveEntry(){
     $('ePass')?.focus();updateStrength();return;
   }
   let urlVal=normalizeUrl?normalizeUrl(urlRaw):urlRaw;
-  let entry={id:editId||crypto.randomUUID(),service:serviceVal,type:'Cuenta',category:($('eCategory')?.value||'general'),user:userVal,email:emailVal,pass,url:urlVal,note:($('eNote')?.value||'').trim(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0};
+  // Preservar historial de contraseñas (máx 3 versiones anteriores)
+  const _prevEntry = editId ? vault.find(x=>x.id===editId) : null;
+  const _prevHistory = _prevEntry ? (_prevEntry.passHistory||[]) : [];
+  let _newHistory = _prevHistory;
+  if(_prevEntry && _prevEntry.pass && _prevEntry.pass !== pass) {
+    // La contraseña cambió — guardar la anterior en el historial
+    const histEntry = {pass:_prevEntry.pass, date:_prevEntry.updated||Date.now()};
+    _newHistory = [histEntry, ..._prevHistory].slice(0,3); // máximo 3
+  }
+  let entry={id:editId||crypto.randomUUID(),service:serviceVal,type:'Cuenta',category:($('eCategory')?.value||'general'),user:userVal,email:emailVal,pass,url:urlVal,note:($('eNote')?.value||'').trim(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
   let i=vault.findIndex(x=>x.id===entry.id);
   if(i>=0)vault[i]=entry;else vault.unshift(entry);
   await persist();closeModals();show('vault');render();try{driveAutoSync();}catch(e){}toast('Guardado \u2713');
@@ -2631,6 +2640,23 @@ h+='<div class="qvTimestamp">Actualizado el '+updated+'</div>';
 
 /* ── Boton editar principal ── */
 h+='<button class="qvBotEdit" onclick="closeModals();openEntry(current)" style="width:100%;margin-bottom:10px">\u270e Editar entrada</button>';
+
+/* ── Historial de contraseñas ── */
+if(e.passHistory && e.passHistory.length > 0) {
+  h += '<div style="margin-bottom:12px;background:rgba(0,14,32,.6);border:1px solid rgba(0,210,255,.1);border-radius:14px;padding:14px">';
+  h += '<div style="font-size:11px;font-weight:900;color:var(--cyan);letter-spacing:.6px;margin-bottom:10px">🕐 HISTORIAL DE CONTRASEÑAS</div>';
+  e.passHistory.forEach(function(h_item, idx_h) {
+    const dateStr = h_item.date ? new Date(h_item.date).toLocaleDateString('es-ES') : '—';
+    h += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:rgba(255,255,255,.03);border-radius:8px;margin-bottom:6px">';
+    h += '<div>';
+    h += '<div style="font-size:12px;color:#4a7090;margin-bottom:2px">Anterior ' + (idx_h+1) + ' · ' + dateStr + '</div>';
+    h += '<div style="font-family:monospace;font-size:13px;color:#7aa0c8" id="histPass_' + idx_h + '">••••••••</div>';
+    h += '</div>';
+    h += '<button onclick="var el=document.getElementById(\"histPass_' + idx_h + '\");el.textContent=el.textContent===\"' + safeEsc(h_item.pass) + '\"?\"••••••••\":\"' + safeEsc(h_item.pass) + '\"" style="font-size:11px;padding:4px 8px;background:rgba(0,210,255,.1);border:1px solid rgba(0,210,255,.2);border-radius:6px;color:var(--cyan)">Ver</button>';
+    h += '</div>';
+  });
+  h += '</div>';
+}
 
 /* ── Acciones secundarias ── */
 h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
