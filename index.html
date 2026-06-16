@@ -1993,36 +1993,113 @@ function useGen(){
   }
 }
 async function exportBackup(){let pack=localStorage.getItem(LS_DATA);if(!pack){vibe([30,30]);soundError();toast('No hay datos');return}let data={app:'VaultKey',version:1,exported:Date.now(),payload:JSON.parse(pack)};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='VaultKey-respaldo-cifrado.json';a.click();let m=meta();m.lastBackup=Date.now();localStorage.setItem(LS_META,JSON.stringify(m));render();soundSuccess();toast('Respaldo cifrado exportado. Solo se restaura con tu PIN')}
-async function importBackup(file){
-  if(!file)return;
-  // BUG2 FIX: Pedir PIN al usuario para descifrar el respaldo (puede ser PIN diferente al actual)
-  const pinForImport=prompt('Introduce el PIN con el que se cifró este respaldo:');
-  if(pinForImport===null)return; // cancelado
-  if(!pinForImport.trim()){soundError();toast('PIN vacío. Importación cancelada.');return;}
-  try{
-    const text=await file.text();
-    let data=JSON.parse(text);
-    if(!data.payload)throw Error('Sin payload');
-    // Intentar descifrar con el PIN introducido por el usuario
-    const decrypted=await decryptData(data.payload,pinForImport);
-    if(!decrypted||!Array.isArray(decrypted))throw Error('Datos inválidos');
-    const count=decrypted.length;
-    const currentCount=vault.length;
-    const msg=currentCount>0
-      ? 'Tienes '+currentCount+' entrada'+(currentCount!==1?'s':'')+' actuales. El respaldo contiene '+count+'. ¿Reemplazar todo?'
-      : 'El respaldo contiene '+count+' entrada'+(count!==1?'s':'')+'. ¿Importar?';
-    if(!confirm(msg))return;
-    // Re-cifrar los datos importados con el PIN actual de la bóveda (lastKey)
-    vault=decrypted;
-    await persist(); // guarda con lastKey (PIN actual)
-    render();
-    soundSuccess();vibe([30,20,60]);
-    toast('✓ Respaldo importado — '+count+' entradas restauradas');
-  }catch(e){
-    soundError();vibe([40,30,40]);
-    toast('Respaldo inválido o PIN incorrecto');
+
+// ============================================================
+// IMPORTACIÓN CON PANTALLA PROPIA
+// ============================================================
+let _importFile = null;
+let _importDecrypted = null;
+
+function openImportModal(file) {
+  if(!file) return;
+  _importFile = file;
+  _importDecrypted = null;
+  // Reset UI
+  document.getElementById('importStep1').style.display = '';
+  document.getElementById('importStep2').style.display = 'none';
+  document.getElementById('importPinError').style.display = 'none';
+  document.getElementById('importPinInput').value = '';
+  document.getElementById('importFileName').textContent = file.name || 'respaldo.json';
+  document.getElementById('importFileInfo').textContent = 'Tamaño: ' + (file.size ? Math.round(file.size/1024*10)/10 + ' KB' : '—');
+  const modal = document.getElementById('importModal');
+  if(modal) { modal.classList.add('open'); setTimeout(()=>document.getElementById('importPinInput').focus(),300); }
+}
+
+function closeImportModal() {
+  const modal = document.getElementById('importModal');
+  if(modal) modal.classList.remove('open');
+  _importFile = null;
+  _importDecrypted = null;
+  // Reset file input
+  const fi = document.getElementById('importFile');
+  if(fi) fi.value = '';
+}
+
+async function doImportStep1() {
+  const pinInput = document.getElementById('importPinInput');
+  const pinErr = document.getElementById('importPinError');
+  const pin = (pinInput.value || '').trim();
+  
+  if(!pin) { pinErr.textContent = '❌ Introduce el PIN'; pinErr.style.display = ''; return; }
+  if(!_importFile) { closeImportModal(); return; }
+  
+  pinErr.style.display = 'none';
+  const btn = document.querySelector('#importStep1 .btn');
+  if(btn) { btn.textContent = 'Verificando...'; btn.disabled = true; }
+  
+  try {
+    const text = await _importFile.text();
+    const data = JSON.parse(text);
+    if(!data.payload) throw new Error('Sin payload');
+    
+    const decrypted = await decryptData(data.payload, pin);
+    if(!decrypted || !Array.isArray(decrypted)) throw new Error('PIN incorrecto');
+    
+    _importDecrypted = decrypted;
+    const count = decrypted.length;
+    const currentCount = vault ? vault.length : 0;
+    const exported = data.exported ? new Date(data.exported).toLocaleString('es-ES') : 'Desconocida';
+    
+    // Show summary
+    document.getElementById('importSummary').innerHTML = 
+      `• Entradas en el respaldo: <b>${count}</b><br>` +
+      `• Entradas actuales en tu bóveda: <b>${currentCount}</b><br>` +
+      `• Fecha del respaldo: <b>${exported}</b>`;
+    
+    // Warning if current vault has entries
+    const warn = document.getElementById('importWarning');
+    const warnTxt = document.getElementById('importWarningText');
+    if(currentCount > 0) {
+      warnTxt.textContent = `Tienes ${currentCount} entrada${currentCount!==1?'s':''} actuales que serán reemplazadas por las ${count} del respaldo. Esta acción no se puede deshacer.`;
+      warn.style.display = '';
+    } else {
+      warn.style.display = 'none';
+    }
+    
+    document.getElementById('importStep1').style.display = 'none';
+    document.getElementById('importStep2').style.display = '';
+    
+  } catch(e) {
+    pinErr.textContent = '❌ PIN incorrecto o archivo inválido';
+    pinErr.style.display = '';
+    soundError(); vibe([40,30,40]);
+  } finally {
+    if(btn) { btn.textContent = 'Verificar respaldo'; btn.disabled = false; }
   }
 }
+
+async function doImportConfirm() {
+  if(!_importDecrypted) { closeImportModal(); return; }
+  try {
+    vault = _importDecrypted;
+    await persist();
+    render();
+    const count = vault.length;
+    closeImportModal();
+    soundSuccess(); vibe([30,20,60]);
+    toast('✓ Respaldo importado — ' + count + ' entradas restauradas');
+    try{ driveAutoSync(); }catch(e){}
+  } catch(e) {
+    soundError();
+    toast('Error al importar el respaldo');
+  }
+}
+
+async function importBackup(file) {
+  if(!file) return;
+  openImportModal(file);
+}
+
 
 function makeRecoveryCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let out='VK';for(let block=0;block<4;block++){out+='-';for(let i=0;i<4;i++){let a=new Uint32Array(1);crypto.getRandomValues(a);out+=chars[a[0]%chars.length]}}return out}
 async function ensureRecoveryCode(){
@@ -3250,6 +3327,61 @@ function showSecurityInfo(){
       </div>
 
       <button class="btn" onclick="closeModals()" style="width:100%">Entendido</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" id="importModal">
+  <div class="sheet">
+    <div class="sheetHead">
+      <div class="sheetTitle">📥 Importar respaldo</div>
+      <div class="spacer"></div>
+      <button class="iconBtn" onclick="closeImportModal()">✕</button>
+    </div>
+
+    <!-- Step 1: File info -->
+    <div id="importStep1">
+      <div style="background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:14px;margin-bottom:16px">
+        <p style="color:#00e5ff;font-weight:700;margin-bottom:6px">📄 Archivo seleccionado</p>
+        <p class="sub" id="importFileName" style="word-break:break-all">—</p>
+        <p class="sub" id="importFileInfo" style="margin-top:6px;color:#4a7090">—</p>
+      </div>
+
+      <p class="sub" style="margin-bottom:12px">Introduce el PIN con el que se cifró este respaldo:</p>
+
+      <div class="inp-wrap" style="margin-bottom:16px">
+        <input type="password" id="importPinInput" class="inp" placeholder="PIN del respaldo..." 
+               maxlength="8" inputmode="numeric" pattern="[0-9]*"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();doImportStep1();}">
+      </div>
+
+      <div id="importPinError" style="color:#ff6b6b;font-size:13px;margin-bottom:12px;display:none">
+        ❌ PIN incorrecto o respaldo inválido
+      </div>
+
+      <button class="btn" onclick="doImportStep1()" style="width:100%;margin-bottom:10px">
+        Verificar respaldo
+      </button>
+      <button class="ghost" onclick="closeImportModal()" style="width:100%">Cancelar</button>
+    </div>
+
+    <!-- Step 2: Confirmation -->
+    <div id="importStep2" style="display:none">
+      <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:14px;margin-bottom:16px">
+        <p style="color:#22c55e;font-weight:700;margin-bottom:8px">✅ Respaldo verificado</p>
+        <div id="importSummary" class="sub"></div>
+      </div>
+
+      <div id="importWarning" style="background:rgba(255,159,10,.08);border:1px solid rgba(255,159,10,.2);border-radius:12px;padding:14px;margin-bottom:16px;display:none">
+        <p style="color:#f59e0b;font-weight:700;margin-bottom:6px">⚠️ Atención</p>
+        <p class="sub" id="importWarningText"></p>
+      </div>
+
+      <button class="btn" onclick="doImportConfirm()" style="width:100%;margin-bottom:10px">
+        ✅ Importar ahora
+      </button>
+      <button class="ghost" onclick="closeImportModal()" style="width:100%">Cancelar</button>
     </div>
   </div>
 </div>
