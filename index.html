@@ -1913,7 +1913,7 @@ function isValidEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||'
 function serviceRequiresEmail(){return true}
 function toggleQvPass(){let el=$('qvPass');el.textContent=el.textContent.startsWith('•')?current.pass:'••••••••••••'}
 async function toggleFav(id){let e=vault.find(x=>x.id===id);if(e){e.fav=!e.fav;await persist();closeModals();render();toast('Actualizado')}}
-async function delEntry(id){vibe([40,20,40]);soundDelete();if(await vkConfirm('Eliminar entrada','¿Eliminar esta entrada de la bóveda?')){vault=vault.filter(e=>e.id!==id);await persist();closeModals();render();toast('Entrada eliminada')}}
+async function delEntry(id){vibe([40,20,40]);soundDelete();if(await vkConfirm('Eliminar entrada','¿Eliminar esta entrada de la bóveda?')){vault=vault.filter(e=>e.id!==id);await persist();closeModals();render();toast('Entrada eliminada');try{driveAutoSync();}catch(e){}}}
 function copyText(t='',btn=null){
   navigator.clipboard?.writeText(t).then(()=>{
     vibe(35);soundCopy();
@@ -2363,7 +2363,7 @@ async function saveEntry(){
   let entry={id:editId||crypto.randomUUID(),service:serviceVal,type:'Cuenta',user:userVal,email:emailVal,pass,url:urlVal,note:($('eNote')?.value||'').trim(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0};
   let i=vault.findIndex(x=>x.id===entry.id);
   if(i>=0)vault[i]=entry;else vault.unshift(entry);
-  await persist();closeModals();show('vault');render();toast('Guardado \u2713');
+  await persist();closeModals();show('vault');render();try{driveAutoSync();}catch(e){}toast('Guardado \u2713');
 }
 // BUG4 FIX: Tab switcher para Recientes
 let _vaultTab='todas';
@@ -3079,7 +3079,8 @@ async function driveSyncNow(silent) {
   try {
     const pack = localStorage.getItem(LS_DATA);
     if(!pack) { if(!silent) toast('No hay datos para sincronizar'); return; }
-    const data = {app:'VaultKey',version:1,exported:Date.now(),payload:JSON.parse(pack)};
+    const localEntries = vault ? vault.length : 0;
+    const data = {app:'VaultKey',version:1,exported:Date.now(),entries:localEntries,payload:JSON.parse(pack)};
     const content_str = JSON.stringify(data);
 
     // Buscar si ya existe el archivo
@@ -3148,7 +3149,9 @@ async function driveRestore() {
     }
     const fileId = searchData.files[0].id;
     const modified = new Date(searchData.files[0].modifiedTime).toLocaleString('es-ES');
-    if(!confirm(`Restaurar respaldo de Drive del ${modified}? Se reemplazarán las entradas actuales.`)) return;
+    const localCount = vault ? vault.length : 0;
+    const confirmMsg = `Respaldo de Drive del ${modified}\n\n• Entradas locales actuales: ${localCount}\n\nSi restauras se reemplazarán todas las entradas locales con las del respaldo.\n\n¿Continuar?`;
+    if(!confirm(confirmMsg)) return;
 
     // Descargar archivo
     const dl = await fetch(
