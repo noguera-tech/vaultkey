@@ -2398,6 +2398,8 @@ function openEntry(e=null){
   if($('eUrl'))$('eUrl').value=e?.url||'';
   if($('eNote'))$('eNote').value=e?.note||'';
   if($('eIconSearch'))$('eIconSearch').value='';
+  // FIX: Resetear categoría a 'general' en nueva entrada, o restaurar la guardada
+  if($('eCategory'))$('eCategory').value=e?.category||'general';
   const btn=$('favToggleBtn');const thumb=$('favThumb');
   if(btn)btn.style.background=_entryFav?'var(--cyan)':'rgba(255,255,255,.15)';
   if(thumb)thumb.style.left=_entryFav?'25px':'3px';
@@ -2647,12 +2649,13 @@ if(e.passHistory && e.passHistory.length > 0) {
   h += '<div style="font-size:11px;font-weight:900;color:var(--cyan);letter-spacing:.6px;margin-bottom:10px">🕐 HISTORIAL DE CONTRASEÑAS</div>';
   e.passHistory.forEach(function(h_item, idx_h) {
     const dateStr = h_item.date ? new Date(h_item.date).toLocaleDateString('es-ES') : '—';
+    // Store pass in data attribute to avoid escaping issues
     h += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:rgba(255,255,255,.03);border-radius:8px;margin-bottom:6px">';
-    h += '<div>';
+    h += '<div style="flex:1;min-width:0">';
     h += '<div style="font-size:12px;color:#4a7090;margin-bottom:2px">Anterior ' + (idx_h+1) + ' · ' + dateStr + '</div>';
-    h += '<div style="font-family:monospace;font-size:13px;color:#7aa0c8" id="histPass_' + idx_h + '">••••••••</div>';
+    h += '<div class="histPassEl" style="font-family:monospace;font-size:13px;color:#7aa0c8" data-pass="' + safeEsc(h_item.pass||'') + '">••••••••</div>';
     h += '</div>';
-    h += '<button onclick="var el=document.getElementById(\"histPass_' + idx_h + '\");el.textContent=el.textContent===\"' + safeEsc(h_item.pass) + '\"?\"••••••••\":\"' + safeEsc(h_item.pass) + '\"" style="font-size:11px;padding:4px 8px;background:rgba(0,210,255,.1);border:1px solid rgba(0,210,255,.2);border-radius:6px;color:var(--cyan)">Ver</button>';
+    h += '<button onclick="toggleHistPass(this)" style="font-size:11px;padding:4px 8px;margin-left:8px;background:rgba(0,210,255,.1);border:1px solid rgba(0,210,255,.2);border-radius:6px;color:var(--cyan);flex-shrink:0">Ver</button>';
     h += '</div>';
   });
   h += '</div>';
@@ -3482,6 +3485,20 @@ function renderHealthPanel() {
 
     <button class="btn" onclick="closeModals()" style="width:100%;margin-top:8px">Cerrar</button>
   `;
+}
+
+function toggleHistPass(btn) {
+  const el = btn.previousElementSibling && btn.previousElementSibling.querySelector('.histPassEl') 
+             || btn.parentElement.querySelector('.histPassEl');
+  if(!el) return;
+  const pass = el.dataset.pass || '';
+  if(el.textContent === '••••••••') {
+    el.textContent = pass || '(vacía)';
+    btn.textContent = 'Ocultar';
+  } else {
+    el.textContent = '••••••••';
+    btn.textContent = 'Ver';
+  }
 }
 </script>
 <div class="modal" id="securityModal">
