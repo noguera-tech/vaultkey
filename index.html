@@ -3149,7 +3149,7 @@ let driveToken = null;
 
 // Inicializar Drive al arrancar
 function driveInit() {
-  const saved = localStorage.getItem(LS_DRIVE_TOKEN);
+  driveSyncUI(false);
   if(saved) { driveToken = saved; driveSyncUI(true); }
   else { driveSyncUI(false); }
   // Auto sync por defecto activado
@@ -3208,7 +3208,6 @@ function driveConnectNow() {
     callback: async (resp) => {
       if(resp.error) { toast('Error al conectar con Google'); return; }
       driveToken = resp.access_token;
-      localStorage.setItem(LS_DRIVE_TOKEN, driveToken);
       driveSyncUI(true);
       soundSuccess(); vibe([30,20,60]);
       toast('✅ Google Drive conectado');
@@ -3268,7 +3267,6 @@ async function driveSyncNow(silent) {
     } else if(response.status === 401) {
       // Token expirado
       driveToken = null;
-      localStorage.removeItem(LS_DRIVE_TOKEN);
       driveSyncUI(false);
       toast('Sesión de Drive expirada. Vuelve a conectar');
     } else {
@@ -3326,7 +3324,6 @@ async function driveRestore() {
 function driveDisconnect() {
   if(!confirm('¿Desconectar Google Drive? No se borrarán los datos guardados en Drive.')) return;
   driveToken = null;
-  localStorage.removeItem(LS_DRIVE_TOKEN);
   localStorage.removeItem(LS_DRIVE_LAST);
   driveSyncUI(false);
   toast('Drive desconectado');
