@@ -3141,7 +3141,7 @@ function rankIcon(ic){
 const DRIVE_CLIENT_ID = '299016319331-5it6s2gdts517jnehshfc1hkfpjgd4ku.apps.googleusercontent.com';
 const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
 const DRIVE_FILE_NAME = 'vaultkey-backup.json';
-const LS_DRIVE_TOKEN = 'vk_drive_token';
+const LS_DRIVE_TOKEN = 'vk_drive_token'; // sesión únicamente
 const LS_DRIVE_AUTO = 'vk_drive_auto';
 const LS_DRIVE_LAST = 'vk_drive_last_sync';
 
@@ -3150,6 +3150,8 @@ let driveToken = null;
 // Inicializar Drive al arrancar
 function driveInit() {
   driveSyncUI(false);
+  const sub = document.getElementById('driveStatusSub');
+  if(sub) sub.textContent = '🔄 Reconecta Drive al abrir la app';
   // Auto sync por defecto activado
   const auto = localStorage.getItem(LS_DRIVE_AUTO);
   if(auto === null) localStorage.setItem(LS_DRIVE_AUTO, '1');
@@ -3175,7 +3177,7 @@ function driveSyncUI(connected) {
     // Update last sync time
     const last = localStorage.getItem(LS_DRIVE_LAST);
     const sub = document.getElementById('driveStatusSub');
-    if(sub) sub.textContent = last ? 'Última sync: ' + new Date(parseInt(last)).toLocaleString('es-ES') : 'Última sync: nunca';
+    if(sub) sub.textContent = last ? 'Última sync: ' + new Date(parseInt(last)).toLocaleString('es-ES') : '🔄 Conecta Drive para sincronizar';
   }
 }
 
