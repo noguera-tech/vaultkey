@@ -2173,7 +2173,7 @@ async function showRecoveryCode(first=false){
   const btn=$('recoveryCloseBtn');
   if(btn)btn.style.display=first?'none':'';
   $('recoveryModal').classList.add('open');
-  if(first)toast('⚠️ Guarda este código ahora. Sin él no podrás recuperar tu bóveda.');
+  if(first)toast('📋 Guarda este código como identificador de tu bóveda. Recuerda: sin tu PIN, las contraseñas no se pueden recuperar.');
 }
 async function regenerateRecoveryCode(){
   if(!lastKey)return;
@@ -3150,8 +3150,6 @@ let driveToken = null;
 // Inicializar Drive al arrancar
 function driveInit() {
   driveSyncUI(false);
-  if(saved) { driveToken = saved; driveSyncUI(true); }
-  else { driveSyncUI(false); }
   // Auto sync por defecto activado
   const auto = localStorage.getItem(LS_DRIVE_AUTO);
   if(auto === null) localStorage.setItem(LS_DRIVE_AUTO, '1');
