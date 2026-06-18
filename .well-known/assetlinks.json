@@ -1,0 +1,14 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.nogueratech.vaultkey",
+      "sha256_cert_fingerprints": [
+        "55:A9:43:4A:93:40:90:6F:20:93:B2:D8:F6:A5:C2:A0:16:EB:07:D3:A8:27:71:8D:A7:1E:FF:4D:D3:4A:26:D7",
+        "BB:9A:CB:C4:82:16:6F:D4:DF:50:75:3C:6D:89:17:FF:17:5C:EA:EF:A2:3C:56:90:6E:C4:4A:F3:59:F3:DF:96",
+        "6F:62:F2:8D:73:B2:78:2B:5F:15:8F:97:7C:1B:D6:0A:A9:8D:F0:42:FB:2A:4F:F4:84:67:00:7A:7E:58:C9:45"
+      ]
+    }
+  }
+]
