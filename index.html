@@ -1442,7 +1442,7 @@ async function bioSettingsAction(){
   }
 }
 function clearAutoLockTimer(){if(autoLockTimer){clearTimeout(autoLockTimer);autoLockTimer=null}}
-function resetAutoLockTimer(){clearAutoLockTimer();if(!unlocked||document.hidden)return;let ms=getAutoLockMs();if(ms>0){autoLockTimer=setTimeout(()=>{if(unlocked&&!document.hidden)lock()},ms)}}
+function resetAutoLockTimer(){clearAutoLockTimer();if(!unlocked||document.hidden)return;let ms=getAutoLockMs();if(ms>0){autoLockTimer=setTimeout(()=>{if(unlocked&&!document.hidden){soundLock();lock()}},ms)}}
 function toggleHomeMenu(){const m=$('homeMenu');if(m)m.style.display=m.style.display==='none'?'block':'none';}
 document.addEventListener('click',e=>{const m=$('homeMenu');if(m&&m.style.display==='block'&&!e.target.closest('#homeMenu')&&!e.target.closest('[onclick*="toggleHomeMenu"]'))m.style.display='none';});
 function openBackup(){show('settings');setTimeout(()=>{document.querySelector('[onclick*="exportBackup"]')?.closest('.settingsRow')?.scrollIntoView({behavior:'smooth',block:'center'})},200)}
@@ -1471,7 +1471,7 @@ function handleVisibilityChange(){
       showPrivacyOverlay();
       const ms=getAutoLockMs();
       if(ms===0){unlocked=false;lastKey=null;pin='';clearAutoLockTimer();closeModals();}
-      else{clearAutoLockTimer();autoLockTimer=setTimeout(()=>{if(!unlocked)return;unlocked=false;lastKey=null;pin='';closeModals();},ms);}
+      else{clearAutoLockTimer();autoLockTimer=setTimeout(()=>{if(!unlocked)return;soundLock();unlocked=false;lastKey=null;pin='';closeModals();},ms);}
     }
   } else {
     if(!unlocked){
