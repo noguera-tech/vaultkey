@@ -1,3 +1,4 @@
+const CACHE = 'vaultkey-v2-2-3-c';
 const FILES = [
   './index.html',
   './style.css',
@@ -7,14 +8,12 @@ const FILES = [
   './icon-512.png',
   './vaultkey-shield-scene.png?v=221'
 ];
-
 const NO_CACHE_HOSTS = [
   'accounts.google.com',
   'oauth2.googleapis.com',
   'www.googleapis.com',
   'googleusercontent.com'
 ];
-
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE)
@@ -22,7 +21,6 @@ self.addEventListener('install', event => {
       .then(() => self.skipWaiting())
   );
 });
-
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
@@ -32,25 +30,17 @@ self.addEventListener('activate', event => {
       .then(clients => clients.forEach(client => client.postMessage({ type: 'SW_UPDATED' })))
   );
 });
-
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-
   const url = new URL(event.request.url);
-
-  // Nunca cachear APIs externas ni peticiones con Authorization
   if (NO_CACHE_HOSTS.some(host => url.hostname.includes(host))) return;
   if (event.request.headers.get('Authorization')) return;
-
-  // index.html siempre fresco de red
   if (url.pathname === '/' || url.pathname.endsWith('index.html')) {
     event.respondWith(
       fetch(event.request, { cache: 'no-store' }).catch(() => caches.match('./index.html'))
     );
     return;
   }
-
-  // Resto de archivos propios: cache first
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
@@ -62,7 +52,6 @@ self.addEventListener('fetch', event => {
     })
   );
 });
-
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
