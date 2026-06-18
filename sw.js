@@ -1,8 +1,6 @@
-const CACHE = 'vaultkey-v2-2-3-c';
+const CACHE = 'vaultkey-v2-2-3-d';
 const FILES = [
   './index.html',
-  './style.css',
-  './app.js',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
