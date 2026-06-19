@@ -2089,7 +2089,7 @@ async function doImportStep1() {
     _importDecrypted = decrypted;
     const count = decrypted.length;
     const currentCount = vault ? vault.length : 0;
-    const exported = data.exported ? new Date(data.exported).toLocaleString('es-ES') : 'Desconocida';
+    const exported = data.exported ? esc(new Date(data.exported).toLocaleString('es-ES')) : 'Desconocida';
     
     // Show summary
     document.getElementById('importSummary').innerHTML = 
