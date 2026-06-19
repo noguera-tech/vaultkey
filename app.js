@@ -738,6 +738,17 @@ function startOnboardAnim(step){
     });
     setTimeout(()=>{if(badge)badge.style.opacity='1';},2800);
   }
+  if(step===4){
+    const rows=document.querySelectorAll('.onboardSlide[data-step="4"] .obCheckRow');
+    rows.forEach((c,i)=>{
+      if(!c)return;
+      setTimeout(()=>{
+        c.style.opacity='1';c.style.transition='opacity .5s';
+        const ico=c.querySelector('.obCheckIco');
+        setTimeout(()=>{if(ico){ico.style.color='#00e5ff';}},400);
+      },i*600);
+    });
+  }
 }
 function resetScreensForBoot(){
   document.querySelectorAll('.screen').forEach(s=>{
