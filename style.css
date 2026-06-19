@@ -792,3 +792,5 @@ input[type=range]::-moz-range-thumb {
 .catChip{border:1px solid rgba(0,210,255,.2);background:rgba(0,14,32,.6);color:#7aa0c8;font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;white-space:nowrap;cursor:pointer;transition:.2s;flex-shrink:0}
 .catChip.active{background:var(--cyan);color:#000;border-color:var(--cyan)}
 #catFilterRow::-webkit-scrollbar{display:none}
+
+
