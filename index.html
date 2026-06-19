@@ -2122,8 +2122,20 @@ async function doImportStep1() {
 async function doImportConfirm() {
   if(!_importDecrypted) { closeImportModal(); return; }
   try {
-    vault = _importDecrypted;
-    await persist();
+    vault = _importDecrypted.filter(e=>e&&typeof e==='object').map(e=>({
+      id: String(e.id||crypto.randomUUID()),
+      service: String(e.service||''),
+      user: String(e.user||''),
+      email: String(e.email||''),
+      pass: String(e.pass||''),
+      url: String(e.url||''),
+      note: String(e.note||''),
+      category: String(e.category||'general'),
+      fav: !!e.fav,
+      used: Number(e.used||0),
+      updated: Number(e.updated||0),
+      passHistory: Array.isArray(e.passHistory)?e.passHistory:[]
+    }));
     render();
     const count = vault.length;
     closeImportModal();
