@@ -1310,7 +1310,7 @@ async function tryBioRegister(pinKey){
     localStorage.removeItem(LS_BIO_CRED);
     vibe([40,30,40]);soundPinErr();
     if(e.name==='NotAllowedError')toast('Registro de huella cancelado.');
-    else toast('No se pudo activar la huella: '+e.message);
+    else toast('No se pudo activar la huella. Inténtalo de nuevo.');
   }
 }
 async function persist(p=lastKey){if(!p)return;localStorage.setItem(LS_DATA,JSON.stringify(await encryptData(vault,p)))}
@@ -3329,7 +3329,7 @@ async function driveRestore() {
     toast(`✅ ${vault.length} entradas restauradas desde Drive`);
   } catch(e) {
     soundError();
-    toast('Error al restaurar: ' + (e.message||'comprueba tu PIN'));
+    toast('No se pudo restaurar el respaldo. Comprueba tu PIN e inténtalo de nuevo.');
   }
 }
 
