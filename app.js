@@ -679,7 +679,7 @@ function vkGetIcon(id,label,bg){
 function iconObjHTML(ic,cls='logo'){return `<div class="${cls}" style="background:${ic.bg};${ic.svg?'padding:0':''}">${ic.svg||ic.emoji||''}</div>`}
 let onboardStep=0;
 function renderOnboarding(){document.querySelectorAll('.onboardSlide').forEach((x,i)=>x.classList.toggle('active',i===onboardStep));document.querySelectorAll('.onDot').forEach((x,i)=>x.classList.toggle('on',i===onboardStep));let b=$('onboardBtn');if(b)b.textContent=onboardStep>=3?'Comenzar':'Siguiente'}
-function nextOnboarding(){if(onboardStep<3){onboardStep++;renderOnboarding();startOnboardAnim(onboardStep);return}finishOnboarding()}
+function nextOnboarding(){if(onboardStep<4){onboardStep++;renderOnboarding();startOnboardAnim(onboardStep);return}finishOnboarding()}
 function startOnboardAnim(step){
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789#@$!&*%';
   function randStr(len){let s='';for(let i=0;i<len;i++)s+=chars[Math.floor(Math.random()*chars.length)];return s;}
