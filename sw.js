@@ -1,4 +1,4 @@
-const CACHE = 'vaultkey-v2-2-3-d';
+const CACHE = 'vaultkey-v2-2-4';
 const FILES = [
   './index.html',
   './manifest.json',
