@@ -1,10 +1,12 @@
 const CACHE = 'vaultkey-v2-2-4';
 const FILES = [
   './index.html',
+  './style.css',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
   './vaultkey-shield-scene.png?v=221'
+];
 ];
 const NO_CACHE_HOSTS = [
   'accounts.google.com',
