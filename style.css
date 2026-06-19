@@ -263,7 +263,7 @@ select option { background:#000F24; color:var(--t1); }
 .onboardSlide.active { display:flex; }
 
 .onboardHeroWrap { display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.onboardHeroImg  { width:min(92vw,380px); }
+.onboardHeroImg  { width:min(72vw,280px); }
 
 .onboardTitle { font-size:26px; font-weight:950; line-height:1.1; letter-spacing:-.5px; color:var(--t1); margin:20px 0 10px; }
 .onboardTitle span { color:var(--cyan); }
@@ -773,7 +773,7 @@ input[type=range]::-moz-range-thumb {
 /* Media pequeÃ±o */
 @media (max-height:740px) {
   .shield { width:min(78vw,300px); }
-  .onboardHeroImg { width:min(84vw,340px); }
+  .onboardHeroImg { width:min(64vw,240px); }
   .onboardTitle { font-size:22px; margin:14px 0 8px; }
   .keys { grid-template-columns:repeat(3,60px); gap:8px 18px; }
   .key  { width:60px; height:60px; font-size:22px; }
