@@ -1939,8 +1939,8 @@ h+='</div>';
 /* ── Etiquetas ── */
 if(e.tags&&e.tags.length){
   h+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding:0 2px">';
-  e.tags.forEach(t=>{
-    h+='<span style="display:inline-flex;align-items:center;background:rgba(0,180,255,.1);border:1px solid rgba(0,180,255,.25);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;color:#00b8e6;cursor:pointer" onclick="setTagFilter(''+t+'');closeModals();show('vault')">#'+esc(t)+'</span>';
+  e.tags.forEach(function(t){
+    h+='<span style="display:inline-flex;align-items:center;background:rgba(0,180,255,.1);border:1px solid rgba(0,180,255,.25);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;color:#00b8e6;cursor:pointer" onclick="setTagFilter(this.dataset.tag);closeModals();show(\u0027vault\u0027)" data-tag="'+esc(t)+'">#'+esc(t)+'</span>';
   });
   h+='</div>';
 }
@@ -3062,7 +3062,13 @@ function renderTagChipsEdit(){
   _entryTags.forEach(tag => {
     const chip = document.createElement('span');
     chip.style.cssText = 'display:inline-flex;align-items:center;gap:4px;background:rgba(0,180,255,.15);border:1px solid rgba(0,180,255,.35);border-radius:20px;padding:3px 10px 3px 10px;font-size:12px;color:#00d9ff;font-weight:700;cursor:default';
-    chip.innerHTML = `#${esc(tag)} <button onclick="removeEntryTag('${tag}')" style="border:0;background:none;color:#00d9ff;font-size:12px;cursor:pointer;padding:0;line-height:1;margin-left:2px">✕</button>`;
+    const chipText = document.createTextNode('#'+tag+' ');
+    const chipBtn = document.createElement('button');
+    chipBtn.textContent = '✕';
+    chipBtn.style.cssText = 'border:0;background:none;color:#00d9ff;font-size:12px;cursor:pointer;padding:0;line-height:1;margin-left:2px';
+    chipBtn.onclick = (function(t){return function(){removeEntryTag(t);};})(tag);
+    chip.appendChild(chipText);
+    chip.appendChild(chipBtn);
     el.appendChild(chip);
   });
 }
@@ -3124,7 +3130,7 @@ function renderTagFilterChips(){
         border:1px solid ${active?'rgba(0,210,255,.6)':'rgba(0,180,255,.2)'};
         background:${active?'rgba(0,210,255,.15)':'none'};
         color:${active?'#00d9ff':'#4a7090'}`;
-      chip.innerHTML = `#${esc(tag)} <span style="opacity:.6">${count}</span>`;
+      chip.textContent = '#'+tag+' '+count;
       chips.appendChild(chip);
     });
 }
