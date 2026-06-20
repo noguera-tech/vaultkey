@@ -27,7 +27,14 @@ function setEntryType(type){
   if(eService)eService.placeholder=isNote?'Título de la nota...':isCard?'Nombre identificativo (ej: Visa BBVA)...':'Gmail, Banco, Netflix...';
   if(eServiceLabel)eServiceLabel.textContent=isNote?'Título de la nota *':isCard?'Nombre identificativo *':'Nombre del servicio *';
 }
-const $=id=>document.getElementById(id);const byId=$;const enc=new TextEncoder(),dec=new TextDecoder();
+const $=id=>document.getElementById(id);
+function fmtExpiry(el){
+  let v=el.value.replace(/[^0-9]/g,'');
+  if(v.length>=3) v=v.substring(0,2)+'/'+v.substring(2,4);
+  else if(v.length===2 && el._lastLen!==1) v=v+'/';
+  el._lastLen=el.value.length;
+  el.value=v;
+}const byId=$;const enc=new TextEncoder(),dec=new TextDecoder();
 function b64(buf){return btoa(String.fromCharCode(...new Uint8Array(buf)))}function ub64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
 async function digest(s){let h=await crypto.subtle.digest('SHA-256',enc.encode(s));return b64(h)}
 async function hashPin(p,salt){const key=await crypto.subtle.importKey('raw',enc.encode(p),'PBKDF2',false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:ub64(salt),iterations:200000,hash:'SHA-256'},key,256);return b64(bits);}
@@ -1080,7 +1087,6 @@ async function doImportConfirm() {
       cardNumber: String(e.cardNumber||''),
       cardExpiry: String(e.cardExpiry||''),
       cardCvv: String(e.cardCvv||''),
-      cardBank: String(e.cardBank||''),
       cardType: String(e.cardType||''),
     }));
     render();
@@ -1366,7 +1372,7 @@ function openEntry(e=null){
   if($('eCardNumber'))$('eCardNumber').value=e?.cardNumber||'';
   if($('eCardExpiry'))$('eCardExpiry').value=e?.cardExpiry||'';
   if($('eCardCvv'))$('eCardCvv').value=e?.cardCvv||'';
-  if($('eCardBank'))$('eCardBank').value=e?.cardBank||'';
+
   if($('eCardType'))$('eCardType').value=e?.cardType||'visa';
   if($('eIconSearch'))$('eIconSearch').value='';
   // FIX: Resetear categoría a 'general' en nueva entrada, o restaurar la guardada
@@ -1479,7 +1485,6 @@ async function saveEntry(){
     cardNumber:($('eCardNumber')?.value||'').replace(/\s/g,''),
     cardExpiry:($('eCardExpiry')?.value||'').trim(),
     cardCvv:($('eCardCvv')?.value||'').trim(),
-    cardBank:($('eCardBank')?.value||'').trim(),
     cardType:($('eCardType')?.value||'visa'),
   }:{};
   let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,...cardData,type:'Cuenta',category:($('eCategory')?.value||'general'),user:_entryType==='note'?'':userVal,email:_entryType==='note'?'':emailVal,pass:_entryType==='note'?'':pass,url:_entryType==='note'?'':urlVal,note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
@@ -1631,7 +1636,6 @@ if(e.entryType==='note'){
   h+=qvRow('Número','💳','<span id="qvCardNum" style="font-family:ui-monospace,monospace;letter-spacing:.5px">'+esc(maskedNum)+'</span>',qvBtn('Ver','toggleQvCard()')+qvBtn('Copiar','copyText(current.cardNumber,this)'));
   if(e.cardExpiry)h+=qvRow('Caducidad','📅',esc(e.cardExpiry),'');
   if(e.cardCvv)h+=qvRow('CVV','🔒','<span id="qvCvv">•••</span>',qvBtn('Ver','toggleQvCvv()'));
-  if(e.cardBank)h+=qvRow('Banco','🏦',esc(e.cardBank),'');
   if(e.cardType)h+=qvRow('Tipo','💳',esc(e.cardType.charAt(0).toUpperCase()+e.cardType.slice(1)),'',true);
 } else {
 if(u)h+=qvRow('Usuario','\ud83d\udc64',esc(u),qvBtn('Copiar','copyText(userFromEntry(current),this)'));
