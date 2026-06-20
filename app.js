@@ -40,7 +40,13 @@ function setEntryType(type){
   const labels={password:'Nombre del servicio *',note:'Título de la nota *',card:'Nombre identificativo *',id:'Nombre identificativo *',license:'Nombre identificativo *',medical:'Nombre identificativo *',wifi:'Nombre de la red (SSID) *'};
   if(eService)eService.placeholder=placeholders[type]||'Nombre...';
   if(eServiceLabel)eServiceLabel.textContent=labels[type]||'Nombre *';
-  // No auto-asignar categoría — el usuario la elige
+  // Sugerir categoría por tipo (solo si está en 'general' o vacío)
+  const eCat=$('eCategory');
+  if(eCat&&(eCat.value===''||eCat.value==='general')){
+    const suggest={password:'general',note:'general',card:'banco',
+      id:'documentos',license:'documentos',medical:'salud',wifi:'wifi'};
+    if(suggest[type]&&suggest[type]!=='general')eCat.value=suggest[type];
+  }
 }
 const $=id=>document.getElementById(id);
 function fmtDate(el){
@@ -1615,7 +1621,21 @@ function render(){let q=($('search')?.value||'').toLowerCase();
   } else {
     if(elist) elist.style.display='';
     if(rvault) rvault.style.display='none';
-    const _cf=_catFilter||'';const _catMatch=(e)=>{if(!_cf)return true;if((e.category||'general')===_cf)return true;if(e.entryType==='wifi'&&_cf==='wifi')return true;if((e.entryType==='id'||e.entryType==='license'||e.entryType==='medical')&&_cf==='otros')return true;return false;};let list=vault.filter(e=>entrySearchText(e).includes(q)&&_catMatch(e));$('entryList')&&( $('entryList').innerHTML='', list.length?list.forEach(e=>{try{$('entryList').appendChild(row(e))}catch(err){console.warn('row error',e?.id,err)}}):$('entryList').innerHTML='<div class="empty"><div class="emptyVault"><svg viewBox="0 0 80 80" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="16" width="64" height="52" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,80,200,.08)"/><rect x="8" y="16" width="64" height="14" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,100,255,.15)"/><circle cx="40" cy="50" r="11" stroke="#00d4ff" stroke-width="2.5" fill="rgba(0,210,255,.06)"/><circle cx="40" cy="50" r="4" fill="#00d4ff" opacity=".7"/><line x1="40" y1="39" x2="40" y2="43" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="57" x2="40" y2="61" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="29" y1="50" x2="33" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="47" y1="50" x2="51" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="62" y="40" width="8" height="16" rx="4" stroke="#1a6fff" stroke-width="2" fill="rgba(0,80,200,.1)"/></svg></div><b style="color:#e0f0ff;font-size:16px">Tu bóveda está vacía</b><p style="color:#4a7090;margin-top:6px;font-size:13px">Crea tu primera credencial con el botón +</p></div>');
+    const _cf=_catFilter||'';const _catMatch=(e)=>{
+  if(!_cf)return true;
+  const cat=e.category||'general';
+  if(cat===_cf)return true;
+  // Mapeos entryType → catChip
+  if(e.entryType==='wifi'&&_cf==='wifi')return true;
+  if(e.entryType==='card'&&_cf==='banco')return true;
+  if(e.entryType==='id'&&_cf==='documentos')return true;
+  if(e.entryType==='license'&&_cf==='documentos')return true;
+  if(e.entryType==='medical'&&_cf==='salud')return true;
+  // Mapeos categoría legacy → catChip nuevo
+  if(cat==='otros'&&_cf==='documentos'&&['id','license'].includes(e.entryType))return true;
+  if(cat==='otros'&&_cf==='salud'&&e.entryType==='medical')return true;
+  return false;
+};let list=vault.filter(e=>entrySearchText(e).includes(q)&&_catMatch(e));$('entryList')&&( $('entryList').innerHTML='', list.length?list.forEach(e=>{try{$('entryList').appendChild(row(e))}catch(err){console.warn('row error',e?.id,err)}}):$('entryList').innerHTML='<div class="empty"><div class="emptyVault"><svg viewBox="0 0 80 80" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="16" width="64" height="52" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,80,200,.08)"/><rect x="8" y="16" width="64" height="14" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,100,255,.15)"/><circle cx="40" cy="50" r="11" stroke="#00d4ff" stroke-width="2.5" fill="rgba(0,210,255,.06)"/><circle cx="40" cy="50" r="4" fill="#00d4ff" opacity=".7"/><line x1="40" y1="39" x2="40" y2="43" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="57" x2="40" y2="61" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="29" y1="50" x2="33" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="47" y1="50" x2="51" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="62" y="40" width="8" height="16" rx="4" stroke="#1a6fff" stroke-width="2" fill="rgba(0,80,200,.1)"/></svg></div><b style="color:#e0f0ff;font-size:16px">Tu bóveda está vacía</b><p style="color:#4a7090;margin-top:6px;font-size:13px">Crea tu primera credencial con el botón +</p></div>');
   }
   renderFav();let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);$('recentList')&&( $('recentList').innerHTML='', recent.length?recent.forEach(e=>{try{$('recentList').appendChild(row(e))}catch(err){console.warn('row fav error',e?.id,err)}}):$('recentList').innerHTML='<p class="sub">Todavía no has usado entradas.</p>');$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
 
@@ -1883,6 +1903,20 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     ['medico,salud,hospital,clinica,health,medical,seguridad social,sip', vk128Icon('MED','#991b1b','#fff',14)],
     ['wifi,wi-fi,router,red,ssid,internet casa,fibra', vk128Icon('WiFi','#0369a1','#fff',13)],
     ['airbnb', vk128Icon('A','#FF5A5F','#fff',25)],
+    ['dgt,dirección general de tráfico,trafico,tráfico,permiso conducir', vk128Icon('DGT','#c00','#fff',13)],
+    ['sgt,sección de gestión tributaria,gestión tributaria', vk128Icon('SGT','#1d4ed8','#fff',13)],
+    ['hacienda,agencia tributaria,aeat,tax,impuestos,renta,irpf', vk128Icon('AEAT','#c00','#fff',13)],
+    ['seguridad social,seg social,inss,tesoreria,tesorería', vk128Icon('SS','#003f8c','#fff',16)],
+    ['mutua,mutua madrileña,mutua universal,mutualia,asisa,sanitas', vk128Icon('MUT','#0066cc','#fff',14)],
+    ['dni electronico,dni electrónico,clave pin,cl@ve,clave permanente', vk128Icon('CL@','#005eb8','#fff',14)],
+    ['ayuntamiento,municipio,padron,padrón,empadronamiento', vk128Icon('AYT','#4a7c3f','#fff',14)],
+    ['correos,correos de españa,correos express', vk128Icon('COR','#ffcc00','#333',14)],
+    ['renfe,cercanias,cercanías,ave,tren,feve', vk128Icon('RNF','#c00','#fff',14)],
+    ['seat,sepe,inem,desempleo,paro,erte', vk128Icon('SEPE','#004691','#fff',13)],
+    ['consejeria,consejería,junta,generalitat,xunta,diputacion', vk128Icon('GOB','#2563eb','#fff',14)],
+    ['hospital,clinica,clínica,medico,médico,cita previa,sanidad', vk128Icon('SAN','#dc2626','#fff',14)],
+    ['universidad,uned,campus,matricula,matrícula,expediente', vk128Icon('UNI','#7c3aed','#fff',14)],
+    ['catastro,registro,notaria,notaría,escritura', vk128Icon('REG','#0f766e','#fff',14)],
     ['skype', vk128Icon('S','#00AFF0','#fff',25)],
     ['wordpress', vk128Icon('W','#21759B','#fff',25)],
     ['wix', vk128Icon('W','#111827','#fff',25)],
@@ -2126,6 +2160,13 @@ function serviceLabel(id){
 }
 const _synonymMap={
   banco:['bank','bbva','santander','caixa','ing','banesco','mercantil','banco','chase','boa','wellsfargo','zelle','revolut','wise'],
+  gobierno:['dgt','sgt','aeat','hacienda','seguridad social','mutua','clave','ayuntamiento','correos','renfe','sepe','inem','diputacion','consejeria','junta','generalitat'],
+  salud:['hospital','clinica','medico','sanidad','mutua','asisa','sanitas','farmacia','cita previa'],
+  documentos:['dni','nie','pasaporte','cedula','licencia','carnet','permiso','catastro','registro','notaria'],
+  viajes:['airbnb','booking','renfe','iberia','ryanair','vueling','aena','trivago','kayak','hotels'],
+  educacion:['universidad','uned','campus','escuela','instituto','coursera','udemy','khan'],
+  familia:['pediatra','colegio','guarderia','seguro escolar'],
+  desarrollo:['github','gitlab','bitbucket','vercel','netlify','aws','gcp','azure','cloudflare','digitalocean','hetzner'],
   bancos:['bank','bbva','santander','caixa','ing','banesco','mercantil','banco','chase','boa','wellsfargo','zelle','revolut','wise'],
   bank:['bank','bbva','santander','caixa','ing','banesco','mercantil','chase','boa','wellsfargo','zelle','revolut','wise'],
   correo:['gmail','outlook','hotmail','yahoo','icloud','proton','google'],
@@ -2280,3 +2321,88 @@ function rankIcon(ic){
     setTimeout(()=>{try{window.renderIconStrip()}catch(e){}},300);
   });
 })();
+
+
+// ══════════════════════════════════════════════════════
+//  SISTEMA DE NOTIFICACIONES LOCALES — VaultKey
+// ══════════════════════════════════════════════════════
+
+// Comprobar recordatorios al desbloquear la bóveda
+function checkVaultReminders(){
+  if(!vault||!vault.length)return;
+  const now=Date.now();
+  const reminders=[];
+
+  // 1. Contraseñas antiguas (>90 días)
+  const oldPassDays=90;
+  vault.forEach(e=>{
+    if(e.entryType!=='password'||!e.pass)return;
+    const age=Math.floor((now-(e.updated||now))/(1000*60*60*24));
+    if(age>=oldPassDays){
+      reminders.push({type:'oldpass',service:e.service,age,id:e.id});
+    }
+  });
+
+  // 2. Tarjetas caducadas o próximas a caducar (30 días)
+  vault.forEach(e=>{
+    if(e.entryType!=='card'||!e.cardExpiry)return;
+    const [mm,yy]=e.cardExpiry.split('/').map(Number);
+    if(!mm||!yy)return;
+    const expDate=new Date(2000+yy,mm-1,1);
+    const daysLeft=Math.floor((expDate-now)/(1000*60*60*24));
+    if(daysLeft<0){
+      reminders.push({type:'cardexpired',service:e.service,id:e.id});
+    } else if(daysLeft<=30){
+      reminders.push({type:'cardexpiring',service:e.service,days:daysLeft,id:e.id});
+    }
+  });
+
+  // 3. Documentos caducados o próximos a caducar (60 días)
+  vault.forEach(e=>{
+    if(!['id','license'].includes(e.entryType))return;
+    const expStr=e.idExpiry||e.licExpiry||'';
+    if(!expStr||expStr.length<10)return;
+    const [dd,mm,yyyy]=expStr.split('/').map(Number);
+    if(!dd||!mm||!yyyy)return;
+    const expDate=new Date(yyyy,mm-1,dd);
+    const daysLeft=Math.floor((expDate-now)/(1000*60*60*24));
+    const name=e.service||'Documento';
+    if(daysLeft<0){
+      reminders.push({type:'docexpired',service:name,id:e.id});
+    } else if(daysLeft<=60){
+      reminders.push({type:'docexpiring',service:name,days:daysLeft,id:e.id});
+    }
+  });
+
+  // 4. Notas con recordatorio (campo medNotes o note que empiece con 🔔)
+  vault.forEach(e=>{
+    const noteText=e.note||e.medNotes||'';
+    if(noteText.startsWith('🔔')){
+      reminders.push({type:'note',service:e.service,id:e.id});
+    }
+  });
+
+  if(!reminders.length)return;
+
+  // Mostrar máximo 3 recordatorios, uno cada 4 segundos
+  reminders.slice(0,3).forEach((r,i)=>{
+    setTimeout(()=>{
+      let msg='';
+      if(r.type==='oldpass') msg=`⏰ ${r.service}: contraseña con ${r.age} días sin cambiar`;
+      else if(r.type==='cardexpired') msg=`⚠️ Tarjeta ${r.service} caducada`;
+      else if(r.type==='cardexpiring') msg=`💳 ${r.service}: caduca en ${r.days} días`;
+      else if(r.type==='docexpired') msg=`⚠️ ${r.service}: documento caducado`;
+      else if(r.type==='docexpiring') msg=`🪪 ${r.service}: caduca en ${r.days} días`;
+      else if(r.type==='note') msg=`🔔 Recordatorio: ${r.service}`;
+      if(msg) toast(msg, 5000);
+    }, 3000 + i*4500);
+  });
+}
+
+// Hook: llamar checkVaultReminders al desbloquear
+const _origUnlockOk=window.unlockOk;
+window.unlockOk=async function(p){
+  if(_origUnlockOk) await _origUnlockOk(p);
+  setTimeout(checkVaultReminders, 1500);
+};
+window._checkVaultReminders=checkVaultReminders;

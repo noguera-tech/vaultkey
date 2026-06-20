@@ -66,15 +66,23 @@
 </div>
 <div class="search targetSearch"><input id="search" placeholder="Buscar entradas..." oninput="render()"></div>
 <div style="position:relative"><div id="catFilterRow" style="display:flex;gap:6px;overflow-x:auto;padding:8px 20px 4px 4px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x mandatory">
-  <button class="catChip active" onclick="setCatFilter('',this)">Todas</button>
+  <button class="catChip active" onclick="setCatFilter('',this)">✦ Todas</button>
   <button class="catChip" onclick="setCatFilter('banco',this)">🏦 Banco</button>
   <button class="catChip" onclick="setCatFilter('correo',this)">📧 Correo</button>
   <button class="catChip" onclick="setCatFilter('social',this)">💬 Social</button>
+  <button class="catChip" onclick="setCatFilter('trabajo',this)">💼 Trabajo</button>
   <button class="catChip" onclick="setCatFilter('streaming',this)">🎬 Stream</button>
   <button class="catChip" onclick="setCatFilter('compras',this)">🛒 Compras</button>
-  <button class="catChip" onclick="setCatFilter('trabajo',this)">💼 Trabajo</button>
   <button class="catChip" onclick="setCatFilter('gaming',this)">🎮 Gaming</button>
   <button class="catChip" onclick="setCatFilter('cripto',this)">₿ Cripto</button>
+  <button class="catChip" onclick="setCatFilter('wifi',this)">📶 WiFi</button>
+  <button class="catChip" onclick="setCatFilter('gobierno',this)">🏛️ Gobierno</button>
+  <button class="catChip" onclick="setCatFilter('salud',this)">🏥 Salud</button>
+  <button class="catChip" onclick="setCatFilter('documentos',this)">🪪 Docs</button>
+  <button class="catChip" onclick="setCatFilter('viajes',this)">✈️ Viajes</button>
+  <button class="catChip" onclick="setCatFilter('educacion',this)">🎓 Educación</button>
+  <button class="catChip" onclick="setCatFilter('familia',this)">👨‍👩‍👧 Familia</button>
+  <button class="catChip" onclick="setCatFilter('servidor',this)">🖥️ Servidor</button>
   <button class="catChip" onclick="setCatFilter('otros',this)">📁 Otros</button>
 </div></div>
 <div class="vaultTabs"><button class="active" id="tabTodas" onclick="switchVaultTab('todas',this)">Todas <span id="vaultSub">0 entradas</span></button><button id="tabFav" onclick="show('fav')">Favoritos</button><button id="tabRecientes" onclick="switchVaultTab('recientes',this)">Recientes</button></div>
@@ -266,16 +274,40 @@
   <div class="label">CATEGORÍA</div>
   <select id="eCategory" class="inp" style="width:100%;padding:10px 12px;border-radius:10px;appearance:none;-webkit-appearance:none;cursor:pointer">
     <option value="general">🗂️ General</option>
-    <option value="banco">🏦 Banco y finanzas</option>
-    <option value="correo">📧 Correo electrónico</option>
-    <option value="social">💬 Redes sociales</option>
-    <option value="streaming">🎬 Streaming</option>
-    <option value="compras">🛒 Compras</option>
-    <option value="trabajo">💼 Trabajo</option>
-    <option value="gaming">🎮 Gaming</option>
-    <option value="cripto">₿ Cripto</option>
-    <option value="wifi">📶 WiFi y routers</option>
-    <option value="servidor">🖥️ Servidores y hosting</option>
+    <optgroup label="── Finanzas ──">
+      <option value="banco">🏦 Banco y finanzas</option>
+      <option value="cripto">₿ Criptomonedas</option>
+      <option value="inversion">📈 Inversión y bolsa</option>
+      <option value="seguro">🛡️ Seguros</option>
+    </optgroup>
+    <optgroup label="── Comunicación ──">
+      <option value="correo">📧 Correo electrónico</option>
+      <option value="social">💬 Redes sociales</option>
+      <option value="mensajeria">💬 Mensajería</option>
+    </optgroup>
+    <optgroup label="── Ocio ──">
+      <option value="streaming">🎬 Streaming y música</option>
+      <option value="gaming">🎮 Gaming</option>
+      <option value="viajes">✈️ Viajes y transporte</option>
+      <option value="compras">🛒 Compras online</option>
+    </optgroup>
+    <optgroup label="── Trabajo ──">
+      <option value="trabajo">💼 Trabajo y empresa</option>
+      <option value="servidor">🖥️ Servidores y hosting</option>
+      <option value="educacion">🎓 Educación y formación</option>
+    </optgroup>
+    <optgroup label="── Personal ──">
+      <option value="gobierno">🏛️ Gobierno y administración</option>
+      <option value="salud">🏥 Salud y sanidad</option>
+      <option value="documentos">🪪 Documentos personales</option>
+      <option value="familia">👨‍👩‍👧 Familia</option>
+      <option value="wifi">📶 WiFi y redes</option>
+    </optgroup>
+    <optgroup label="── Tecnología ──">
+      <option value="cloud">☁️ Cloud y almacenamiento</option>
+      <option value="dominio">🌐 Dominios y DNS</option>
+      <option value="desarrollo">💻 Desarrollo y código</option>
+    </optgroup>
     <option value="otros">📁 Otros</option>
   </select>
 </div>
