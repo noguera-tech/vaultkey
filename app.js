@@ -347,8 +347,60 @@ function closeModals(){
     }
     m.classList.remove('open');
   });
-  editId=null;useGenTarget=false;selectedEntryIcon='';
+  editId=null;useGenTarget=false;selectedEntryIcon='';try{resetNoteReminder();}catch(e){}
 }
+
+// ══ RECORDATORIO EN NOTAS ══
+let _reminderActive = false;
+
+function toggleNoteReminder(){
+  _reminderActive = !_reminderActive;
+  const toggle = $('reminderToggle');
+  const thumb  = $('reminderThumb');
+  const fields = $('reminderFields');
+  const hint   = $('reminderHint');
+  if(_reminderActive){
+    if(toggle){ toggle.style.background='rgba(0,210,255,.35)'; toggle.style.borderColor='rgba(0,210,255,.7)'; }
+    if(thumb) { thumb.style.background='#00d9ff'; thumb.style.left='22px'; }
+    if(fields){ fields.style.display=''; }
+    if(hint)  { hint.textContent='Recordatorio activado'; hint.style.color='#00d9ff'; }
+    // Poner fecha de hoy por defecto si está vacía
+    const dateEl=$('eReminderDate');
+    if(dateEl&&!dateEl.value){
+      const d=new Date(); d.setDate(d.getDate()+1);
+      dateEl.value=d.toISOString().split('T')[0];
+    }
+  } else {
+    if(toggle){ toggle.style.background='rgba(0,100,180,.3)'; toggle.style.borderColor='rgba(0,180,255,.3)'; }
+    if(thumb) { thumb.style.background='#7ab0d0'; thumb.style.left='2px'; }
+    if(fields){ fields.style.display='none'; }
+    if(hint)  { hint.textContent='Avisa al abrir la app'; hint.style.color='rgba(160,210,240,.6)'; }
+  }
+}
+
+function resetNoteReminder(){
+  _reminderActive=false;
+  const toggle=$('reminderToggle');const thumb=$('reminderThumb');const fields=$('reminderFields');const hint=$('reminderHint');
+  if(toggle){toggle.style.background='rgba(0,100,180,.3)';toggle.style.borderColor='rgba(0,180,255,.3)';}
+  if(thumb){thumb.style.background='#7ab0d0';thumb.style.left='2px';}
+  if(fields)fields.style.display='none';
+  if(hint){hint.textContent='Avisa al abrir la app';hint.style.color='rgba(160,210,240,.6)';}
+  const dateEl=$('eReminderDate');if(dateEl)dateEl.value='';
+  const timeEl=$('eReminderTime');if(timeEl)timeEl.value='09:00';
+  const msgEl=$('eReminderMsg');if(msgEl)msgEl.value='';
+}
+
+function loadNoteReminder(e){
+  resetNoteReminder();
+  if(!e||!e.reminder)return;
+  const r=e.reminder;
+  _reminderActive=true;
+  toggleNoteReminder();
+  const dateEl=$('eReminderDate');if(dateEl&&r.date)dateEl.value=r.date;
+  const timeEl=$('eReminderTime');if(timeEl&&r.time)timeEl.value=r.time;
+  const msgEl=$('eReminderMsg');if(msgEl&&r.msg)msgEl.value=r.msg;
+}
+
 function confirmRecoverySaved(){
   vibe([30,20,60]);
   const btn=$('recoveryCloseBtn');
@@ -1124,6 +1176,7 @@ async function doImportConfirm() {
       used: Number(e.used||0),
       updated: Number(e.updated||0),
       passHistory: Array.isArray(e.passHistory)?e.passHistory:[],
+      reminder: e.reminder||null,
       cardName: String(e.cardName||''),
       cardNumber: String(e.cardNumber||''),
       cardExpiry: String(e.cardExpiry||''),
@@ -1421,6 +1474,8 @@ function openEntry(e=null){
   if($('eUrl'))$('eUrl').value=e?.url||'';
   if($('eNote'))$('eNote').value=e?.note||'';
   if($('eSecureNote'))$('eSecureNote').value=(e?.entryType==='note'?e?.note:'')||'';
+  // Cargar recordatorio si existe
+  try{ loadNoteReminder(e?.entryType==='note'?e:null); }catch(err){}
   // Restaurar campos de tarjeta
   if($('eCardName'))$('eCardName').value=e?.cardName||'';
   if($('eCardNumber'))$('eCardNumber').value=e?.cardNumber||'';
@@ -1549,6 +1604,12 @@ async function saveEntry(){
     _newHistory = [histEntry, ..._prevHistory].slice(0,3); // máximo 3
   }
   const secureNoteVal=_entryType==='note'?($('eSecureNote')?.value||'').trim():'';
+  const reminderData=(_entryType==='note'&&_reminderActive)?{
+    date:($('eReminderDate')?.value||''),
+    time:($('eReminderTime')?.value||'09:00'),
+    msg:($('eReminderMsg')?.value||'').trim()||secureNoteVal.slice(0,60),
+    active:true,
+  }:null;
   const cardData=_entryType==='card'?{
     cardName:($('eCardName')?.value||'').trim(),
     cardNumber:($('eCardNumber')?.value||'').replace(/\s/g,''),
@@ -1589,7 +1650,7 @@ async function saveEntry(){
     wifiIp:($('eWifiIp')?.value||'').trim(),
   }:{};
   const isPassType=_entryType==='password';
-  let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,...cardData,...idData,...licData,...medData,...wifiData,type:'Cuenta',category:($('eCategory')?.value||'general'),user:isPassType?userVal:'',email:isPassType?emailVal:'',pass:isPassType?pass:'',url:isPassType?urlVal:'',note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
+  let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,...cardData,...idData,...licData,...medData,...wifiData,type:'Cuenta',category:($('eCategory')?.value||'general'),user:isPassType?userVal:'',email:isPassType?emailVal:'',pass:isPassType?pass:'',url:isPassType?urlVal:'',note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),reminder:reminderData||null,icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
   let i=vault.findIndex(x=>x.id===entry.id);
   if(i>=0)vault[i]=entry;else vault.unshift(entry);
   _catFilter='';_vaultTab='todas';document.querySelectorAll('.catChip').forEach(c=>c.classList.remove('active'));const _fc=document.querySelectorAll('.catChip')[0];if(_fc)_fc.classList.add('active');
@@ -2327,75 +2388,63 @@ function rankIcon(ic){
 //  SISTEMA DE NOTIFICACIONES LOCALES — VaultKey
 // ══════════════════════════════════════════════════════
 
-// Comprobar recordatorios al desbloquear la bóveda
+// ══ Comprobar recordatorios al desbloquear ══
 function checkVaultReminders(){
   if(!vault||!vault.length)return;
   const now=Date.now();
+  const todayStr=new Date().toISOString().split('T')[0];
   const reminders=[];
 
-  // 1. Contraseñas antiguas (>90 días)
-  const oldPassDays=90;
   vault.forEach(e=>{
-    if(e.entryType!=='password'||!e.pass)return;
-    const age=Math.floor((now-(e.updated||now))/(1000*60*60*24));
-    if(age>=oldPassDays){
-      reminders.push({type:'oldpass',service:e.service,age,id:e.id});
+    // Recordatorio de nota con fecha
+    if(e.entryType==='note'&&e.reminder&&e.reminder.active&&e.reminder.date){
+      if(e.reminder.date<=todayStr){
+        reminders.push({type:'note',service:e.service,msg:e.reminder.msg||e.service,id:e.id,date:e.reminder.date});
+      }
+      return;
     }
-  });
-
-  // 2. Tarjetas caducadas o próximas a caducar (30 días)
-  vault.forEach(e=>{
-    if(e.entryType!=='card'||!e.cardExpiry)return;
-    const [mm,yy]=e.cardExpiry.split('/').map(Number);
-    if(!mm||!yy)return;
-    const expDate=new Date(2000+yy,mm-1,1);
-    const daysLeft=Math.floor((expDate-now)/(1000*60*60*24));
-    if(daysLeft<0){
-      reminders.push({type:'cardexpired',service:e.service,id:e.id});
-    } else if(daysLeft<=30){
-      reminders.push({type:'cardexpiring',service:e.service,days:daysLeft,id:e.id});
+    // Contraseñas antiguas >90 días
+    if(e.entryType==='password'&&e.pass){
+      const age=Math.floor((now-(e.updated||now))/(1000*60*60*24));
+      if(age>=90) reminders.push({type:'oldpass',service:e.service,age,id:e.id});
     }
-  });
-
-  // 3. Documentos caducados o próximos a caducar (60 días)
-  vault.forEach(e=>{
-    if(!['id','license'].includes(e.entryType))return;
-    const expStr=e.idExpiry||e.licExpiry||'';
-    if(!expStr||expStr.length<10)return;
-    const [dd,mm,yyyy]=expStr.split('/').map(Number);
-    if(!dd||!mm||!yyyy)return;
-    const expDate=new Date(yyyy,mm-1,dd);
-    const daysLeft=Math.floor((expDate-now)/(1000*60*60*24));
-    const name=e.service||'Documento';
-    if(daysLeft<0){
-      reminders.push({type:'docexpired',service:name,id:e.id});
-    } else if(daysLeft<=60){
-      reminders.push({type:'docexpiring',service:name,days:daysLeft,id:e.id});
+    // Tarjetas caducadas o próximas
+    if(e.entryType==='card'&&e.cardExpiry){
+      const[mm,yy]=e.cardExpiry.split('/').map(Number);
+      if(mm&&yy){
+        const exp=new Date(2000+yy,mm-1,1);
+        const days=Math.floor((exp-now)/(1000*60*60*24));
+        if(days<0) reminders.push({type:'cardexpired',service:e.service,id:e.id});
+        else if(days<=30) reminders.push({type:'cardexpiring',service:e.service,days,id:e.id});
+      }
     }
-  });
-
-  // 4. Notas con recordatorio (campo medNotes o note que empiece con 🔔)
-  vault.forEach(e=>{
-    const noteText=e.note||e.medNotes||'';
-    if(noteText.startsWith('🔔')){
-      reminders.push({type:'note',service:e.service,id:e.id});
+    // Documentos caducados o próximos
+    if(['id','license'].includes(e.entryType)){
+      const expStr=e.idExpiry||e.licExpiry||'';
+      if(expStr&&expStr.length===10){
+        const[dd,mm,yyyy]=expStr.split('/').map(Number);
+        if(dd&&mm&&yyyy){
+          const exp=new Date(yyyy,mm-1,dd);
+          const days=Math.floor((exp-now)/(1000*60*60*24));
+          if(days<0) reminders.push({type:'docexpired',service:e.service,id:e.id});
+          else if(days<=60) reminders.push({type:'docexpiring',service:e.service,days,id:e.id});
+        }
+      }
     }
   });
 
   if(!reminders.length)return;
-
-  // Mostrar máximo 3 recordatorios, uno cada 4 segundos
   reminders.slice(0,3).forEach((r,i)=>{
     setTimeout(()=>{
       let msg='';
-      if(r.type==='oldpass') msg=`⏰ ${r.service}: contraseña con ${r.age} días sin cambiar`;
+      if(r.type==='note')       msg=`🔔 ${r.msg}`;
+      else if(r.type==='oldpass')     msg=`⏰ ${r.service}: ${r.age} días sin cambiar contraseña`;
       else if(r.type==='cardexpired') msg=`⚠️ Tarjeta ${r.service} caducada`;
-      else if(r.type==='cardexpiring') msg=`💳 ${r.service}: caduca en ${r.days} días`;
-      else if(r.type==='docexpired') msg=`⚠️ ${r.service}: documento caducado`;
+      else if(r.type==='cardexpiring')msg=`💳 ${r.service}: caduca en ${r.days} días`;
+      else if(r.type==='docexpired')  msg=`⚠️ ${r.service}: documento caducado`;
       else if(r.type==='docexpiring') msg=`🪪 ${r.service}: caduca en ${r.days} días`;
-      else if(r.type==='note') msg=`🔔 Recordatorio: ${r.service}`;
-      if(msg) toast(msg, 5000);
-    }, 3000 + i*4500);
+      if(msg) toast(msg,6000);
+    },2000+i*5000);
   });
 }
 

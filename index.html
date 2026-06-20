@@ -170,9 +170,42 @@
 <!-- CONTRASEÑA -->
 <div class="field" id="fieldPass"><div class="label">Contraseña / código *</div><div style="display:flex;gap:8px"><input class="inp" id="ePass" style="flex:1" placeholder="Contraseña o PIN" inputmode="text"><button class="smallBtn" onclick="openGen(true)">🔑</button></div><div class="strength"><i id="strBar"></i></div><div class="sub" id="strTxt">Mínimo 6 caracteres.</div></div>
 <!-- NOTA SEGURA (solo visible en modo nota) -->
-<div id="fieldSecureNote" style="display:none" class="field">
-  <div class="label">Contenido de la nota *</div>
-  <textarea class="inp" id="eSecureNote" placeholder="Escribe tu nota segura aquí..." rows="6" style="resize:none;line-height:1.5"></textarea>
+<div id="fieldSecureNote" style="display:none">
+  <div class="field">
+    <div class="label">Contenido de la nota *</div>
+    <textarea class="inp" id="eSecureNote" placeholder="Escribe tu nota segura aquí..." rows="6" style="resize:none;line-height:1.5"></textarea>
+  </div>
+  <!-- RECORDATORIO -->
+  <div style="background:rgba(0,180,255,.07);border:1px solid rgba(0,180,255,.18);border-radius:14px;padding:12px 14px;margin-bottom:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleNoteReminder()">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">🔔</span>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:#e8f4ff">Recordatorio</div>
+          <div style="font-size:11px;color:rgba(160,210,240,.6)" id="reminderHint">Avisa al abrir la app</div>
+        </div>
+      </div>
+      <div id="reminderToggle" style="width:44px;height:24px;border-radius:12px;background:rgba(0,100,180,.3);border:1.5px solid rgba(0,180,255,.3);position:relative;transition:.2s;flex-shrink:0">
+        <div id="reminderThumb" style="width:18px;height:18px;border-radius:9px;background:#7ab0d0;position:absolute;top:2px;left:2px;transition:.2s"></div>
+      </div>
+    </div>
+    <div id="reminderFields" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid rgba(0,180,255,.12)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field" style="margin-bottom:0">
+          <div class="label">Fecha</div>
+          <input class="inp" id="eReminderDate" type="date" autocomplete="off" style="color:#e8f4ff">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="label">Hora (opcional)</div>
+          <input class="inp" id="eReminderTime" type="time" value="09:00" autocomplete="off" style="color:#e8f4ff">
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <div class="label">Mensaje del recordatorio</div>
+        <input class="inp" id="eReminderMsg" placeholder="¿Qué quieres recordar?" autocomplete="off">
+      </div>
+    </div>
+  </div>
 </div>
 <!-- TARJETA (solo visible en modo tarjeta) -->
 <div id="fieldCard" style="display:none">
