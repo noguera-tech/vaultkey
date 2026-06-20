@@ -1527,7 +1527,7 @@ async function saveEntry(){
     $('eEmail')?.focus();return;
   }
   }
-  if(_entryType!=='note'&&_entryType!=='card'){
+  if(_entryType==='password'){
   if(emailVal && !isValidEmail(emailVal)){
     $('eEmail')?.classList.add('fieldError');
     vibe([30,30]);soundError();
