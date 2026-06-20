@@ -392,10 +392,15 @@ function resetNoteReminder(){
 
 function loadNoteReminder(e){
   resetNoteReminder();
-  if(!e||!e.reminder)return;
+  if(!e||!e.reminder||!e.reminder.active)return;
   const r=e.reminder;
+  // Activar directamente sin pasar por toggleNoteReminder (que invertiría el valor)
   _reminderActive=true;
-  toggleNoteReminder();
+  const toggle=$('reminderToggle'),thumb=$('reminderThumb'),fields=$('reminderFields'),hint=$('reminderHint');
+  if(toggle){toggle.style.background='rgba(0,210,255,.35)';toggle.style.borderColor='rgba(0,210,255,.7)';}
+  if(thumb){thumb.style.background='#00d9ff';thumb.style.left='22px';}
+  if(fields)fields.style.display='';
+  if(hint){hint.textContent='Recordatorio activado';hint.style.color='#00d9ff';}
   const dateEl=$('eReminderDate');if(dateEl&&r.date)dateEl.value=r.date;
   const timeEl=$('eReminderTime');if(timeEl&&r.time)timeEl.value=r.time;
   const msgEl=$('eReminderMsg');if(msgEl&&r.msg)msgEl.value=r.msg;
