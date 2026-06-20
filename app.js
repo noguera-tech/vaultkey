@@ -940,7 +940,7 @@ function copyText(t='',btn=null){
 }
 function scheduleClipboardClear(value){setTimeout(async()=>{try{const txt=await navigator.clipboard.readText?.();if(txt===value)await navigator.clipboard.writeText('');}catch(e){}},30000)}
 function openUrl(u){vibe(20);if(!/^https?:\/\//.test(u))u='https://'+u;window.open(u,'_blank')}
-function openGen(target=false){useGenTarget=target;$('genModal').classList.add('open');syncRanges(false);if($('genOut').textContent==='Pulsa generar')markGeneratorDirty()}
+function openGen(target=false,targetField='ePass'){useGenTarget=target;window._genTargetField=targetField;$('genModal').classList.add('open');syncRanges(false);if($('genOut').textContent==='Pulsa generar')markGeneratorDirty()}
 function setGenLen(n){$('gLen').value=n;syncRanges(true)}
 function markGeneratorDirty(){syncRanges(false);$('genOut').textContent='Pulsa generar';}
 function generatePass(){
@@ -990,7 +990,9 @@ function useGen(){
   let v=$('genOut').textContent;
   if(!v || v==='Pulsa generar'){generatePass();v=$('genOut').textContent;}
   if(useGenTarget){
-    $('ePass').value=v;updateStrength();
+    const fieldId=window._genTargetField||'ePass';
+    const el=$(fieldId);
+    if(el){el.value=v;if(fieldId==='ePass')updateStrength();}
     $('genModal').classList.remove('open');
     $('entryModal').classList.add('open');
     toast('Contraseña añadida a la entrada');
@@ -1880,6 +1882,10 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     ['pedidosya,pedidos ya', vk128Icon('PY','#E31B23','#fff',17)],
     ['rappi', vk128Icon('R','#FF441F','#fff',25)],
     ['booking,booking.com', vk128Icon('B','#003B95','#fff',25)],
+    ['dni,nie,pasaporte,cedula,documento,documento de identidad,identity', vk128Icon('ID','#1e40af','#fff',17)],
+    ['licencia,carnet,permiso,conducir,driving license', vk128Icon('DL','#166534','#fff',17)],
+    ['medico,salud,hospital,clinica,health,medical,seguridad social,sip', vk128Icon('MED','#991b1b','#fff',14)],
+    ['wifi,wi-fi,router,red,ssid,internet casa,fibra', vk128Icon('WiFi','#0369a1','#fff',13)],
     ['airbnb', vk128Icon('A','#FF5A5F','#fff',25)],
     ['skype', vk128Icon('S','#00AFF0','#fff',25)],
     ['wordpress', vk128Icon('W','#21759B','#fff',25)],
