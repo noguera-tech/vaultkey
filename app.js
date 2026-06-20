@@ -2455,3 +2455,147 @@ window.unlockOk=async function(p){
   setTimeout(checkVaultReminders, 1500);
 };
 window._checkVaultReminders=checkVaultReminders;
+
+// ══ PANEL DE SALUD ══════════════════════════════════════
+function showHealthPanel(){
+  if(!vault||!vault.length){
+    toast('No hay entradas en la bóveda');return;
+  }
+  $('healthModal').classList.add('open');
+  renderHealthPanel();
+}
+
+function renderHealthPanel(){
+  const el=$('healthContent');
+  if(!el)return;
+
+  const passes=vault.filter(e=>e.entryType==='password'&&e.pass);
+  const now=Date.now();
+
+  // Clasificar por score
+  const strong=passes.filter(e=>score(e.pass)>=4);
+  const medium=passes.filter(e=>score(e.pass)===3);
+  const weak=passes.filter(e=>score(e.pass)<=2);
+
+  // Duplicadas
+  const passCounts={};
+  passes.forEach(e=>{if(e.pass)passCounts[e.pass]=(passCounts[e.pass]||0)+1;});
+  const dupes=passes.filter(e=>passCounts[e.pass]>1);
+
+  // Antiguas (>90 días)
+  const old=passes.filter(e=>Math.floor((now-(e.updated||now))/(864e5))>=90);
+
+  // Tarjetas próximas a caducar
+  const cards=vault.filter(e=>e.entryType==='card'&&e.cardExpiry);
+  const cardWarn=cards.filter(e=>{
+    const[mm,yy]=e.cardExpiry.split('/').map(Number);
+    if(!mm||!yy)return false;
+    return Math.floor((new Date(2000+yy,mm-1,1)-now)/864e5)<=30;
+  });
+
+  // Documentos próximos a caducar
+  const docWarn=vault.filter(e=>{
+    if(!['id','license'].includes(e.entryType))return false;
+    const exp=e.idExpiry||e.licExpiry||'';
+    if(exp.length!==10)return false;
+    const[dd,mm,yyyy]=exp.split('/').map(Number);
+    return Math.floor((new Date(yyyy,mm-1,dd)-now)/864e5)<=60;
+  });
+
+  // Score global (0-100)
+  const total=passes.length;
+  const globalScore=total===0?100:Math.round(
+    ((strong.length*100+medium.length*60+weak.length*20)/total)
+    - (dupes.length/total)*20
+    - (old.length/total)*15
+  );
+  const clampedScore=Math.max(0,Math.min(100,globalScore));
+
+  // Color del score
+  const scoreColor=clampedScore>=80?'#00e676':clampedScore>=50?'#f59e0b':'#ff5252';
+  const scoreLabel=clampedScore>=80?'Excelente':clampedScore>=60?'Buena':clampedScore>=40?'Regular':'Mejorable';
+
+  // Actualizar resumen en home
+  const sumEl=$('healthSummaryText');
+  if(sumEl)sumEl.textContent=`Seguridad ${scoreLabel.toLowerCase()} · ${weak.length} débil${weak.length!==1?'es':''}`;
+
+  let h='';
+
+  // ── Score circular ──
+  h+=`<div style="text-align:center;padding:16px 0 20px">
+    <div style="position:relative;display:inline-block">
+      <svg width="110" height="110" viewBox="0 0 110 110">
+        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(0,180,255,.1)" stroke-width="10"/>
+        <circle cx="55" cy="55" r="46" fill="none" stroke="${scoreColor}" stroke-width="10"
+          stroke-dasharray="${Math.round(clampedScore*2.89)} 289"
+          stroke-dashoffset="72" stroke-linecap="round" transform="rotate(-90 55 55)"/>
+      </svg>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-size:26px;font-weight:900;color:${scoreColor}">${clampedScore}</div>
+        <div style="font-size:10px;color:#4a7090;font-weight:700">/ 100</div>
+      </div>
+    </div>
+    <div style="font-size:16px;font-weight:900;color:${scoreColor};margin-top:6px">${scoreLabel}</div>
+    <div style="font-size:12px;color:#4a7090;margin-top:2px">${total} contraseñas analizadas</div>
+  </div>`;
+
+  // ── Resumen de barras ──
+  h+=`<div style="background:rgba(0,14,32,.6);border:1px solid rgba(0,210,255,.12);border-radius:14px;padding:14px;margin-bottom:12px">`;
+  const bars=[
+    {label:'Fuertes',count:strong.length,color:'#00e676'},
+    {label:'Medias', count:medium.length,color:'#f59e0b'},
+    {label:'Débiles',count:weak.length,  color:'#ff5252'},
+  ];
+  bars.forEach(b=>{
+    const pct=total>0?Math.round(b.count/total*100):0;
+    h+=`<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span style="color:#c0d8f0;font-weight:700">${b.label}</span>
+        <span style="color:${b.color};font-weight:800">${b.count} (${pct}%)</span>
+      </div>
+      <div style="height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${b.color};border-radius:3px;transition:.4s"></div>
+      </div>
+    </div>`;
+  });
+  h+=`</div>`;
+
+  // ── Alertas ──
+  const alerts=[];
+  if(weak.length)   alerts.push({icon:'🔴',title:`${weak.length} contraseña${weak.length>1?'s':''} débil${weak.length>1?'es':''}`,sub:'Menos de 8 caracteres o sin variedad',entries:weak,color:'#ff5252'});
+  if(dupes.length)  alerts.push({icon:'🟡',title:`${dupes.length} contraseña${dupes.length>1?'s':''} repetida${dupes.length>1?'s':''}`,sub:'Usada en más de un servicio',entries:[...new Map(dupes.map(e=>[e.pass,e])).values()],color:'#f59e0b'});
+  if(old.length)    alerts.push({icon:'🟠',title:`${old.length} contraseña${old.length>1?'s':''} antigua${old.length>1?'s':''}`,sub:'Sin actualizar en más de 90 días',entries:old,color:'#fb923c'});
+  if(cardWarn.length) alerts.push({icon:'💳',title:`${cardWarn.length} tarjeta${cardWarn.length>1?'s':''} por caducar`,sub:'En menos de 30 días',entries:cardWarn,color:'#a78bfa'});
+  if(docWarn.length)  alerts.push({icon:'🪪',title:`${docWarn.length} documento${docWarn.length>1?'s':''} por caducar`,sub:'En menos de 60 días',entries:docWarn,color:'#60a5fa'});
+
+  if(alerts.length){
+    alerts.forEach(a=>{
+      h+=`<div style="background:rgba(0,14,32,.6);border:1px solid ${a.color}33;border-radius:14px;padding:12px 14px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span style="font-size:18px">${a.icon}</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:${a.color}">${a.title}</div>
+            <div style="font-size:11px;color:#4a7090">${a.sub}</div>
+          </div>
+        </div>`;
+      a.entries.slice(0,4).forEach(e=>{
+        h+=`<div onclick="closeModals();setTimeout(()=>quick('${e.id}'),200)"
+          style="display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid rgba(255,255,255,.05);cursor:pointer">
+          <span style="font-size:13px;color:#c0d8f0;flex:1">${esc(e.service)}</span>
+          <span style="font-size:11px;color:${a.color};font-weight:700">Ver →</span>
+        </div>`;
+      });
+      if(a.entries.length>4) h+=`<div style="font-size:11px;color:#4a7090;padding-top:6px;border-top:1px solid rgba(255,255,255,.05)">y ${a.entries.length-4} más...</div>`;
+      h+=`</div>`;
+    });
+  } else {
+    h+=`<div style="text-align:center;padding:20px;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:14px;margin-bottom:12px">
+      <div style="font-size:32px;margin-bottom:8px">✅</div>
+      <div style="font-size:14px;font-weight:800;color:#00e676">Todo en orden</div>
+      <div style="font-size:12px;color:#4a7090;margin-top:4px">No se detectaron problemas de seguridad</div>
+    </div>`;
+  }
+
+  el.innerHTML=h;
+}
+// ════════════════════════════════════════════════════════
