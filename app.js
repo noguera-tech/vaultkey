@@ -14,6 +14,9 @@ function setEntryType(type){
 if(iconSection)iconSection.style.display='';
   ['fieldUser','fieldEmail','fieldPass'].forEach(id=>{const el=$(id);if(el)el.style.display=isNote?'none':''});
   const fieldNote=$('fieldSecureNote');if(fieldNote)fieldNote.style.display=isNote?'':'none';
+  // Ocultar botones URL y Nota extra en modo nota
+  const extraBtns=$('fieldExtraBtns');if(extraBtns)extraBtns.style.display=isNote?'none':'';
+  // Ocultar favorito y categoría no son necesarios ocultarlos
 }
 const $=id=>document.getElementById(id);const byId=$;const enc=new TextEncoder(),dec=new TextDecoder();
 function b64(buf){return btoa(String.fromCharCode(...new Uint8Array(buf)))}function ub64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
@@ -1297,9 +1300,13 @@ function isLikelyUrl(v){
 function legacyEmailFromEntry(e){return (!e?.email && isValidEmail(e?.user||'')) ? (e.user||'') : (e?.email||'')}
 function userFromEntry(e){return (!e?.email && isValidEmail(e?.user||'')) ? '' : (e?.user||'')}
 function entryMainIdentity(e){
-  const u=userFromEntry(e);
+  if(e?.entryType==='note') return '📝 Nota segura';
   const em=legacyEmailFromEntry(e);
-  return u || em || e?.type || 'Sin usuario';
+  const u=userFromEntry(e);
+  // Mostrar email si existe, si no usuario parcialmente oculto
+  if(em) return em;
+  if(u) return u.length>3 ? u.substring(0,2)+'***' : '***';
+  return e?.type || 'Sin usuario';
 }
 function entrySearchText(e){return [e.service,userFromEntry(e),legacyEmailFromEntry(e),e.url,e.note,e.type].join(' ').toLowerCase()}
 function clearEntryErrors(){document.querySelectorAll('.fieldErrorNote').forEach(x=>x.remove());['eService','eUser','eEmail','eUrl','ePass'].forEach(id=>$(id)?.classList.remove('fieldError'))}
@@ -1522,7 +1529,7 @@ function setIconCat(cat,btn){window._setIconCat(cat,btn);}
 document.addEventListener('click',function(e){const btn=e.target.closest('[data-cat]');if(btn&&btn.classList.contains('iconCat')){e.stopPropagation();window._setIconCat(btn.dataset.cat,btn);}});
 
 
-function row(e){let div=document.createElement('div');div.className='entry';div.onclick=()=>quick(e.id);let ic=iconForEntry(e);const weak=score(e.pass)<3;div.innerHTML=`${vkLogoHTML(ic)}<div style="flex:1;min-width:0"><h3 style="display:flex;align-items:center;gap:6px">${esc(e.service)}${e.fav?'<span style="font-size:11px">⭐</span>':''}${weak?'<span style="font-size:9px;background:rgba(255,77,85,.2);color:#ff8c94;border:1px solid rgba(255,77,85,.3);border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.3px">DÉBIL</span>':''}</h3><p style="color:#7a9ec0">${esc(entryMainIdentity(e))}</p></div><div class="go" style="color:rgba(0,210,255,.4);font-size:18px">›</div>`;return div}
+function row(e){let div=document.createElement('div');div.className='entry';div.onclick=()=>quick(e.id);let ic=iconForEntry(e);const weak=e?.entryType!=='note'&&score(e.pass)<3;div.innerHTML=`${vkLogoHTML(ic)}<div style="flex:1;min-width:0"><h3 style="display:flex;align-items:center;gap:6px">${esc(e.service)}${e.fav?'<span style="font-size:11px">⭐</span>':''}${weak?'<span style="font-size:9px;background:rgba(255,77,85,.2);color:#ff8c94;border:1px solid rgba(255,77,85,.3);border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.3px">DÉBIL</span>':''}</h3><p style="color:#7a9ec0">${esc(entryMainIdentity(e))}</p></div><div class="go" style="color:rgba(0,210,255,.4);font-size:18px">›</div>`;return div}
 
 function renderFav(){
   const grid=$('favGrid');
@@ -1537,7 +1544,7 @@ function renderFav(){
   grid.innerHTML='';
   favs.forEach(e=>{
     const ic=iconForEntry(e);
-    const weak=score(e.pass)<3;
+    const weak=e?.entryType!=='note'&&score(e.pass)<3;
     const identity=entryMainIdentity(e);
     const row=document.createElement('div');
     row.className='favRow';
