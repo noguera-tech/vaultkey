@@ -367,8 +367,16 @@ function toggleNoteReminder(){
     // Poner fecha de hoy por defecto si está vacía
     const dateEl=$('eReminderDate');
     if(dateEl&&!dateEl.value){
-      const d=new Date(); d.setDate(d.getDate()+1);
-      dateEl.value=d.toISOString().split('T')[0];
+      const d=new Date();
+      dateEl.value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    }
+    // Hora por defecto = hora actual local redondeada a media hora
+    const timeEl=$('eReminderTime');
+    if(timeEl&&(timeEl.value==='09:00'||!timeEl.value)){
+      const n=new Date();
+      const h=n.getHours();
+      const m=n.getMinutes()>=30?30:0;
+      timeEl.value=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
     }
   } else {
     if(toggle){ toggle.style.background='rgba(0,100,180,.3)'; toggle.style.borderColor='rgba(0,180,255,.3)'; }
@@ -386,7 +394,7 @@ function resetNoteReminder(){
   if(fields)fields.style.display='none';
   if(hint){hint.textContent='Avisa al abrir la app';hint.style.color='rgba(160,210,240,.6)';}
   const dateEl=$('eReminderDate');if(dateEl)dateEl.value='';
-  const timeEl=$('eReminderTime');if(timeEl)timeEl.value='09:00';
+  const timeEl=$('eReminderTime');if(timeEl)timeEl.value='';
   const msgEl=$('eReminderMsg');if(msgEl)msgEl.value='';
 }
 
@@ -1611,7 +1619,7 @@ async function saveEntry(){
   const secureNoteVal=_entryType==='note'?($('eSecureNote')?.value||'').trim():'';
   const reminderData=(_entryType==='note'&&_reminderActive)?{
     date:($('eReminderDate')?.value||''),
-    time:($('eReminderTime')?.value||'09:00'),
+    time:($('eReminderTime')?.value||''),
     msg:($('eReminderMsg')?.value||'').trim()||secureNoteVal.slice(0,60),
     active:true,
   }:null;
@@ -2397,51 +2405,103 @@ function rankIcon(ic){
 
 // ══ BANNER DE RECORDATORIO ═══════════════════════════════
 function showReminderBanner(msg, id){
-  // Eliminar banner anterior si existe
   const prev=document.getElementById('vkReminderBanner');
   if(prev)prev.remove();
 
-  const banner=document.createElement('div');
-  banner.id='vkReminderBanner';
-  banner.style.cssText=[
-    'position:fixed','top:0','left:0','right:0','z-index:99999',
-    'background:linear-gradient(135deg,#003a6b,#00234a)',
-    'border-bottom:2px solid rgba(0,210,255,.5)',
-    'padding:14px 16px','display:flex','align-items:flex-start','gap:12px',
-    'box-shadow:0 4px 24px rgba(0,0,0,.6)',
-    'animation:vkBannerIn .3s cubic-bezier(.4,0,.2,1)',
-  ].join(';');
-
-  // Animación de entrada
+  // Inyectar estilos una vez
   if(!document.getElementById('vkBannerStyle')){
     const st=document.createElement('style');
     st.id='vkBannerStyle';
     st.textContent=`
-      @keyframes vkBannerIn{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
-      @keyframes vkBannerOut{from{transform:translateY(0);opacity:1}to{transform:translateY(-100%);opacity:0}}
-      #vkReminderBanner.hiding{animation:vkBannerOut .25s forwards}
+      @keyframes vkBannerIn{
+        from{transform:translateY(-110%);opacity:0}
+        to{transform:translateY(0);opacity:1}
+      }
+      @keyframes vkBannerOut{
+        from{transform:translateY(0);opacity:1}
+        to{transform:translateY(-110%);opacity:0}
+      }
+      @keyframes vkBell{
+        0%,100%{transform:rotate(0)}
+        15%{transform:rotate(18deg)}
+        30%{transform:rotate(-16deg)}
+        45%{transform:rotate(12deg)}
+        60%{transform:rotate(-8deg)}
+        75%{transform:rotate(4deg)}
+      }
+      #vkReminderBanner{
+        position:fixed;top:0;left:0;right:0;z-index:99999;
+        background:linear-gradient(135deg,#00122e 0%,#001f4a 60%,#001533 100%);
+        border-bottom:2px solid rgba(0,200,255,.45);
+        box-shadow:0 6px 32px rgba(0,0,0,.7), 0 0 60px rgba(0,120,255,.15);
+        animation:vkBannerIn .35s cubic-bezier(.22,1,.36,1) both;
+        overflow:hidden;
+      }
+      #vkReminderBanner::before{
+        content:'';position:absolute;top:0;left:0;right:0;height:2px;
+        background:linear-gradient(90deg,transparent,#00d9ff,#7b5fff,#00d9ff,transparent);
+        animation:vkShimmer 2.5s infinite;
+      }
+      @keyframes vkShimmer{
+        0%{background-position:-200% center}
+        100%{background-position:200% center}
+      }
+      #vkReminderBanner.hiding{animation:vkBannerOut .28s cubic-bezier(.4,0,1,1) forwards}
+      .vkBannerBell{display:inline-block;animation:vkBell .7s .4s ease both}
+      .vkBannerBtn{
+        display:inline-flex;align-items:center;gap:6px;
+        margin-top:10px;padding:8px 16px;border-radius:10px;
+        border:1px solid rgba(0,210,255,.45);
+        background:linear-gradient(135deg,rgba(0,100,255,.2),rgba(0,60,180,.15));
+        color:#00d9ff;font-size:13px;font-weight:800;cursor:pointer;
+        box-shadow:0 0 14px rgba(0,150,255,.2);
+        transition:all .15s;
+      }
+      .vkBannerBtn:active{transform:scale(.96);background:rgba(0,120,255,.3)}
+      .vkBannerClose{
+        position:absolute;top:10px;right:12px;
+        width:30px;height:30px;border-radius:50%;
+        border:1px solid rgba(255,255,255,.15);
+        background:rgba(255,255,255,.07);
+        color:#7a9ec0;font-size:15px;cursor:pointer;
+        display:flex;align-items:center;justify-content:center;
+        transition:all .15s;
+      }
+      .vkBannerClose:active{background:rgba(255,255,255,.18);color:#fff}
     `;
     document.head.appendChild(st);
   }
 
-  banner.innerHTML=`
-    <span style="font-size:26px;flex-shrink:0;margin-top:2px">🔔</span>
-    <div style="flex:1;min-width:0">
-      <div style="font-size:13px;font-weight:900;color:#00d9ff;letter-spacing:.3px;margin-bottom:3px">RECORDATORIO</div>
-      <div style="font-size:15px;font-weight:700;color:#e8f4ff;line-height:1.4">${msg}</div>
-      ${id?`<button onclick="closeModals();hideReminderBanner();setTimeout(()=>quick('${id}'),200)"
-        style="margin-top:8px;padding:5px 12px;border-radius:8px;border:1px solid rgba(0,210,255,.4);
-        background:rgba(0,210,255,.12);color:#00d9ff;font-size:12px;font-weight:800;cursor:pointer">
-        Ver entrada →
-      </button>`:''}
-    </div>
-    <button onclick="hideReminderBanner()" style="
-      width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,.15);
-      background:rgba(255,255,255,.08);color:#a0b8d0;font-size:16px;
-      display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer">✕</button>
-  `;
+  const now=new Date();
+  const timeStr=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
 
+  const banner=document.createElement('div');
+  banner.id='vkReminderBanner';
+  banner.innerHTML=`
+    <button class="vkBannerClose" onclick="hideReminderBanner()">✕</button>
+    <div style="padding:16px 48px 16px 16px;display:flex;gap:14px;align-items:flex-start">
+      <div style="
+        width:48px;height:48px;border-radius:14px;flex-shrink:0;
+        background:linear-gradient(135deg,rgba(0,150,255,.25),rgba(100,50,255,.2));
+        border:1px solid rgba(0,180,255,.3);
+        display:flex;align-items:center;justify-content:center;font-size:24px;
+        box-shadow:0 0 20px rgba(0,150,255,.25)">
+        <span class="vkBannerBell">🔔</span>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-size:10px;font-weight:900;letter-spacing:1.2px;color:#00d9ff;text-transform:uppercase">Recordatorio</span>
+          <span style="font-size:10px;color:rgba(0,200,255,.45);font-weight:600">${timeStr}</span>
+        </div>
+        <div style="font-size:15px;font-weight:700;color:#e8f6ff;line-height:1.45;word-break:break-word">${msg}</div>
+        ${id?`<button class="vkBannerBtn" onclick="closeModals();hideReminderBanner();setTimeout(()=>quick('${id}'),200)">
+          <span>Ver nota</span><span style="opacity:.7">→</span>
+        </button>`:''}
+      </div>
+    </div>
+  `;
   document.body.appendChild(banner);
+  // NO auto-cierra — el usuario lo cierra manualmente
 }
 
 function hideReminderBanner(){
