@@ -4,23 +4,28 @@ const LS_META='vk_meta_v1',LS_DATA='vk_data_v1',LS_REC='vk_recovery_v1';let pin=
 function setEntryType(type){
   _entryType=type;
   const isNote=type==='note';
-  // Botones
-  const btnPass=$('typeBtnPass');const btnNote=$('typeBtnNote');
-  if(btnPass){btnPass.style.border=isNote?'1px solid rgba(0,210,255,.2)':'2px solid var(--cyan)';btnPass.style.background=isNote?'rgba(0,14,32,.6)':'rgba(0,210,255,.12)';btnPass.style.color=isNote?'#7aa0c8':'#00e5ff';}
-  if(btnNote){btnNote.style.border=isNote?'2px solid var(--cyan)':'1px solid rgba(0,210,255,.2)';btnNote.style.background=isNote?'rgba(0,210,255,.12)':'rgba(0,14,32,.6)';btnNote.style.color=isNote?'#00e5ff':'#7aa0c8';}
-  // Campos
-  const fieldsPass=['fieldUser','fieldEmail','fieldPass','fieldUrl','iconStripRow','eIconSearch'];
+  const isCard=type==='card';
+  const isPass=type==='password';
+  // Botones - resaltar el activo
+  ['typeBtnPass','typeBtnNote','typeBtnCard'].forEach(id=>{
+    const btn=$(id);if(!btn)return;
+    const active=(id==='typeBtnPass'&&isPass)||(id==='typeBtnNote'&&isNote)||(id==='typeBtnCard'&&isCard);
+    btn.style.border=active?'2px solid var(--cyan)':'1px solid rgba(0,210,255,.2)';
+    btn.style.background=active?'rgba(0,210,255,.12)':'rgba(0,14,32,.6)';
+    btn.style.color=active?'#00e5ff':'#7aa0c8';
+  });
+  // Iconos siempre visibles
   const iconSection=$('iconStripRow')?.parentElement;
-if(iconSection)iconSection.style.display='';
-  ['fieldUser','fieldEmail','fieldPass'].forEach(id=>{const el=$(id);if(el)el.style.display=isNote?'none':''});
+  if(iconSection)iconSection.style.display='';
+  // Campos según tipo
+  ['fieldUser','fieldEmail','fieldPass'].forEach(id=>{const el=$(id);if(el)el.style.display=(isNote||isCard)?'none':''});
   const fieldNote=$('fieldSecureNote');if(fieldNote)fieldNote.style.display=isNote?'':'none';
-  // Ocultar botones URL y Nota extra en modo nota
-  const extraBtns=$('fieldExtraBtns');if(extraBtns)extraBtns.style.display=isNote?'none':'';
-  // Cambiar placeholder y label del campo nombre
-  const eService=$('eService');
-  const eServiceLabel=$('eServiceLabel');
-  if(eService)eService.placeholder=isNote?'Título de la nota...':'Gmail, Banco, Netflix...';
-  if(eServiceLabel)eServiceLabel.textContent=isNote?'Título de la nota *':'Nombre del servicio *';
+  const fieldCard=$('fieldCard');if(fieldCard)fieldCard.style.display=isCard?'':'none';
+  const extraBtns=$('fieldExtraBtns');if(extraBtns)extraBtns.style.display=(isNote||isCard)?'none':'';
+  // Placeholder y label según tipo
+  const eService=$('eService');const eServiceLabel=$('eServiceLabel');
+  if(eService)eService.placeholder=isNote?'Título de la nota...':isCard?'Nombre identificativo (ej: Visa BBVA)...':'Gmail, Banco, Netflix...';
+  if(eServiceLabel)eServiceLabel.textContent=isNote?'Título de la nota *':isCard?'Nombre identificativo *':'Nombre del servicio *';
 }
 const $=id=>document.getElementById(id);const byId=$;const enc=new TextEncoder(),dec=new TextDecoder();
 function b64(buf){return btoa(String.fromCharCode(...new Uint8Array(buf)))}function ub64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
@@ -885,6 +890,9 @@ function isValidEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||'
 function serviceRequiresEmail(){return true}
 function toggleQvPass(){let el=$('qvPass');el.textContent=el.textContent.startsWith('•')?current.pass:'••••••••••••'}
 function toggleQvNote(){const el=$('qvNote');if(!el)return;if(el.textContent==='••••••••'){el.textContent=current.note;el.style.whiteSpace='pre-wrap';el.style.fontSize='14px';el.style.lineHeight='1.6';}else{el.textContent='••••••••';el.style.whiteSpace='';el.style.fontSize='';el.style.lineHeight='';}}
+
+function toggleQvCard(){const el=$('qvCardNum');if(!el)return;if(el.textContent.includes('•')){el.textContent=current.cardNumber;}else{el.textContent='•••• •••• •••• '+current.cardNumber.slice(-4);}}
+function toggleQvCvv(){const el=$('qvCvv');if(!el)return;el.textContent=el.textContent==='•••'?current.cardCvv:'•••';}
 async function toggleFav(id){let e=vault.find(x=>x.id===id);if(e){e.fav=!e.fav;await persist();closeModals();render();toast('Actualizado')}}
 async function delEntry(id){vibe([40,20,40]);soundDelete();if(await vkConfirm('Eliminar entrada','¿Eliminar esta entrada de la bóveda?')){vault=vault.filter(e=>e.id!==id);await persist();closeModals();render();toast('Entrada eliminada');try{driveAutoSync();}catch(e){}}}
 function copyText(t='',btn=null){
@@ -1067,7 +1075,13 @@ async function doImportConfirm() {
       fav: !!e.fav,
       used: Number(e.used||0),
       updated: Number(e.updated||0),
-      passHistory: Array.isArray(e.passHistory)?e.passHistory:[]
+      passHistory: Array.isArray(e.passHistory)?e.passHistory:[],
+      cardName: String(e.cardName||''),
+      cardNumber: String(e.cardNumber||''),
+      cardExpiry: String(e.cardExpiry||''),
+      cardCvv: String(e.cardCvv||''),
+      cardBank: String(e.cardBank||''),
+      cardType: String(e.cardType||''),
     }));
     render();
     const count = vault.length;
@@ -1307,6 +1321,7 @@ function legacyEmailFromEntry(e){return (!e?.email && isValidEmail(e?.user||''))
 function userFromEntry(e){return (!e?.email && isValidEmail(e?.user||'')) ? '' : (e?.user||'')}
 function entryMainIdentity(e){
   if(e?.entryType==='note') return '📝 Nota segura';
+  if(e?.entryType==='card') return '💳 '+(e.cardType?e.cardType.charAt(0).toUpperCase()+e.cardType.slice(1):'Tarjeta')+(e.cardNumber?' ••'+e.cardNumber.slice(-2):'');
   return '••••••••';
 }
 function entrySearchText(e){return [e.service,userFromEntry(e),legacyEmailFromEntry(e),e.url,e.note,e.type].join(' ').toLowerCase()}
@@ -1346,6 +1361,13 @@ function openEntry(e=null){
   if($('eUrl'))$('eUrl').value=e?.url||'';
   if($('eNote'))$('eNote').value=e?.note||'';
   if($('eSecureNote'))$('eSecureNote').value=(e?.entryType==='note'?e?.note:'')||'';
+  // Restaurar campos de tarjeta
+  if($('eCardName'))$('eCardName').value=e?.cardName||'';
+  if($('eCardNumber'))$('eCardNumber').value=e?.cardNumber||'';
+  if($('eCardExpiry'))$('eCardExpiry').value=e?.cardExpiry||'';
+  if($('eCardCvv'))$('eCardCvv').value=e?.cardCvv||'';
+  if($('eCardBank'))$('eCardBank').value=e?.cardBank||'';
+  if($('eCardType'))$('eCardType').value=e?.cardType||'visa';
   if($('eIconSearch'))$('eIconSearch').value='';
   // FIX: Resetear categoría a 'general' en nueva entrada, o restaurar la guardada
   if($('eCategory'))$('eCategory').value=e?.category||'general';
@@ -1393,7 +1415,13 @@ async function saveEntry(){
   if(_entryType==='note'){
     const noteVal=($('eSecureNote')?.value||'').trim();
     if(!noteVal){vibe([30,30]);soundEmpty();toast('El contenido de la nota no puede estar vacío.');$('eSecureNote')?.focus();return;}
-    // Para notas saltamos todas las validaciones de usuario/email/pass/url
+  } else if(_entryType==='card'){
+    const cardNum=($('eCardNumber')?.value||'').replace(/\s/g,'');
+    const cardName=($('eCardName')?.value||'').trim();
+    const cardExp=($('eCardExpiry')?.value||'').trim();
+    if(!cardName){vibe([30,30]);soundEmpty();toast('El titular de la tarjeta es obligatorio.');$('eCardName')?.focus();return;}
+    if(!cardNum||cardNum.length<13){vibe([30,30]);soundEmpty();toast('Introduce un número de tarjeta válido.');$('eCardNumber')?.focus();return;}
+    if(!cardExp||!/^\d{2}\/\d{2}$/.test(cardExp)){vibe([30,30]);soundEmpty();toast('La caducidad debe tener formato MM/AA.');$('eCardExpiry')?.focus();return;}
   } else {
   if(!userVal && !emailVal){
     $('eUser')?.classList.add('fieldError');
@@ -1446,7 +1474,15 @@ async function saveEntry(){
     _newHistory = [histEntry, ..._prevHistory].slice(0,3); // máximo 3
   }
   const secureNoteVal=_entryType==='note'?($('eSecureNote')?.value||'').trim():'';
-  let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,type:'Cuenta',category:($('eCategory')?.value||'general'),user:_entryType==='note'?'':userVal,email:_entryType==='note'?'':emailVal,pass:_entryType==='note'?'':pass,url:_entryType==='note'?'':urlVal,note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
+  const cardData=_entryType==='card'?{
+    cardName:($('eCardName')?.value||'').trim(),
+    cardNumber:($('eCardNumber')?.value||'').replace(/\s/g,''),
+    cardExpiry:($('eCardExpiry')?.value||'').trim(),
+    cardCvv:($('eCardCvv')?.value||'').trim(),
+    cardBank:($('eCardBank')?.value||'').trim(),
+    cardType:($('eCardType')?.value||'visa'),
+  }:{};
+  let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,...cardData,type:'Cuenta',category:($('eCategory')?.value||'general'),user:_entryType==='note'?'':userVal,email:_entryType==='note'?'':emailVal,pass:_entryType==='note'?'':pass,url:_entryType==='note'?'':urlVal,note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
   let i=vault.findIndex(x=>x.id===entry.id);
   if(i>=0)vault[i]=entry;else vault.unshift(entry);
   await persist();closeModals();show('vault');render();try{driveAutoSync();}catch(e){}toast('Guardado \u2713');
@@ -1589,6 +1625,14 @@ function qvBtn(label,onclick){
 h+='<div style="border-radius:20px;overflow:hidden;border:1px solid rgba(0,180,255,.14);margin-bottom:6px;box-shadow:0 4px 24px rgba(0,0,0,.35)">';
 if(e.entryType==='note'){
   h+=qvRow('Nota segura','📝','<span id="qvNote" style="font-family:ui-monospace,monospace;letter-spacing:.5px">••••••••</span>',qvBtn('Ver','toggleQvNote()')+qvBtn('Copiar','copyText(current.note,this)'),true);
+} else if(e.entryType==='card'){
+  const maskedNum=e.cardNumber?'•••• •••• •••• '+e.cardNumber.slice(-4):'—';
+  if(e.cardName)h+=qvRow('Titular','👤',esc(e.cardName),qvBtn('Copiar','copyText(current.cardName,this)'));
+  h+=qvRow('Número','💳','<span id="qvCardNum" style="font-family:ui-monospace,monospace;letter-spacing:.5px">'+esc(maskedNum)+'</span>',qvBtn('Ver','toggleQvCard()')+qvBtn('Copiar','copyText(current.cardNumber,this)'));
+  if(e.cardExpiry)h+=qvRow('Caducidad','📅',esc(e.cardExpiry),'');
+  if(e.cardCvv)h+=qvRow('CVV','🔒','<span id="qvCvv">•••</span>',qvBtn('Ver','toggleQvCvv()'));
+  if(e.cardBank)h+=qvRow('Banco','🏦',esc(e.cardBank),'');
+  if(e.cardType)h+=qvRow('Tipo','💳',esc(e.cardType.charAt(0).toUpperCase()+e.cardType.slice(1)),'',true);
 } else {
 if(u)h+=qvRow('Usuario','\ud83d\udc64',esc(u),qvBtn('Copiar','copyText(userFromEntry(current),this)'));
 if(em)h+=qvRow('Correo','\u2709\ufe0f',esc(em),qvBtn('Copiar','copyText(legacyEmailFromEntry(current),this)'));
