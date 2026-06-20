@@ -1576,11 +1576,15 @@ function qvBtn(label,onclick){
 
 /* ── Campos ── */
 h+='<div style="border-radius:20px;overflow:hidden;border:1px solid rgba(0,180,255,.14);margin-bottom:6px;box-shadow:0 4px 24px rgba(0,0,0,.35)">';
+if(e.entryType==='note'){
+  h+=qvRow('Nota segura','📝','<span style="color:#b0cce8;font-size:14px;line-height:1.6;white-space:pre-wrap">'+esc(e.note)+'</span>',qvBtn('Copiar','copyText(current.note,this)'),true);
+} else {
 if(u)h+=qvRow('Usuario','\ud83d\udc64',esc(u),qvBtn('Copiar','copyText(userFromEntry(current),this)'));
 if(em)h+=qvRow('Correo','\u2709\ufe0f',esc(em),qvBtn('Copiar','copyText(legacyEmailFromEntry(current),this)'));
 h+=qvRow('Contrase\u00f1a','\ud83d\udd11','<span id="qvPass" style="font-family:ui-monospace,monospace;letter-spacing:.5px">\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022</span>',qvBtn('Ver','toggleQvPass()')+qvBtn('Copiar','copyText(current.pass,this)'));
 if(e.url)h+=qvRow('Sitio web','\ud83c\udf10','<span style="color:#00d4ff;font-size:14px">'+esc(e.url)+'</span>',qvBtn('Abrir','openUrl(current.url)'));
 if(e.note)h+=qvRow('Nota','\ud83d\udcdd','<span style="color:#b0cce8;font-size:14px;line-height:1.4">'+esc(e.note)+'</span>','',true);
+}
 h+='</div>';
 
 /* ── Timestamp ── */
@@ -1591,7 +1595,7 @@ h+='<div class="qvTimestamp">Actualizado el '+updated+'</div>';
 h+='<button class="qvBotEdit" onclick="closeModals();openEntry(current)" style="width:100%;margin-bottom:10px">\u270e Editar entrada</button>';
 
 /* ── Historial de contraseñas ── */
-if(e.passHistory && e.passHistory.length > 0) {
+if(e.entryType!=='note' && e.passHistory && e.passHistory.length > 0) {
   h += '<div style="margin-bottom:12px;background:rgba(0,14,32,.6);border:1px solid rgba(0,210,255,.1);border-radius:14px;padding:14px">';
   h += '<div style="font-size:11px;font-weight:900;color:var(--cyan);letter-spacing:.6px;margin-bottom:10px">🕐 HISTORIAL DE CONTRASEÑAS</div>';
   e.passHistory.forEach(function(h_item, idx_h) {
