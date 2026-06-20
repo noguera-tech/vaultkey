@@ -1,6 +1,20 @@
 ﻿let confirmResolver=null;
 let appBooted=false;
-const LS_META='vk_meta_v1',LS_DATA='vk_data_v1',LS_REC='vk_recovery_v1';let pin='',mode='unlock',tempPin='',unlocked=false,vault=[],current=null,editId=null,lastKey=null,useGenTarget=false,autoLockTimer=null,lockCountdownTimer=null;
+const LS_META='vk_meta_v1',LS_DATA='vk_data_v1',LS_REC='vk_recovery_v1';let pin='',mode='unlock',tempPin='',unlocked=false,vault=[],current=null,editId=null,lastKey=null,useGenTarget=false,autoLockTimer=null,lockCountdownTimer=null,_entryType='password';
+function setEntryType(type){
+  _entryType=type;
+  const isNote=type==='note';
+  // Botones
+  const btnPass=$('typeBtnPass');const btnNote=$('typeBtnNote');
+  if(btnPass){btnPass.style.border=isNote?'1px solid rgba(0,210,255,.2)':'2px solid var(--cyan)';btnPass.style.background=isNote?'rgba(0,14,32,.6)':'rgba(0,210,255,.12)';btnPass.style.color=isNote?'#7aa0c8':'#00e5ff';}
+  if(btnNote){btnNote.style.border=isNote?'2px solid var(--cyan)':'1px solid rgba(0,210,255,.2)';btnNote.style.background=isNote?'rgba(0,210,255,.12)':'rgba(0,14,32,.6)';btnNote.style.color=isNote?'#00e5ff':'#7aa0c8';}
+  // Campos
+  const fieldsPass=['fieldUser','fieldEmail','fieldPass','fieldUrl','iconStripRow','eIconSearch'];
+  const iconSection=$('iconStripRow')?.parentElement;
+  if(iconSection)iconSection.style.display=isNote?'none':'';
+  ['fieldUser','fieldEmail','fieldPass'].forEach(id=>{const el=$(id);if(el)el.style.display=isNote?'none':''});
+  const fieldNote=$('fieldSecureNote');if(fieldNote)fieldNote.style.display=isNote?'':'none';
+}
 const $=id=>document.getElementById(id);const byId=$;const enc=new TextEncoder(),dec=new TextDecoder();
 function b64(buf){return btoa(String.fromCharCode(...new Uint8Array(buf)))}function ub64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
 async function digest(s){let h=await crypto.subtle.digest('SHA-256',enc.encode(s));return b64(h)}
@@ -1314,12 +1328,16 @@ function openEntry(e=null){
   editId=e?.id||null;selectedEntryIcon=e?.icon||'';
   _entryFav=!!(e?.fav);
   $('entryTitle').textContent=e?'Editar entrada':'Nueva entrada';
+  // Resetear tipo de entrada
+  const entryType=e?.entryType||'password';
+  setEntryType(entryType);
   $('eService').value=e?.service||'';
   if($('eUser'))$('eUser').value=e?.user||'';
   if($('eEmail'))$('eEmail').value=e?.email||'';
   if($('ePass'))$('ePass').value=e?.pass||'';
   if($('eUrl'))$('eUrl').value=e?.url||'';
   if($('eNote'))$('eNote').value=e?.note||'';
+  if($('eSecureNote'))$('eSecureNote').value=(e?.entryType==='note'?e?.note:'')||'';
   if($('eIconSearch'))$('eIconSearch').value='';
   // FIX: Resetear categoría a 'general' en nueva entrada, o restaurar la guardada
   if($('eCategory'))$('eCategory').value=e?.category||'general';
@@ -1364,6 +1382,10 @@ async function saveEntry(){
     toast('El nombre del servicio es obligatorio.');
     $('eService')?.focus();return;
   }
+  if(_entryType==='note'){
+    const noteVal=($('eSecureNote')?.value||'').trim();
+    if(!noteVal){vibe([30,30]);soundEmpty();toast('La nota no puede estar vacía.');return;}
+  } else {
   if(!userVal && !emailVal){
     $('eUser')?.classList.add('fieldError');
     $('eEmail')?.classList.add('fieldError');
@@ -1382,6 +1404,7 @@ async function saveEntry(){
     vibe([30,30]);soundEmpty();
     toast('El correo electrónico es obligatorio.');
     $('eEmail')?.focus();return;
+  }
   }
   if(emailVal && !isValidEmail(emailVal)){
     $('eEmail')?.classList.add('fieldError');
@@ -1411,7 +1434,8 @@ async function saveEntry(){
     const histEntry = {pass:_prevEntry.pass, date:_prevEntry.updated||Date.now()};
     _newHistory = [histEntry, ..._prevHistory].slice(0,3); // máximo 3
   }
-  let entry={id:editId||crypto.randomUUID(),service:serviceVal,type:'Cuenta',category:($('eCategory')?.value||'general'),user:userVal,email:emailVal,pass,url:urlVal,note:($('eNote')?.value||'').trim(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
+  const secureNoteVal=_entryType==='note'?($('eSecureNote')?.value||'').trim():'';
+  let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,type:'Cuenta',category:($('eCategory')?.value||'general'),user:_entryType==='note'?'':userVal,email:_entryType==='note'?'':emailVal,pass:_entryType==='note'?'':pass,url:_entryType==='note'?'':urlVal,note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
   let i=vault.findIndex(x=>x.id===entry.id);
   if(i>=0)vault[i]=entry;else vault.unshift(entry);
   await persist();closeModals();show('vault');render();try{driveAutoSync();}catch(e){}toast('Guardado \u2713');
