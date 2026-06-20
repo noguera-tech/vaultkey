@@ -375,8 +375,10 @@ function toggleNoteReminder(){
     if(timeEl&&(timeEl.value==='09:00'||!timeEl.value)){
       const n=new Date();
       const h=n.getHours();
-      const m=n.getMinutes()>=30?30:0;
-      timeEl.value=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+      const m=Math.ceil(n.getMinutes()/5)*5;
+      const hf=m>=60?h+1:h;
+      const mf=m>=60?0:m;
+      timeEl.value=String(hf%24).padStart(2,'0')+':'+String(mf).padStart(2,'0');
     }
   } else {
     if(toggle){ toggle.style.background='rgba(0,100,180,.3)'; toggle.style.borderColor='rgba(0,180,255,.3)'; }
