@@ -347,7 +347,7 @@ function closeModals(){
     }
     m.classList.remove('open');
   });
-  editId=null;useGenTarget=false;selectedEntryIcon='';try{resetNoteReminder();}catch(e){}
+  editId=null;useGenTarget=false;selectedEntryIcon='';try{resetNoteReminder();}catch(e){}try{resetEntryTags();}catch(e){}
 }
 
 // ══ RECORDATORIO EN NOTAS ══
@@ -1204,6 +1204,8 @@ async function doImportConfirm() {
       updated: Number(e.updated||0),
       passHistory: Array.isArray(e.passHistory)?e.passHistory:[],
       reminder: e.reminder||null,
+      tags: Array.isArray(e.tags)?e.tags.filter(t=>typeof t==='string').slice(0,10):[],
+      
       cardName: String(e.cardName||''),
       cardNumber: String(e.cardNumber||''),
       cardExpiry: String(e.cardExpiry||''),
@@ -1503,6 +1505,8 @@ function openEntry(e=null){
   if($('eSecureNote'))$('eSecureNote').value=(e?.entryType==='note'?e?.note:'')||'';
   // Cargar recordatorio si existe
   try{ loadNoteReminder(e?.entryType==='note'?e:null); }catch(err){}
+  // Cargar etiquetas
+  try{ _loadTagsForEntry(e); }catch(err){}
   // Restaurar campos de tarjeta
   if($('eCardName'))$('eCardName').value=e?.cardName||'';
   if($('eCardNumber'))$('eCardNumber').value=e?.cardNumber||'';
@@ -1677,7 +1681,7 @@ async function saveEntry(){
     wifiIp:($('eWifiIp')?.value||'').trim(),
   }:{};
   const isPassType=_entryType==='password';
-  let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,...cardData,...idData,...licData,...medData,...wifiData,type:'Cuenta',category:($('eCategory')?.value||'general'),user:isPassType?userVal:'',email:isPassType?emailVal:'',pass:isPassType?pass:'',url:isPassType?urlVal:'',note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),reminder:reminderData||null,icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
+  let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,...cardData,...idData,...licData,...medData,...wifiData,type:'Cuenta',category:($('eCategory')?.value||'general'),user:isPassType?userVal:'',email:isPassType?emailVal:'',pass:isPassType?pass:'',url:isPassType?urlVal:'',note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),reminder:reminderData||null,tags:_getEntryTags(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
   let i=vault.findIndex(x=>x.id===entry.id);
   if(i>=0)vault[i]=entry;else vault.unshift(entry);
   _catFilter='';_vaultTab='todas';document.querySelectorAll('.catChip').forEach(c=>c.classList.remove('active'));const _fc=document.querySelectorAll('.catChip')[0];if(_fc)_fc.classList.add('active');
@@ -1761,12 +1765,14 @@ function render(){let q=($('search')?.value||'').toLowerCase();
   if(cat==='otros'&&_cf==='salud'&&e.entryType==='medical')return true;
   return false;
 };let list=vault.filter(e=>entrySearchText(e).includes(q)&&_catMatch(e));
+    // Filtrar por etiqueta activa
+    if(_activeTagFilter) list=list.filter(e=>(e.tags||[]).includes(_activeTagFilter));
     // Ordenar según preferencia
     if(_sortOrder==='name') list.sort((a,b)=>(a.service||'').localeCompare(b.service||'','es',{sensitivity:'base'}));
     else if(_sortOrder==='used') list.sort((a,b)=>(b.used||0)-(a.used||0));
     else list.sort((a,b)=>(b.updated||0)-(a.updated||0));$('entryList')&&( $('entryList').innerHTML='', list.length?list.forEach(e=>{try{$('entryList').appendChild(row(e))}catch(err){console.warn('row error',e?.id,err)}}):$('entryList').innerHTML='<div class="empty"><div class="emptyVault"><svg viewBox="0 0 80 80" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="16" width="64" height="52" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,80,200,.08)"/><rect x="8" y="16" width="64" height="14" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,100,255,.15)"/><circle cx="40" cy="50" r="11" stroke="#00d4ff" stroke-width="2.5" fill="rgba(0,210,255,.06)"/><circle cx="40" cy="50" r="4" fill="#00d4ff" opacity=".7"/><line x1="40" y1="39" x2="40" y2="43" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="57" x2="40" y2="61" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="29" y1="50" x2="33" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="47" y1="50" x2="51" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="62" y="40" width="8" height="16" rx="4" stroke="#1a6fff" stroke-width="2" fill="rgba(0,80,200,.1)"/></svg></div><b style="color:#e0f0ff;font-size:16px">Tu bóveda está vacía</b><p style="color:#4a7090;margin-top:6px;font-size:13px">Crea tu primera credencial con el botón +</p></div>');
   }
-  renderFav();let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);$('recentList')&&( $('recentList').innerHTML='', recent.length?recent.forEach(e=>{try{$('recentList').appendChild(row(e))}catch(err){console.warn('row fav error',e?.id,err)}}):$('recentList').innerHTML='<p class="sub">Todavía no has usado entradas.</p>');$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
+  renderFav();try{renderTagFilterChips();}catch(e){}let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);$('recentList')&&( $('recentList').innerHTML='', recent.length?recent.forEach(e=>{try{$('recentList').appendChild(row(e))}catch(err){console.warn('row fav error',e?.id,err)}}):$('recentList').innerHTML='<p class="sub">Todavía no has usado entradas.</p>');$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
 
 function vk128SvgText(label,bg,fg='#fff',fs=18){return {bg,svg:`<svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="${bg}"/><text x="24" y="31" font-size="${fs}" font-weight="900" fill="${fg}" text-anchor="middle" font-family="Arial, sans-serif">${label}</text></svg>`}}
 function vk128Match(n,k){k=(k||'').toLowerCase().trim();if(!k)return false;if(k.length<=2)return n===k;return n===k||n.includes(k)}
@@ -1930,6 +1936,14 @@ if(e.note)h+=qvRow('Nota','\ud83d\udcdd','<span style="color:#b0cce8;font-size:1
 }
 h+='</div>';
 
+/* ── Etiquetas ── */
+if(e.tags&&e.tags.length){
+  h+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding:0 2px">';
+  e.tags.forEach(t=>{
+    h+='<span style="display:inline-flex;align-items:center;background:rgba(0,180,255,.1);border:1px solid rgba(0,180,255,.25);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;color:#00b8e6;cursor:pointer" onclick="setTagFilter(''+t+'');closeModals();show('vault')">#'+esc(t)+'</span>';
+  });
+  h+='</div>';
+}
 /* ── Timestamp ── */
 const updated=e.updated?new Date(e.updated).toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'}):'--';
 h+='<div class="qvTimestamp">Actualizado el '+updated+'</div>';
@@ -3005,3 +3019,135 @@ async function confirmCsvImport(){
   toast(`✅ ${imported} entradas importadas correctamente`);
 }
 // ═════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════
+//  SISTEMA DE ETIQUETAS PERSONALIZADAS
+// ══════════════════════════════════════════════════════════════
+
+let _entryTags = []; // etiquetas de la entrada en edición
+let _activeTagFilter = null; // etiqueta activa en el filtro
+
+// ── Editor de etiquetas en el formulario ──────────────────────
+function handleTagInput(e){
+  const input = $('tagInput');
+  if(!input) return;
+  const val = input.value.trim().replace(/,$/,'').trim();
+  if((e.key === 'Enter' || e.key === ',') && val){
+    e.preventDefault();
+    addEntryTag(val);
+    input.value = '';
+    input.style.width = '120px';
+  } else if(e.key === 'Backspace' && !input.value && _entryTags.length){
+    removeEntryTag(_entryTags[_entryTags.length-1]);
+  }
+}
+
+function addEntryTag(tag){
+  const t = tag.toLowerCase().trim().replace(/[^a-záéíóúüñA-ZÁÉÍÓÚÜÑ0-9\s\-_]/g,'').trim();
+  if(!t || _entryTags.includes(t)) return;
+  if(_entryTags.length >= 10){ toast('Máximo 10 etiquetas por entrada'); return; }
+  _entryTags.push(t);
+  renderTagChipsEdit();
+}
+
+function removeEntryTag(tag){
+  _entryTags = _entryTags.filter(t => t !== tag);
+  renderTagChipsEdit();
+}
+
+function renderTagChipsEdit(){
+  const el = $('tagChipsEdit');
+  if(!el) return;
+  el.innerHTML = '';
+  _entryTags.forEach(tag => {
+    const chip = document.createElement('span');
+    chip.style.cssText = 'display:inline-flex;align-items:center;gap:4px;background:rgba(0,180,255,.15);border:1px solid rgba(0,180,255,.35);border-radius:20px;padding:3px 10px 3px 10px;font-size:12px;color:#00d9ff;font-weight:700;cursor:default';
+    chip.innerHTML = `#${esc(tag)} <button onclick="removeEntryTag('${tag}')" style="border:0;background:none;color:#00d9ff;font-size:12px;cursor:pointer;padding:0;line-height:1;margin-left:2px">✕</button>`;
+    el.appendChild(chip);
+  });
+}
+
+function resetEntryTags(){
+  _entryTags = [];
+  renderTagChipsEdit();
+  const input = $('tagInput');
+  if(input){ input.value=''; input.style.width='120px'; }
+}
+
+function loadEntryTags(e){
+  _entryTags = Array.isArray(e?.tags) ? [...e.tags] : [];
+  renderTagChipsEdit();
+}
+
+// ── Filtro por etiqueta en la lista ──────────────────────────
+function setTagFilter(tag){
+  _activeTagFilter = _activeTagFilter === tag ? null : tag;
+  renderTagFilterChips();
+  render();
+}
+
+function renderTagFilterChips(){
+  // Recoger todas las etiquetas del vault
+  const allTags = {};
+  vault.forEach(e => {
+    (e.tags||[]).forEach(t => { allTags[t] = (allTags[t]||0)+1; });
+  });
+
+  const row = $('tagFilterRow');
+  const chips = $('tagFilterChips');
+  if(!row || !chips) return;
+
+  if(!Object.keys(allTags).length){
+    row.style.display = 'none';
+    return;
+  }
+
+  row.style.display = '';
+  chips.innerHTML = '';
+
+  // Chip "Sin filtro" si hay uno activo
+  if(_activeTagFilter){
+    const clear = document.createElement('button');
+    clear.onclick = () => setTagFilter(null);
+    clear.style.cssText = 'padding:4px 10px;border-radius:20px;border:1px solid rgba(255,100,100,.4);background:rgba(255,100,100,.08);color:#ff8a8a;font-size:11px;font-weight:800;cursor:pointer';
+    clear.textContent = '✕ Quitar filtro';
+    chips.appendChild(clear);
+  }
+
+  Object.entries(allTags)
+    .sort((a,b) => b[1]-a[1])
+    .forEach(([tag, count]) => {
+      const active = _activeTagFilter === tag;
+      const chip = document.createElement('button');
+      chip.onclick = () => setTagFilter(tag);
+      chip.style.cssText = `padding:4px 12px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;transition:.15s;
+        border:1px solid ${active?'rgba(0,210,255,.6)':'rgba(0,180,255,.2)'};
+        background:${active?'rgba(0,210,255,.15)':'none'};
+        color:${active?'#00d9ff':'#4a7090'}`;
+      chip.innerHTML = `#${esc(tag)} <span style="opacity:.6">${count}</span>`;
+      chips.appendChild(chip);
+    });
+}
+
+// ── Integración con openEntry ─────────────────────────────────
+// (se llama desde openEntry al cargar una entrada)
+function _loadTagsForEntry(e){
+  loadEntryTags(e);
+}
+
+// ── Integración con saveEntry ─────────────────────────────────
+// (se llama desde saveEntry para obtener las tags actuales)
+function _getEntryTags(){
+  // Si hay texto sin confirmar en el input, añadirlo
+  const input = $('tagInput');
+  if(input && input.value.trim()){
+    addEntryTag(input.value.trim());
+    input.value = '';
+  }
+  return [..._entryTags];
+}
+
+// ── Integración con closeModals ───────────────────────────────
+// resetEntryTags ya está definida arriba — se llama desde closeModals
+
+// ══════════════════════════════════════════════════════════════
