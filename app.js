@@ -1371,7 +1371,7 @@ function legacyEmailFromEntry(e){return (!e?.email && isValidEmail(e?.user||''))
 function userFromEntry(e){return (!e?.email && isValidEmail(e?.user||'')) ? '' : (e?.user||'')}
 function entryMainIdentity(e){
   if(e?.entryType==='note') return '📝 Nota segura';
-  if(e?.entryType==='card') return '💳 '+(e.cardType?e.cardType.charAt(0).toUpperCase()+e.cardType.slice(1):'Tarjeta')+(e.cardNumber?' ••'+e.cardNumber.slice(-2):'');
+  if(e?.entryType==='card') return '💳 '+((e.cardType&&typeof e.cardType==='string')?e.cardType.charAt(0).toUpperCase()+e.cardType.slice(1):'Tarjeta')+(e.cardNumber&&typeof e.cardNumber==='string'?' ••'+e.cardNumber.slice(-2):'');
   if(e?.entryType==='id') return '🪪 '+(e.idType?e.idType.toUpperCase():'Documento')+(e.idNumber?' ••'+e.idNumber.slice(-3):'');
   if(e?.entryType==='license') return '🚗 Licencia'+(e.licCategory?' ('+e.licCategory+')':'');
   if(e?.entryType==='medical') return '🏥 Datos médicos'+(e.medBlood?' · '+e.medBlood:'');
@@ -1615,9 +1615,9 @@ function render(){let q=($('search')?.value||'').toLowerCase();
   } else {
     if(elist) elist.style.display='';
     if(rvault) rvault.style.display='none';
-    const _cf=_catFilter||'';const _catMatch=(e)=>{if(!_cf)return true;if((e.category||'general')===_cf)return true;if(e.entryType==='wifi'&&_cf==='wifi')return true;if((e.entryType==='id'||e.entryType==='license'||e.entryType==='medical')&&_cf==='otros')return true;return false;};let list=vault.filter(e=>entrySearchText(e).includes(q)&&_catMatch(e));$('entryList')&&( $('entryList').innerHTML='', list.length?list.forEach(e=>$('entryList').appendChild(row(e))):$('entryList').innerHTML='<div class="empty"><div class="emptyVault"><svg viewBox="0 0 80 80" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="16" width="64" height="52" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,80,200,.08)"/><rect x="8" y="16" width="64" height="14" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,100,255,.15)"/><circle cx="40" cy="50" r="11" stroke="#00d4ff" stroke-width="2.5" fill="rgba(0,210,255,.06)"/><circle cx="40" cy="50" r="4" fill="#00d4ff" opacity=".7"/><line x1="40" y1="39" x2="40" y2="43" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="57" x2="40" y2="61" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="29" y1="50" x2="33" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="47" y1="50" x2="51" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="62" y="40" width="8" height="16" rx="4" stroke="#1a6fff" stroke-width="2" fill="rgba(0,80,200,.1)"/></svg></div><b style="color:#e0f0ff;font-size:16px">Tu bóveda está vacía</b><p style="color:#4a7090;margin-top:6px;font-size:13px">Crea tu primera credencial con el botón +</p></div>');
+    const _cf=_catFilter||'';const _catMatch=(e)=>{if(!_cf)return true;if((e.category||'general')===_cf)return true;if(e.entryType==='wifi'&&_cf==='wifi')return true;if((e.entryType==='id'||e.entryType==='license'||e.entryType==='medical')&&_cf==='otros')return true;return false;};let list=vault.filter(e=>entrySearchText(e).includes(q)&&_catMatch(e));$('entryList')&&( $('entryList').innerHTML='', list.length?list.forEach(e=>{try{$('entryList').appendChild(row(e))}catch(err){console.warn('row error',e?.id,err)}}):$('entryList').innerHTML='<div class="empty"><div class="emptyVault"><svg viewBox="0 0 80 80" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="16" width="64" height="52" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,80,200,.08)"/><rect x="8" y="16" width="64" height="14" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,100,255,.15)"/><circle cx="40" cy="50" r="11" stroke="#00d4ff" stroke-width="2.5" fill="rgba(0,210,255,.06)"/><circle cx="40" cy="50" r="4" fill="#00d4ff" opacity=".7"/><line x1="40" y1="39" x2="40" y2="43" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="57" x2="40" y2="61" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="29" y1="50" x2="33" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="47" y1="50" x2="51" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="62" y="40" width="8" height="16" rx="4" stroke="#1a6fff" stroke-width="2" fill="rgba(0,80,200,.1)"/></svg></div><b style="color:#e0f0ff;font-size:16px">Tu bóveda está vacía</b><p style="color:#4a7090;margin-top:6px;font-size:13px">Crea tu primera credencial con el botón +</p></div>');
   }
-  renderFav();let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);$('recentList')&&( $('recentList').innerHTML='', recent.length?recent.forEach(e=>$('recentList').appendChild(row(e))):$('recentList').innerHTML='<p class="sub">Todavía no has usado entradas.</p>');$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
+  renderFav();let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);$('recentList')&&( $('recentList').innerHTML='', recent.length?recent.forEach(e=>{try{$('recentList').appendChild(row(e))}catch(err){console.warn('row fav error',e?.id,err)}}):$('recentList').innerHTML='<p class="sub">Todavía no has usado entradas.</p>');$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
 
 function vk128SvgText(label,bg,fg='#fff',fs=18){return {bg,svg:`<svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="${bg}"/><text x="24" y="31" font-size="${fs}" font-weight="900" fill="${fg}" text-anchor="middle" font-family="Arial, sans-serif">${label}</text></svg>`}}
 function vk128Match(n,k){k=(k||'').toLowerCase().trim();if(!k)return false;if(k.length<=2)return n===k;return n===k||n.includes(k)}
@@ -1654,10 +1654,21 @@ const VK128_BRAND_ICONS=[
 serviceIcon=function(s){const n=(s||'').toLowerCase().trim();if(!n)return vk128Shield();for(const item of VK128_BRAND_ICONS){if(item.k.some(k=>vk128Match(n,k)))return item.v;}return vk128Shield();}
 function iconFromKey(id){
   if(!id||id==='auto')return null;
+  // Buscar primero en VK128_BRAND_ICONS (tienen svg real)
+  if(typeof VK128_BRAND_ICONS!=='undefined'){
+    for(const b of VK128_BRAND_ICONS){
+      if(b.k&&b.k.includes(id))return b.v;
+    }
+  }
+  // Buscar en MANUAL_ICONS y generar SVG desde emoji o label
   const ic=MANUAL_ICONS.find(x=>x.id===id);
   if(!ic)return null;
-  return {bg:ic.bg||'#0a84ff',label:ic.label||ic.id,id:ic.id};
-}function iconForEntry(e){
+  const label=ic.emoji||ic.label||ic.id||'?';
+  const fs=String(label).length>2?14:String(label).length===2?20:24;
+  const {svg}=vk128SvgText(label,ic.bg||'#0a84ff','#fff',fs);
+  return {bg:ic.bg||'#0a84ff',svg,id:ic.id,label:ic.label||ic.id};
+}function _iconByServiceName(s){try{return serviceIcon(s||"");}catch(e){return null;}}
+function iconForEntry(e){
   if(e?.icon&&e.icon!=='auto'){const m=iconFromKey(e.icon);if(m&&m.svg)return m;}
   const byName=_iconByServiceName(e?.service);
   if(byName)return byName;
