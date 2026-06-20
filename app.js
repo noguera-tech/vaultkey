@@ -16,7 +16,11 @@ if(iconSection)iconSection.style.display='';
   const fieldNote=$('fieldSecureNote');if(fieldNote)fieldNote.style.display=isNote?'':'none';
   // Ocultar botones URL y Nota extra en modo nota
   const extraBtns=$('fieldExtraBtns');if(extraBtns)extraBtns.style.display=isNote?'none':'';
-  // Ocultar favorito y categoría no son necesarios ocultarlos
+  // Cambiar placeholder y label del campo nombre
+  const eService=$('eService');
+  const eServiceLabel=$('eServiceLabel');
+  if(eService)eService.placeholder=isNote?'Título de la nota...':'Gmail, Banco, Netflix...';
+  if(eServiceLabel)eServiceLabel.textContent=isNote?'Título de la nota *':'Nombre del servicio *';
 }
 const $=id=>document.getElementById(id);const byId=$;const enc=new TextEncoder(),dec=new TextDecoder();
 function b64(buf){return btoa(String.fromCharCode(...new Uint8Array(buf)))}function ub64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
@@ -1386,7 +1390,8 @@ async function saveEntry(){
   }
   if(_entryType==='note'){
     const noteVal=($('eSecureNote')?.value||'').trim();
-    if(!noteVal){vibe([30,30]);soundEmpty();toast('La nota no puede estar vacía.');return;}
+    if(!noteVal){vibe([30,30]);soundEmpty();toast('El contenido de la nota no puede estar vacío.');$('eSecureNote')?.focus();return;}
+    // Para notas saltamos todas las validaciones de usuario/email/pass/url
   } else {
   if(!userVal && !emailVal){
     $('eUser')?.classList.add('fieldError');
@@ -1408,6 +1413,7 @@ async function saveEntry(){
     $('eEmail')?.focus();return;
   }
   }
+  if(_entryType!=='note'){
   if(emailVal && !isValidEmail(emailVal)){
     $('eEmail')?.classList.add('fieldError');
     vibe([30,30]);soundError();
@@ -1425,6 +1431,7 @@ async function saveEntry(){
     vibe([30,30]);soundError();
     toast('La contrase\xf1a debe tener m\xednimo 6 caracteres');
     $('ePass')?.focus();updateStrength();return;
+  }
   }
   let urlVal=normalizeUrl?normalizeUrl(urlRaw):urlRaw;
   // Preservar historial de contraseñas (máx 3 versiones anteriores)
