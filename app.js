@@ -884,6 +884,7 @@ function updateStrength(){let p=$('ePass').value,s=score(p),w=s*20;$('strBar').s
 function isValidEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||'').trim())}
 function serviceRequiresEmail(){return true}
 function toggleQvPass(){let el=$('qvPass');el.textContent=el.textContent.startsWith('•')?current.pass:'••••••••••••'}
+function toggleQvNote(){const el=$('qvNote');if(!el)return;if(el.textContent==='••••••••'){el.textContent=current.note;el.style.whiteSpace='pre-wrap';el.style.fontSize='14px';el.style.lineHeight='1.6';}else{el.textContent='••••••••';el.style.whiteSpace='';el.style.fontSize='';el.style.lineHeight='';}}
 async function toggleFav(id){let e=vault.find(x=>x.id===id);if(e){e.fav=!e.fav;await persist();closeModals();render();toast('Actualizado')}}
 async function delEntry(id){vibe([40,20,40]);soundDelete();if(await vkConfirm('Eliminar entrada','¿Eliminar esta entrada de la bóveda?')){vault=vault.filter(e=>e.id!==id);await persist();closeModals();render();toast('Entrada eliminada');try{driveAutoSync();}catch(e){}}}
 function copyText(t='',btn=null){
@@ -1586,7 +1587,7 @@ function qvBtn(label,onclick){
 /* ── Campos ── */
 h+='<div style="border-radius:20px;overflow:hidden;border:1px solid rgba(0,180,255,.14);margin-bottom:6px;box-shadow:0 4px 24px rgba(0,0,0,.35)">';
 if(e.entryType==='note'){
-  h+=qvRow('Nota segura','📝','<span style="color:#b0cce8;font-size:14px;line-height:1.6;white-space:pre-wrap">'+esc(e.note)+'</span>',qvBtn('Copiar','copyText(current.note,this)'),true);
+  h+=qvRow('Nota segura','📝','<span id="qvNote" style="font-family:ui-monospace,monospace;letter-spacing:.5px">••••••••</span>',qvBtn('Ver','toggleQvNote()')+qvBtn('Copiar','copyText(current.note,this)'),true);
 } else {
 if(u)h+=qvRow('Usuario','\ud83d\udc64',esc(u),qvBtn('Copiar','copyText(userFromEntry(current),this)'));
 if(em)h+=qvRow('Correo','\u2709\ufe0f',esc(em),qvBtn('Copiar','copyText(legacyEmailFromEntry(current),this)'));
