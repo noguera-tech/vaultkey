@@ -1494,29 +1494,10 @@ async function saveEntry(){
     toast('El nombre del servicio es obligatorio.');
     $('eService')?.focus();return;
   }
+  // ── Validaciones por tipo ──────────────────────────────────
   if(_entryType==='note'){
     const noteVal=($('eSecureNote')?.value||'').trim();
     if(!noteVal){vibe([30,30]);soundEmpty();toast('El contenido de la nota no puede estar vacío.');$('eSecureNote')?.focus();return;}
-  } else if(_entryType==='id'){
-    if(!($('eIdName')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre completo es obligatorio.');$('eIdName')?.focus();return;}
-    if(!($('eIdNumber')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El número de documento es obligatorio.');$('eIdNumber')?.focus();return;}
-    const _idExp=($('eIdExpiry')?.value||'').trim();
-    if(_idExp&&!/^\d{2}\/\d{2}\/\d{4}$/.test(_idExp)){vibe([30,30]);soundError();toast('Caducidad: formato DD/MM/AAAA');$('eIdExpiry')?.focus();return;}
-  } else if(_entryType==='license'){
-    if(!($('eLicName')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre completo es obligatorio.');$('eLicName')?.focus();return;}
-    if(!($('eLicNumber')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El número de licencia es obligatorio.');$('eLicNumber')?.focus();return;}
-    const _licExp=($('eLicExpiry')?.value||'').trim();
-    if(_licExp&&!/^\d{2}\/\d{2}\/\d{4}$/.test(_licExp)){vibe([30,30]);soundError();toast('Caducidad: formato DD/MM/AAAA');$('eLicExpiry')?.focus();return;}
-    if(_licExp){
-      const[_ld,_lm,_ly]=_licExp.split('/').map(Number);
-      const _ln=new Date();
-      if(new Date(_ly,_lm-1,_ld)<_ln){vibe([30,30]);soundError();toast('⚠️ La licencia está caducada.');$('eLicExpiry')?.focus();return;}
-    }
-  } else if(_entryType==='medical'){
-    if(!($('eMedName')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre del paciente es obligatorio.');$('eMedName')?.focus();return;}
-  } else if(_entryType==='wifi'){
-    if(!serviceVal){vibe([30,30]);soundEmpty();toast('El nombre de la red (SSID) es obligatorio.');$('eService')?.focus();return;}
-    if(!($('eWifiPass')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('La contraseña WiFi es obligatoria.');$('eWifiPass')?.focus();return;}
   } else if(_entryType==='card'){
     const cardNum=($('eCardNumber')?.value||'').replace(/\s/g,'');
     const cardName=($('eCardName')?.value||'').trim();
@@ -1528,46 +1509,28 @@ async function saveEntry(){
     if(expM<1||expM>12){vibe([30,30]);soundError();toast('El mes debe estar entre 01 y 12.');$('eCardExpiry')?.focus();return;}
     const _now=new Date();const _nowY=_now.getFullYear()%100;const _nowM=_now.getMonth()+1;
     if(expY<_nowY||(expY===_nowY&&expM<_nowM)){vibe([30,30]);soundError();toast('La tarjeta está caducada. Revisa la fecha.');$('eCardExpiry')?.focus();return;}
+  } else if(_entryType==='id'){
+    if(!($('eIdName')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre completo es obligatorio.');$('eIdName')?.focus();return;}
+    if(!($('eIdNumber')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El número de documento es obligatorio.');$('eIdNumber')?.focus();return;}
+    const _idExp=($('eIdExpiry')?.value||'').trim();
+    if(_idExp&&!/^\d{2}\/\d{2}\/\d{4}$/.test(_idExp)){vibe([30,30]);soundError();toast('Caducidad: formato DD/MM/AAAA');$('eIdExpiry')?.focus();return;}
+  } else if(_entryType==='license'){
+    if(!($('eLicName')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre completo es obligatorio.');$('eLicName')?.focus();return;}
+    if(!($('eLicNumber')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El número de licencia es obligatorio.');$('eLicNumber')?.focus();return;}
+    const _licExp=($('eLicExpiry')?.value||'').trim();
+    if(_licExp&&!/^\d{2}\/\d{2}\/\d{4}$/.test(_licExp)){vibe([30,30]);soundError();toast('Caducidad: formato DD/MM/AAAA');$('eLicExpiry')?.focus();return;}
+    if(_licExp){const[_ld,_lm,_ly]=_licExp.split('/').map(Number);if(new Date(_ly,_lm-1,_ld)<new Date()){vibe([30,30]);soundError();toast('⚠️ La licencia está caducada.');$('eLicExpiry')?.focus();return;}}
+  } else if(_entryType==='medical'){
+    if(!($('eMedName')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre del paciente es obligatorio.');$('eMedName')?.focus();return;}
+  } else if(_entryType==='wifi'){
+    if(!serviceVal){vibe([30,30]);soundEmpty();toast('El nombre de la red (SSID) es obligatorio.');$('eService')?.focus();return;}
+    if(!($('eWifiPass')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('La contraseña WiFi es obligatoria.');$('eWifiPass')?.focus();return;}
   } else {
-  if(!userVal && !emailVal){
-    $('eUser')?.classList.add('fieldError');
-    $('eEmail')?.classList.add('fieldError');
-    vibe([30,30]);soundEmpty();
-    toast('El usuario y el correo son obligatorios.');
-    $('eUser')?.focus();return;
-  }
-  if(!userVal){
-    $('eUser')?.classList.add('fieldError');
-    vibe([30,30]);soundEmpty();
-    toast('El usuario es obligatorio.');
-    $('eUser')?.focus();return;
-  }
-  if(!emailVal){
-    $('eEmail')?.classList.add('fieldError');
-    vibe([30,30]);soundEmpty();
-    toast('El correo electrónico es obligatorio.');
-    $('eEmail')?.focus();return;
-  }
-  }
-  if(_entryType==='password'){
-  if(emailVal && !isValidEmail(emailVal)){
-    $('eEmail')?.classList.add('fieldError');
-    vibe([30,30]);soundError();
-    toast('El correo no tiene formato v\xe1lido. Ej: usuario@gmail.com');
-    $('eEmail')?.focus();return;
-  }
-  if(urlRaw && !isLikelyUrl(urlRaw)){
-    $('eUrl')?.classList.add('fieldError');
-    vibe([30,30]);soundError();
-    toast('La URL no es v\xe1lida. Ej: https://google.com');
-    $('eUrl')?.focus();return;
-  }
-  if(pass.length<6){
-    $('ePass')?.classList.add('fieldError');
-    vibe([30,30]);soundError();
-    toast('La contrase\xf1a debe tener m\xednimo 6 caracteres');
-    $('ePass')?.focus();updateStrength();return;
-  }
+    // password — validaciones estándar
+    if(!userVal && !emailVal){$('eUser')?.classList.add('fieldError');$('eEmail')?.classList.add('fieldError');vibe([30,30]);soundEmpty();toast('El usuario o el correo son obligatorios.');$('eUser')?.focus();return;}
+    if(emailVal && !isValidEmail(emailVal)){$('eEmail')?.classList.add('fieldError');vibe([30,30]);soundError();toast('El correo no tiene formato válido. Ej: usuario@gmail.com');$('eEmail')?.focus();return;}
+    if(urlRaw && !isLikelyUrl(urlRaw)){$('eUrl')?.classList.add('fieldError');vibe([30,30]);soundError();toast('La URL no es válida. Ej: https://google.com');$('eUrl')?.focus();return;}
+    if(pass.length<6){$('ePass')?.classList.add('fieldError');vibe([30,30]);soundError();toast('La contraseña debe tener mínimo 6 caracteres');$('ePass')?.focus();updateStrength();return;}
   }
   let urlVal=normalizeUrl?normalizeUrl(urlRaw):urlRaw;
   // Preservar historial de contraseñas (máx 3 versiones anteriores)
