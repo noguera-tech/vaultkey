@@ -486,7 +486,7 @@ const MANUAL_ICONS=[
  {id:'wallet',label:'Wallet',emoji:'👛',bg:'#7c3aed'},
  {id:'mercadolibre',label:'MercadoLibre',emoji:'📦',bg:'#FFE600'},
  {id:'aliexpress',label:'AliExpress',emoji:'🛍️',bg:'#E62E04'},
- {id:'apple',label:'Apple',emoji:'',bg:'#111827'},
+ {id:'apple',label:'Apple',emoji:'🍎',bg:'#111827'},
  {id:'microsoft',label:'Microsoft',emoji:'⊞',bg:'#00A4EF'},
  {id:'drive',label:'Drive',emoji:'📁',bg:'#0F9D58'},
  {id:'dropbox',label:'Dropbox',emoji:'📦',bg:'#0061FF'},
@@ -1449,7 +1449,7 @@ async function saveEntry(){
     $('eEmail')?.focus();return;
   }
   }
-  if(_entryType!=='note'){
+  if(_entryType!=='note'&&_entryType!=='card'){
   if(emailVal && !isValidEmail(emailVal)){
     $('eEmail')?.classList.add('fieldError');
     vibe([30,30]);soundError();
@@ -1574,7 +1574,7 @@ function setIconCat(cat,btn){window._setIconCat(cat,btn);}
 document.addEventListener('click',function(e){const btn=e.target.closest('[data-cat]');if(btn&&btn.classList.contains('iconCat')){e.stopPropagation();window._setIconCat(btn.dataset.cat,btn);}});
 
 
-function row(e){let div=document.createElement('div');div.className='entry';div.onclick=()=>quick(e.id);let ic=iconForEntry(e);const weak=e?.entryType!=='note'&&score(e.pass)<3;div.innerHTML=`${vkLogoHTML(ic)}<div style="flex:1;min-width:0"><h3 style="display:flex;align-items:center;gap:6px">${esc(e.service)}${e.fav?'<span style="font-size:11px">⭐</span>':''}${weak?'<span style="font-size:9px;background:rgba(255,77,85,.2);color:#ff8c94;border:1px solid rgba(255,77,85,.3);border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.3px">DÉBIL</span>':''}</h3><p style="color:#7a9ec0">${esc(entryMainIdentity(e))}</p></div><div class="go" style="color:rgba(0,210,255,.4);font-size:18px">›</div>`;return div}
+function row(e){let div=document.createElement('div');div.className='entry';div.onclick=()=>quick(e.id);let ic=iconForEntry(e);const weak=e?.entryType!=='note'&&score(e.pass)<3;const typeEmoji=e?.entryType==='note'?'📝':e?.entryType==='card'?'💳':'🔑';div.innerHTML=`${vkLogoHTML(ic)}<div style="flex:1;min-width:0"><h3 style="display:flex;align-items:center;gap:6px">${esc(e.service)}${e.fav?'<span style="font-size:11px">⭐</span>':''} ${weak?'<span style="font-size:9px;background:rgba(255,77,85,.2);color:#ff8c94;border:1px solid rgba(255,77,85,.3);border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.3px">DÉBIL</span>':''}</h3><p style="color:#7a9ec0">${esc(entryMainIdentity(e))}</p></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:14px;opacity:.7">${typeEmoji}</span><div class="go" style="color:rgba(0,210,255,.4);font-size:18px">›</div></div>`;return div}
 
 function renderFav(){
   const grid=$('favGrid');
@@ -1689,7 +1689,7 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     ['onedrive,one drive', vk128Icon('☁','#0078D4','#fff',25)],
     ['mega,mega nz', vk128Icon('M','#D9272E','#fff',25)],
     ['microsoft,office,outlook office', vk128Icon('MS','#F25022','#fff',17)],
-    ['apple,apple id,app store', vk128Icon('','#111827','#fff',25)],
+    ['apple,apple id,app store', vk128Icon('A','#111827','#fff',25)],
     ['adobe', vk128Icon('A','#FA0F00','#fff',25)],
     ['canva', vk128Icon('C','#00C4CC','#fff',25)],
     ['notion', vk128Icon('N','#ffffff','#111827',25)],
