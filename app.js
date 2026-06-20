@@ -2324,6 +2324,7 @@ function rankIcon(ic){
     if(m){m.failedAttempts=0;m.totalFailed=0;m.lockedUntil=0;m.lockLevel=0;m.lastOk=Date.now();saveMeta(m)}
     try{vibe([30,20,60]);soundPinOk()}catch(e){}
     lastKey=p;unlocked=true;pin='';renderDots();hidePrivacyOverlay();show('home');render();syncSettingsUI();resetAutoLockTimer();
+    setTimeout(()=>{try{checkVaultReminders();}catch(e){}},2000);
     if(localStorage.getItem(REC_PENDING)==='1' || (localStorage.getItem(LS_REC)&&localStorage.getItem(REC_SAVED)!=='1')){
       setTimeout(()=>showRecoveryCode(true),120);
     }else{
@@ -2397,7 +2398,8 @@ function rankIcon(ic){
 function checkVaultReminders(){
   if(!vault||!vault.length)return;
   const now=Date.now();
-  const todayStr=new Date().toISOString().split('T')[0];
+  const _td=new Date();
+  const todayStr=_td.getFullYear()+'-'+String(_td.getMonth()+1).padStart(2,'0')+'-'+String(_td.getDate()).padStart(2,'0');
   const reminders=[];
 
   vault.forEach(e=>{
@@ -2453,12 +2455,6 @@ function checkVaultReminders(){
   });
 }
 
-// Hook: llamar checkVaultReminders al desbloquear
-const _origUnlockOk=window.unlockOk;
-window.unlockOk=async function(p){
-  if(_origUnlockOk) await _origUnlockOk(p);
-  setTimeout(checkVaultReminders, 1500);
-};
 window._checkVaultReminders=checkVaultReminders;
 
 // ══ PANEL DE SALUD ══════════════════════════════════════
