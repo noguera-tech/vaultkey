@@ -40,10 +40,7 @@ function setEntryType(type){
   const labels={password:'Nombre del servicio *',note:'Título de la nota *',card:'Nombre identificativo *',id:'Nombre identificativo *',license:'Nombre identificativo *',medical:'Nombre identificativo *',wifi:'Nombre de la red (SSID) *'};
   if(eService)eService.placeholder=placeholders[type]||'Nombre...';
   if(eServiceLabel)eServiceLabel.textContent=labels[type]||'Nombre *';
-  // Auto-asignar categoría según tipo
-  const catMap={id:'otros',license:'otros',medical:'otros',wifi:'wifi',password:'',note:'',card:'banco'};
-  const eCat=$('eCategory');
-  if(eCat&&catMap[type]!==undefined&&catMap[type]!==''){eCat.value=catMap[type];}
+  // No auto-asignar categoría — el usuario la elige
 }
 const $=id=>document.getElementById(id);
 function fmtDate(el){
@@ -1626,7 +1623,7 @@ async function saveEntry(){
   let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,...cardData,...idData,...licData,...medData,...wifiData,type:'Cuenta',category:($('eCategory')?.value||'general'),user:isPassType?userVal:'',email:isPassType?emailVal:'',pass:isPassType?pass:'',url:isPassType?urlVal:'',note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
   let i=vault.findIndex(x=>x.id===entry.id);
   if(i>=0)vault[i]=entry;else vault.unshift(entry);
-  if(!editId){_catFilter='';_vaultTab='todas';document.querySelectorAll('.catChip').forEach(c=>c.classList.remove('active'));const _fc=document.querySelectorAll('.catChip')[0];if(_fc)_fc.classList.add('active');}
+  _catFilter='';_vaultTab='todas';document.querySelectorAll('.catChip').forEach(c=>c.classList.remove('active'));const _fc=document.querySelectorAll('.catChip')[0];if(_fc)_fc.classList.add('active');
   await persist();closeModals();show('vault');render();try{driveAutoSync();}catch(e){}toast('Guardado \u2713');
 }
 // BUG4 FIX: Tab switcher para Recientes
