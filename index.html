@@ -64,13 +64,12 @@
   <span class="vaultTitle">Entradas</span>
   <button class="mockIconBtn" onclick="document.getElementById('search').focus()" style="font-size:22px;color:#b0cfe8">⌕</button>
 </div>
-<div class="search targetSearch"><input id="search" placeholder="Buscar entradas..." oninput="render()">
-</div>
-<div style="display:flex;gap:4px;padding:0 2px 8px;justify-content:flex-end" id="sortBtns">
+<div class="search targetSearch"><input id="search" placeholder="Buscar entradas..." oninput="render()"></div>
+<div id="sortBtns" style="display:flex;gap:4px;padding:2px 4px 6px;justify-content:flex-end">
   <button onclick="setSortOrder('updated',this)" style="font-size:11px;font-weight:800;color:#00d9ff;background:rgba(0,180,255,.08);border:1px solid rgba(0,180,255,.3);border-radius:8px;padding:4px 10px">🕐 Reciente</button>
   <button onclick="setSortOrder('name',this)" style="font-size:11px;font-weight:800;color:#4a7090;background:none;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:4px 10px">🔤 Nombre</button>
   <button onclick="setSortOrder('used',this)" style="font-size:11px;font-weight:800;color:#4a7090;background:none;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:4px 10px">⭐ Uso</button>
-<div style="display:none"></div>
+</div>
 <div style="position:relative"><div id="catFilterRow" style="display:flex;gap:6px;overflow-x:auto;padding:8px 20px 4px 4px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x mandatory">
   <button class="catChip active" onclick="setCatFilter('',this)">✦ Todas</button>
   <button class="catChip" onclick="setCatFilter('banco',this)">🏦 Banco</button>
