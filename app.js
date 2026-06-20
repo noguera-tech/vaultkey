@@ -2402,6 +2402,15 @@ function checkVaultReminders(){
   const todayStr=_td.getFullYear()+'-'+String(_td.getMonth()+1).padStart(2,'0')+'-'+String(_td.getDate()).padStart(2,'0');
   const reminders=[];
 
+  // DEBUG TEMPORAL — mostrar notas y su reminder
+  const notes=vault.filter(e=>e.entryType==='note');
+  if(notes.length){
+    const info=notes.map(e=>`"${e.service}": reminder=${JSON.stringify(e.reminder)}`).join(' | ');
+    toast('🔍 DEBUG notas: '+info, 8000);
+  } else {
+    toast('🔍 DEBUG: no hay notas en vault', 4000);
+  }
+
   vault.forEach(e=>{
     // Recordatorio de nota con fecha
     if(e.entryType==='note'&&e.reminder&&e.reminder.active&&e.reminder.date){
