@@ -15,37 +15,6 @@
 
 
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-<style>
-/* ── Inputs más visibles — fondo diferenciado del fondo de pantalla ── */
-.inp,input.inp,select.inp,textarea.inp{
-  background:rgba(10,30,60,0.85)!important;
-  border:1.5px solid rgba(0,180,255,0.25)!important;
-  color:#e8f4ff!important;
-}
-.inp:focus,input.inp:focus,select.inp:focus,textarea.inp:focus{
-  background:rgba(0,40,90,0.95)!important;
-  border-color:rgba(0,210,255,0.6)!important;
-  outline:none!important;
-  box-shadow:0 0 0 3px rgba(0,180,255,0.12)!important;
-}
-.inp::placeholder{color:rgba(120,160,200,0.55)!important;}
-/* Bloques de campos nuevos — fondo ligeramente más claro que el sheet */
-#fieldId,#fieldLicense,#fieldMedical,#fieldWifi,#fieldCard,#fieldSecureNote{
-  background:rgba(0,20,50,0.4);
-  border-radius:16px;
-  padding:12px;
-  margin-bottom:12px;
-  border:1px solid rgba(0,180,255,0.1);
-}
-/* Label de campos — más visible */
-.label{
-  color:#00b8e6!important;
-  font-size:11px!important;
-  font-weight:900!important;
-  letter-spacing:.6px!important;
-  text-transform:uppercase!important;
-}
-</style>
 </head>
 <body>
 <div class="app">
@@ -266,7 +235,8 @@
 </div>
 <!-- WIFI -->
 <div id="fieldWifi" style="display:none">
-  <div class="field"><div class="label">Nombre de la red (SSID) *</div><input class="inp" id="eWifiSsid" placeholder="Nombre del WiFi" autocomplete="off"></div>
+  <!-- eWifiSsid = eService — no se duplica -->
+  <input type="hidden" id="eWifiSsid">
   <div class="field"><div class="label">Contraseña *</div><div style="display:flex;gap:8px"><input class="inp" id="eWifiPass" style="flex:1" placeholder="Contraseña del WiFi" autocomplete="off"><button class="smallBtn" onclick="openGen(true,'eWifiPass')">🔑</button></div></div>
   <div class="field"><div class="label">Tipo de seguridad</div>
     <select class="inp" id="eWifiSec" style="width:100%;padding:10px 12px;border-radius:10px;appearance:none;-webkit-appearance:none">

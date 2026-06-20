@@ -36,8 +36,8 @@ function setEntryType(type){
   const extraBtns=$('fieldExtraBtns');if(extraBtns)extraBtns.style.display=isPass?'':'none';
   // Placeholder y label
   const eService=$('eService');const eServiceLabel=$('eServiceLabel');
-  const placeholders={password:'Gmail, Banco, Netflix...',note:'Título de la nota...',card:'Nombre identificativo (ej: Visa BBVA)...',id:'Nombre identificativo (ej: DNI personal)...',license:'Nombre identificativo (ej: Carnet B)...',medical:'Nombre identificativo (ej: Datos de Juan)...',wifi:'Nombre de la red o lugar (ej: WiFi casa)...'};
-  const labels={password:'Nombre del servicio *',note:'Título de la nota *',card:'Nombre identificativo *',id:'Nombre identificativo *',license:'Nombre identificativo *',medical:'Nombre identificativo *',wifi:'Nombre identificativo *'};
+  const placeholders={password:'Gmail, Banco, Netflix...',note:'Título de la nota...',card:'Nombre identificativo (ej: Visa BBVA)...',id:'Nombre identificativo (ej: DNI personal)...',license:'Nombre identificativo (ej: Carnet B)...',medical:'Nombre identificativo (ej: Datos de Juan)...',wifi:'Nombre de la red WiFi (ej: Movistar_Casa)...'};
+  const labels={password:'Nombre del servicio *',note:'Título de la nota *',card:'Nombre identificativo *',id:'Nombre identificativo *',license:'Nombre identificativo *',medical:'Nombre identificativo *',wifi:'Nombre de la red (SSID) *'};
   if(eService)eService.placeholder=placeholders[type]||'Nombre...';
   if(eServiceLabel)eServiceLabel.textContent=labels[type]||'Nombre *';
   // Auto-asignar categoría según tipo
@@ -48,6 +48,17 @@ function setEntryType(type){
 const $=id=>document.getElementById(id);
 function fmtDate(el){
   let v=el.value.replace(/[^0-9]/g,'');
+  // Limitar día (01-31) y mes (01-12) al escribir
+  if(v.length>=2){
+    let dd=parseInt(v.slice(0,2),10);
+    if(dd<1)dd=1; if(dd>31)dd=31;
+    v=String(dd).padStart(2,'0')+v.slice(2);
+  }
+  if(v.length>=4){
+    let mm=parseInt(v.slice(2,4),10);
+    if(mm<1)mm=1; if(mm>12)mm=12;
+    v=v.slice(0,2)+String(mm).padStart(2,'0')+v.slice(4);
+  }
   if(v.length>2&&v.length<=4)v=v.slice(0,2)+'/'+v.slice(2);
   else if(v.length>4)v=v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4,8);
   el.value=v;
@@ -1367,7 +1378,7 @@ function entryMainIdentity(e){
   if(e?.entryType==='id') return '🪪 '+(e.idType?e.idType.toUpperCase():'Documento')+(e.idNumber?' ••'+e.idNumber.slice(-3):'');
   if(e?.entryType==='license') return '🚗 Licencia'+(e.licCategory?' ('+e.licCategory+')':'');
   if(e?.entryType==='medical') return '🏥 Datos médicos'+(e.medBlood?' · '+e.medBlood:'');
-  if(e?.entryType==='wifi') return '📶 '+(e.wifiSsid||'WiFi')+(e.wifiSec?' · '+e.wifiSec:'');
+  if(e?.entryType==='wifi') return '📶 '+(e.wifiSsid||e.service||'WiFi')+(e.wifiSec?' · '+e.wifiSec:'');
   return '••••••••';
 }
 function entrySearchText(e){return [e.service,userFromEntry(e),legacyEmailFromEntry(e),e.url,e.note,e.type,e.wifiSsid,e.wifiRouter,e.idName,e.idNumber,e.idType,e.licName,e.licNumber,e.medName,e.medSS,e.cardName].filter(Boolean).join(' ').toLowerCase()}
@@ -1436,6 +1447,7 @@ function openEntry(e=null){
   if($('eMedDoctor'))$('eMedDoctor').value=e?.medDoctor||'';
   if($('eMedNotes'))$('eMedNotes').value=e?.medNotes||'';
   // Restaurar campos WiFi
+  if(_entryType==='wifi'&&e?.wifiSsid&&$('eService'))$('eService').value=e.wifiSsid;
   if($('eWifiSsid'))$('eWifiSsid').value=e?.wifiSsid||'';
   if($('eWifiPass'))$('eWifiPass').value=e?.wifiPass||'';
   if($('eWifiSec'))$('eWifiSec').value=e?.wifiSec||'WPA2';
@@ -1491,9 +1503,18 @@ async function saveEntry(){
   } else if(_entryType==='id'){
     if(!($('eIdName')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre completo es obligatorio.');$('eIdName')?.focus();return;}
     if(!($('eIdNumber')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El número de documento es obligatorio.');$('eIdNumber')?.focus();return;}
+    const _idExp=($('eIdExpiry')?.value||'').trim();
+    if(_idExp&&!/^\d{2}\/\d{2}\/\d{4}$/.test(_idExp)){vibe([30,30]);soundError();toast('Caducidad: formato DD/MM/AAAA');$('eIdExpiry')?.focus();return;}
   } else if(_entryType==='license'){
     if(!($('eLicName')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre completo es obligatorio.');$('eLicName')?.focus();return;}
     if(!($('eLicNumber')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El número de licencia es obligatorio.');$('eLicNumber')?.focus();return;}
+    const _licExp=($('eLicExpiry')?.value||'').trim();
+    if(_licExp&&!/^\d{2}\/\d{2}\/\d{4}$/.test(_licExp)){vibe([30,30]);soundError();toast('Caducidad: formato DD/MM/AAAA');$('eLicExpiry')?.focus();return;}
+    if(_licExp){
+      const[_ld,_lm,_ly]=_licExp.split('/').map(Number);
+      const _ln=new Date();
+      if(new Date(_ly,_lm-1,_ld)<_ln){vibe([30,30]);soundError();toast('⚠️ La licencia está caducada.');$('eLicExpiry')?.focus();return;}
+    }
   } else if(_entryType==='medical'){
     if(!($('eMedName')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre del paciente es obligatorio.');$('eMedName')?.focus();return;}
   } else if(_entryType==='wifi'){
@@ -1595,7 +1616,7 @@ async function saveEntry(){
     medNotes:($('eMedNotes')?.value||'').trim(),
   }:{};
   const wifiData=_entryType==='wifi'?{
-    wifiSsid:($('eWifiSsid')?.value||'').trim(),
+    wifiSsid:serviceVal,
     wifiPass:($('eWifiPass')?.value||'').trim(),
     wifiSec:($('eWifiSec')?.value||'WPA2'),
     wifiRouter:($('eWifiRouter')?.value||'').trim(),
