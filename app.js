@@ -1210,7 +1210,7 @@ function showAppInfo(){
   const backup=m&&m.lastBackup?new Date(m.lastBackup).toLocaleDateString('es-ES'):'Nunca';
   const total=vault?vault.length:0;
   const favs=vault?vault.filter(e=>e.fav).length:0;
-  const debiles=vault?vault.filter(e=>e.entryType!=='note'&&score(e.pass)<3).length:0;
+  const debiles=vault?vault.filter(e=>e.entryType!=='note'&&e.entryType!=='card'&&score(e.pass)<3).length:0;
   vkConfirm(
     'VaultKey V2.2.1 Clean',
     `📦 Entradas guardadas: ${total}\n⭐ Favoritos: ${favs}\n⚠️ Contraseñas débiles: ${debiles}\n📅 PIN creado: ${creado}\n☁️ Último respaldo: ${backup}\n\n🔒 Cifrado AES-GCM 256 bits\n🔑 PBKDF2 · 200.000 iteraciones`
@@ -1426,8 +1426,12 @@ async function saveEntry(){
     const cardName=($('eCardName')?.value||'').trim();
     const cardExp=($('eCardExpiry')?.value||'').trim();
     if(!cardName){vibe([30,30]);soundEmpty();toast('El titular de la tarjeta es obligatorio.');$('eCardName')?.focus();return;}
-    if(!cardNum||cardNum.length<13){vibe([30,30]);soundEmpty();toast('Introduce un número de tarjeta válido.');$('eCardNumber')?.focus();return;}
+    if(!cardNum||cardNum.length<16){vibe([30,30]);soundEmpty();toast('El número debe tener 16 dígitos (tiene '+cardNum.length+').');$('eCardNumber')?.focus();return;}
     if(!cardExp||!/^\d{2}\/\d{2}$/.test(cardExp)){vibe([30,30]);soundEmpty();toast('La caducidad debe tener formato MM/AA.');$('eCardExpiry')?.focus();return;}
+    const [expM,expY]=cardExp.split('/').map(Number);
+    if(expM<1||expM>12){vibe([30,30]);soundError();toast('El mes debe estar entre 01 y 12.');$('eCardExpiry')?.focus();return;}
+    const _now=new Date();const _nowY=_now.getFullYear()%100;const _nowM=_now.getMonth()+1;
+    if(expY<_nowY||(expY===_nowY&&expM<_nowM)){vibe([30,30]);soundError();toast('La tarjeta está caducada. Revisa la fecha.');$('eCardExpiry')?.focus();return;}
   } else {
   if(!userVal && !emailVal){
     $('eUser')?.classList.add('fieldError');
@@ -1521,7 +1525,7 @@ function render(){let q=($('search')?.value||'').toLowerCase();
     if(rvault) rvault.style.display='none';
     let list=vault.filter(e=>entrySearchText(e).includes(q)&&(!_catFilter||(e.category||'general')===_catFilter));$('entryList')&&( $('entryList').innerHTML='', list.length?list.forEach(e=>$('entryList').appendChild(row(e))):$('entryList').innerHTML='<div class="empty"><div class="emptyVault"><svg viewBox="0 0 80 80" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="16" width="64" height="52" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,80,200,.08)"/><rect x="8" y="16" width="64" height="14" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,100,255,.15)"/><circle cx="40" cy="50" r="11" stroke="#00d4ff" stroke-width="2.5" fill="rgba(0,210,255,.06)"/><circle cx="40" cy="50" r="4" fill="#00d4ff" opacity=".7"/><line x1="40" y1="39" x2="40" y2="43" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="57" x2="40" y2="61" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="29" y1="50" x2="33" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="47" y1="50" x2="51" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="62" y="40" width="8" height="16" rx="4" stroke="#1a6fff" stroke-width="2" fill="rgba(0,80,200,.1)"/></svg></div><b style="color:#e0f0ff;font-size:16px">Tu bóveda está vacía</b><p style="color:#4a7090;margin-top:6px;font-size:13px">Crea tu primera credencial con el botón +</p></div>');
   }
-  renderFav();let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);$('recentList')&&( $('recentList').innerHTML='', recent.length?recent.forEach(e=>$('recentList').appendChild(row(e))):$('recentList').innerHTML='<p class="sub">Todavía no has usado entradas.</p>');$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType!=='note'&&score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
+  renderFav();let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);$('recentList')&&( $('recentList').innerHTML='', recent.length?recent.forEach(e=>$('recentList').appendChild(row(e))):$('recentList').innerHTML='<p class="sub">Todavía no has usado entradas.</p>');$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType!=='note'&&e.entryType!=='card'&&score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
 
 function vk128SvgText(label,bg,fg='#fff',fs=18){return {bg,svg:`<svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="${bg}"/><text x="24" y="31" font-size="${fs}" font-weight="900" fill="${fg}" text-anchor="middle" font-family="Arial, sans-serif">${label}</text></svg>`}}
 function vk128Match(n,k){k=(k||'').toLowerCase().trim();if(!k)return false;if(k.length<=2)return n===k;return n===k||n.includes(k)}
@@ -1574,7 +1578,7 @@ function setIconCat(cat,btn){window._setIconCat(cat,btn);}
 document.addEventListener('click',function(e){const btn=e.target.closest('[data-cat]');if(btn&&btn.classList.contains('iconCat')){e.stopPropagation();window._setIconCat(btn.dataset.cat,btn);}});
 
 
-function row(e){let div=document.createElement('div');div.className='entry';div.onclick=()=>quick(e.id);let ic=iconForEntry(e);const weak=e?.entryType!=='note'&&score(e.pass)<3;const typeEmoji=e?.entryType==='note'?'📝':e?.entryType==='card'?'💳':'🔑';div.innerHTML=`${vkLogoHTML(ic)}<div style="flex:1;min-width:0"><h3 style="display:flex;align-items:center;gap:6px">${esc(e.service)}${e.fav?'<span style="font-size:11px">⭐</span>':''} ${weak?'<span style="font-size:9px;background:rgba(255,77,85,.2);color:#ff8c94;border:1px solid rgba(255,77,85,.3);border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.3px">DÉBIL</span>':''}</h3><p style="color:#7a9ec0">${esc(entryMainIdentity(e))}</p></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:14px;opacity:.7">${typeEmoji}</span><div class="go" style="color:rgba(0,210,255,.4);font-size:18px">›</div></div>`;return div}
+function row(e){let div=document.createElement('div');div.className='entry';div.onclick=()=>quick(e.id);let ic=iconForEntry(e);const weak=e?.entryType!=='note'&&e?.entryType!=='card'&&score(e.pass)<3;const typeEmoji=e?.entryType==='note'?'📝':e?.entryType==='card'?'💳':'🔑';div.innerHTML=`${vkLogoHTML(ic)}<div style="flex:1;min-width:0"><h3 style="display:flex;align-items:center;gap:6px">${esc(e.service)}${e.fav?'<span style="font-size:11px">⭐</span>':''} ${weak?'<span style="font-size:9px;background:rgba(255,77,85,.2);color:#ff8c94;border:1px solid rgba(255,77,85,.3);border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.3px">DÉBIL</span>':''}</h3><p style="color:#7a9ec0">${esc(entryMainIdentity(e))}</p></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:14px;opacity:.7">${typeEmoji}</span><div class="go" style="color:rgba(0,210,255,.4);font-size:18px">›</div></div>`;return div}
 
 function renderFav(){
   const grid=$('favGrid');
@@ -1589,7 +1593,7 @@ function renderFav(){
   grid.innerHTML='';
   favs.forEach(e=>{
     const ic=iconForEntry(e);
-    const weak=e?.entryType!=='note'&&score(e.pass)<3;
+    const weak=e?.entryType!=='note'&&e?.entryType!=='card'&&score(e.pass)<3;
     const identity=entryMainIdentity(e);
     const row=document.createElement('div');
     row.className='favRow';
