@@ -11,7 +11,7 @@ function setEntryType(type){
   // Campos
   const fieldsPass=['fieldUser','fieldEmail','fieldPass','fieldUrl','iconStripRow','eIconSearch'];
   const iconSection=$('iconStripRow')?.parentElement;
-  if(iconSection)iconSection.style.display=isNote?'none':'';
+if(iconSection)iconSection.style.display='';
   ['fieldUser','fieldEmail','fieldPass'].forEach(id=>{const el=$(id);if(el)el.style.display=isNote?'none':''});
   const fieldNote=$('fieldSecureNote');if(fieldNote)fieldNote.style.display=isNote?'':'none';
 }
