@@ -2247,8 +2247,27 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     if('serviceWorker'in navigator){
       navigator.serviceWorker.register('./sw.js').catch(()=>{});
       navigator.serviceWorker.addEventListener('message',e=>{
-        if(e.data&&e.data.type==='SW_UPDATED'&&!unlocked)window.location.reload();
+        if(!e.data)return;
+        // Nueva versión detectada
+        if(e.data.type==='SW_UPDATED'){
+          if(!unlocked){
+            // App bloqueada — recargar silenciosamente
+            window.location.reload();
+          } else {
+            // App desbloqueada — avisar sin interrumpir
+            const v=e.data.version||'';
+            toast(`✨ VaultKey actualizado${v?' (v'+v+')':''} — reinicia para aplicar`,5000);
+          }
+        }
+        // Respuesta a GET_VERSION
+        if(e.data.type==='SW_VERSION'){
+          console.log('SW version:',e.data.version);
+        }
       });
+      // Pedir versión del SW al arrancar (útil para debug)
+      navigator.serviceWorker.ready.then(reg=>{
+        reg.active?.postMessage({type:'GET_VERSION'});
+      }).catch(()=>{});
     }
     if(!localStorage.getItem('vaultkey_onboarding_v130') || !localStorage.getItem('vk_meta_v1')){
       // Nuevo usuario: sin onboarding visto O sin PIN configurado → mostrar bienvenida
