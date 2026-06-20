@@ -2394,6 +2394,64 @@ function rankIcon(ic){
 //  SISTEMA DE NOTIFICACIONES LOCALES — VaultKey
 // ══════════════════════════════════════════════════════
 
+
+// ══ BANNER DE RECORDATORIO ═══════════════════════════════
+function showReminderBanner(msg, id){
+  // Eliminar banner anterior si existe
+  const prev=document.getElementById('vkReminderBanner');
+  if(prev)prev.remove();
+
+  const banner=document.createElement('div');
+  banner.id='vkReminderBanner';
+  banner.style.cssText=[
+    'position:fixed','top:0','left:0','right:0','z-index:99999',
+    'background:linear-gradient(135deg,#003a6b,#00234a)',
+    'border-bottom:2px solid rgba(0,210,255,.5)',
+    'padding:14px 16px','display:flex','align-items:flex-start','gap:12px',
+    'box-shadow:0 4px 24px rgba(0,0,0,.6)',
+    'animation:vkBannerIn .3s cubic-bezier(.4,0,.2,1)',
+  ].join(';');
+
+  // Animación de entrada
+  if(!document.getElementById('vkBannerStyle')){
+    const st=document.createElement('style');
+    st.id='vkBannerStyle';
+    st.textContent=`
+      @keyframes vkBannerIn{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+      @keyframes vkBannerOut{from{transform:translateY(0);opacity:1}to{transform:translateY(-100%);opacity:0}}
+      #vkReminderBanner.hiding{animation:vkBannerOut .25s forwards}
+    `;
+    document.head.appendChild(st);
+  }
+
+  banner.innerHTML=`
+    <span style="font-size:26px;flex-shrink:0;margin-top:2px">🔔</span>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:900;color:#00d9ff;letter-spacing:.3px;margin-bottom:3px">RECORDATORIO</div>
+      <div style="font-size:15px;font-weight:700;color:#e8f4ff;line-height:1.4">${msg}</div>
+      ${id?`<button onclick="closeModals();hideReminderBanner();setTimeout(()=>quick('${id}'),200)"
+        style="margin-top:8px;padding:5px 12px;border-radius:8px;border:1px solid rgba(0,210,255,.4);
+        background:rgba(0,210,255,.12);color:#00d9ff;font-size:12px;font-weight:800;cursor:pointer">
+        Ver entrada →
+      </button>`:''}
+    </div>
+    <button onclick="hideReminderBanner()" style="
+      width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,.15);
+      background:rgba(255,255,255,.08);color:#a0b8d0;font-size:16px;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer">✕</button>
+  `;
+
+  document.body.appendChild(banner);
+}
+
+function hideReminderBanner(){
+  const b=document.getElementById('vkReminderBanner');
+  if(!b)return;
+  b.classList.add('hiding');
+  setTimeout(()=>b.remove(),280);
+}
+// ═════════════════════════════════════════════════════════
+
 // ══ Comprobar recordatorios al desbloquear ══
 function checkVaultReminders(){
   if(!vault||!vault.length)return;
@@ -2401,15 +2459,6 @@ function checkVaultReminders(){
   const _td=new Date();
   const todayStr=_td.getFullYear()+'-'+String(_td.getMonth()+1).padStart(2,'0')+'-'+String(_td.getDate()).padStart(2,'0');
   const reminders=[];
-
-  // DEBUG TEMPORAL — mostrar notas y su reminder
-  const notes=vault.filter(e=>e.entryType==='note');
-  if(notes.length){
-    const info=notes.map(e=>`"${e.service}": reminder=${JSON.stringify(e.reminder)}`).join(' | ');
-    toast('🔍 DEBUG notas: '+info, 8000);
-  } else {
-    toast('🔍 DEBUG: no hay notas en vault', 4000);
-  }
 
   vault.forEach(e=>{
     // Recordatorio de nota con fecha
@@ -2450,18 +2499,23 @@ function checkVaultReminders(){
   });
 
   if(!reminders.length)return;
-  reminders.slice(0,3).forEach((r,i)=>{
+  // Mostrar recordatorios como banners — primero el más importante
+  reminders.slice(0,1).forEach((r,i)=>{
     setTimeout(()=>{
       let msg='';
-      if(r.type==='note')       msg=`🔔 ${r.msg}`;
-      else if(r.type==='oldpass')     msg=`⏰ ${r.service}: ${r.age} días sin cambiar contraseña`;
-      else if(r.type==='cardexpired') msg=`⚠️ Tarjeta ${r.service} caducada`;
-      else if(r.type==='cardexpiring')msg=`💳 ${r.service}: caduca en ${r.days} días`;
-      else if(r.type==='docexpired')  msg=`⚠️ ${r.service}: documento caducado`;
-      else if(r.type==='docexpiring') msg=`🪪 ${r.service}: caduca en ${r.days} días`;
-      if(msg) toast(msg,6000);
-    },2000+i*5000);
+      if(r.type==='note')            msg=r.msg||r.service;
+      else if(r.type==='oldpass')    msg=`${r.service}: contraseña con ${r.age} días sin cambiar`;
+      else if(r.type==='cardexpired')msg=`Tarjeta ${r.service} caducada`;
+      else if(r.type==='cardexpiring')msg=`${r.service}: caduca en ${r.days} días`;
+      else if(r.type==='docexpired') msg=`${r.service}: documento caducado`;
+      else if(r.type==='docexpiring')msg=`${r.service}: caduca en ${r.days} días`;
+      if(msg) showReminderBanner(msg, r.id||null);
+    },2000+i*4000);
   });
+  // Los demás como toast normal si hay más de uno
+  if(reminders.length>1){
+    setTimeout(()=>toast(`+${reminders.length-1} recordatorio${reminders.length>2?'s':''} más pendiente${reminders.length>2?'s':''}`,4000),7000);
+  }
 }
 
 window._checkVaultReminders=checkVaultReminders;
