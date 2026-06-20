@@ -1686,23 +1686,45 @@ async function saveEntry(){
 // Tab switcher para Recientes
 function switchVaultTab(tab, btn){
   _vaultTab=tab;
-  document.querySelectorAll('.vaultTabs button').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
+  ['tabTodas','tabFav','tabRecientes'].forEach(id=>{
+    const b=$(id);if(!b)return;
+    const active=b===btn;
+    b.style.color=active?'#00d9ff':'#4a7090';
+    b.style.borderBottomColor=active?'#00d9ff':'transparent';
+    b.style.fontWeight=active?'800':'700';
+  });
   render();
 }
 let _sortOrder='updated'; // 'updated' | 'name' | 'used'
-function setSortOrder(v,btn){
-  _sortOrder=v;
-  document.querySelectorAll('#sortBtns button').forEach(b=>{
-    b.style.color='#4a7090';
-    b.style.background='none';
-    b.style.borderColor='rgba(255,255,255,.06)';
-  });
-  if(btn){
-    btn.style.color='#00d9ff';
-    btn.style.background='rgba(0,180,255,.08)';
-    btn.style.borderColor='rgba(0,180,255,.3)';
+function toggleSortMenu(){
+  const m=$('sortMenu');
+  if(!m)return;
+  m.style.display=m.style.display==='none'?'block':'none';
+  // Cerrar al hacer clic fuera
+  if(m.style.display==='block'){
+    setTimeout(()=>document.addEventListener('click',_closeSortMenu,{once:true}),10);
   }
+}
+function _closeSortMenu(){const m=$('sortMenu');if(m)m.style.display='none';}
+
+function setSortOrder(v){
+  _sortOrder=v;
+  // Actualizar visual del menú
+  ['updated','name','used'].forEach(k=>{
+    const btn=$('sort_'+k);
+    if(!btn)return;
+    if(k===v){
+      btn.style.background='rgba(0,210,255,.08)';
+      btn.style.color='#00d9ff';
+    } else {
+      btn.style.background='transparent';
+      btn.style.color='#7ab0d0';
+    }
+  });
+  // Actualizar icono del botón
+  const labels={updated:'🕐',name:'🔤',used:'⭐'};
+  const btn=$('sortMenuBtn');
+  if(btn)btn.textContent=labels[v]||'⇅';
   render();
 }
 function render(){let q=($('search')?.value||'').toLowerCase();
