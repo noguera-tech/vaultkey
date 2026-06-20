@@ -143,8 +143,10 @@
   </div></div>
   <div class="settingBlock"><div class="label">Respaldos</div><div class="settingsGrid">
     <div class="settingsRow" onclick="exportBackup()"><div class="sico">📤</div><div class="stxt"><b>Exportar respaldo cifrado</b><span>Guarda una copia protegida de la bóveda</span></div><div>›</div></div>
-    <div class="settingsRow" onclick="document.getElementById('importFile').click()"><div class="sico">📥</div><div class="stxt"><b>Importar respaldo</b><span>Restaurar desde archivo cifrado</span></div><div>›</div></div>
+    <div class="settingsRow" onclick="document.getElementById('importFile').click()"><div class="sico">📥</div><div class="stxt"><b>Importar respaldo</b><span>Restaurar desde archivo cifrado (.json)</span></div><div>›</div></div>
     <input id="importFile" type="file" accept="application/json" class="hidden" onchange="importBackup(this.files[0])">
+    <div class="settingsRow" onclick="document.getElementById('importCsvFile').click()"><div class="sico">📋</div><div class="stxt"><b>Importar desde otro gestor</b><span>LastPass, Bitwarden, 1Password, Chrome (.csv)</span></div><div>›</div></div>
+    <input id="importCsvFile" type="file" accept=".csv,text/csv" class="hidden" onchange="importFromCSV(this.files[0]);this.value=''">
   </div></div>
 
   <div class="settingBlock"><div class="label">Google Drive</div><div class="settingsGrid">
@@ -651,5 +653,16 @@
   </div>
 </div>
 
+<!-- MODAL IMPORTAR CSV -->
+<div class="modal" id="csvImportModal">
+  <div class="sheet" style="max-height:92dvh;overflow-y:auto">
+    <div class="sheetHead">
+      <div class="sheetTitle">📋 Importar desde CSV</div>
+      <div class="spacer"></div>
+      <button class="iconBtn" onclick="closeModals()">✕</button>
+    </div>
+    <div id="csvImportBody" style="padding:0 4px"></div>
+  </div>
+</div>
 </body>
 </html>

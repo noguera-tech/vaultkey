@@ -2797,3 +2797,211 @@ function renderHealthPanel(){
   el.innerHTML=h;
 }
 // ════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════
+//  IMPORTADOR CSV — LastPass, Bitwarden, 1Password, Chrome
+// ══════════════════════════════════════════════════════════════
+
+// Detectar formato del CSV y mapear columnas
+function detectCsvFormat(headers){
+  const h = headers.map(x=>x.toLowerCase().trim());
+  // LastPass: url,username,password,totp,extra,name,grouping,fav
+  if(h.includes('grouping') && h.includes('extra')) return 'lastpass';
+  // Bitwarden: type,name,notes,fields,reprompt,login_uri,login_username,login_password,login_totp
+  if(h.includes('login_username') || h.includes('login_password')) return 'bitwarden';
+  // 1Password: title,username,password,url,notes,type
+  if(h.includes('type') && h.includes('title') && h.includes('notes')) return '1password';
+  // Chrome / Edge: name,url,username,password
+  if(h.includes('name') && h.includes('url') && h.includes('username') && h.includes('password') && h.length<=5) return 'chrome';
+  // Genérico
+  return 'generic';
+}
+
+function parseCsvLine(line){
+  const result=[];let cur='';let inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){
+      if(inQ && line[i+1]==='"'){cur+='"';i++;}
+      else inQ=!inQ;
+    } else if(c===','&&!inQ){result.push(cur);cur='';}
+    else cur+=c;
+  }
+  result.push(cur);
+  return result;
+}
+
+function parseCsv(text){
+  const lines=text.split(/\r?\n/).filter(l=>l.trim());
+  if(!lines.length)return[];
+  const headers=parseCsvLine(lines[0]);
+  return lines.slice(1).map(line=>{
+    const vals=parseCsvLine(line);
+    const obj={};
+    headers.forEach((h,i)=>obj[h.trim()]=vals[i]?.trim()||'');
+    return obj;
+  }).filter(row=>Object.values(row).some(v=>v));
+}
+
+function mapCsvRow(row, format){
+  let service='',user='',pass='',url='',note='',category='general';
+  
+  if(format==='lastpass'){
+    service = row['name']||row['grouping']||'';
+    user    = row['username']||'';
+    pass    = row['password']||'';
+    url     = row['url']||'';
+    note    = row['extra']||'';
+    const g = (row['grouping']||'').toLowerCase();
+    if(g.includes('bank')||g.includes('banco')) category='banco';
+    else if(g.includes('email')||g.includes('mail')) category='correo';
+    else if(g.includes('social')) category='social';
+    else if(g.includes('work')||g.includes('trabajo')) category='trabajo';
+  } else if(format==='bitwarden'){
+    service = row['name']||'';
+    user    = row['login_username']||row['username']||'';
+    pass    = row['login_password']||row['password']||'';
+    url     = row['login_uri']||row['uri']||'';
+    note    = row['notes']||'';
+    const type=(row['type']||'').toLowerCase();
+    if(type==='login') category='general';
+  } else if(format==='1password'){
+    service = row['title']||'';
+    user    = row['username']||'';
+    pass    = row['password']||'';
+    url     = row['url']||row['website']||'';
+    note    = row['notes']||'';
+  } else if(format==='chrome'){
+    service = row['name']||'';
+    user    = row['username']||'';
+    pass    = row['password']||'';
+    url     = row['url']||'';
+  } else {
+    // Genérico — intentar detectar columnas comunes
+    service = row['name']||row['title']||row['service']||row['sitename']||Object.values(row)[0]||'';
+    user    = row['username']||row['user']||row['login']||row['email']||'';
+    pass    = row['password']||row['pass']||row['passwd']||'';
+    url     = row['url']||row['website']||row['uri']||'';
+    note    = row['notes']||row['note']||row['comment']||'';
+  }
+  
+  return {service:service.trim(),user:user.trim(),pass:pass.trim(),
+          url:url.trim(),note:note.trim(),category};
+}
+
+async function importFromCSV(file){
+  if(!file)return;
+  if(!unlocked){toast('Desbloquea la bóveda primero');return;}
+  
+  const text = await file.text().catch(()=>{toast('Error al leer el archivo');return null;});
+  if(!text)return;
+  
+  const rows = parseCsv(text);
+  if(!rows.length){toast('El archivo CSV está vacío o no tiene el formato correcto');return;}
+  
+  const headers = Object.keys(rows[0]);
+  const format  = detectCsvFormat(headers);
+  
+  // Mapear todas las filas
+  const mapped = rows.map(r=>mapCsvRow(r,format)).filter(r=>r.service||r.user||r.pass);
+  
+  if(!mapped.length){toast('No se encontraron entradas válidas en el CSV');return;}
+  
+  // Mostrar preview en modal
+  renderCsvImportModal(mapped, format, file.name);
+}
+
+function renderCsvImportModal(entries, format, filename){
+  const formatLabels={lastpass:'LastPass',bitwarden:'Bitwarden','1password':'1Password',chrome:'Chrome/Edge',generic:'Genérico'};
+  const fLabel = formatLabels[format]||format;
+  
+  let h='';
+  
+  // Header info
+  h+=`<div style="background:rgba(0,180,255,.07);border:1px solid rgba(0,180,255,.15);border-radius:12px;padding:12px 14px;margin-bottom:16px">
+    <div style="font-size:13px;font-weight:800;color:#00d9ff;margin-bottom:4px">Formato detectado: ${fLabel}</div>
+    <div style="font-size:12px;color:#7ab0d0">Archivo: ${esc(filename)}</div>
+    <div style="font-size:12px;color:#7ab0d0;margin-top:2px">${entries.length} entradas encontradas</div>
+  </div>`;
+  
+  // Aviso duplicados
+  const existing = new Set(vault.map(e=>e.service.toLowerCase()));
+  const dupes = entries.filter(e=>existing.has(e.service.toLowerCase()));
+  if(dupes.length){
+    h+=`<div style="background:rgba(255,180,0,.07);border:1px solid rgba(255,180,0,.2);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#f59e0b">
+      ⚠️ ${dupes.length} entrada${dupes.length>1?'s':''} ya existe${dupes.length>1?'n':''} en tu bóveda (se añadirán de todas formas)
+    </div>`;
+  }
+  
+  // Preview (primeras 5)
+  h+=`<div style="font-size:11px;font-weight:900;color:rgba(0,210,255,.6);letter-spacing:.6px;margin-bottom:8px">VISTA PREVIA (${Math.min(5,entries.length)} de ${entries.length})</div>`;
+  entries.slice(0,5).forEach(e=>{
+    h+=`<div style="background:rgba(0,14,32,.6);border:1px solid rgba(0,180,255,.1);border-radius:10px;padding:10px 12px;margin-bottom:6px">
+      <div style="font-size:13px;font-weight:700;color:#e8f4ff">${esc(e.service)||'(sin nombre)'}</div>
+      <div style="font-size:11px;color:#4a7090;margin-top:2px">${esc(e.user||e.url||'')}</div>
+    </div>`;
+  });
+  if(entries.length>5){
+    h+=`<div style="font-size:12px;color:#4a7090;text-align:center;padding:8px 0">...y ${entries.length-5} más</div>`;
+  }
+  
+  // Botones
+  h+=`<div style="display:flex;gap:10px;margin-top:16px">
+    <button onclick="closeModals()" style="flex:1;padding:13px;border-radius:12px;border:1px solid rgba(0,180,255,.2);background:none;color:#7ab0d0;font-weight:700;font-size:14px">Cancelar</button>
+    <button onclick="confirmCsvImport()" id="csvImportConfirmBtn"
+      style="flex:2;padding:13px;border-radius:12px;border:0;background:linear-gradient(135deg,#6A35FF,#007BFF);color:#fff;font-weight:900;font-size:14px">
+      Importar ${entries.length} entradas
+    </button>
+  </div>`;
+  
+  // Guardar referencia global
+  window._csvImportEntries = entries;
+  
+  const body = document.getElementById('csvImportBody');
+  if(body) body.innerHTML = h;
+  
+  const modal = document.getElementById('csvImportModal');
+  if(modal) modal.classList.add('open');
+}
+
+async function confirmCsvImport(){
+  const entries = window._csvImportEntries;
+  if(!entries||!entries.length){closeModals();return;}
+  
+  const btn = document.getElementById('csvImportConfirmBtn');
+  if(btn){btn.disabled=true;btn.textContent='Importando...';}
+  
+  let imported=0;
+  for(const e of entries){
+    if(!e.service && !e.user && !e.pass) continue;
+    const entry={
+      id: crypto.randomUUID(),
+      service: e.service||e.url||e.user||'Importado',
+      entryType: 'password',
+      type: 'Cuenta',
+      category: e.category||'general',
+      user: e.user||'',
+      email: '',
+      pass: e.pass||'',
+      url: e.url||'',
+      note: e.note||'',
+      icon: '',
+      fav: false,
+      updated: Date.now(),
+      used: 0,
+      passHistory: [],
+      reminder: null,
+    };
+    vault.unshift(entry);
+    imported++;
+  }
+  
+  await persist();
+  window._csvImportEntries = null;
+  closeModals();
+  render();
+  vibe([30,20,60]);
+  soundSuccess?.();
+  toast(`✅ ${imported} entradas importadas correctamente`);
+}
+// ═════════════════════════════════════════════════════════════
