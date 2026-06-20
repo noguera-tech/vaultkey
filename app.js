@@ -6,10 +6,16 @@ function setEntryType(type){
   const isNote=type==='note';
   const isCard=type==='card';
   const isPass=type==='password';
-  // Botones - resaltar el activo
-  ['typeBtnPass','typeBtnNote','typeBtnCard'].forEach(id=>{
+  const isId=type==='id';
+  const isLic=type==='license';
+  const isMed=type==='medical';
+  const isWifi=type==='wifi';
+  const isSpecial=isNote||isCard||isId||isLic||isMed||isWifi;
+  // Botones - resaltar activo
+  const btnMap={'typeBtnPass':'password','typeBtnNote':'note','typeBtnCard':'card','typeBtnId':'id','typeBtnLicense':'license','typeBtnMedical':'medical','typeBtnWifi':'wifi'};
+  Object.entries(btnMap).forEach(([id,t])=>{
     const btn=$(id);if(!btn)return;
-    const active=(id==='typeBtnPass'&&isPass)||(id==='typeBtnNote'&&isNote)||(id==='typeBtnCard'&&isCard);
+    const active=t===type;
     btn.style.border=active?'2px solid var(--cyan)':'1px solid rgba(0,210,255,.2)';
     btn.style.background=active?'rgba(0,210,255,.12)':'rgba(0,14,32,.6)';
     btn.style.color=active?'#00e5ff':'#7aa0c8';
@@ -17,17 +23,31 @@ function setEntryType(type){
   // Iconos siempre visibles
   const iconSection=$('iconStripRow')?.parentElement;
   if(iconSection)iconSection.style.display='';
-  // Campos según tipo
-  ['fieldUser','fieldEmail','fieldPass'].forEach(id=>{const el=$(id);if(el)el.style.display=(isNote||isCard)?'none':''});
+  // Campos comunes password
+  ['fieldUser','fieldEmail','fieldPass'].forEach(id=>{const el=$(id);if(el)el.style.display=isPass?'':'none'});
+  // Bloques específicos
   const fieldNote=$('fieldSecureNote');if(fieldNote)fieldNote.style.display=isNote?'':'none';
   const fieldCard=$('fieldCard');if(fieldCard)fieldCard.style.display=isCard?'':'none';
-  const extraBtns=$('fieldExtraBtns');if(extraBtns)extraBtns.style.display=(isNote||isCard)?'none':'';
-  // Placeholder y label según tipo
+  const fieldId=$('fieldId');if(fieldId)fieldId.style.display=isId?'':'none';
+  const fieldLic=$('fieldLicense');if(fieldLic)fieldLic.style.display=isLic?'':'none';
+  const fieldMed=$('fieldMedical');if(fieldMed)fieldMed.style.display=isMed?'':'none';
+  const fieldWifi=$('fieldWifi');if(fieldWifi)fieldWifi.style.display=isWifi?'':'none';
+  // Extras (URL/Nota) solo en password
+  const extraBtns=$('fieldExtraBtns');if(extraBtns)extraBtns.style.display=isPass?'':'none';
+  // Placeholder y label
   const eService=$('eService');const eServiceLabel=$('eServiceLabel');
-  if(eService)eService.placeholder=isNote?'Título de la nota...':isCard?'Nombre identificativo (ej: Visa BBVA)...':'Gmail, Banco, Netflix...';
-  if(eServiceLabel)eServiceLabel.textContent=isNote?'Título de la nota *':isCard?'Nombre identificativo *':'Nombre del servicio *';
+  const placeholders={password:'Gmail, Banco, Netflix...',note:'Título de la nota...',card:'Nombre identificativo (ej: Visa BBVA)...',id:'Nombre identificativo (ej: DNI personal)...',license:'Nombre identificativo (ej: Carnet B)...',medical:'Nombre identificativo (ej: Datos de Juan)...',wifi:'Nombre de la red o lugar (ej: WiFi casa)...'};
+  const labels={password:'Nombre del servicio *',note:'Título de la nota *',card:'Nombre identificativo *',id:'Nombre identificativo *',license:'Nombre identificativo *',medical:'Nombre identificativo *',wifi:'Nombre identificativo *'};
+  if(eService)eService.placeholder=placeholders[type]||'Nombre...';
+  if(eServiceLabel)eServiceLabel.textContent=labels[type]||'Nombre *';
 }
 const $=id=>document.getElementById(id);
+function fmtDate(el){
+  let v=el.value.replace(/[^0-9]/g,'');
+  if(v.length>2&&v.length<=4)v=v.slice(0,2)+'/'+v.slice(2);
+  else if(v.length>4)v=v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4,8);
+  el.value=v;
+}
 function fmtExpiry(el){
   let v=el.value.replace(/[^0-9]/g,'');
   if(v.length>=3) v=v.substring(0,2)+'/'+v.substring(2,4);
@@ -900,6 +920,7 @@ function toggleQvNote(){const el=$('qvNote');if(!el)return;if(el.textContent==='
 
 function toggleQvCard(){const el=$('qvCardNum');if(!el)return;if(el.textContent.includes('•')){el.textContent=current.cardNumber;}else{el.textContent='•••• •••• •••• '+current.cardNumber.slice(-4);}}
 function toggleQvCvv(){const el=$('qvCvv');if(!el)return;el.textContent=el.textContent==='•••'?current.cardCvv:'•••';}
+function toggleQvWifiPass(){const el=$('qvWifiPass');if(!el)return;el.textContent=el.textContent==='••••••••'?current.wifiPass:'••••••••';}
 async function toggleFav(id){let e=vault.find(x=>x.id===id);if(e){e.fav=!e.fav;await persist();closeModals();render();toast('Actualizado')}}
 async function delEntry(id){vibe([40,20,40]);soundDelete();if(await vkConfirm('Eliminar entrada','¿Eliminar esta entrada de la bóveda?')){vault=vault.filter(e=>e.id!==id);await persist();closeModals();render();toast('Entrada eliminada');try{driveAutoSync();}catch(e){}}}
 function copyText(t='',btn=null){
@@ -1088,6 +1109,15 @@ async function doImportConfirm() {
       cardExpiry: String(e.cardExpiry||''),
       cardCvv: String(e.cardCvv||''),
       cardType: String(e.cardType||''),
+      idName: String(e.idName||''), idNumber: String(e.idNumber||''), idDob: String(e.idDob||''),
+      idExpiry: String(e.idExpiry||''), idCountry: String(e.idCountry||''), idType: String(e.idType||''),
+      licName: String(e.licName||''), licNumber: String(e.licNumber||''), licIssued: String(e.licIssued||''),
+      licExpiry: String(e.licExpiry||''), licCountry: String(e.licCountry||''), licCategory: String(e.licCategory||''),
+      medName: String(e.medName||''), medSS: String(e.medSS||''), medBlood: String(e.medBlood||''),
+      medAllergies: String(e.medAllergies||''), medMeds: String(e.medMeds||''),
+      medDoctor: String(e.medDoctor||''), medNotes: String(e.medNotes||''),
+      wifiSsid: String(e.wifiSsid||''), wifiPass: String(e.wifiPass||''),
+      wifiSec: String(e.wifiSec||''), wifiRouter: String(e.wifiRouter||''), wifiIp: String(e.wifiIp||''),
     }));
     render();
     const count = vault.length;
@@ -1210,7 +1240,7 @@ function showAppInfo(){
   const backup=m&&m.lastBackup?new Date(m.lastBackup).toLocaleDateString('es-ES'):'Nunca';
   const total=vault?vault.length:0;
   const favs=vault?vault.filter(e=>e.fav).length:0;
-  const debiles=vault?vault.filter(e=>e.entryType!=='note'&&e.entryType!=='card'&&score(e.pass)<3).length:0;
+  const debiles=vault?vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length:0;
   vkConfirm(
     'VaultKey V2.2.1 Clean',
     `📦 Entradas guardadas: ${total}\n⭐ Favoritos: ${favs}\n⚠️ Contraseñas débiles: ${debiles}\n📅 PIN creado: ${creado}\n☁️ Último respaldo: ${backup}\n\n🔒 Cifrado AES-GCM 256 bits\n🔑 PBKDF2 · 200.000 iteraciones`
@@ -1328,6 +1358,10 @@ function userFromEntry(e){return (!e?.email && isValidEmail(e?.user||'')) ? '' :
 function entryMainIdentity(e){
   if(e?.entryType==='note') return '📝 Nota segura';
   if(e?.entryType==='card') return '💳 '+(e.cardType?e.cardType.charAt(0).toUpperCase()+e.cardType.slice(1):'Tarjeta')+(e.cardNumber?' ••'+e.cardNumber.slice(-2):'');
+  if(e?.entryType==='id') return '🪪 '+(e.idType?e.idType.toUpperCase():'Documento')+(e.idNumber?' ••'+e.idNumber.slice(-3):'');
+  if(e?.entryType==='license') return '🚗 Licencia'+(e.licCategory?' ('+e.licCategory+')':'');
+  if(e?.entryType==='medical') return '🏥 Datos médicos'+(e.medBlood?' · '+e.medBlood:'');
+  if(e?.entryType==='wifi') return '📶 '+(e.wifiSsid||'WiFi')+(e.wifiSec?' · '+e.wifiSec:'');
   return '••••••••';
 }
 function entrySearchText(e){return [e.service,userFromEntry(e),legacyEmailFromEntry(e),e.url,e.note,e.type].join(' ').toLowerCase()}
@@ -1372,8 +1406,35 @@ function openEntry(e=null){
   if($('eCardNumber'))$('eCardNumber').value=e?.cardNumber||'';
   if($('eCardExpiry'))$('eCardExpiry').value=e?.cardExpiry||'';
   if($('eCardCvv'))$('eCardCvv').value=e?.cardCvv||'';
-
   if($('eCardType'))$('eCardType').value=e?.cardType||'visa';
+  // Restaurar campos de documento
+  if($('eIdName'))$('eIdName').value=e?.idName||'';
+  if($('eIdNumber'))$('eIdNumber').value=e?.idNumber||'';
+  if($('eIdDob'))$('eIdDob').value=e?.idDob||'';
+  if($('eIdExpiry'))$('eIdExpiry').value=e?.idExpiry||'';
+  if($('eIdCountry'))$('eIdCountry').value=e?.idCountry||'';
+  if($('eIdType'))$('eIdType').value=e?.idType||'dni';
+  // Restaurar campos de licencia
+  if($('eLicName'))$('eLicName').value=e?.licName||'';
+  if($('eLicNumber'))$('eLicNumber').value=e?.licNumber||'';
+  if($('eLicIssued'))$('eLicIssued').value=e?.licIssued||'';
+  if($('eLicExpiry'))$('eLicExpiry').value=e?.licExpiry||'';
+  if($('eLicCountry'))$('eLicCountry').value=e?.licCountry||'';
+  if($('eLicCategory'))$('eLicCategory').value=e?.licCategory||'';
+  // Restaurar campos médicos
+  if($('eMedName'))$('eMedName').value=e?.medName||'';
+  if($('eMedSS'))$('eMedSS').value=e?.medSS||'';
+  if($('eMedBlood'))$('eMedBlood').value=e?.medBlood||'';
+  if($('eMedAllergies'))$('eMedAllergies').value=e?.medAllergies||'';
+  if($('eMedMeds'))$('eMedMeds').value=e?.medMeds||'';
+  if($('eMedDoctor'))$('eMedDoctor').value=e?.medDoctor||'';
+  if($('eMedNotes'))$('eMedNotes').value=e?.medNotes||'';
+  // Restaurar campos WiFi
+  if($('eWifiSsid'))$('eWifiSsid').value=e?.wifiSsid||'';
+  if($('eWifiPass'))$('eWifiPass').value=e?.wifiPass||'';
+  if($('eWifiSec'))$('eWifiSec').value=e?.wifiSec||'WPA2';
+  if($('eWifiRouter'))$('eWifiRouter').value=e?.wifiRouter||'';
+  if($('eWifiIp'))$('eWifiIp').value=e?.wifiIp||'';
   if($('eIconSearch'))$('eIconSearch').value='';
   // FIX: Resetear categoría a 'general' en nueva entrada, o restaurar la guardada
   if($('eCategory'))$('eCategory').value=e?.category||'general';
@@ -1421,6 +1482,17 @@ async function saveEntry(){
   if(_entryType==='note'){
     const noteVal=($('eSecureNote')?.value||'').trim();
     if(!noteVal){vibe([30,30]);soundEmpty();toast('El contenido de la nota no puede estar vacío.');$('eSecureNote')?.focus();return;}
+  } else if(_entryType==='id'){
+    if(!($('eIdName')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre completo es obligatorio.');$('eIdName')?.focus();return;}
+    if(!($('eIdNumber')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El número de documento es obligatorio.');$('eIdNumber')?.focus();return;}
+  } else if(_entryType==='license'){
+    if(!($('eLicName')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre completo es obligatorio.');$('eLicName')?.focus();return;}
+    if(!($('eLicNumber')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El número de licencia es obligatorio.');$('eLicNumber')?.focus();return;}
+  } else if(_entryType==='medical'){
+    if(!($('eMedName')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre del paciente es obligatorio.');$('eMedName')?.focus();return;}
+  } else if(_entryType==='wifi'){
+    if(!($('eWifiSsid')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre de la red (SSID) es obligatorio.');$('eWifiSsid')?.focus();return;}
+    if(!($('eWifiPass')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('La contraseña WiFi es obligatoria.');$('eWifiPass')?.focus();return;}
   } else if(_entryType==='card'){
     const cardNum=($('eCardNumber')?.value||'').replace(/\s/g,'');
     const cardName=($('eCardName')?.value||'').trim();
@@ -1491,7 +1563,40 @@ async function saveEntry(){
     cardCvv:($('eCardCvv')?.value||'').trim(),
     cardType:($('eCardType')?.value||'visa'),
   }:{};
-  let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,...cardData,type:'Cuenta',category:($('eCategory')?.value||'general'),user:_entryType==='note'?'':userVal,email:_entryType==='note'?'':emailVal,pass:_entryType==='note'?'':pass,url:_entryType==='note'?'':urlVal,note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
+  const idData=_entryType==='id'?{
+    idName:($('eIdName')?.value||'').trim(),
+    idNumber:($('eIdNumber')?.value||'').trim(),
+    idDob:($('eIdDob')?.value||'').trim(),
+    idExpiry:($('eIdExpiry')?.value||'').trim(),
+    idCountry:($('eIdCountry')?.value||'').trim(),
+    idType:($('eIdType')?.value||'dni'),
+  }:{};
+  const licData=_entryType==='license'?{
+    licName:($('eLicName')?.value||'').trim(),
+    licNumber:($('eLicNumber')?.value||'').trim(),
+    licIssued:($('eLicIssued')?.value||'').trim(),
+    licExpiry:($('eLicExpiry')?.value||'').trim(),
+    licCountry:($('eLicCountry')?.value||'').trim(),
+    licCategory:($('eLicCategory')?.value||'').trim(),
+  }:{};
+  const medData=_entryType==='medical'?{
+    medName:($('eMedName')?.value||'').trim(),
+    medSS:($('eMedSS')?.value||'').trim(),
+    medBlood:($('eMedBlood')?.value||''),
+    medAllergies:($('eMedAllergies')?.value||'').trim(),
+    medMeds:($('eMedMeds')?.value||'').trim(),
+    medDoctor:($('eMedDoctor')?.value||'').trim(),
+    medNotes:($('eMedNotes')?.value||'').trim(),
+  }:{};
+  const wifiData=_entryType==='wifi'?{
+    wifiSsid:($('eWifiSsid')?.value||'').trim(),
+    wifiPass:($('eWifiPass')?.value||'').trim(),
+    wifiSec:($('eWifiSec')?.value||'WPA2'),
+    wifiRouter:($('eWifiRouter')?.value||'').trim(),
+    wifiIp:($('eWifiIp')?.value||'').trim(),
+  }:{};
+  const isPassType=_entryType==='password';
+  let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,...cardData,...idData,...licData,...medData,...wifiData,type:'Cuenta',category:($('eCategory')?.value||'general'),user:isPassType?userVal:'',email:isPassType?emailVal:'',pass:isPassType?pass:'',url:isPassType?urlVal:'',note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
   let i=vault.findIndex(x=>x.id===entry.id);
   if(i>=0)vault[i]=entry;else vault.unshift(entry);
   await persist();closeModals();show('vault');render();try{driveAutoSync();}catch(e){}toast('Guardado \u2713');
@@ -1525,7 +1630,7 @@ function render(){let q=($('search')?.value||'').toLowerCase();
     if(rvault) rvault.style.display='none';
     let list=vault.filter(e=>entrySearchText(e).includes(q)&&(!_catFilter||(e.category||'general')===_catFilter));$('entryList')&&( $('entryList').innerHTML='', list.length?list.forEach(e=>$('entryList').appendChild(row(e))):$('entryList').innerHTML='<div class="empty"><div class="emptyVault"><svg viewBox="0 0 80 80" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="16" width="64" height="52" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,80,200,.08)"/><rect x="8" y="16" width="64" height="14" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,100,255,.15)"/><circle cx="40" cy="50" r="11" stroke="#00d4ff" stroke-width="2.5" fill="rgba(0,210,255,.06)"/><circle cx="40" cy="50" r="4" fill="#00d4ff" opacity=".7"/><line x1="40" y1="39" x2="40" y2="43" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="57" x2="40" y2="61" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="29" y1="50" x2="33" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="47" y1="50" x2="51" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="62" y="40" width="8" height="16" rx="4" stroke="#1a6fff" stroke-width="2" fill="rgba(0,80,200,.1)"/></svg></div><b style="color:#e0f0ff;font-size:16px">Tu bóveda está vacía</b><p style="color:#4a7090;margin-top:6px;font-size:13px">Crea tu primera credencial con el botón +</p></div>');
   }
-  renderFav();let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);$('recentList')&&( $('recentList').innerHTML='', recent.length?recent.forEach(e=>$('recentList').appendChild(row(e))):$('recentList').innerHTML='<p class="sub">Todavía no has usado entradas.</p>');$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType!=='note'&&e.entryType!=='card'&&score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
+  renderFav();let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);$('recentList')&&( $('recentList').innerHTML='', recent.length?recent.forEach(e=>$('recentList').appendChild(row(e))):$('recentList').innerHTML='<p class="sub">Todavía no has usado entradas.</p>');$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
 
 function vk128SvgText(label,bg,fg='#fff',fs=18){return {bg,svg:`<svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="${bg}"/><text x="24" y="31" font-size="${fs}" font-weight="900" fill="${fg}" text-anchor="middle" font-family="Arial, sans-serif">${label}</text></svg>`}}
 function vk128Match(n,k){k=(k||'').toLowerCase().trim();if(!k)return false;if(k.length<=2)return n===k;return n===k||n.includes(k)}
@@ -1578,7 +1683,7 @@ function setIconCat(cat,btn){window._setIconCat(cat,btn);}
 document.addEventListener('click',function(e){const btn=e.target.closest('[data-cat]');if(btn&&btn.classList.contains('iconCat')){e.stopPropagation();window._setIconCat(btn.dataset.cat,btn);}});
 
 
-function row(e){let div=document.createElement('div');div.className='entry';div.onclick=()=>quick(e.id);let ic=iconForEntry(e);const weak=e?.entryType!=='note'&&e?.entryType!=='card'&&score(e.pass)<3;const typeEmoji=e?.entryType==='note'?'📝':e?.entryType==='card'?'💳':'🔑';div.innerHTML=`${vkLogoHTML(ic)}<div style="flex:1;min-width:0"><h3 style="display:flex;align-items:center;gap:6px">${esc(e.service)}${e.fav?'<span style="font-size:11px">⭐</span>':''} ${weak?'<span style="font-size:9px;background:rgba(255,77,85,.2);color:#ff8c94;border:1px solid rgba(255,77,85,.3);border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.3px">DÉBIL</span>':''}</h3><p style="color:#7a9ec0">${esc(entryMainIdentity(e))}</p></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:14px;opacity:.7">${typeEmoji}</span><div class="go" style="color:rgba(0,210,255,.4);font-size:18px">›</div></div>`;return div}
+function row(e){let div=document.createElement('div');div.className='entry';div.onclick=()=>quick(e.id);let ic=iconForEntry(e);const weak=e?.entryType==='password'&&score(e.pass)<3;const typeEmoji=e?.entryType==='note'?'📝':e?.entryType==='card'?'💳':e?.entryType==='id'?'🪪':e?.entryType==='license'?'🚗':e?.entryType==='medical'?'🏥':e?.entryType==='wifi'?'📶':'🔑';div.innerHTML=`${vkLogoHTML(ic)}<div style="flex:1;min-width:0"><h3 style="display:flex;align-items:center;gap:6px">${esc(e.service)}${e.fav?'<span style="font-size:11px">⭐</span>':''} ${weak?'<span style="font-size:9px;background:rgba(255,77,85,.2);color:#ff8c94;border:1px solid rgba(255,77,85,.3);border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.3px">DÉBIL</span>':''}</h3><p style="color:#7a9ec0">${esc(entryMainIdentity(e))}</p></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:14px;opacity:.7">${typeEmoji}</span><div class="go" style="color:rgba(0,210,255,.4);font-size:18px">›</div></div>`;return div}
 
 function renderFav(){
   const grid=$('favGrid');
@@ -1593,7 +1698,7 @@ function renderFav(){
   grid.innerHTML='';
   favs.forEach(e=>{
     const ic=iconForEntry(e);
-    const weak=e?.entryType!=='note'&&e?.entryType!=='card'&&score(e.pass)<3;
+    const weak=e?.entryType==='password'&&score(e.pass)<3;
     const identity=entryMainIdentity(e);
     const row=document.createElement('div');
     row.className='favRow';
@@ -1641,6 +1746,34 @@ if(e.entryType==='note'){
   if(e.cardExpiry)h+=qvRow('Caducidad','📅',esc(e.cardExpiry),'');
   if(e.cardCvv)h+=qvRow('CVV','🔒','<span id="qvCvv">•••</span>',qvBtn('Ver','toggleQvCvv()'));
   if(e.cardType)h+=qvRow('Tipo','💳',esc(e.cardType.charAt(0).toUpperCase()+e.cardType.slice(1)),'',true);
+} else if(e.entryType==='id'){
+  if(e.idName)h+=qvRow('Nombre','👤',esc(e.idName),qvBtn('Copiar','copyText(current.idName,this)'));
+  if(e.idNumber)h+=qvRow('Número','🪪','<span style="font-family:ui-monospace,monospace">'+esc(e.idNumber)+'</span>',qvBtn('Copiar','copyText(current.idNumber,this)'));
+  if(e.idType)h+=qvRow('Tipo','📄',esc(e.idType.toUpperCase()),'');
+  if(e.idDob)h+=qvRow('Nacimiento','🎂',esc(e.idDob),'');
+  if(e.idExpiry)h+=qvRow('Caducidad','📅',esc(e.idExpiry),'');
+  if(e.idCountry)h+=qvRow('País','🌍',esc(e.idCountry),'',true);
+} else if(e.entryType==='license'){
+  if(e.licName)h+=qvRow('Nombre','👤',esc(e.licName),qvBtn('Copiar','copyText(current.licName,this)'));
+  if(e.licNumber)h+=qvRow('Número','🚗','<span style="font-family:ui-monospace,monospace">'+esc(e.licNumber)+'</span>',qvBtn('Copiar','copyText(current.licNumber,this)'));
+  if(e.licCategory)h+=qvRow('Categorías','🏷️',esc(e.licCategory),'');
+  if(e.licIssued)h+=qvRow('Emisión','📅',esc(e.licIssued),'');
+  if(e.licExpiry)h+=qvRow('Caducidad','📅',esc(e.licExpiry),'');
+  if(e.licCountry)h+=qvRow('País','🌍',esc(e.licCountry),'',true);
+} else if(e.entryType==='medical'){
+  if(e.medName)h+=qvRow('Paciente','👤',esc(e.medName),qvBtn('Copiar','copyText(current.medName,this)'));
+  if(e.medSS)h+=qvRow('Nº SS / SIP','🏥','<span style="font-family:ui-monospace,monospace">'+esc(e.medSS)+'</span>',qvBtn('Copiar','copyText(current.medSS,this)'));
+  if(e.medBlood)h+=qvRow('Grupo sanguíneo','🩸',esc(e.medBlood),'');
+  if(e.medAllergies)h+=qvRow('Alergias','⚠️',esc(e.medAllergies),'');
+  if(e.medMeds)h+=qvRow('Medicación','💊',esc(e.medMeds),'');
+  if(e.medDoctor)h+=qvRow('Médico / Centro','🩺',esc(e.medDoctor),'');
+  if(e.medNotes)h+=qvRow('Notas','📝',esc(e.medNotes),'',true);
+} else if(e.entryType==='wifi'){
+  if(e.wifiSsid)h+=qvRow('Red (SSID)','📶',esc(e.wifiSsid),qvBtn('Copiar','copyText(current.wifiSsid,this)'));
+  h+=qvRow('Contraseña','🔒','<span id="qvWifiPass" style="font-family:ui-monospace,monospace;letter-spacing:.5px">••••••••</span>',qvBtn('Ver','toggleQvWifiPass()')+qvBtn('Copiar','copyText(current.wifiPass,this)'));
+  if(e.wifiSec)h+=qvRow('Seguridad','🔐',esc(e.wifiSec),'');
+  if(e.wifiRouter)h+=qvRow('Router / ISP','📡',esc(e.wifiRouter),'');
+  if(e.wifiIp)h+=qvRow('IP','🌐',esc(e.wifiIp),qvBtn('Copiar','copyText(current.wifiIp,this)'),true);
 } else {
 if(u)h+=qvRow('Usuario','\ud83d\udc64',esc(u),qvBtn('Copiar','copyText(userFromEntry(current),this)'));
 if(em)h+=qvRow('Correo','\u2709\ufe0f',esc(em),qvBtn('Copiar','copyText(legacyEmailFromEntry(current),this)'));
