@@ -1031,6 +1031,18 @@ function markGeneratorDirty(){syncRanges(false);$('genOut').textContent='Pulsa g
 function generatePass(){
   vibe(40);soundGen();
   syncRanges();
+  // Modo PIN numérico
+  if($('gPinMode')?.checked){
+    const plen=Math.max(4,Math.min(12,+$('gLen').value||6));
+    $('gLen').value=plen;
+    let pin='';const nu='0123456789';
+    const arr=new Uint32Array(plen);
+    crypto.getRandomValues(arr);
+    arr.forEach(v=>pin+=nu[v%10]);
+    $('genOut').textContent=pin;
+    $('genOut').className='genOut';
+    return;
+  }
   let up='ABCDEFGHIJKLMNOPQRSTUVWXYZ',lo='abcdefghijklmnopqrstuvwxyz',nu='0123456789',sy=($('gSymbols')?.value||'!@#$%&*-_+=?/');
   if($('gNoSimilar')?.checked){up=up.replace(/[IO]/g,'');lo=lo.replace(/[lo]/g,'');nu=nu.replace(/[01]/g,'')}
   let len=Math.max(6,Math.min(64,+$('gLen').value||12));
@@ -1452,7 +1464,7 @@ function entryMainIdentity(e){
   if(e?.entryType==='wifi') return '📶 '+(e.wifiSsid||e.service||'WiFi')+(e.wifiSec?' · '+e.wifiSec:'');
   return '••••••••';
 }
-function entrySearchText(e){return [e.service,userFromEntry(e),legacyEmailFromEntry(e),e.url,e.note,e.type,e.wifiSsid,e.wifiRouter,e.idName,e.idNumber,e.idType,e.licName,e.licNumber,e.medName,e.medSS,e.cardName].filter(Boolean).join(' ').toLowerCase()}
+function entrySearchText(e){return [e.service,userFromEntry(e),legacyEmailFromEntry(e),e.url,e.note,e.type,e.wifiSsid,e.wifiRouter,e.idName,e.idNumber,e.idType,e.licName,e.licNumber,e.medName,e.medSS,e.cardName,e.cardNumber?'••'+e.cardNumber.slice(-4):''].filter(Boolean).join(' ').toLowerCase()}
 function clearEntryErrors(){document.querySelectorAll('.fieldErrorNote').forEach(x=>x.remove());['eService','eUser','eEmail','eUrl','ePass'].forEach(id=>$(id)?.classList.remove('fieldError'))}
 document.addEventListener('input',ev=>{if(ev.target&&['eService','eUser','eEmail','eUrl','ePass'].includes(ev.target.id))clearFieldError(ev.target.id)},true);
 function openEntry(e=null){
@@ -1678,6 +1690,21 @@ function switchVaultTab(tab, btn){
   if(btn) btn.classList.add('active');
   render();
 }
+let _sortOrder='updated'; // 'updated' | 'name' | 'used'
+function setSortOrder(v,btn){
+  _sortOrder=v;
+  document.querySelectorAll('#sortBtns button').forEach(b=>{
+    b.style.color='#4a7090';
+    b.style.background='none';
+    b.style.borderColor='rgba(255,255,255,.06)';
+  });
+  if(btn){
+    btn.style.color='#00d9ff';
+    btn.style.background='rgba(0,180,255,.08)';
+    btn.style.borderColor='rgba(0,180,255,.3)';
+  }
+  render();
+}
 function render(){let q=($('search')?.value||'').toLowerCase();
   const rvault=$('recentListVault');
   const elist=$('entryList');
@@ -1711,7 +1738,11 @@ function render(){let q=($('search')?.value||'').toLowerCase();
   if(cat==='otros'&&_cf==='documentos'&&['id','license'].includes(e.entryType))return true;
   if(cat==='otros'&&_cf==='salud'&&e.entryType==='medical')return true;
   return false;
-};let list=vault.filter(e=>entrySearchText(e).includes(q)&&_catMatch(e));$('entryList')&&( $('entryList').innerHTML='', list.length?list.forEach(e=>{try{$('entryList').appendChild(row(e))}catch(err){console.warn('row error',e?.id,err)}}):$('entryList').innerHTML='<div class="empty"><div class="emptyVault"><svg viewBox="0 0 80 80" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="16" width="64" height="52" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,80,200,.08)"/><rect x="8" y="16" width="64" height="14" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,100,255,.15)"/><circle cx="40" cy="50" r="11" stroke="#00d4ff" stroke-width="2.5" fill="rgba(0,210,255,.06)"/><circle cx="40" cy="50" r="4" fill="#00d4ff" opacity=".7"/><line x1="40" y1="39" x2="40" y2="43" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="57" x2="40" y2="61" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="29" y1="50" x2="33" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="47" y1="50" x2="51" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="62" y="40" width="8" height="16" rx="4" stroke="#1a6fff" stroke-width="2" fill="rgba(0,80,200,.1)"/></svg></div><b style="color:#e0f0ff;font-size:16px">Tu bóveda está vacía</b><p style="color:#4a7090;margin-top:6px;font-size:13px">Crea tu primera credencial con el botón +</p></div>');
+};let list=vault.filter(e=>entrySearchText(e).includes(q)&&_catMatch(e));
+    // Ordenar según preferencia
+    if(_sortOrder==='name') list.sort((a,b)=>(a.service||'').localeCompare(b.service||'','es',{sensitivity:'base'}));
+    else if(_sortOrder==='used') list.sort((a,b)=>(b.used||0)-(a.used||0));
+    else list.sort((a,b)=>(b.updated||0)-(a.updated||0));$('entryList')&&( $('entryList').innerHTML='', list.length?list.forEach(e=>{try{$('entryList').appendChild(row(e))}catch(err){console.warn('row error',e?.id,err)}}):$('entryList').innerHTML='<div class="empty"><div class="emptyVault"><svg viewBox="0 0 80 80" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="16" width="64" height="52" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,80,200,.08)"/><rect x="8" y="16" width="64" height="14" rx="10" stroke="#1a6fff" stroke-width="2.5" fill="rgba(0,100,255,.15)"/><circle cx="40" cy="50" r="11" stroke="#00d4ff" stroke-width="2.5" fill="rgba(0,210,255,.06)"/><circle cx="40" cy="50" r="4" fill="#00d4ff" opacity=".7"/><line x1="40" y1="39" x2="40" y2="43" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="57" x2="40" y2="61" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="29" y1="50" x2="33" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="47" y1="50" x2="51" y2="50" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><rect x="62" y="40" width="8" height="16" rx="4" stroke="#1a6fff" stroke-width="2" fill="rgba(0,80,200,.1)"/></svg></div><b style="color:#e0f0ff;font-size:16px">Tu bóveda está vacía</b><p style="color:#4a7090;margin-top:6px;font-size:13px">Crea tu primera credencial con el botón +</p></div>');
   }
   renderFav();let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);$('recentList')&&( $('recentList').innerHTML='', recent.length?recent.forEach(e=>{try{$('recentList').appendChild(row(e))}catch(err){console.warn('row fav error',e?.id,err)}}):$('recentList').innerHTML='<p class="sub">Todavía no has usado entradas.</p>');$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
 
