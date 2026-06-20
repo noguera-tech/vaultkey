@@ -1518,7 +1518,7 @@ async function saveEntry(){
   } else if(_entryType==='medical'){
     if(!($('eMedName')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre del paciente es obligatorio.');$('eMedName')?.focus();return;}
   } else if(_entryType==='wifi'){
-    if(!($('eWifiSsid')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('El nombre de la red (SSID) es obligatorio.');$('eWifiSsid')?.focus();return;}
+    if(!serviceVal){vibe([30,30]);soundEmpty();toast('El nombre de la red (SSID) es obligatorio.');$('eService')?.focus();return;}
     if(!($('eWifiPass')?.value||'').trim()){vibe([30,30]);soundEmpty();toast('La contraseña WiFi es obligatoria.');$('eWifiPass')?.focus();return;}
   } else if(_entryType==='card'){
     const cardNum=($('eCardNumber')?.value||'').replace(/\s/g,'');
