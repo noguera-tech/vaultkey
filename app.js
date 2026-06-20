@@ -1301,12 +1301,7 @@ function legacyEmailFromEntry(e){return (!e?.email && isValidEmail(e?.user||''))
 function userFromEntry(e){return (!e?.email && isValidEmail(e?.user||'')) ? '' : (e?.user||'')}
 function entryMainIdentity(e){
   if(e?.entryType==='note') return '📝 Nota segura';
-  const em=legacyEmailFromEntry(e);
-  const u=userFromEntry(e);
-  // Mostrar email si existe, si no usuario parcialmente oculto
-  if(em) return em;
-  if(u) return u.length>3 ? u.substring(0,2)+'***' : '***';
-  return e?.type || 'Sin usuario';
+  return '••••••••';
 }
 function entrySearchText(e){return [e.service,userFromEntry(e),legacyEmailFromEntry(e),e.url,e.note,e.type].join(' ').toLowerCase()}
 function clearEntryErrors(){document.querySelectorAll('.fieldErrorNote').forEach(x=>x.remove());['eService','eUser','eEmail','eUrl','ePass'].forEach(id=>$(id)?.classList.remove('fieldError'))}
