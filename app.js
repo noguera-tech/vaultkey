@@ -1389,7 +1389,7 @@ function showAppInfo(){
   const favs=vault?vault.filter(e=>e.fav).length:0;
   const debiles=vault?vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length:0;
   vkConfirm(
-    'VaultKey V2.2.1 Clean',
+    'VaultKey V2.3.0',
     `📦 Entradas guardadas: ${total}\n⭐ Favoritos: ${favs}\n⚠️ Contraseñas débiles: ${debiles}\n📅 PIN creado: ${creado}\n☁️ Último respaldo: ${backup}\n\n🔒 Cifrado AES-GCM 256 bits\n🔑 PBKDF2 · 200.000 iteraciones`
   ).catch(()=>{});
 }
