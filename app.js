@@ -1,4 +1,4 @@
-﻿let confirmResolver=null;
+let confirmResolver=null;
 let appBooted=false;
 const LS_META='vk_meta_v1',LS_DATA='vk_data_v1',LS_REC='vk_recovery_v1';let pin='',mode='unlock',tempPin='',unlocked=false,vault=[],current=null,editId=null,lastKey=null,useGenTarget=false,autoLockTimer=null,lockCountdownTimer=null,_entryType='password',_catFilter='',_vaultTab='todas';
 function setEntryType(type){
@@ -1888,7 +1888,7 @@ function setIconCat(cat,btn){window._setIconCat(cat,btn);}
 document.addEventListener('click',function(e){const btn=e.target.closest('[data-cat]');if(btn&&btn.classList.contains('iconCat')){e.stopPropagation();window._setIconCat(btn.dataset.cat,btn);}});
 
 
-function row(e){let div=document.createElement('div');div.className='entry';div.onclick=()=>quick(e.id);let ic=iconForEntry(e);const weak=e?.entryType==='password'&&score(e.pass)<3;const typeEmoji=e?.entryType==='note'?'📝':e?.entryType==='card'?'💳':e?.entryType==='id'?'🪪':e?.entryType==='license'?'🚗':e?.entryType==='medical'?'🏥':e?.entryType==='wifi'?'📶':'🔑';div.innerHTML=`${vkLogoHTML(ic)}<div style="flex:1;min-width:0"><h3 style="display:flex;align-items:center;gap:6px">${esc(e.service)}${e.fav?'<span style="font-size:11px">⭐</span>':''} ${weak?'<span style="font-size:9px;background:rgba(255,77,85,.2);color:#ff8c94;border:1px solid rgba(255,77,85,.3);border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.3px">DÉBIL</span>':''}</h3><p style="color:#7a9ec0">${esc(entryMainIdentity(e))}</p></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:14px;opacity:.7">${typeEmoji}</span><div class="go" style="color:rgba(0,210,255,.4);font-size:18px">›</div></div>`;return div}
+function row(e){let div=document.createElement('div');div.className='entry';div.onclick=()=>quick(e.id);let ic=iconForEntry(e);const weak=e?.entryType==='password'&&score(e.pass)<3;const typeEmoji=e?.entryType==='note'?'📝':e?.entryType==='card'?'💳':e?.entryType==='id'?'🪪':e?.entryType==='license'?'🚗':e?.entryType==='medical'?'🏥':e?.entryType==='wifi'?'📶':'🔑';div.innerHTML=`${vkLogoHTML(ic)}<div style="flex:1;min-width:0"><h3 style="display:flex;align-items:center;gap:6px">${safeEsc(e.service)}${e.fav?'<span style="font-size:11px">⭐</span>':''} ${weak?'<span style="font-size:9px;background:rgba(255,77,85,.2);color:#ff8c94;border:1px solid rgba(255,77,85,.3);border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.3px">DÉBIL</span>':''}</h3><p style="color:#7a9ec0">${esc(entryMainIdentity(e))}</p></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:14px;opacity:.7">${typeEmoji}</span><div class="go" style="color:rgba(0,210,255,.4);font-size:18px">›</div></div>`;return div}
 
 function renderFav(){
   const grid=$('favGrid');
@@ -1909,7 +1909,7 @@ function renderFav(){
     row.className='favRow';
     row.onclick=()=>quick(e.id);
     const userVal=e.user||e.email||'';
-    row.innerHTML=`<div class="favRowIco">${vkLogoHTML(ic,'logo',48)}</div><div class="favRowInfo"><div class="favRowName">${esc(e.service)}${weak?'<span class="favRowWeak">DÉBIL</span>':''}</div>${identity?'<div class="favRowId">'+esc(identity)+'</div>':''}</div><div class="favRowBtns"><button class="favRowBtn2" onclick="event.stopPropagation();vibe(25);soundCopy();copyText(${JSON.stringify(userVal)});toast('Usuario copiado')">👤</button><button class="favRowBtn" onclick="event.stopPropagation();vibe(25);soundCopy();copyText(${JSON.stringify(e.pass||'')});toast('Contraseña copiada')">🔑</button></div>`;
+    row.innerHTML=`<div class="favRowIco">${vkLogoHTML(ic,'logo',48)}</div><div class="favRowInfo"><div class="favRowName">${safeEsc(e.service)}${weak?'<span class="favRowWeak">DÉBIL</span>':''}</div>${identity?'<div class="favRowId">'+esc(identity)+'</div>':''}</div><div class="favRowBtns"><button class="favRowBtn2" onclick="event.stopPropagation();vibe(25);soundCopy();copyText(${JSON.stringify(userVal)});toast('Usuario copiado')">👤</button><button class="favRowBtn" onclick="event.stopPropagation();vibe(25);soundCopy();copyText(${JSON.stringify(e.pass||'')});toast('Contraseña copiada')">🔑</button></div>`;
     grid.appendChild(row);
   });
 }
@@ -1928,7 +1928,7 @@ h+='<div style="position:relative;margin-bottom:18px">';
 h+='<div style="width:100px;height:100px;border-radius:28px;overflow:hidden;box-shadow:0 0 0 3px rgba(0,210,255,.22),0 16px 48px rgba(0,0,0,.7),0 0 40px rgba(0,130,255,.15)">'+vkLogoHTML(ic,'logo',100)+'</div>';
 if(e.fav)h+='<div style="position:absolute;bottom:-7px;right:-7px;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#ffd447,#ffb020);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 10px rgba(0,0,0,.5)">\u2b50</div>';
 h+='</div>';
-h+='<div style="font-size:26px;font-weight:950;color:#fff;letter-spacing:-.5px;margin-bottom:8px">'+esc(e.service)+'</div>';
+h+='<div style="font-size:26px;font-weight:950;color:#fff;letter-spacing:-.5px;margin-bottom:8px">'+safeEsc(e.service)+'</div>';
 h+='<div style="font-size:11px;color:#4a7898;font-weight:800;letter-spacing:.8px;text-transform:uppercase;background:rgba(0,150,255,.08);border:1px solid rgba(0,150,255,.15);border-radius:20px;padding:4px 12px">'+esc(e.type||'Cuenta')+'</div>';
 h+='</div>';
 
@@ -2849,7 +2849,7 @@ function renderHealthPanel(){
       a.entries.slice(0,4).forEach(e=>{
         h+=`<div onclick="closeModals();setTimeout(()=>quick('${e.id}'),200)"
           style="display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid rgba(255,255,255,.05);cursor:pointer">
-          <span style="font-size:13px;color:#c0d8f0;flex:1">${esc(e.service)}</span>
+          <span style="font-size:13px;color:#c0d8f0;flex:1">${safeEsc(e.service)}</span>
           <span style="font-size:11px;color:${a.color};font-weight:700">Ver →</span>
         </div>`;
       });
@@ -2961,6 +2961,7 @@ function mapCsvRow(row, format){
 
 async function importFromCSV(file){
   if(!file)return;
+  if(file.size > 5 * 1024 * 1024){ toast('Archivo demasiado grande (máx. 5 MB)'); return; }
   if(!unlocked){toast('Desbloquea la bóveda primero');return;}
   
   const text = await file.text().catch(()=>{toast('Error al leer el archivo');return null;});
@@ -3007,7 +3008,7 @@ function renderCsvImportModal(entries, format, filename){
   h+=`<div style="font-size:11px;font-weight:900;color:rgba(0,210,255,.6);letter-spacing:.6px;margin-bottom:8px">VISTA PREVIA (${Math.min(5,entries.length)} de ${entries.length})</div>`;
   entries.slice(0,5).forEach(e=>{
     h+=`<div style="background:rgba(0,14,32,.6);border:1px solid rgba(0,180,255,.1);border-radius:10px;padding:10px 12px;margin-bottom:6px">
-      <div style="font-size:13px;font-weight:700;color:#e8f4ff">${esc(e.service)||'(sin nombre)'}</div>
+      <div style="font-size:13px;font-weight:700;color:#e8f4ff">${safeEsc(e.service)||'(sin nombre)'}</div>
       <div style="font-size:11px;color:#4a7090;margin-top:2px">${esc(e.user||e.url||'')}</div>
     </div>`;
   });

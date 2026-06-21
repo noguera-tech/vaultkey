@@ -298,7 +298,7 @@ function renderHealthPanel() {
     if(!items.length) return `<div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:12px;padding:12px;margin-bottom:12px"><p style="color:#22c55e;font-size:13px">✅ ${emptyMsg}</p></div>`;
     return `<div style="background:rgba(${color},.08);border:1px solid rgba(${color},.2);border-radius:12px;padding:12px;margin-bottom:12px">
       <p style="font-weight:700;font-size:13px;margin-bottom:8px;color:rgb(${color})">${title} (${items.length})</p>
-      ${items.map(e => `<div onclick="closeModals();setTimeout(()=>quick('${e.id}'),300)" style="padding:8px;background:rgba(0,14,32,.4);border-radius:8px;margin-bottom:6px;cursor:pointer">
+      ${items.map(e => `<div onclick="closeModals();setTimeout(()=>quick('${e.id.replace(/'/g,"\\'")}'),300)" style="padding:8px;background:rgba(0,14,32,.4);border-radius:8px;margin-bottom:6px;cursor:pointer">
         <div style="font-weight:700;font-size:13px;color:#e0f0ff">${safeEsc(e.service)}</div>
         ${showPass ? `<div style="font-size:11px;color:#4a7090;font-family:monospace">${e.pass ? '••••••••' : 'Sin contraseña'}</div>` : ''}
       </div>`).join('')}
