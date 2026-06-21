@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -18,41 +18,41 @@
 </head>
 <body>
 <div class="app">
-<div id="privacyOverlay" class="privacyOverlay"><div class="privacyBox"><div class="privacyIcon">ðŸ”</div><h2>VaultKey</h2><p>BÃ³veda protegida</p></div></div>
+<div id="privacyOverlay" class="privacyOverlay"><div class="privacyBox"><div class="privacyIcon">🔐</div><h2>VaultKey</h2><p>Bóveda protegida</p></div></div>
 <section id="pin" class="screen pinScreen">
   <div class="pinAura"></div>
   <div class="pinInner">
     <div class="shield"><img class="pinLogo" src="vaultkey-shield-scene.png?v=221" alt="VaultKey"></div>
     <h1 class="pinTitle">VaultKey</h1>
-    <p class="pinTag">Tu bÃ³veda segura</p>
-    <p class="pinSub" id="pinMsg">Crea un PIN de 6 dÃ­gitos</p>
+    <p class="pinTag">Tu bóveda segura</p>
+    <p class="pinSub" id="pinMsg">Crea un PIN de 6 dígitos</p>
     <div class="dots" id="dots"></div>
     <div class="keys" id="keys"></div>
-    <div class="bioHint" id="bioHint">Huella preparada para biometrÃ­a</div>
+    <div class="bioHint" id="bioHint">Huella preparada para biometría</div>
     <div class="pinActions"></div>
   </div>
 </section>
 <section id="home" class="screen homeHeroPremium targetHome">
 
-  <!-- â”€â”€ Header con saludo y menÃº â”€â”€ -->
+  <!-- ┬┬ Header con saludo y menú ┬┬ -->
   <div style="padding:12px 18px 0;position:relative;z-index:10;text-align:center">
     <div style="font-size:11px;color:rgba(0,210,255,.6);font-weight:700;letter-spacing:1px" id="homeGreeting">BIENVENIDO</div>
   </div>
 
   <div class="content homePremium targetHomeContent" style="padding-top:8px;padding-bottom:24px">
 
-    <!-- â”€â”€ Hero escudo â”€â”€ -->
+    <!-- ┬┬ Hero escudo ┬┬ -->
     <div class="homeBrand targetHero" style="margin:0 0 0">
       <img class="heroShield" src="vaultkey-shield-scene.png?v=221" alt="VaultKey">
     </div>
 
-    <!-- â”€â”€ TÃ­tulo bajo escudo â”€â”€ -->
+    <!-- ┬┬ Título bajo escudo ┬┬ -->
     <div style="text-align:center;padding:0 16px 12px;margin-top:-4px">
       <b class="heroBrandTitle">Vault<span>Key</span></b>
-      <strong style="display:block;font-size:13px;color:rgba(160,210,240,.65);font-weight:600;margin-top:2px">Tu bÃ³veda digital privada</strong>
+      <strong style="display:block;font-size:13px;color:rgba(160,210,240,.65);font-weight:600;margin-top:2px">Tu bóveda digital privada</strong>
     </div>
 
-    <!-- â”€â”€ Stats cards â”€â”€ -->
+    <!-- ┬┬ Stats cards ┬┬ -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
       <div onclick="show('vault')" style="background:linear-gradient(135deg,rgba(0,100,200,.2),rgba(0,60,140,.15));border:1px solid rgba(0,180,255,.2);border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer">
         <div style="font-size:26px;font-weight:900;color:#00e5ff;line-height:1" id="statTotal">0</div>
@@ -64,38 +64,38 @@
       </div>
       <div onclick="showHealthPanel()" style="background:linear-gradient(135deg,rgba(255,80,100,.15),rgba(180,20,40,.1));border:1px solid rgba(255,80,100,.25);border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer">
         <div style="font-size:26px;font-weight:900;color:#ff6b75;line-height:1" id="statWeak">0</div>
-        <div style="font-size:10px;color:rgba(255,100,120,.6);margin-top:4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px">DÃ©biles</div>
+        <div style="font-size:10px;color:rgba(255,100,120,.6);margin-top:4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px">Débiles</div>
       </div>
     </div>
 
-    <!-- â”€â”€ Panel de salud â”€â”€ -->
+    <!-- ┬┬ Panel de salud ┬┬ -->
     <div onclick="showHealthPanel()" style="margin-bottom:12px;padding:14px 16px;background:linear-gradient(135deg,rgba(0,40,90,.6),rgba(0,20,55,.7));border:1px solid rgba(0,180,255,.18);border-radius:16px;cursor:pointer;display:flex;align-items:center;gap:14px;box-shadow:0 4px 20px rgba(0,0,0,.3)">
-      <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,rgba(0,150,255,.2),rgba(0,80,200,.15));border:1px solid rgba(0,180,255,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">ðŸ›¡ï¸</div>
+      <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,rgba(0,150,255,.2),rgba(0,80,200,.15));border:1px solid rgba(0,180,255,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🛡️</div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:800;color:#e0f0ff;font-size:14px;margin-bottom:2px">Panel de salud</div>
-        <div style="font-size:12px;color:#4a7090" id="healthSummaryText">Analizar contraseÃ±as</div>
+        <div style="font-size:12px;color:#4a7090" id="healthSummaryText">Analizar contraseñas</div>
       </div>
-      <div style="color:rgba(0,210,255,.4);font-size:20px;font-weight:300">â€º</div>
+      <div style="color:rgba(0,210,255,.4);font-size:20px;font-weight:300">›</div>
     </div>
 
-    <!-- â”€â”€ Accesos rÃ¡pidos â”€â”€ -->
+    <!-- ┬┬ Accesos rápidos ┬┬ -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
       <button onclick="openEntry()" style="padding:14px 12px;border-radius:14px;border:1px solid rgba(100,80,255,.35);background:linear-gradient(135deg,rgba(80,60,255,.2),rgba(40,20,180,.15));color:#a89fff;font-size:13px;font-weight:800;text-align:left;display:flex;align-items:center;gap:8px">
-        <span style="font-size:18px">âž•</span>Nueva entrada
+        <span style="font-size:18px">➕</span>Nueva entrada
       </button>
       <button onclick="show('vault')" style="padding:14px 12px;border-radius:14px;border:1px solid rgba(0,180,255,.25);background:linear-gradient(135deg,rgba(0,80,200,.2),rgba(0,40,120,.15));color:#7ab0d0;font-size:13px;font-weight:800;text-align:left;display:flex;align-items:center;gap:8px">
-        <span style="font-size:18px">ðŸ”‘</span>Mis entradas
+        <span style="font-size:18px">🔑</span>Mis entradas
       </button>
       <button onclick="show('fav')" style="padding:14px 12px;border-radius:14px;border:1px solid rgba(245,158,11,.25);background:linear-gradient(135deg,rgba(180,100,0,.15),rgba(120,60,0,.1));color:#c8880a;font-size:13px;font-weight:800;text-align:left;display:flex;align-items:center;gap:8px">
-        <span style="font-size:18px">â­</span>Favoritos
+        <span style="font-size:18px">⭐</span>Favoritos
       </button>
       <button onclick="showHealthPanel()" style="padding:14px 12px;border-radius:14px;border:1px solid rgba(0,200,120,.25);background:linear-gradient(135deg,rgba(0,160,80,.15),rgba(0,100,40,.1));color:#00c875;font-size:13px;font-weight:800;text-align:left;display:flex;align-items:center;gap:8px">
-        <span style="font-size:18px">ðŸ›¡ï¸</span>Salud
+        <span style="font-size:18px">🛡️</span>Salud
       </button>
 
     </div>
 
-    <!-- â”€â”€ Recientes â”€â”€ -->
+    <!-- ┬┬ Recientes ┬┬ -->
     <div id="recentList" class="targetRecent"></div>
 
   </div>
@@ -104,61 +104,61 @@
 </section>
 <section id="vault" class="screen targetVault">
 
-<!-- â”€â”€ Header vault â”€â”€ -->
+<!-- ┬┬ Header vault ┬┬ -->
 <div style="display:flex;align-items:center;gap:10px;padding:12px 16px 8px;position:relative;z-index:5">
   <div style="flex:1;position:relative">
-    <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;color:#4a7090;pointer-events:none">âŒ•</span>
+    <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;color:#4a7090;pointer-events:none">✕</span>
     <input id="search" placeholder="Buscar entradas..." oninput="render()"
       style="width:100%;background:rgba(0,20,50,.7);border:1.5px solid rgba(0,150,210,.2);border-radius:14px;padding:10px 12px 10px 36px;color:#e8f4ff;font-size:14px;outline:none;transition:.2s"
       onfocus="this.style.borderColor='rgba(0,210,255,.5)'" onblur="this.style.borderColor='rgba(0,150,210,.2)'">
   </div>
-  <!-- BotÃ³n ordenar -->
+  <!-- Botón ordenar -->
   <div style="position:relative">
     <button onclick="toggleSortMenu()" id="sortMenuBtn"
       style="width:40px;height:40px;border-radius:12px;border:1.5px solid rgba(0,150,210,.2);background:rgba(0,20,50,.7);color:#7ab0d0;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-      â‡…
+      ⇅
     </button>
     <div id="sortMenu" style="display:none;position:absolute;right:0;top:46px;z-index:50;background:linear-gradient(135deg,rgba(0,32,70,.98),rgba(0,14,32,.99));border:1px solid rgba(0,180,255,.2);border-radius:14px;overflow:hidden;min-width:160px;box-shadow:0 8px 32px rgba(0,0,0,.6)">
       <button onclick="setSortOrder('updated');toggleSortMenu()" id="sort_updated"
-        style="width:100%;text-align:left;padding:12px 16px;border:0;background:rgba(0,210,255,.08);color:#00d9ff;font-size:13px;font-weight:800;border-bottom:1px solid rgba(0,180,255,.1)">ðŸ• MÃ¡s reciente</button>
+        style="width:100%;text-align:left;padding:12px 16px;border:0;background:rgba(0,210,255,.08);color:#00d9ff;font-size:13px;font-weight:800;border-bottom:1px solid rgba(0,180,255,.1)">🕕 Más reciente</button>
       <button onclick="setSortOrder('name');toggleSortMenu()" id="sort_name"
-        style="width:100%;text-align:left;padding:12px 16px;border:0;background:transparent;color:#7ab0d0;font-size:13px;font-weight:700;border-bottom:1px solid rgba(0,180,255,.1)">ðŸ”¤ Por nombre</button>
+        style="width:100%;text-align:left;padding:12px 16px;border:0;background:transparent;color:#7ab0d0;font-size:13px;font-weight:700;border-bottom:1px solid rgba(0,180,255,.1)">🔤 Por nombre</button>
       <button onclick="setSortOrder('used');toggleSortMenu()" id="sort_used"
-        style="width:100%;text-align:left;padding:12px 16px;border:0;background:transparent;color:#7ab0d0;font-size:13px;font-weight:700">â­ MÃ¡s usadas</button>
+        style="width:100%;text-align:left;padding:12px 16px;border:0;background:transparent;color:#7ab0d0;font-size:13px;font-weight:700">⭐ Más usadas</button>
     </div>
   </div>
 </div>
 
-<!-- â”€â”€ Chips de categorÃ­a â”€â”€ -->
+<!-- ┬┬ Chips de categoría ┬┬ -->
 <div style="position:relative">
   <div id="catFilterRow" style="display:flex;gap:6px;overflow-x:auto;padding:4px 16px 8px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x mandatory">
-    <button class="catChip active" onclick="setCatFilter('',this)">âœ¦ Todas</button>
-    <button class="catChip" onclick="setCatFilter('banco',this)">ðŸ¦ Banco</button>
-    <button class="catChip" onclick="setCatFilter('correo',this)">ðŸ“§ Correo</button>
-    <button class="catChip" onclick="setCatFilter('social',this)">ðŸ’¬ Social</button>
-    <button class="catChip" onclick="setCatFilter('trabajo',this)">ðŸ’¼ Trabajo</button>
-    <button class="catChip" onclick="setCatFilter('streaming',this)">ðŸŽ¬ Stream</button>
-    <button class="catChip" onclick="setCatFilter('compras',this)">ðŸ›’ Compras</button>
-    <button class="catChip" onclick="setCatFilter('gaming',this)">ðŸŽ® Gaming</button>
-    <button class="catChip" onclick="setCatFilter('cripto',this)">â‚¿ Cripto</button>
-    <button class="catChip" onclick="setCatFilter('wifi',this)">ðŸ“¶ WiFi</button>
-    <button class="catChip" onclick="setCatFilter('gobierno',this)">ðŸ›ï¸ Gobierno</button>
-    <button class="catChip" onclick="setCatFilter('salud',this)">ðŸ¥ Salud</button>
-    <button class="catChip" onclick="setCatFilter('documentos',this)">ðŸªª Docs</button>
-    <button class="catChip" onclick="setCatFilter('viajes',this)">âœˆï¸ Viajes</button>
-    <button class="catChip" onclick="setCatFilter('educacion',this)">ðŸŽ“ EducaciÃ³n</button>
-    <button class="catChip" onclick="setCatFilter('familia',this)">ðŸ‘¨â€ðŸ‘©â€ðŸ‘§ Familia</button>
-    <button class="catChip" onclick="setCatFilter('servidor',this)">ðŸ–¥ï¸ Servidor</button>
-    <button class="catChip" onclick="setCatFilter('otros',this)">ðŸ“ Otros</button>
+    <button class="catChip active" onclick="setCatFilter('',this)">✦ Todas</button>
+    <button class="catChip" onclick="setCatFilter('banco',this)">🏦 Banco</button>
+    <button class="catChip" onclick="setCatFilter('correo',this)">📧 Correo</button>
+    <button class="catChip" onclick="setCatFilter('social',this)">💬 Social</button>
+    <button class="catChip" onclick="setCatFilter('trabajo',this)">💼 Trabajo</button>
+    <button class="catChip" onclick="setCatFilter('streaming',this)">🎬 Stream</button>
+    <button class="catChip" onclick="setCatFilter('compras',this)">🛒 Compras</button>
+    <button class="catChip" onclick="setCatFilter('gaming',this)">🎮 Gaming</button>
+    <button class="catChip" onclick="setCatFilter('cripto',this)">₿ Cripto</button>
+    <button class="catChip" onclick="setCatFilter('wifi',this)">📶 WiFi</button>
+    <button class="catChip" onclick="setCatFilter('gobierno',this)">🏛️ Gobierno</button>
+    <button class="catChip" onclick="setCatFilter('salud',this)">🏥 Salud</button>
+    <button class="catChip" onclick="setCatFilter('documentos',this)">🪪 Docs</button>
+    <button class="catChip" onclick="setCatFilter('viajes',this)">✈️ Viajes</button>
+    <button class="catChip" onclick="setCatFilter('educacion',this)">🎓 Educación</button>
+    <button class="catChip" onclick="setCatFilter('familia',this)">👨‍👩‍👧 Familia</button>
+    <button class="catChip" onclick="setCatFilter('servidor',this)">🖥️ Servidor</button>
+    <button class="catChip" onclick="setCatFilter('otros',this)">📁 Otros</button>
   </div>
 </div>
 
-<!-- â”€â”€ Etiquetas activas (se renderizan dinÃ¡micamente) â”€â”€ -->
+<!-- ┬┬ Etiquetas activas (se renderizan dinámicamente) ┬┬ -->
 <div id="tagFilterRow" style="display:none;padding:0 16px 6px">
   <div id="tagFilterChips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
 </div>
 
-<!-- â”€â”€ Tabs Todas / Favoritos / Recientes â”€â”€ -->
+<!-- ┬┬ Tabs Todas / Favoritos / Recientes ┬┬ -->
 <div style="display:flex;gap:0;padding:0 16px 6px;border-bottom:1px solid rgba(0,180,255,.08)">
   <button id="tabTodas" onclick="switchVaultTab('todas',this)"
     style="flex:1;padding:8px 4px;border:0;background:none;color:#00d9ff;font-size:13px;font-weight:800;border-bottom:2px solid #00d9ff;transition:.15s">
@@ -174,14 +174,14 @@
   </button>
 </div>
 
-<!-- â”€â”€ Lista â”€â”€ -->
+<!-- ┬┬ Lista ┬┬ -->
 <div class="content targetListContent" style="padding-top:8px">
   <!-- Empty state vault -->
   <div id="vaultEmptyState" style="display:none;position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden">
     <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center">
       <img src="vaultkey-shield-scene.png?v=221" style="width:220px;opacity:.12;filter:blur(1px) saturate(1.4);margin-bottom:24px;user-select:none">
       <div style="font-size:20px;font-weight:900;color:rgba(0,210,255,.25);letter-spacing:-.3px;margin-bottom:8px">Vault<span style="color:rgba(0,160,220,.2)">Key</span></div>
-      <div style="font-size:13px;color:rgba(120,160,200,.3);line-height:1.6;font-weight:600">Tu bÃ³veda estÃ¡ lista.<br>AÃ±ade tu primera entrada<br>pulsando el botÃ³n +</div>
+      <div style="font-size:13px;color:rgba(120,160,200,.3);line-height:1.6;font-weight:600">Tu bóveda está lista.<br>Añade tu primera entrada<br>pulsando el botón +</div>
     </div>
   </div>
   <div id="entryList" style="position:relative;z-index:2"></div>
@@ -190,46 +190,46 @@
   <!-- FAB nueva entrada -->
   <button onclick="openEntry()" id="fabAdd" style="position:fixed;bottom:28px;right:20px;width:56px;height:56px;border-radius:28px;background:linear-gradient(135deg,#5544ff,#0066ff);border:none;color:#fff;font-size:28px;font-weight:200;box-shadow:0 6px 24px rgba(0,100,255,.5);display:none;align-items:center;justify-content:center;z-index:90;transition:transform .15s,opacity .2s">+</button>
 </section>
-<section id="fav" class="screen"><div class="vaultHeader"><button style="opacity:0;pointer-events:none;width:36px;height:36px;border:0;background:transparent">â˜°</button><span class="vaultTitle">Favoritos</span><span id="favCount" style="font-size:12px;color:var(--muted);font-weight:700;background:rgba(0,210,255,.1);border:1px solid rgba(0,210,255,.2);border-radius:20px;padding:3px 10px"></span></div><div class="content" style="padding-top:8px"><div id="favGrid" class="favGrid" style="position:relative;z-index:2">
+<section id="fav" class="screen"><div class="vaultHeader"><button style="opacity:0;pointer-events:none;width:36px;height:36px;border:0;background:transparent">☰</button><span class="vaultTitle">Favoritos</span><span id="favCount" style="font-size:12px;color:var(--muted);font-weight:700;background:rgba(0,210,255,.1);border:1px solid rgba(0,210,255,.2);border-radius:20px;padding:3px 10px"></span></div><div class="content" style="padding-top:8px"><div id="favGrid" class="favGrid" style="position:relative;z-index:2">
     <!-- Empty state fav -->
     <div id="favEmptyState" style="display:none;position:fixed;top:60px;left:0;right:0;bottom:0;z-index:1;pointer-events:none;overflow:hidden">
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center">
         <img src="vaultkey-shield-scene.png?v=221" style="width:200px;opacity:.1;filter:blur(1.5px) saturate(1.2);margin-bottom:20px;user-select:none">
-        <div style="font-size:18px;font-weight:900;color:rgba(245,158,11,.2);margin-bottom:8px">Sin favoritos aÃºn</div>
-        <div style="font-size:13px;color:rgba(120,160,200,.28);line-height:1.6;font-weight:600">Marca entradas con â­<br>para acceder rÃ¡pido a ellas</div>
+        <div style="font-size:18px;font-weight:900;color:rgba(245,158,11,.2);margin-bottom:8px">Sin favoritos aún</div>
+        <div style="font-size:13px;color:rgba(120,160,200,.28);line-height:1.6;font-weight:600">Marca entradas con ⭐<br>para acceder rápido a ellas</div>
       </div>
     </div>
   </div></div></section>
 <section id="settings" class="screen"><div class="top"><div><div class="title">Ajustes</div><div class="sub">Seguridad, respaldos y apariencia</div></div></div><div class="content">
   <div class="settingBlock"><div class="label">Seguridad</div><div class="settingsGrid">
-    <div class="settingsRow" onclick="lock()"><div class="sico">ðŸ”’</div><div class="stxt"><b>Bloquear ahora</b><span>Pide el PIN al volver a entrar</span></div><div>â€º</div></div>
-    <div class="settingsRow" id="bioSettingsRow" onclick="bioSettingsAction()"><div class="sico">ðŸ‘†</div><div class="stxt"><b>Huella dactilar</b><span id="bioSettingsSpan">Introduce el PIN una vez para activarla</span></div><div id="bioSettingsPill" class="pill">Inactiva</div></div>
-    <div class="settingsRow" onclick="showRecoveryCode()"><div class="sico">ðŸ§©</div><div class="stxt"><b>CÃ³digo de recuperaciÃ³n</b><span>Ver o copiar el cÃ³digo creado con la bÃ³veda</span></div><div>â€º</div></div>
-    <div class="settingsRow" data-vk-kind="recovery" onclick="regenerateRecoveryCode()"><div class="sico">ðŸ”„</div><div class="stxt"><b>Regenerar cÃ³digo de recuperaciÃ³n</b><span>Crea uno nuevo e invalida el anterior</span></div><div>â€º</div></div>
-    <div class="settingsRow"><div class="sico">ðŸ”¢</div><div class="stxt"><b>Longitud del PIN</b><span id="pinLenSpan">PIN de 6 dÃ­gitos (actual)</span></div><div style="display:flex;gap:6px"><button id="pinLen6Btn" class="pill" onclick="setPinLen(6)" style="cursor:pointer">6</button><button id="pinLen8Btn" class="pill" onclick="setPinLen(8)" style="cursor:pointer">8</button></div></div>
-    <div class="settingsRow" onclick="toast('Auto bloqueo inmediato al cerrar o bloquear manualmente')"><div class="sico">â±ï¸</div><div class="stxt"><b>Auto bloqueo</b><span>Recomendado: inmediato</span></div><div class="pill">Seguro</div></div>
-    <div class="settingsRow" style="flex-direction:column;align-items:flex-start;gap:8px"><div style="display:flex;align-items:center;gap:10px;width:100%"><div class="sico" style="background:rgba(255,77,85,.12);font-size:20px">ðŸ—‘ï¸</div><div class="stxt"><b>Borrado automÃ¡tico</b><span>Borra toda la bÃ³veda tras 10 intentos fallidos de PIN</span></div><label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0"><input type="checkbox" id="autoWipeToggle" style="width:18px;height:18px;accent-color:#ff4d55;cursor:pointer" onchange="confirmAutoWipe(this.checked)"></label></div><p style="font-size:11px;color:rgba(255,77,85,.8);margin:0;line-height:1.4">âš ï¸ AcciÃ³n irreversible. AsegÃºrate de tener un respaldo cifrado antes de activar esta opciÃ³n.</p></div>
+    <div class="settingsRow" onclick="lock()"><div class="sico">🔒</div><div class="stxt"><b>Bloquear ahora</b><span>Pide el PIN al volver a entrar</span></div><div>›</div></div>
+    <div class="settingsRow" id="bioSettingsRow" onclick="bioSettingsAction()"><div class="sico">👆</div><div class="stxt"><b>Huella dactilar</b><span id="bioSettingsSpan">Introduce el PIN una vez para activarla</span></div><div id="bioSettingsPill" class="pill">Inactiva</div></div>
+    <div class="settingsRow" onclick="showRecoveryCode()"><div class="sico">🧩</div><div class="stxt"><b>Código de recuperación</b><span>Ver o copiar el código creado con la bóveda</span></div><div>›</div></div>
+    <div class="settingsRow" data-vk-kind="recovery" onclick="regenerateRecoveryCode()"><div class="sico">🔄</div><div class="stxt"><b>Regenerar código de recuperación</b><span>Crea uno nuevo e invalida el anterior</span></div><div>›</div></div>
+    <div class="settingsRow"><div class="sico">🔢</div><div class="stxt"><b>Longitud del PIN</b><span id="pinLenSpan">PIN de 6 dígitos (actual)</span></div><div style="display:flex;gap:6px"><button id="pinLen6Btn" class="pill" onclick="setPinLen(6)" style="cursor:pointer">6</button><button id="pinLen8Btn" class="pill" onclick="setPinLen(8)" style="cursor:pointer">8</button></div></div>
+    <div class="settingsRow" onclick="toast('Auto bloqueo inmediato al cerrar o bloquear manualmente')"><div class="sico">⏱ï¸</div><div class="stxt"><b>Auto bloqueo</b><span>Recomendado: inmediato</span></div><div class="pill">Seguro</div></div>
+    <div class="settingsRow" style="flex-direction:column;align-items:flex-start;gap:8px"><div style="display:flex;align-items:center;gap:10px;width:100%"><div class="sico" style="background:rgba(255,77,85,.12);font-size:20px">🗑️</div><div class="stxt"><b>Borrado automático</b><span>Borra toda la bóveda tras 10 intentos fallidos de PIN</span></div><label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0"><input type="checkbox" id="autoWipeToggle" style="width:18px;height:18px;accent-color:#ff4d55;cursor:pointer" onchange="confirmAutoWipe(this.checked)"></label></div><p style="font-size:11px;color:rgba(255,77,85,.8);margin:0;line-height:1.4">⚠️ï¸ Acción irreversible. Asegúrate de tener un respaldo cifrado antes de activar esta opción.</p></div>
   </div></div>
   <div class="settingBlock"><div class="label">Respaldos</div><div class="settingsGrid">
-    <div class="settingsRow" onclick="exportBackup()"><div class="sico">ðŸ“¤</div><div class="stxt"><b>Exportar respaldo cifrado</b><span>Guarda una copia protegida de la bÃ³veda</span></div><div>â€º</div></div>
-    <div class="settingsRow" onclick="document.getElementById('importFile').click()"><div class="sico">ðŸ“¥</div><div class="stxt"><b>Importar respaldo</b><span>Restaurar desde archivo cifrado (.json)</span></div><div>â€º</div></div>
+    <div class="settingsRow" onclick="exportBackup()"><div class="sico">📤</div><div class="stxt"><b>Exportar respaldo cifrado</b><span>Guarda una copia protegida de la bóveda</span></div><div>›</div></div>
+    <div class="settingsRow" onclick="document.getElementById('importFile').click()"><div class="sico">📥</div><div class="stxt"><b>Importar respaldo</b><span>Restaurar desde archivo cifrado (.json)</span></div><div>›</div></div>
     <input id="importFile" type="file" accept="application/json" class="hidden" onchange="importBackup(this.files[0])">
-    <div class="settingsRow" onclick="document.getElementById('importCsvFile').click()"><div class="sico">ðŸ“‹</div><div class="stxt"><b>Importar desde otro gestor</b><span>LastPass, Bitwarden, 1Password, Chrome (.csv)</span></div><div>â€º</div></div>
+    <div class="settingsRow" onclick="document.getElementById('importCsvFile').click()"><div class="sico">📋</div><div class="stxt"><b>Importar desde otro gestor</b><span>LastPass, Bitwarden, 1Password, Chrome (.csv)</span></div><div>›</div></div>
     <input id="importCsvFile" type="file" accept=".csv,text/csv" class="hidden" onchange="importFromCSV(this.files[0]);this.value=''">
   </div></div>
 
   <div class="settingBlock"><div class="label">Google Drive</div><div class="settingsGrid">
-    <div class="settingsRow" id="driveConnectRow" onclick="driveConnect()"><div class="sico">â˜ï¸</div><div class="stxt"><b>Conectar Google Drive</b><span>SincronizaciÃ³n automÃ¡tica activada por defecto</span></div><div>â€º</div></div>
-    <div class="settingsRow" id="driveStatusRow" style="display:none"><div class="sico" id="driveStatusIco">âœ…</div><div class="stxt"><b id="driveStatusTxt">Drive conectado</b><span id="driveStatusSub">Ãšltima sync: nunca</span></div><div id="driveStatusArrow">â€º</div></div>
-    <div class="settingsRow" id="driveSyncRow" onclick="driveSyncNow()" style="display:none"><div class="sico">ðŸ”„</div><div class="stxt"><b>Sincronizar ahora</b><span>Subir respaldo cifrado a Drive</span></div><div>â€º</div></div>
-    <div class="settingsRow" id="driveRestoreRow" onclick="driveRestore()" style="display:none"><div class="sico">â¬‡ï¸</div><div class="stxt"><b>Restaurar desde Drive</b><span>Descargar y restaurar Ãºltimo respaldo</span></div><div>â€º</div></div>
-    <div class="settingsRow" id="driveAutoRow" style="display:none"><div class="sico">âš™ï¸</div><div class="stxt"><b>Sync automÃ¡tica</b><span id="driveAutoSub">Al guardar cada entrada</span></div><div><label class="toggle"><input type="checkbox" id="driveAutoToggle" onchange="driveToggleAuto(this.checked)" checked><span class="slider"></span></label></div></div>
-    <div class="settingsRow" id="driveDisconnectRow" onclick="driveDisconnect()" style="display:none"><div class="sico">ðŸ”Œ</div><div class="stxt"><b>Desconectar Drive</b><span>Dejar de sincronizar</span></div><div>â€º</div></div>
+    <div class="settingsRow" id="driveConnectRow" onclick="driveConnect()"><div class="sico">☁️</div><div class="stxt"><b>Conectar Google Drive</b><span>Sincronización automática activada por defecto</span></div><div>›</div></div>
+    <div class="settingsRow" id="driveStatusRow" style="display:none"><div class="sico" id="driveStatusIco">✅</div><div class="stxt"><b id="driveStatusTxt">Drive conectado</b><span id="driveStatusSub">Última sync: nunca</span></div><div id="driveStatusArrow">›</div></div>
+    <div class="settingsRow" id="driveSyncRow" onclick="driveSyncNow()" style="display:none"><div class="sico">🔄</div><div class="stxt"><b>Sincronizar ahora</b><span>Subir respaldo cifrado a Drive</span></div><div>›</div></div>
+    <div class="settingsRow" id="driveRestoreRow" onclick="driveRestore()" style="display:none"><div class="sico">⬇️</div><div class="stxt"><b>Restaurar desde Drive</b><span>Descargar y restaurar último respaldo</span></div><div>›</div></div>
+    <div class="settingsRow" id="driveAutoRow" style="display:none"><div class="sico">⚙️</div><div class="stxt"><b>Sync automática</b><span id="driveAutoSub">Al guardar cada entrada</span></div><div><label class="toggle"><input type="checkbox" id="driveAutoToggle" onchange="driveToggleAuto(this.checked)" checked><span class="slider"></span></label></div></div>
+    <div class="settingsRow" id="driveDisconnectRow" onclick="driveDisconnect()" style="display:none"><div class="sico">🔌</div><div class="stxt"><b>Desconectar Drive</b><span>Dejar de sincronizar</span></div><div>›</div></div>
   </div></div>
 
-  <div class="settingBlock"><div class="label">ConfiguraciÃ³n</div><div class="card">
+  <div class="settingBlock"><div class="label">Configuración</div><div class="card">
     <b>Autobloqueo inteligente</b>
-    <div class="sub">No debe pedir PIN mientras estÃ¡s escribiendo, tocando o navegando. Solo bloquea al salir o tras inactividad real.</div>
+    <div class="sub">No debe pedir PIN mientras estás escribiendo, tocando o navegando. Solo bloquea al salir o tras inactividad real.</div>
     <select id="autoLockSelect" class="settingSelect" onchange="setAutoLock(this.value)">
       <option value="0">Inmediato al salir</option>
       <option value="30000" selected>30 segundos sin actividad</option>
@@ -237,21 +237,21 @@
       <option value="300000">5 minutos</option>
       <option value="900000">15 minutos</option>
     </select>
-    <div class="securityNote">En aplicaciones recientes se mostrarÃ¡ una pantalla privada: ðŸ” VaultKey â€” BÃ³veda protegida.</div>
+    <div class="securityNote">En aplicaciones recientes se mostrará una pantalla privada: 🔐 VaultKey " Bóveda protegida.</div>
   </div></div>
   
   <div class="settingBlock"><div class="label">Preferencias</div><div class="settingsGrid">
-    <div class="settingsRow" onclick="toggleVibration()"><div class="sico">ðŸ“³</div><div class="stxt"><b>VibraciÃ³n</b><span id="vibeSettingHint">Feedback hÃ¡ptico en botones y acciones</span></div><div id="vibeToggle">â—</div></div>
-    <div class="settingsRow" onclick="toggleSound()"><div class="sico">ðŸ””</div><div class="stxt"><b>Sonidos</b><span id="soundSettingHint">Sonidos de confirmaciÃ³n y error</span></div><div id="soundToggle">â—‹</div></div>
-    <div class="settingsRow" id="soundStyleRow" style="display:none"><div class="sico">ðŸŽµ</div><div class="stxt"><b>Estilo de sonido</b><span id="soundStyleHint">Suave</span></div><div onclick="event.stopPropagation()"><select id="soundStyleSelect" onchange="setSoundStyle(this.value)" style="background:transparent;border:none;color:var(--cyan);font-weight:800;font-size:14px;text-align:right"><option value="suave">Suave</option><option value="cristal">Cristal</option><option value="retro">Retro</option><option value="minimo">MÃ­nimo</option></select></div></div>
+    <div class="settingsRow" onclick="toggleVibration()"><div class="sico">📳</div><div class="stxt"><b>Vibración</b><span id="vibeSettingHint">Feedback háptico en botones y acciones</span></div><div id="vibeToggle">●</div></div>
+    <div class="settingsRow" onclick="toggleSound()"><div class="sico">🔔</div><div class="stxt"><b>Sonidos</b><span id="soundSettingHint">Sonidos de confirmación y error</span></div><div id="soundToggle">○</div></div>
+    <div class="settingsRow" id="soundStyleRow" style="display:none"><div class="sico">🎵</div><div class="stxt"><b>Estilo de sonido</b><span id="soundStyleHint">Suave</span></div><div onclick="event.stopPropagation()"><select id="soundStyleSelect" onchange="setSoundStyle(this.value)" style="background:transparent;border:none;color:var(--cyan);font-weight:800;font-size:14px;text-align:right"><option value="suave">Suave</option><option value="cristal">Cristal</option><option value="retro">Retro</option><option value="minimo">Mínimo</option></select></div></div>
   </div></div>
   <div class="settingBlock"><div class="label">General</div><div class="settingsGrid">
-    <div class="settingsRow" onclick="shareApp()"><div class="sico">ðŸ“²</div><div class="stxt"><b>Compartir aplicaciÃ³n</b><span>Enviar enlace cuando estÃ© publicada</span></div><div>â€º</div></div>
-    <div class="settingsRow" onclick="showSecurityInfo()"><div class="sico">ðŸ“‹</div><div class="stxt"><b>Privacidad y seguridad</b><span>CÃ³mo protege VaultKey tus datos</span></div><div>â€º</div></div>
+    <div class="settingsRow" onclick="shareApp()"><div class="sico">📲</div><div class="stxt"><b>Compartir aplicación</b><span>Enviar enlace cuando esté publicada</span></div><div>›</div></div>
+    <div class="settingsRow" onclick="showSecurityInfo()"><div class="sico">📋</div><div class="stxt"><b>Privacidad y seguridad</b><span>Cómo protege VaultKey tus datos</span></div><div>›</div></div>
     <div class="settingsRow" onclick="window.open('https://noguera-tech.github.io/vaultkey/privacy.html','_blank','noopener,noreferrer')"><div class="sico">📄</div><div class="stxt"><b>Política de privacidad</b><span>Ver documento legal de privacidad</span></div><div>›</div></div>
-    <div class="settingsRow" id="versionRow" style="cursor:pointer"><div class="sico">â„¹ï¸</div><div class="stxt"><b>VaultKey V2.2.1 Clean</b><span id="versionRowHint">Pulsa para ver informaciÃ³n de la bÃ³veda</span></div><div>â€º</div></div>
+    <div class="settingsRow" id="versionRow" style="cursor:pointer"><div class="sico">ℹï¸</div><div class="stxt"><b>VaultKey V2.2.1 Clean</b><span id="versionRowHint">Pulsa para ver información de la bóveda</span></div><div>›</div></div>
   </div></div>
-  <div class="settingBlock"><div class="label">Zona de peligro</div><div class="settingsRow" style="flex-direction:column;align-items:flex-start;gap:8px;border-color:rgba(255,77,85,.3);background:rgba(255,77,85,.06)"><div style="display:flex;align-items:center;gap:10px;width:100%"><div class="sico" style="background:rgba(255,77,85,.15);font-size:20px">âš ï¸</div><div class="stxt"><b style="color:#ff6b75">Borrar todos los datos</b><span>Elimina el PIN, todas las contraseÃ±as y el cÃ³digo de recuperaciÃ³n. Irreversible.</span></div></div><button class="ghost danger" onclick="wipe()" style="width:100%;margin-top:4px">Borrar y restablecer app</button></div></div>
+  <div class="settingBlock"><div class="label">Zona de peligro</div><div class="settingsRow" style="flex-direction:column;align-items:flex-start;gap:8px;border-color:rgba(255,77,85,.3);background:rgba(255,77,85,.06)"><div style="display:flex;align-items:center;gap:10px;width:100%"><div class="sico" style="background:rgba(255,77,85,.15);font-size:20px">⚠️ï¸</div><div class="stxt"><b style="color:#ff6b75">Borrar todos los datos</b><span>Elimina el PIN, todas las contraseñas y el código de recuperación. Irreversible.</span></div></div><button class="ghost danger" onclick="wipe()" style="width:100%;margin-top:4px">Borrar y restablecer app</button></div></div>
 </div></section>
 <div class="modal" id="entryModal"><div class="sheet">
 <div class="sheetHead entryTargetHead">
@@ -261,15 +261,15 @@
 </div>
 <!-- TIPO DE ENTRADA -->
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
-  <button type="button" id="typeBtnPass" onclick="setEntryType('password')" style="padding:8px 4px;border-radius:12px;border:2px solid var(--cyan);background:rgba(0,210,255,.12);color:#00e5ff;font-size:12px;font-weight:700">ðŸ”‘ ContraseÃ±a</button>
-  <button type="button" id="typeBtnNote" onclick="setEntryType('note')" style="padding:8px 4px;border-radius:12px;border:1px solid rgba(0,210,255,.2);background:rgba(0,14,32,.6);color:#7aa0c8;font-size:12px;font-weight:700">ðŸ“ Nota</button>
-  <button type="button" id="typeBtnCard" onclick="setEntryType('card')" style="padding:8px 4px;border-radius:12px;border:1px solid rgba(0,210,255,.2);background:rgba(0,14,32,.6);color:#7aa0c8;font-size:12px;font-weight:700">ðŸ’³ Tarjeta</button>
+  <button type="button" id="typeBtnPass" onclick="setEntryType('password')" style="padding:8px 4px;border-radius:12px;border:2px solid var(--cyan);background:rgba(0,210,255,.12);color:#00e5ff;font-size:12px;font-weight:700">🔑 Contraseña</button>
+  <button type="button" id="typeBtnNote" onclick="setEntryType('note')" style="padding:8px 4px;border-radius:12px;border:1px solid rgba(0,210,255,.2);background:rgba(0,14,32,.6);color:#7aa0c8;font-size:12px;font-weight:700">📝 Nota</button>
+  <button type="button" id="typeBtnCard" onclick="setEntryType('card')" style="padding:8px 4px;border-radius:12px;border:1px solid rgba(0,210,255,.2);background:rgba(0,14,32,.6);color:#7aa0c8;font-size:12px;font-weight:700">💳 Tarjeta</button>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-  <button type="button" id="typeBtnId" onclick="setEntryType('id')" style="padding:8px 4px;border-radius:12px;border:1px solid rgba(0,210,255,.2);background:rgba(0,14,32,.6);color:#7aa0c8;font-size:12px;font-weight:700">ðŸªª Documento</button>
-  <button type="button" id="typeBtnLicense" onclick="setEntryType('license')" style="padding:8px 4px;border-radius:12px;border:1px solid rgba(0,210,255,.2);background:rgba(0,14,32,.6);color:#7aa0c8;font-size:12px;font-weight:700">ðŸš— Licencia</button>
-  <button type="button" id="typeBtnMedical" onclick="setEntryType('medical')" style="padding:8px 4px;border-radius:12px;border:1px solid rgba(0,210,255,.2);background:rgba(0,14,32,.6);color:#7aa0c8;font-size:12px;font-weight:700">ðŸ¥ MÃ©dico</button>
-  <button type="button" id="typeBtnWifi" onclick="setEntryType('wifi')" style="padding:8px 4px;border-radius:12px;border:1px solid rgba(0,210,255,.2);background:rgba(0,14,32,.6);color:#7aa0c8;font-size:12px;font-weight:700">ðŸ“¶ WiFi</button>
+  <button type="button" id="typeBtnId" onclick="setEntryType('id')" style="padding:8px 4px;border-radius:12px;border:1px solid rgba(0,210,255,.2);background:rgba(0,14,32,.6);color:#7aa0c8;font-size:12px;font-weight:700">🪪 Documento</button>
+  <button type="button" id="typeBtnLicense" onclick="setEntryType('license')" style="padding:8px 4px;border-radius:12px;border:1px solid rgba(0,210,255,.2);background:rgba(0,14,32,.6);color:#7aa0c8;font-size:12px;font-weight:700">🚗 Licencia</button>
+  <button type="button" id="typeBtnMedical" onclick="setEntryType('medical')" style="padding:8px 4px;border-radius:12px;border:1px solid rgba(0,210,255,.2);background:rgba(0,14,32,.6);color:#7aa0c8;font-size:12px;font-weight:700">🏥 Médico</button>
+  <button type="button" id="typeBtnWifi" onclick="setEntryType('wifi')" style="padding:8px 4px;border-radius:12px;border:1px solid rgba(0,210,255,.2);background:rgba(0,14,32,.6);color:#7aa0c8;font-size:12px;font-weight:700">📶 WiFi</button>
 </div>
 <!-- BARRA DE ICONOS DESLIZABLE -->
 <div style="margin-bottom:14px">
@@ -281,20 +281,20 @@
 <!-- USUARIO -->
 <div class="field" id="fieldUser"><div class="label">Usuario</div><input class="inp" id="eUser" placeholder="nombre de usuario o alias" autocomplete="off" type="text"></div>
 <!-- CORREO -->
-<div class="field" id="fieldEmail"><div class="label">Correo electrÃ³nico</div><input class="inp" id="eEmail" placeholder="correo@ejemplo.com" autocomplete="off" type="email" inputmode="email"></div>
-<!-- CONTRASEÃ‘A -->
-<div class="field" id="fieldPass"><div class="label">ContraseÃ±a / cÃ³digo *</div><div style="display:flex;gap:8px"><input class="inp" id="ePass" style="flex:1" placeholder="ContraseÃ±a o PIN" inputmode="text"><button class="smallBtn" onclick="openGen(true)">ðŸ”‘</button></div><div class="strength"><i id="strBar"></i></div><div class="sub" id="strTxt">MÃ­nimo 6 caracteres.</div></div>
+<div class="field" id="fieldEmail"><div class="label">Correo electrónico</div><input class="inp" id="eEmail" placeholder="correo@ejemplo.com" autocomplete="off" type="email" inputmode="email"></div>
+<!-- CONTRASEÓA -->
+<div class="field" id="fieldPass"><div class="label">Contraseña / código *</div><div style="display:flex;gap:8px"><input class="inp" id="ePass" style="flex:1" placeholder="Contraseña o PIN" inputmode="text"><button class="smallBtn" onclick="openGen(true)">🔑</button></div><div class="strength"><i id="strBar"></i></div><div class="sub" id="strTxt">Mínimo 6 caracteres.</div></div>
 <!-- NOTA SEGURA (solo visible en modo nota) -->
 <div id="fieldSecureNote" style="display:none">
   <div class="field">
     <div class="label">Contenido de la nota *</div>
-    <textarea class="inp" id="eSecureNote" placeholder="Escribe tu nota segura aquÃ­..." rows="6" style="resize:none;line-height:1.5"></textarea>
+    <textarea class="inp" id="eSecureNote" placeholder="Escribe tu nota segura aquí..." rows="6" style="resize:none;line-height:1.5"></textarea>
   </div>
   <!-- RECORDATORIO -->
   <div style="background:rgba(0,180,255,.07);border:1px solid rgba(0,180,255,.18);border-radius:14px;padding:12px 14px;margin-bottom:10px">
     <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleNoteReminder()">
       <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:20px">ðŸ””</span>
+        <span style="font-size:20px">🔔</span>
         <div>
           <div style="font-size:13px;font-weight:800;color:#e8f4ff">Recordatorio</div>
           <div style="font-size:11px;color:rgba(160,210,240,.6)" id="reminderHint">Avisa al abrir la app</div>
@@ -312,12 +312,12 @@
         </div>
         <div class="field" style="margin-bottom:0">
           <div class="label">Hora (opcional)</div>
-          <select class="inp" id="eReminderTime" style="color:#e8f4ff;appearance:none;-webkit-appearance:none"><option value="">â€” Hora â€”</option><option value="00:00">00:00</option><option value="00:05">00:05</option><option value="00:10">00:10</option><option value="00:15">00:15</option><option value="00:20">00:20</option><option value="00:25">00:25</option><option value="00:30">00:30</option><option value="00:35">00:35</option><option value="00:40">00:40</option><option value="00:45">00:45</option><option value="00:50">00:50</option><option value="00:55">00:55</option><option value="01:00">01:00</option><option value="01:05">01:05</option><option value="01:10">01:10</option><option value="01:15">01:15</option><option value="01:20">01:20</option><option value="01:25">01:25</option><option value="01:30">01:30</option><option value="01:35">01:35</option><option value="01:40">01:40</option><option value="01:45">01:45</option><option value="01:50">01:50</option><option value="01:55">01:55</option><option value="02:00">02:00</option><option value="02:05">02:05</option><option value="02:10">02:10</option><option value="02:15">02:15</option><option value="02:20">02:20</option><option value="02:25">02:25</option><option value="02:30">02:30</option><option value="02:35">02:35</option><option value="02:40">02:40</option><option value="02:45">02:45</option><option value="02:50">02:50</option><option value="02:55">02:55</option><option value="03:00">03:00</option><option value="03:05">03:05</option><option value="03:10">03:10</option><option value="03:15">03:15</option><option value="03:20">03:20</option><option value="03:25">03:25</option><option value="03:30">03:30</option><option value="03:35">03:35</option><option value="03:40">03:40</option><option value="03:45">03:45</option><option value="03:50">03:50</option><option value="03:55">03:55</option><option value="04:00">04:00</option><option value="04:05">04:05</option><option value="04:10">04:10</option><option value="04:15">04:15</option><option value="04:20">04:20</option><option value="04:25">04:25</option><option value="04:30">04:30</option><option value="04:35">04:35</option><option value="04:40">04:40</option><option value="04:45">04:45</option><option value="04:50">04:50</option><option value="04:55">04:55</option><option value="05:00">05:00</option><option value="05:05">05:05</option><option value="05:10">05:10</option><option value="05:15">05:15</option><option value="05:20">05:20</option><option value="05:25">05:25</option><option value="05:30">05:30</option><option value="05:35">05:35</option><option value="05:40">05:40</option><option value="05:45">05:45</option><option value="05:50">05:50</option><option value="05:55">05:55</option><option value="06:00">06:00</option><option value="06:05">06:05</option><option value="06:10">06:10</option><option value="06:15">06:15</option><option value="06:20">06:20</option><option value="06:25">06:25</option><option value="06:30">06:30</option><option value="06:35">06:35</option><option value="06:40">06:40</option><option value="06:45">06:45</option><option value="06:50">06:50</option><option value="06:55">06:55</option><option value="07:00">07:00</option><option value="07:05">07:05</option><option value="07:10">07:10</option><option value="07:15">07:15</option><option value="07:20">07:20</option><option value="07:25">07:25</option><option value="07:30">07:30</option><option value="07:35">07:35</option><option value="07:40">07:40</option><option value="07:45">07:45</option><option value="07:50">07:50</option><option value="07:55">07:55</option><option value="08:00">08:00</option><option value="08:05">08:05</option><option value="08:10">08:10</option><option value="08:15">08:15</option><option value="08:20">08:20</option><option value="08:25">08:25</option><option value="08:30">08:30</option><option value="08:35">08:35</option><option value="08:40">08:40</option><option value="08:45">08:45</option><option value="08:50">08:50</option><option value="08:55">08:55</option><option value="09:00">09:00</option><option value="09:05">09:05</option><option value="09:10">09:10</option><option value="09:15">09:15</option><option value="09:20">09:20</option><option value="09:25">09:25</option><option value="09:30">09:30</option><option value="09:35">09:35</option><option value="09:40">09:40</option><option value="09:45">09:45</option><option value="09:50">09:50</option><option value="09:55">09:55</option><option value="10:00">10:00</option><option value="10:05">10:05</option><option value="10:10">10:10</option><option value="10:15">10:15</option><option value="10:20">10:20</option><option value="10:25">10:25</option><option value="10:30">10:30</option><option value="10:35">10:35</option><option value="10:40">10:40</option><option value="10:45">10:45</option><option value="10:50">10:50</option><option value="10:55">10:55</option><option value="11:00">11:00</option><option value="11:05">11:05</option><option value="11:10">11:10</option><option value="11:15">11:15</option><option value="11:20">11:20</option><option value="11:25">11:25</option><option value="11:30">11:30</option><option value="11:35">11:35</option><option value="11:40">11:40</option><option value="11:45">11:45</option><option value="11:50">11:50</option><option value="11:55">11:55</option><option value="12:00">12:00</option><option value="12:05">12:05</option><option value="12:10">12:10</option><option value="12:15">12:15</option><option value="12:20">12:20</option><option value="12:25">12:25</option><option value="12:30">12:30</option><option value="12:35">12:35</option><option value="12:40">12:40</option><option value="12:45">12:45</option><option value="12:50">12:50</option><option value="12:55">12:55</option><option value="13:00">13:00</option><option value="13:05">13:05</option><option value="13:10">13:10</option><option value="13:15">13:15</option><option value="13:20">13:20</option><option value="13:25">13:25</option><option value="13:30">13:30</option><option value="13:35">13:35</option><option value="13:40">13:40</option><option value="13:45">13:45</option><option value="13:50">13:50</option><option value="13:55">13:55</option><option value="14:00">14:00</option><option value="14:05">14:05</option><option value="14:10">14:10</option><option value="14:15">14:15</option><option value="14:20">14:20</option><option value="14:25">14:25</option><option value="14:30">14:30</option><option value="14:35">14:35</option><option value="14:40">14:40</option><option value="14:45">14:45</option><option value="14:50">14:50</option><option value="14:55">14:55</option><option value="15:00">15:00</option><option value="15:05">15:05</option><option value="15:10">15:10</option><option value="15:15">15:15</option><option value="15:20">15:20</option><option value="15:25">15:25</option><option value="15:30">15:30</option><option value="15:35">15:35</option><option value="15:40">15:40</option><option value="15:45">15:45</option><option value="15:50">15:50</option><option value="15:55">15:55</option><option value="16:00">16:00</option><option value="16:05">16:05</option><option value="16:10">16:10</option><option value="16:15">16:15</option><option value="16:20">16:20</option><option value="16:25">16:25</option><option value="16:30">16:30</option><option value="16:35">16:35</option><option value="16:40">16:40</option><option value="16:45">16:45</option><option value="16:50">16:50</option><option value="16:55">16:55</option><option value="17:00">17:00</option><option value="17:05">17:05</option><option value="17:10">17:10</option><option value="17:15">17:15</option><option value="17:20">17:20</option><option value="17:25">17:25</option><option value="17:30">17:30</option><option value="17:35">17:35</option><option value="17:40">17:40</option><option value="17:45">17:45</option><option value="17:50">17:50</option><option value="17:55">17:55</option><option value="18:00">18:00</option><option value="18:05">18:05</option><option value="18:10">18:10</option><option value="18:15">18:15</option><option value="18:20">18:20</option><option value="18:25">18:25</option><option value="18:30">18:30</option><option value="18:35">18:35</option><option value="18:40">18:40</option><option value="18:45">18:45</option><option value="18:50">18:50</option><option value="18:55">18:55</option><option value="19:00">19:00</option><option value="19:05">19:05</option><option value="19:10">19:10</option><option value="19:15">19:15</option><option value="19:20">19:20</option><option value="19:25">19:25</option><option value="19:30">19:30</option><option value="19:35">19:35</option><option value="19:40">19:40</option><option value="19:45">19:45</option><option value="19:50">19:50</option><option value="19:55">19:55</option><option value="20:00">20:00</option><option value="20:05">20:05</option><option value="20:10">20:10</option><option value="20:15">20:15</option><option value="20:20">20:20</option><option value="20:25">20:25</option><option value="20:30">20:30</option><option value="20:35">20:35</option><option value="20:40">20:40</option><option value="20:45">20:45</option><option value="20:50">20:50</option><option value="20:55">20:55</option><option value="21:00">21:00</option><option value="21:05">21:05</option><option value="21:10">21:10</option><option value="21:15">21:15</option><option value="21:20">21:20</option><option value="21:25">21:25</option><option value="21:30">21:30</option><option value="21:35">21:35</option><option value="21:40">21:40</option><option value="21:45">21:45</option><option value="21:50">21:50</option><option value="21:55">21:55</option><option value="22:00">22:00</option><option value="22:05">22:05</option><option value="22:10">22:10</option><option value="22:15">22:15</option><option value="22:20">22:20</option><option value="22:25">22:25</option><option value="22:30">22:30</option><option value="22:35">22:35</option><option value="22:40">22:40</option><option value="22:45">22:45</option><option value="22:50">22:50</option><option value="22:55">22:55</option><option value="23:00">23:00</option><option value="23:05">23:05</option><option value="23:10">23:10</option><option value="23:15">23:15</option><option value="23:20">23:20</option><option value="23:25">23:25</option><option value="23:30">23:30</option><option value="23:35">23:35</option><option value="23:40">23:40</option><option value="23:45">23:45</option><option value="23:50">23:50</option><option value="23:55">23:55</option></select>
+          <select class="inp" id="eReminderTime" style="color:#e8f4ff;appearance:none;-webkit-appearance:none"><option value="">" Hora "</option><option value="00:00">00:00</option><option value="00:05">00:05</option><option value="00:10">00:10</option><option value="00:15">00:15</option><option value="00:20">00:20</option><option value="00:25">00:25</option><option value="00:30">00:30</option><option value="00:35">00:35</option><option value="00:40">00:40</option><option value="00:45">00:45</option><option value="00:50">00:50</option><option value="00:55">00:55</option><option value="01:00">01:00</option><option value="01:05">01:05</option><option value="01:10">01:10</option><option value="01:15">01:15</option><option value="01:20">01:20</option><option value="01:25">01:25</option><option value="01:30">01:30</option><option value="01:35">01:35</option><option value="01:40">01:40</option><option value="01:45">01:45</option><option value="01:50">01:50</option><option value="01:55">01:55</option><option value="02:00">02:00</option><option value="02:05">02:05</option><option value="02:10">02:10</option><option value="02:15">02:15</option><option value="02:20">02:20</option><option value="02:25">02:25</option><option value="02:30">02:30</option><option value="02:35">02:35</option><option value="02:40">02:40</option><option value="02:45">02:45</option><option value="02:50">02:50</option><option value="02:55">02:55</option><option value="03:00">03:00</option><option value="03:05">03:05</option><option value="03:10">03:10</option><option value="03:15">03:15</option><option value="03:20">03:20</option><option value="03:25">03:25</option><option value="03:30">03:30</option><option value="03:35">03:35</option><option value="03:40">03:40</option><option value="03:45">03:45</option><option value="03:50">03:50</option><option value="03:55">03:55</option><option value="04:00">04:00</option><option value="04:05">04:05</option><option value="04:10">04:10</option><option value="04:15">04:15</option><option value="04:20">04:20</option><option value="04:25">04:25</option><option value="04:30">04:30</option><option value="04:35">04:35</option><option value="04:40">04:40</option><option value="04:45">04:45</option><option value="04:50">04:50</option><option value="04:55">04:55</option><option value="05:00">05:00</option><option value="05:05">05:05</option><option value="05:10">05:10</option><option value="05:15">05:15</option><option value="05:20">05:20</option><option value="05:25">05:25</option><option value="05:30">05:30</option><option value="05:35">05:35</option><option value="05:40">05:40</option><option value="05:45">05:45</option><option value="05:50">05:50</option><option value="05:55">05:55</option><option value="06:00">06:00</option><option value="06:05">06:05</option><option value="06:10">06:10</option><option value="06:15">06:15</option><option value="06:20">06:20</option><option value="06:25">06:25</option><option value="06:30">06:30</option><option value="06:35">06:35</option><option value="06:40">06:40</option><option value="06:45">06:45</option><option value="06:50">06:50</option><option value="06:55">06:55</option><option value="07:00">07:00</option><option value="07:05">07:05</option><option value="07:10">07:10</option><option value="07:15">07:15</option><option value="07:20">07:20</option><option value="07:25">07:25</option><option value="07:30">07:30</option><option value="07:35">07:35</option><option value="07:40">07:40</option><option value="07:45">07:45</option><option value="07:50">07:50</option><option value="07:55">07:55</option><option value="08:00">08:00</option><option value="08:05">08:05</option><option value="08:10">08:10</option><option value="08:15">08:15</option><option value="08:20">08:20</option><option value="08:25">08:25</option><option value="08:30">08:30</option><option value="08:35">08:35</option><option value="08:40">08:40</option><option value="08:45">08:45</option><option value="08:50">08:50</option><option value="08:55">08:55</option><option value="09:00">09:00</option><option value="09:05">09:05</option><option value="09:10">09:10</option><option value="09:15">09:15</option><option value="09:20">09:20</option><option value="09:25">09:25</option><option value="09:30">09:30</option><option value="09:35">09:35</option><option value="09:40">09:40</option><option value="09:45">09:45</option><option value="09:50">09:50</option><option value="09:55">09:55</option><option value="10:00">10:00</option><option value="10:05">10:05</option><option value="10:10">10:10</option><option value="10:15">10:15</option><option value="10:20">10:20</option><option value="10:25">10:25</option><option value="10:30">10:30</option><option value="10:35">10:35</option><option value="10:40">10:40</option><option value="10:45">10:45</option><option value="10:50">10:50</option><option value="10:55">10:55</option><option value="11:00">11:00</option><option value="11:05">11:05</option><option value="11:10">11:10</option><option value="11:15">11:15</option><option value="11:20">11:20</option><option value="11:25">11:25</option><option value="11:30">11:30</option><option value="11:35">11:35</option><option value="11:40">11:40</option><option value="11:45">11:45</option><option value="11:50">11:50</option><option value="11:55">11:55</option><option value="12:00">12:00</option><option value="12:05">12:05</option><option value="12:10">12:10</option><option value="12:15">12:15</option><option value="12:20">12:20</option><option value="12:25">12:25</option><option value="12:30">12:30</option><option value="12:35">12:35</option><option value="12:40">12:40</option><option value="12:45">12:45</option><option value="12:50">12:50</option><option value="12:55">12:55</option><option value="13:00">13:00</option><option value="13:05">13:05</option><option value="13:10">13:10</option><option value="13:15">13:15</option><option value="13:20">13:20</option><option value="13:25">13:25</option><option value="13:30">13:30</option><option value="13:35">13:35</option><option value="13:40">13:40</option><option value="13:45">13:45</option><option value="13:50">13:50</option><option value="13:55">13:55</option><option value="14:00">14:00</option><option value="14:05">14:05</option><option value="14:10">14:10</option><option value="14:15">14:15</option><option value="14:20">14:20</option><option value="14:25">14:25</option><option value="14:30">14:30</option><option value="14:35">14:35</option><option value="14:40">14:40</option><option value="14:45">14:45</option><option value="14:50">14:50</option><option value="14:55">14:55</option><option value="15:00">15:00</option><option value="15:05">15:05</option><option value="15:10">15:10</option><option value="15:15">15:15</option><option value="15:20">15:20</option><option value="15:25">15:25</option><option value="15:30">15:30</option><option value="15:35">15:35</option><option value="15:40">15:40</option><option value="15:45">15:45</option><option value="15:50">15:50</option><option value="15:55">15:55</option><option value="16:00">16:00</option><option value="16:05">16:05</option><option value="16:10">16:10</option><option value="16:15">16:15</option><option value="16:20">16:20</option><option value="16:25">16:25</option><option value="16:30">16:30</option><option value="16:35">16:35</option><option value="16:40">16:40</option><option value="16:45">16:45</option><option value="16:50">16:50</option><option value="16:55">16:55</option><option value="17:00">17:00</option><option value="17:05">17:05</option><option value="17:10">17:10</option><option value="17:15">17:15</option><option value="17:20">17:20</option><option value="17:25">17:25</option><option value="17:30">17:30</option><option value="17:35">17:35</option><option value="17:40">17:40</option><option value="17:45">17:45</option><option value="17:50">17:50</option><option value="17:55">17:55</option><option value="18:00">18:00</option><option value="18:05">18:05</option><option value="18:10">18:10</option><option value="18:15">18:15</option><option value="18:20">18:20</option><option value="18:25">18:25</option><option value="18:30">18:30</option><option value="18:35">18:35</option><option value="18:40">18:40</option><option value="18:45">18:45</option><option value="18:50">18:50</option><option value="18:55">18:55</option><option value="19:00">19:00</option><option value="19:05">19:05</option><option value="19:10">19:10</option><option value="19:15">19:15</option><option value="19:20">19:20</option><option value="19:25">19:25</option><option value="19:30">19:30</option><option value="19:35">19:35</option><option value="19:40">19:40</option><option value="19:45">19:45</option><option value="19:50">19:50</option><option value="19:55">19:55</option><option value="20:00">20:00</option><option value="20:05">20:05</option><option value="20:10">20:10</option><option value="20:15">20:15</option><option value="20:20">20:20</option><option value="20:25">20:25</option><option value="20:30">20:30</option><option value="20:35">20:35</option><option value="20:40">20:40</option><option value="20:45">20:45</option><option value="20:50">20:50</option><option value="20:55">20:55</option><option value="21:00">21:00</option><option value="21:05">21:05</option><option value="21:10">21:10</option><option value="21:15">21:15</option><option value="21:20">21:20</option><option value="21:25">21:25</option><option value="21:30">21:30</option><option value="21:35">21:35</option><option value="21:40">21:40</option><option value="21:45">21:45</option><option value="21:50">21:50</option><option value="21:55">21:55</option><option value="22:00">22:00</option><option value="22:05">22:05</option><option value="22:10">22:10</option><option value="22:15">22:15</option><option value="22:20">22:20</option><option value="22:25">22:25</option><option value="22:30">22:30</option><option value="22:35">22:35</option><option value="22:40">22:40</option><option value="22:45">22:45</option><option value="22:50">22:50</option><option value="22:55">22:55</option><option value="23:00">23:00</option><option value="23:05">23:05</option><option value="23:10">23:10</option><option value="23:15">23:15</option><option value="23:20">23:20</option><option value="23:25">23:25</option><option value="23:30">23:30</option><option value="23:35">23:35</option><option value="23:40">23:40</option><option value="23:45">23:45</option><option value="23:50">23:50</option><option value="23:55">23:55</option></select>
         </div>
       </div>
       <div style="margin-top:10px">
         <div class="label">Mensaje del recordatorio</div>
-        <input class="inp" id="eReminderMsg" placeholder="Â¿QuÃ© quieres recordar?" autocomplete="off">
+        <input class="inp" id="eReminderMsg" placeholder="¿Qué quieres recordar?" autocomplete="off">
       </div>
     </div>
   </div>
@@ -325,138 +325,138 @@
 <!-- TARJETA (solo visible en modo tarjeta) -->
 <div id="fieldCard" style="display:none">
   <div class="field"><div class="label">Titular de la tarjeta *</div><input class="inp" id="eCardName" placeholder="Nombre como aparece en la tarjeta" autocomplete="off"></div>
-  <div class="field"><div class="label">NÃºmero de tarjeta *</div><input class="inp" id="eCardNumber" placeholder="â€¢â€¢â€¢â€¢ â€¢â€¢â€¢â€¢ â€¢â€¢â€¢â€¢ â€¢â€¢â€¢â€¢" maxlength="19" inputmode="numeric" autocomplete="off" oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/(.{4})/g,'$1 ').trim()"></div>
+  <div class="field"><div class="label">Número de tarjeta *</div><input class="inp" id="eCardNumber" placeholder="•••• •••• •••• ••••" maxlength="19" inputmode="numeric" autocomplete="off" oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/(.{4})/g,'$1 ').trim()"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
     <div class="field" style="margin-bottom:0"><div class="label">Caducidad *</div><input class="inp" id="eCardExpiry" placeholder="MM/AA" maxlength="5" inputmode="numeric" autocomplete="off" oninput="fmtExpiry(this)"></div>
-    <div class="field" style="margin-bottom:0"><div class="label">CVV</div><input class="inp" id="eCardCvv" placeholder="â€¢â€¢â€¢" maxlength="4" inputmode="numeric" autocomplete="off" type="password"></div>
+    <div class="field" style="margin-bottom:0"><div class="label">CVV</div><input class="inp" id="eCardCvv" placeholder="•••" maxlength="4" inputmode="numeric" autocomplete="off" type="password"></div>
   </div>
   <div class="field"><div class="label">Tipo de tarjeta</div>
     <select class="inp" id="eCardType" style="width:100%;padding:10px 12px;border-radius:10px;appearance:none;-webkit-appearance:none">
-      <option value="visa">ðŸ’³ Visa</option>
-      <option value="mastercard">ðŸ’³ Mastercard</option>
-      <option value="amex">ðŸ’³ American Express</option>
-      <option value="dÃ©bito">ðŸ’³ DÃ©bito</option>
-      <option value="prepago">ðŸ’³ Prepago</option>
-      <option value="otro">ðŸ’³ Otro</option>
+      <option value="visa">💳 Visa</option>
+      <option value="mastercard">💳 Mastercard</option>
+      <option value="amex">💳 American Express</option>
+      <option value="débito">💳 Débito</option>
+      <option value="prepago">💳 Prepago</option>
+      <option value="otro">💳 Otro</option>
     </select>
   </div>
 </div>
 <!-- DOCUMENTO DE IDENTIDAD -->
 <div id="fieldId" style="display:none">
   <div class="field"><div class="label">Nombre completo *</div><input class="inp" id="eIdName" placeholder="Como aparece en el documento" autocomplete="off"></div>
-  <div class="field"><div class="label">NÃºmero de documento *</div><input class="inp" id="eIdNumber" placeholder="DNI, NIE, Pasaporte..." autocomplete="off"></div>
+  <div class="field"><div class="label">Número de documento *</div><input class="inp" id="eIdNumber" placeholder="DNI, NIE, Pasaporte..." autocomplete="off"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
     <div class="field" style="margin-bottom:0"><div class="label">Fecha de nacimiento</div><input class="inp" id="eIdDob" placeholder="DD/MM/AAAA" maxlength="10" inputmode="text" autocomplete="off" oninput="fmtDate(this)"></div>
     <div class="field" style="margin-bottom:0"><div class="label">Caducidad</div><input class="inp" id="eIdExpiry" placeholder="DD/MM/AAAA" maxlength="10" inputmode="text" autocomplete="off" oninput="fmtDate(this)"></div>
   </div>
-  <div class="field"><div class="label">PaÃ­s emisor</div><input class="inp" id="eIdCountry" placeholder="EspaÃ±a, Venezuela..." autocomplete="off"></div>
+  <div class="field"><div class="label">País emisor</div><input class="inp" id="eIdCountry" placeholder="España, Venezuela..." autocomplete="off"></div>
   <div class="field"><div class="label">Tipo de documento</div>
     <select class="inp" id="eIdType" style="width:100%;padding:10px 12px;border-radius:10px;appearance:none;-webkit-appearance:none">
-      <option value="dni">ðŸªª DNI</option>
-      <option value="nie">ðŸªª NIE</option>
-      <option value="pasaporte">ðŸ›‚ Pasaporte</option>
-      <option value="cedula">ðŸªª CÃ©dula</option>
-      <option value="otro">ðŸ“„ Otro</option>
+      <option value="dni">🪪 DNI</option>
+      <option value="nie">🪪 NIE</option>
+      <option value="pasaporte">🛂 Pasaporte</option>
+      <option value="cedula">🪪 Cédula</option>
+      <option value="otro">📄 Otro</option>
     </select>
   </div>
 </div>
 <!-- LICENCIA DE CONDUCIR -->
 <div id="fieldLicense" style="display:none">
   <div class="field"><div class="label">Nombre completo *</div><input class="inp" id="eLicName" placeholder="Como aparece en la licencia" autocomplete="off"></div>
-  <div class="field"><div class="label">NÃºmero de licencia *</div><input class="inp" id="eLicNumber" placeholder="NÃºmero de permiso..." autocomplete="off"></div>
+  <div class="field"><div class="label">Número de licencia *</div><input class="inp" id="eLicNumber" placeholder="Número de permiso..." autocomplete="off"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-    <div class="field" style="margin-bottom:0"><div class="label">Fecha de emisiÃ³n</div><input class="inp" id="eLicIssued" placeholder="DD/MM/AAAA" maxlength="10" inputmode="text" autocomplete="off" oninput="fmtDate(this)"></div>
+    <div class="field" style="margin-bottom:0"><div class="label">Fecha de emisión</div><input class="inp" id="eLicIssued" placeholder="DD/MM/AAAA" maxlength="10" inputmode="text" autocomplete="off" oninput="fmtDate(this)"></div>
     <div class="field" style="margin-bottom:0"><div class="label">Caducidad</div><input class="inp" id="eLicExpiry" placeholder="DD/MM/AAAA" maxlength="10" inputmode="text" autocomplete="off" oninput="fmtDate(this)"></div>
   </div>
-  <div class="field"><div class="label">PaÃ­s emisor</div><input class="inp" id="eLicCountry" placeholder="EspaÃ±a, Venezuela..." autocomplete="off"></div>
-  <div class="field"><div class="label">CategorÃ­as</div><input class="inp" id="eLicCategory" placeholder="B, A, C1..." autocomplete="off"></div>
+  <div class="field"><div class="label">País emisor</div><input class="inp" id="eLicCountry" placeholder="España, Venezuela..." autocomplete="off"></div>
+  <div class="field"><div class="label">Categorías</div><input class="inp" id="eLicCategory" placeholder="B, A, C1..." autocomplete="off"></div>
 </div>
-<!-- DATOS MÃ‰DICOS -->
+<!-- DATOS MÉDICOS -->
 <div id="fieldMedical" style="display:none">
   <div class="field"><div class="label">Nombre completo *</div><input class="inp" id="eMedName" placeholder="Nombre del paciente" autocomplete="off"></div>
-  <div class="field"><div class="label">NÃºmero de seguridad social / SIP</div><input class="inp" id="eMedSS" placeholder="NÂº SS, SIP, historia clÃ­nica..." autocomplete="off"></div>
-  <div class="field"><div class="label">Grupo sanguÃ­neo</div>
+  <div class="field"><div class="label">Número de seguridad social / SIP</div><input class="inp" id="eMedSS" placeholder="Nº SS, SIP, historia clínica..." autocomplete="off"></div>
+  <div class="field"><div class="label">Grupo sanguíneo</div>
     <select class="inp" id="eMedBlood" style="width:100%;padding:10px 12px;border-radius:10px;appearance:none;-webkit-appearance:none">
-      <option value="">â€” No especificado â€”</option>
+      <option value="">" No especificado "</option>
       <option value="A+">A+</option><option value="A-">A-</option>
       <option value="B+">B+</option><option value="B-">B-</option>
       <option value="AB+">AB+</option><option value="AB-">AB-</option>
       <option value="O+">O+</option><option value="O-">O-</option>
     </select>
   </div>
-  <div class="field"><div class="label">Alergias</div><input class="inp" id="eMedAllergies" placeholder="Penicilina, lÃ¡tex, frutos secos..." autocomplete="off"></div>
-  <div class="field"><div class="label">MedicaciÃ³n habitual</div><textarea class="inp" id="eMedMeds" placeholder="Medicamentos, dosis..." rows="3" style="resize:none"></textarea></div>
-  <div class="field"><div class="label">MÃ©dico / Centro de salud</div><input class="inp" id="eMedDoctor" placeholder="Dr. GarcÃ­a â€” Centro de salud..." autocomplete="off"></div>
+  <div class="field"><div class="label">Alergias</div><input class="inp" id="eMedAllergies" placeholder="Penicilina, látex, frutos secos..." autocomplete="off"></div>
+  <div class="field"><div class="label">Medicación habitual</div><textarea class="inp" id="eMedMeds" placeholder="Medicamentos, dosis..." rows="3" style="resize:none"></textarea></div>
+  <div class="field"><div class="label">Médico / Centro de salud</div><input class="inp" id="eMedDoctor" placeholder="Dr. García " Centro de salud..." autocomplete="off"></div>
   <div class="field"><div class="label">Notas adicionales</div><textarea class="inp" id="eMedNotes" placeholder="Condiciones, observaciones..." rows="3" style="resize:none"></textarea></div>
 </div>
 <!-- WIFI -->
 <div id="fieldWifi" style="display:none">
-  <!-- eWifiSsid = eService â€” no se duplica -->
+  <!-- eWifiSsid = eService " no se duplica -->
   <input type="hidden" id="eWifiSsid">
-  <div class="field"><div class="label">ContraseÃ±a *</div><div style="display:flex;gap:8px"><input class="inp" id="eWifiPass" style="flex:1" placeholder="ContraseÃ±a del WiFi" autocomplete="off"><button class="smallBtn" onclick="openGen(true,'eWifiPass')">ðŸ”‘</button></div></div>
+  <div class="field"><div class="label">Contraseña *</div><div style="display:flex;gap:8px"><input class="inp" id="eWifiPass" style="flex:1" placeholder="Contraseña del WiFi" autocomplete="off"><button class="smallBtn" onclick="openGen(true,'eWifiPass')">🔑</button></div></div>
   <div class="field"><div class="label">Tipo de seguridad</div>
     <select class="inp" id="eWifiSec" style="width:100%;padding:10px 12px;border-radius:10px;appearance:none;-webkit-appearance:none">
       <option value="WPA2">WPA2</option>
       <option value="WPA3">WPA3</option>
       <option value="WPA">WPA</option>
       <option value="WEP">WEP</option>
-      <option value="Sin contraseÃ±a">Sin contraseÃ±a</option>
+      <option value="Sin contraseña">Sin contraseña</option>
     </select>
   </div>
   <div class="field"><div class="label">Router / Proveedor</div><input class="inp" id="eWifiRouter" placeholder="Movistar, Vodafone, TP-Link..." autocomplete="off"></div>
-  <div class="field"><div class="label">DirecciÃ³n IP (opcional)</div><input class="inp" id="eWifiIp" placeholder="192.168.1.1" inputmode="decimal" autocomplete="off"></div>
+  <div class="field"><div class="label">Dirección IP (opcional)</div><input class="inp" id="eWifiIp" placeholder="192.168.1.1" inputmode="decimal" autocomplete="off"></div>
 </div>
 <!-- FAVORITO TOGGLE -->
 <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid rgba(0,210,255,.1);border-radius:14px;padding:14px;margin-bottom:12px">
-  <span style="color:#e8f4ff;font-weight:700">â­ Favorito</span>
+  <span style="color:#e8f4ff;font-weight:700">⭐ Favorito</span>
   <button id="favToggleBtn" onclick="toggleFavEntry()" style="width:48px;height:26px;border-radius:999px;border:0;background:rgba(255,255,255,.15);position:relative;transition:.2s" data-fav="false">
     <span style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s" id="favThumb"></span>
   </button>
 </div>
 <!-- EXTRAS: URL y NOTA -->
 <div id="fieldExtraBtns" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-  <button type="button" onclick="openUrlModal()" style="padding:12px;border:1px solid rgba(0,210,255,.15);border-radius:14px;background:rgba(255,255,255,.03);color:#7aa0c8;font-size:13px;font-weight:700">ðŸ”— URL</button>
-  <button type="button" onclick="openNoteModal()" style="padding:12px;border:1px solid rgba(0,210,255,.15);border-radius:14px;background:rgba(255,255,255,.03);color:#7aa0c8;font-size:13px;font-weight:700">ðŸ“ Nota</button>
+  <button type="button" onclick="openUrlModal()" style="padding:12px;border:1px solid rgba(0,210,255,.15);border-radius:14px;background:rgba(255,255,255,.03);color:#7aa0c8;font-size:13px;font-weight:700">🔗 URL</button>
+  <button type="button" onclick="openNoteModal()" style="padding:12px;border:1px solid rgba(0,210,255,.15);border-radius:14px;background:rgba(255,255,255,.03);color:#7aa0c8;font-size:13px;font-weight:700">📝 Nota</button>
 </div>
 <div class="field" style="margin-bottom:12px">
-  <div class="label">CATEGORÃA</div>
+  <div class="label">CATEGORÍA</div>
   <select id="eCategory" class="inp" style="width:100%;padding:10px 12px;border-radius:10px;appearance:none;-webkit-appearance:none;cursor:pointer">
-    <option value="general">ðŸ—‚ï¸ General</option>
-    <optgroup label="â”€â”€ Finanzas â”€â”€">
-      <option value="banco">ðŸ¦ Banco y finanzas</option>
-      <option value="cripto">â‚¿ Criptomonedas</option>
-      <option value="inversion">ðŸ“ˆ InversiÃ³n y bolsa</option>
-      <option value="seguro">ðŸ›¡ï¸ Seguros</option>
+    <option value="general">🗂️ General</option>
+    <optgroup label="┬┬ Finanzas ┬┬">
+      <option value="banco">🏦 Banco y finanzas</option>
+      <option value="cripto">₿ Criptomonedas</option>
+      <option value="inversion">📈 Inversión y bolsa</option>
+      <option value="seguro">🛡️ Seguros</option>
     </optgroup>
-    <optgroup label="â”€â”€ ComunicaciÃ³n â”€â”€">
-      <option value="correo">ðŸ“§ Correo electrÃ³nico</option>
-      <option value="social">ðŸ’¬ Redes sociales</option>
-      <option value="mensajeria">ðŸ’¬ MensajerÃ­a</option>
+    <optgroup label="┬┬ Comunicación ┬┬">
+      <option value="correo">📧 Correo electrónico</option>
+      <option value="social">💬 Redes sociales</option>
+      <option value="mensajeria">💬 Mensajería</option>
     </optgroup>
-    <optgroup label="â”€â”€ Ocio â”€â”€">
-      <option value="streaming">ðŸŽ¬ Streaming y mÃºsica</option>
-      <option value="gaming">ðŸŽ® Gaming</option>
-      <option value="viajes">âœˆï¸ Viajes y transporte</option>
-      <option value="compras">ðŸ›’ Compras online</option>
+    <optgroup label="┬┬ Ocio ┬┬">
+      <option value="streaming">🎬 Streaming y música</option>
+      <option value="gaming">🎮 Gaming</option>
+      <option value="viajes">✈️ Viajes y transporte</option>
+      <option value="compras">🛒 Compras online</option>
     </optgroup>
-    <optgroup label="â”€â”€ Trabajo â”€â”€">
-      <option value="trabajo">ðŸ’¼ Trabajo y empresa</option>
-      <option value="servidor">ðŸ–¥ï¸ Servidores y hosting</option>
-      <option value="educacion">ðŸŽ“ EducaciÃ³n y formaciÃ³n</option>
+    <optgroup label="┬┬ Trabajo ┬┬">
+      <option value="trabajo">💼 Trabajo y empresa</option>
+      <option value="servidor">🖥️ Servidores y hosting</option>
+      <option value="educacion">🎓 Educación y formación</option>
     </optgroup>
-    <optgroup label="â”€â”€ Personal â”€â”€">
-      <option value="gobierno">ðŸ›ï¸ Gobierno y administraciÃ³n</option>
-      <option value="salud">ðŸ¥ Salud y sanidad</option>
-      <option value="documentos">ðŸªª Documentos personales</option>
-      <option value="familia">ðŸ‘¨â€ðŸ‘©â€ðŸ‘§ Familia</option>
-      <option value="wifi">ðŸ“¶ WiFi y redes</option>
+    <optgroup label="┬┬ Personal ┬┬">
+      <option value="gobierno">🏛️ Gobierno y administración</option>
+      <option value="salud">🏥 Salud y sanidad</option>
+      <option value="documentos">🪪 Documentos personales</option>
+      <option value="familia">👨‍👩‍👧 Familia</option>
+      <option value="wifi">📶 WiFi y redes</option>
     </optgroup>
-    <optgroup label="â”€â”€ TecnologÃ­a â”€â”€">
-      <option value="cloud">â˜ï¸ Cloud y almacenamiento</option>
-      <option value="dominio">ðŸŒ Dominios y DNS</option>
-      <option value="desarrollo">ðŸ’» Desarrollo y cÃ³digo</option>
+    <optgroup label="┬┬ Tecnología ┬┬">
+      <option value="cloud">☁️ Cloud y almacenamiento</option>
+      <option value="dominio">🌐 Dominios y DNS</option>
+      <option value="desarrollo">💻 Desarrollo y código</option>
     </optgroup>
-    <option value="otros">ðŸ“ Otros</option>
+    <option value="otros">📁 Otros</option>
   </select>
 </div>
 
@@ -465,33 +465,33 @@
   <div class="label">Etiquetas</div>
   <div id="tagInputWrap" style="background:rgba(0,35,75,.75);border:1.5px solid rgba(0,160,220,.28);border-radius:12px;padding:8px 10px;min-height:42px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;cursor:text" onclick="$('tagInput').focus()">
     <div id="tagChipsEdit" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-    <input id="tagInput" placeholder="AÃ±adir etiqueta..." autocomplete="off"
+    <input id="tagInput" placeholder="Añadir etiqueta..." autocomplete="off"
       style="border:0;background:none;outline:none;color:#e8f4ff;font-size:13px;min-width:120px;flex:1;padding:2px 0"
       onkeydown="handleTagInput(event)" oninput="this.style.width=(this.value.length+2)+'ch'">
   </div>
-  <div style="font-size:11px;color:rgba(120,170,210,.5);margin-top:4px">Pulsa Enter o coma para aÃ±adir Â· Toca âœ• para eliminar</div>
+  <div style="font-size:11px;color:rgba(120,170,210,.5);margin-top:4px">Pulsa Enter o coma para añadir · Toca ✕ para eliminar</div>
 </div>
 
 <div id="eIconPicker" style="display:none"></div>
 </div></div>
 <!-- MINI MODAL URL -->
 <div class="modal" id="urlModal"><div class="sheet" style="max-height:50dvh">
-  <div class="sheetHead"><div class="sheetTitle">ðŸ”— URL del sitio web</div><button class="iconBtn" onclick="closeUrlModal()">âœ•</button></div>
+  <div class="sheetHead"><div class="sheetTitle">🔗 URL del sitio web</div><button class="iconBtn" onclick="closeUrlModal()">✕</button></div>
   <div class="field"><input class="inp" id="eUrl" placeholder="https://..." type="url" inputmode="url"></div>
   <button class="primary" onclick="closeUrlModal()" style="width:100%;margin-top:8px">Listo</button>
 </div></div>
 <!-- MINI MODAL NOTA -->
 <div class="modal" id="noteModal"><div class="sheet" style="max-height:60dvh">
-  <div class="sheetHead"><div class="sheetTitle">ðŸ“ Nota</div><button class="iconBtn" onclick="closeNoteModal()">âœ•</button></div>
-  <div class="field"><textarea class="txt" id="eNote" placeholder="PIN, cÃ³digo, indicaciones..." style="min-height:120px"></textarea></div>
+  <div class="sheetHead"><div class="sheetTitle">📝 Nota</div><button class="iconBtn" onclick="closeNoteModal()">✕</button></div>
+  <div class="field"><textarea class="txt" id="eNote" placeholder="PIN, código, indicaciones..." style="min-height:120px"></textarea></div>
   <button class="primary" onclick="closeNoteModal()" style="width:100%;margin-top:8px">Listo</button>
 </div></div>
 <div class="modal" id="quickModal" style="align-items:stretch;background:#060D1E"><div class="sheet" style="height:100dvh;max-height:none;border-radius:0;border:0;padding:0;background:linear-gradient(180deg,#071428 0%,#060D1E 40%,#030810 100%);display:flex;flex-direction:column"><div id="quickBody" style="flex:1;overflow:auto;padding:0 16px 24px"></div></div></div>
-<div class="modal" id="recoveryModal"><div class="sheet" style="max-height:92dvh"><div class="sheetHead"><div class="sheetTitle">CÃ³digo de recuperaciÃ³n</div><div class="spacer"></div><button class="iconBtn" id="recoveryCloseBtn" onclick="closeModals()">âœ•</button></div><div style="text-align:center;margin:-8px 0 8px"><img src="vaultkey-shield-scene.png?v=221" style="width:min(42vw,155px);mix-blend-mode:screen;display:block;margin:0 auto"></div>
-<p class="sub" style="color:#00e5ff;font-weight:700;margin-bottom:8px">âš ï¸ InformaciÃ³n importante</p>
-<p class="sub" style="margin-bottom:12px">Este cÃ³digo identifica tu bÃ³veda pero <b>no puede recuperar tus contraseÃ±as</b> si olvidas el PIN.</p>
-<p class="sub" style="margin-bottom:12px">VaultKey <b>no conoce tu PIN</b> y no puede acceder a tus datos. Si olvidas el PIN, la Ãºnica forma de recuperar tus contraseÃ±as es tener un <b>respaldo cifrado</b> exportado previamente.</p>
-<p class="sub" style="color:#f59e0b;margin-bottom:16px">ðŸ’¡ RecomendaciÃ³n: Exporta un respaldo cifrado regularmente desde Ajustes â†’ Respaldos o activa la sync con Google Drive.</p>
+<div class="modal" id="recoveryModal"><div class="sheet" style="max-height:92dvh"><div class="sheetHead"><div class="sheetTitle">Código de recuperación</div><div class="spacer"></div><button class="iconBtn" id="recoveryCloseBtn" onclick="closeModals()">✕</button></div><div style="text-align:center;margin:-8px 0 8px"><img src="vaultkey-shield-scene.png?v=221" style="width:min(42vw,155px);mix-blend-mode:screen;display:block;margin:0 auto"></div>
+<p class="sub" style="color:#00e5ff;font-weight:700;margin-bottom:8px">⚠️ï¸ Información importante</p>
+<p class="sub" style="margin-bottom:12px">Este código identifica tu bóveda pero <b>no puede recuperar tus contraseñas</b> si olvidas el PIN.</p>
+<p class="sub" style="margin-bottom:12px">VaultKey <b>no conoce tu PIN</b> y no puede acceder a tus datos. Si olvidas el PIN, la única forma de recuperar tus contraseñas es tener un <b>respaldo cifrado</b> exportado previamente.</p>
+<p class="sub" style="color:#f59e0b;margin-bottom:16px">💡 Recomendación: Exporta un respaldo cifrado regularmente desde Ajustes → Respaldos o activa la sync con Google Drive.</p>
 <div class="recCode" id="recoveryText">----</div><div class="rowBtns"><button class="ghost" onclick="copyText(document.getElementById('recoveryText').textContent)">Copiar</button><button class="ghost" onclick="downloadRecoveryTxt(document.getElementById('recoveryText').textContent)">Descargar</button><button class="primary" onclick="confirmRecoverySaved()">Lo he guardado</button></div></div></div>
 <div class="modal" id="onboardingModal"><div class="sheet onboardSheet onboardSlider">
 
@@ -499,27 +499,27 @@
   <div class="onboardSlide active" data-step="0">
     <div class="onboardHeroWrap"><img class="onboardHeroImg" src="vaultkey-shield-scene.png?v=221" alt="VaultKey"></div>
     <h2 class="onboardTitle">Bienvenido a <span>VaultKey</span></h2>
-    <p class="onboardText">Tu bÃ³veda digital privada. Todo cifrado, todo tuyo.</p>
+    <p class="onboardText">Tu bóveda digital privada. Todo cifrado, todo tuyo.</p>
     <div class="obAnim">
       <div class="obTerminal">
-        <div class="obLine obLine1">ðŸ” Iniciando VaultKey...</div>
-        <div class="obLine obLine2">âœ“ Cifrado AES-256 activado</div>
-        <div class="obLine obLine3">âœ“ BÃ³veda lista y protegida</div>
+        <div class="obLine obLine1">🔐 Iniciando VaultKey...</div>
+        <div class="obLine obLine2">✓ Cifrado AES-256 activado</div>
+        <div class="obLine obLine3">✓ Bóveda lista y protegida</div>
       </div>
     </div>
   </div>
 
-  <!-- SLIDE 1: ContraseÃ±as -->
+  <!-- SLIDE 1: Contraseñas -->
   <div class="onboardSlide" data-step="1">
     <div class="onboardHeroWrap"><img class="onboardHeroImg" src="vaultkey-shield-scene.png?v=221" alt="VaultKey"></div>
-    <h2 class="onboardTitle">Protege tus <span>contraseÃ±as</span></h2>
-    <p class="onboardText">Genera claves imposibles de descifrar. Un toque, mÃ¡xima seguridad.</p>
+    <h2 class="onboardTitle">Protege tus <span>contraseñas</span></h2>
+    <p class="onboardText">Genera claves imposibles de descifrar. Un toque, máxima seguridad.</p>
     <div class="obAnim">
       <div class="obPassWrap">
-        <div class="obPassLabel">Generando contraseÃ±a segura...</div>
+        <div class="obPassLabel">Generando contraseña segura...</div>
         <div class="obPassValue" id="obPassValue">K#9mP$xL2@nQ8vR!</div>
         <div class="obStrengthBar"><div class="obStrengthFill" id="obStrengthFill"></div></div>
-        <div class="obStrengthLabel" id="obStrengthLabel">Fortaleza: MUY SEGURA âœ“</div>
+        <div class="obStrengthLabel" id="obStrengthLabel">Fortaleza: MUY SEGURA ✓</div>
       </div>
     </div>
   </div>
@@ -528,12 +528,12 @@
   <div class="onboardSlide" data-step="2">
     <div class="onboardHeroWrap"><img class="onboardHeroImg" src="vaultkey-shield-scene.png?v=221" alt="VaultKey"></div>
     <h2 class="onboardTitle">Respaldos <span>cifrados</span></h2>
-    <p class="onboardText">Tus datos se cifran antes de guardarse. Solo tÃº tienes la llave.</p>
+    <p class="onboardText">Tus datos se cifran antes de guardarse. Solo tú tienes la llave.</p>
     <div class="obAnim">
       <div class="obCipherWrap">
-        <div class="obCipherRow"><span class="obCipherKey">USUARIO</span><span class="obCipherVal" id="obCipherVal1">usuario@ejemplo.com</span><span class="obCipherIcon">â†’</span><span class="obCipherEnc" id="obCipherEnc1"></span></div>
-        <div class="obCipherRow"><span class="obCipherKey">CLAVE</span><span class="obCipherVal" id="obCipherVal2">miContraseÃ±aÂ·Â·Â·</span><span class="obCipherIcon">â†’</span><span class="obCipherEnc" id="obCipherEnc2"></span></div>
-        <div class="obCipherBadge" id="obCipherBadge">ðŸ”’ AES-GCM 256 bits Â· PBKDF2</div>
+        <div class="obCipherRow"><span class="obCipherKey">USUARIO</span><span class="obCipherVal" id="obCipherVal1">usuario@ejemplo.com</span><span class="obCipherIcon">→</span><span class="obCipherEnc" id="obCipherEnc1"></span></div>
+        <div class="obCipherRow"><span class="obCipherKey">CLAVE</span><span class="obCipherVal" id="obCipherVal2">miContraseña···</span><span class="obCipherIcon">→</span><span class="obCipherEnc" id="obCipherEnc2"></span></div>
+        <div class="obCipherBadge" id="obCipherBadge">🔒 AES-GCM 256 bits · PBKDF2</div>
       </div>
     </div>
   </div>
@@ -542,13 +542,13 @@
   <div class="onboardSlide" data-step="3">
     <div class="onboardHeroWrap"><img class="onboardHeroImg" src="vaultkey-shield-scene.png?v=221" alt="VaultKey"></div>
     <h2 class="onboardTitle">Configura tu <span>acceso</span></h2>
-    <p class="onboardText">Crea un PIN de 6 dÃ­gitos. Es la Ãºnica llave de tu bÃ³veda.</p>
+    <p class="onboardText">Crea un PIN de 6 dígitos. Es la única llave de tu bóveda.</p>
     <div class="obAnim">
       <div class="obCheckWrap">
-        <div class="obCheckRow" id="obCheck1"><span class="obCheckIco">âœ“</span><span class="obCheckTxt">Protegiendo acceso...</span></div>
-        <div class="obCheckRow" id="obCheck2"><span class="obCheckIco">âœ“</span><span class="obCheckTxt">Cifrando informaciÃ³n...</span></div>
-        <div class="obCheckRow" id="obCheck3"><span class="obCheckIco">âœ“</span><span class="obCheckTxt">BÃ³veda segura activada.</span></div>
-        <div class="obCheckBadge" id="obCheckBadge" style="display:none">ðŸ›¡ï¸ BÃ³veda desbloqueada</div>
+        <div class="obCheckRow" id="obCheck1"><span class="obCheckIco">✓</span><span class="obCheckTxt">Protegiendo acceso...</span></div>
+        <div class="obCheckRow" id="obCheck2"><span class="obCheckIco">✓</span><span class="obCheckTxt">Cifrando información...</span></div>
+        <div class="obCheckRow" id="obCheck3"><span class="obCheckIco">✓</span><span class="obCheckTxt">Bóveda segura activada.</span></div>
+        <div class="obCheckBadge" id="obCheckBadge" style="display:none">🛡️ Bóveda desbloqueada</div>
       </div>
     </div>
   </div>
@@ -557,13 +557,13 @@
   <div class="onboardSlide" data-step="4">
     <div class="onboardHeroWrap"><img class="onboardHeroImg" src="vaultkey-shield-scene.png?v=221" alt="VaultKey"></div>
     <h2 class="onboardTitle">Antes de <span>empezar</span></h2>
-    <p class="onboardText">Guarda bien esta informaciÃ³n para proteger tu bÃ³veda.</p>
+    <p class="onboardText">Guarda bien esta información para proteger tu bóveda.</p>
     <div class="obAnim">
       <div class="obCheckWrap">
-        <div class="obCheckRow" style="opacity:0"><span class="obCheckIco">ðŸ”‘</span><span class="obCheckTxt">Crea un PIN fuerte y memorÃ­zalo</span></div>
-        <div class="obCheckRow" style="opacity:0"><span class="obCheckIco">ðŸ§©</span><span class="obCheckTxt">Guarda tu cÃ³digo de recuperaciÃ³n</span></div>
-        <div class="obCheckRow" style="opacity:0"><span class="obCheckIco">âš ï¸</span><span class="obCheckTxt">Sin PIN no hay recuperaciÃ³n posible</span></div>
-        <div class="obCheckRow" style="opacity:0"><span class="obCheckIco">â˜ï¸</span><span class="obCheckTxt">Google Drive es opcional pero recomendado</span></div>
+        <div class="obCheckRow" style="opacity:0"><span class="obCheckIco">🔑</span><span class="obCheckTxt">Crea un PIN fuerte y memorízalo</span></div>
+        <div class="obCheckRow" style="opacity:0"><span class="obCheckIco">🧩</span><span class="obCheckTxt">Guarda tu código de recuperación</span></div>
+        <div class="obCheckRow" style="opacity:0"><span class="obCheckIco">⚠️ï¸</span><span class="obCheckTxt">Sin PIN no hay recuperación posible</span></div>
+        <div class="obCheckRow" style="opacity:0"><span class="obCheckIco">☁️</span><span class="obCheckTxt">Google Drive es opcional pero recomendado</span></div>
       </div>
     </div>
   </div>
@@ -571,24 +571,24 @@
   <div class="onboardDots"><i class="onDot on"></i><i class="onDot"></i><i class="onDot"></i><i class="onDot"></i><i class="onDot"></i></div>
   <button class="primary" id="onboardBtn" onclick="nextOnboarding()">Siguiente</button>
 </div></div>
-<div class="modal" id="genModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle">Generador profesional</div><div class="spacer"></div><button class="iconBtn" onclick="closeModals()">âœ•</button></div>
+<div class="modal" id="genModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle">Generador profesional</div><div class="spacer"></div><button class="iconBtn" onclick="closeModals()">✕</button></div>
   <div class="rangeField"><div class="rangeTop"><b>Longitud total</b><span id="gLenVal">12</span></div><input id="gLen" type="range" min="6" max="64" value="12" oninput="syncRanges(true)"></div><div class="presetBtns"><button onclick="setGenLen(6)">6</button><button onclick="setGenLen(8)">8</button><button onclick="setGenLen(12)">12</button><button onclick="setGenLen(16)">16</button></div>
   <div class="grid2">
-    <div class="rangeField"><div class="rangeTop"><b>MayÃºsculas</b><span id="gUpperVal">2</span></div><input id="gUpper" type="range" min="0" max="32" value="2" oninput="syncRanges(true)"></div>
-    <div class="rangeField"><div class="rangeTop"><b>MinÃºsculas</b><span id="gLowerVal">6</span></div><input id="gLower" type="range" min="0" max="32" value="6" oninput="syncRanges(true)"></div>
-    <div class="rangeField"><div class="rangeTop"><b>NÃºmeros</b><span id="gNumVal">2</span></div><input id="gNum" type="range" min="0" max="32" value="2" oninput="syncRanges(true)"></div>
-    <div class="rangeField"><div class="rangeTop"><b>SÃ­mbolos</b><span id="gSymVal">2</span></div><input id="gSym" type="range" min="0" max="32" value="2" oninput="syncRanges(true)"></div>
+    <div class="rangeField"><div class="rangeTop"><b>Mayúsculas</b><span id="gUpperVal">2</span></div><input id="gUpper" type="range" min="0" max="32" value="2" oninput="syncRanges(true)"></div>
+    <div class="rangeField"><div class="rangeTop"><b>Minúsculas</b><span id="gLowerVal">6</span></div><input id="gLower" type="range" min="0" max="32" value="6" oninput="syncRanges(true)"></div>
+    <div class="rangeField"><div class="rangeTop"><b>Números</b><span id="gNumVal">2</span></div><input id="gNum" type="range" min="0" max="32" value="2" oninput="syncRanges(true)"></div>
+    <div class="rangeField"><div class="rangeTop"><b>Símbolos</b><span id="gSymVal">2</span></div><input id="gSym" type="range" min="0" max="32" value="2" oninput="syncRanges(true)"></div>
   </div>
-  <label class="checkrow"><input type="checkbox" id="gExact" checked onchange="markGeneratorDirty()"> Usar cantidades mÃ­nimas y completar hasta la longitud total</label>
+  <label class="checkrow"><input type="checkbox" id="gExact" checked onchange="markGeneratorDirty()"> Usar cantidades mínimas y completar hasta la longitud total</label>
   <div style="display:flex;align-items:center;gap:10px;background:rgba(0,180,255,.07);border:1px solid rgba(0,180,255,.2);border-radius:10px;padding:10px 12px;margin-bottom:6px;cursor:pointer" onclick="$('gPinMode').click()">
   <input type="checkbox" id="gPinMode" onchange="markGeneratorDirty();if(this.checked){$('gLen').value=6;syncRanges(true)}else{$('gLen').value=12;syncRanges(true)}" style="width:18px;height:18px;accent-color:#00d9ff">
-  <span style="font-size:13px;font-weight:800;color:#00d9ff">ðŸ”¢ Modo PIN numÃ©rico</span>
+  <span style="font-size:13px;font-weight:800;color:#00d9ff">🔢 Modo PIN numérico</span>
 </div>
 <label class="checkrow"><input type="checkbox" id="gNoSimilar" checked onchange="markGeneratorDirty()"> Evitar caracteres confusos: 0/O, 1/l/I</label>
-  <div class="field"><div class="label">SÃ­mbolos permitidos</div><input class="inp" id="gSymbols" value="!@#$%&*-_+=?/" oninput="markGeneratorDirty()"></div>
-  <div class="sub" id="genInfo" style="margin:4px 0 12px">Ajusta los valores y pulsa generar.</div><button class="primary" onclick="generatePass()" style="width:100%">Generar contraseÃ±a</button><div class="genOut" id="genOut">Pulsa generar</div><div class="rowBtns"><button class="ghost" onclick="copyText(document.getElementById('genOut').textContent)">Copiar</button><button class="ghost" id="useGenerated" onclick="useGen()">Usar en entrada</button></div></div></div>
+  <div class="field"><div class="label">Símbolos permitidos</div><input class="inp" id="gSymbols" value="!@#$%&*-_+=?/" oninput="markGeneratorDirty()"></div>
+  <div class="sub" id="genInfo" style="margin:4px 0 12px">Ajusta los valores y pulsa generar.</div><button class="primary" onclick="generatePass()" style="width:100%">Generar contraseña</button><div class="genOut" id="genOut">Pulsa generar</div><div class="rowBtns"><button class="ghost" onclick="copyText(document.getElementById('genOut').textContent)">Copiar</button><button class="ghost" id="useGenerated" onclick="useGen()">Usar en entrada</button></div></div></div>
 
-<div class="modal" id="confirmModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle" id="confirmTitle">Confirmar acciÃ³n</div><div class="spacer"></div><button class="iconBtn" onclick="resolveConfirm(false)">âœ•</button></div><p class="sub" id="confirmMsg">Â¿Confirmas esta acciÃ³n?</p><div class="rowBtns"><button class="ghost" onclick="resolveConfirm(false)">Cancelar</button><button class="ghost danger" id="confirmOk" onclick="resolveConfirm(true)">Aceptar</button></div></div></div>
+<div class="modal" id="confirmModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle" id="confirmTitle">Confirmar acción</div><div class="spacer"></div><button class="iconBtn" onclick="resolveConfirm(false)">✕</button></div><p class="sub" id="confirmMsg">¿Confirmas esta acción?</p><div class="rowBtns"><button class="ghost" onclick="resolveConfirm(false)">Cancelar</button><button class="ghost danger" id="confirmOk" onclick="resolveConfirm(true)">Aceptar</button></div></div></div>
 <div id="toast" style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(10,30,60,.97);color:#f5f9ff;padding:11px 22px;border-radius:12px;font-size:14px;font-weight:600;pointer-events:none;opacity:0;transition:opacity .25s;z-index:9999;max-width:88vw;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.4);border:1px solid rgba(0,210,255,.2)"></div>
 
 <!-- SPLASH SCREEN -->
@@ -603,17 +603,17 @@
 <!-- =========================================================
      VAULTKEY V1.3.0 FINAL6.8 ONBOARDING SAFE BOTTOM FIX
      Sube los controles del onboarding para que Chrome/Android/WebView
-     no tape el texto del botÃ³n Siguiente/Comenzar.
+     no tape el texto del botón Siguiente/Comenzar.
      No toca flujo, PIN, cifrado, respaldos ni entradas.
 ========================================================= -->
 
 <!-- =========================================================
-   VAULTKEY V1.3.0 FINAL6.9 - ESTABILIZACIÃ“N FLUJO + ICONOS
+   VAULTKEY V1.3.0 FINAL6.9 - ESTABILIZACIÓN FLUJO + ICONOS
    Corrige:
-   1) CÃ³digo de recuperaciÃ³n montado encima de huella / app switcher.
-   2) CÃ³digo de recuperaciÃ³n obligatorio hasta confirmaciÃ³n.
+   1) Código de recuperación montado encima de huella / app switcher.
+   2) Código de recuperación obligatorio hasta confirmación.
    3) Iconos del formulario mostrando undefined y servicio duplicado.
-   No cambia cifrado, estructura de bÃ³veda ni formato de backup.
+   No cambia cifrado, estructura de bóveda ni formato de backup.
 ========================================================= -->
 
 <script src="app.js"></script>
@@ -623,42 +623,42 @@
 <div class="modal" id="securityModal">
   <div class="sheet" style="max-height:90vh;overflow-y:auto">
     <div class="sheetHead">
-      <div class="sheetTitle">ðŸ” Privacidad y Seguridad</div>
+      <div class="sheetTitle">🔐 Privacidad y Seguridad</div>
       <div class="spacer"></div>
-      <button class="iconBtn" onclick="closeModals()">âœ•</button>
+      <button class="iconBtn" onclick="closeModals()">✕</button>
     </div>
 
     <div style="padding:0 4px">
 
       <div style="background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:14px;margin-bottom:16px">
-        <p style="color:#00e5ff;font-weight:700;margin-bottom:8px">ðŸ”’ Cifrado local</p>
-        <p class="sub">Tus contraseÃ±as se cifran con <b>AES-256-GCM</b> directamente en tu dispositivo. VaultKey nunca ve tus datos sin cifrar.</p>
+        <p style="color:#00e5ff;font-weight:700;margin-bottom:8px">🔒 Cifrado local</p>
+        <p class="sub">Tus contraseñas se cifran con <b>AES-256-GCM</b> directamente en tu dispositivo. VaultKey nunca ve tus datos sin cifrar.</p>
       </div>
 
       <div style="background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:14px;margin-bottom:16px">
-        <p style="color:#00e5ff;font-weight:700;margin-bottom:8px">ðŸ”‘ Tu PIN es tuyo</p>
-        <p class="sub">VaultKey <b>no conoce tu PIN</b> y no puede recuperarlo. El PIN nunca se almacena â€” solo se usa para derivar la clave de cifrado mediante PBKDF2.</p>
+        <p style="color:#00e5ff;font-weight:700;margin-bottom:8px">🔑 Tu PIN es tuyo</p>
+        <p class="sub">VaultKey <b>no conoce tu PIN</b> y no puede recuperarlo. El PIN nunca se almacena " solo se usa para derivar la clave de cifrado mediante PBKDF2.</p>
       </div>
 
       <div style="background:rgba(255,159,10,.08);border:1px solid rgba(255,159,10,.2);border-radius:12px;padding:14px;margin-bottom:16px">
-        <p style="color:#f59e0b;font-weight:700;margin-bottom:8px">âš ï¸ Si olvidas el PIN</p>
-        <p class="sub"><b>No podremos recuperar tus contraseÃ±as.</b> La bÃ³veda estÃ¡ cifrada con tu PIN y sin Ã©l es inaccesible incluso para nosotros.</p>
-        <p class="sub" style="margin-top:8px">ðŸ’¡ SoluciÃ³n: exporta respaldos cifrados regularmente o activa la sync con Google Drive.</p>
+        <p style="color:#f59e0b;font-weight:700;margin-bottom:8px">⚠️ï¸ Si olvidas el PIN</p>
+        <p class="sub"><b>No podremos recuperar tus contraseñas.</b> La bóveda está cifrada con tu PIN y sin él es inaccesible incluso para nosotros.</p>
+        <p class="sub" style="margin-top:8px">💡 Solución: exporta respaldos cifrados regularmente o activa la sync con Google Drive.</p>
       </div>
 
       <div style="background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:14px;margin-bottom:16px">
-        <p style="color:#00e5ff;font-weight:700;margin-bottom:8px">â˜ï¸ Google Drive</p>
-        <p class="sub">Si activas la sync, Drive recibe <b>Ãºnicamente el respaldo cifrado</b>. Google no puede leer tu contenido â€” para descifrar se necesita tu PIN.</p>
+        <p style="color:#00e5ff;font-weight:700;margin-bottom:8px">☁️ Google Drive</p>
+        <p class="sub">Si activas la sync, Drive recibe <b>únicamente el respaldo cifrado</b>. Google no puede leer tu contenido " para descifrar se necesita tu PIN.</p>
       </div>
 
       <div style="background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:14px;margin-bottom:16px">
-        <p style="color:#00e5ff;font-weight:700;margin-bottom:8px">ðŸ“± DÃ³nde se guardan tus datos</p>
-        <p class="sub">â€¢ <b>ContraseÃ±as:</b> solo en tu dispositivo (localStorage cifrado)<br>â€¢ <b>Respaldo Drive:</b> en tu carpeta privada de app de Google Drive<br>â€¢ <b>PIN:</b> nunca se guarda, solo su hash<br>â€¢ <b>Servidores externos:</b> ninguno</p>
+        <p style="color:#00e5ff;font-weight:700;margin-bottom:8px">📱 Dónde se guardan tus datos</p>
+        <p class="sub">• <b>Contraseñas:</b> solo en tu dispositivo (localStorage cifrado)<br>• <b>Respaldo Drive:</b> en tu carpeta privada de app de Google Drive<br>• <b>PIN:</b> nunca se guarda, solo su hash<br>• <b>Servidores externos:</b> ninguno</p>
       </div>
 
       <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:14px;margin-bottom:24px">
-        <p style="color:#22c55e;font-weight:700;margin-bottom:8px">âœ… Recomendaciones</p>
-        <p class="sub">1. Usa un PIN de 8 dÃ­gitos<br>2. Activa la huella dactilar<br>3. Exporta respaldos regularmente<br>4. Activa sync con Google Drive<br>5. Activa el auto-bloqueo</p>
+        <p style="color:#22c55e;font-weight:700;margin-bottom:8px">✅ Recomendaciones</p>
+        <p class="sub">1. Usa un PIN de 8 dígitos<br>2. Activa la huella dactilar<br>3. Exporta respaldos regularmente<br>4. Activa sync con Google Drive<br>5. Activa el auto-bloqueo</p>
       </div>
 
       <button class="btn" onclick="closeModals()" style="width:100%">Entendido</button>
@@ -670,20 +670,20 @@
 <div class="modal" id="importModal">
   <div class="sheet">
     <div class="sheetHead">
-      <div class="sheetTitle">ðŸ“¥ Importar respaldo</div>
+      <div class="sheetTitle">📥 Importar respaldo</div>
       <div class="spacer"></div>
-      <button class="iconBtn" onclick="closeImportModal()">âœ•</button>
+      <button class="iconBtn" onclick="closeImportModal()">✕</button>
     </div>
 
     <!-- Step 1: File info -->
     <div id="importStep1">
       <div style="background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:14px;margin-bottom:16px">
-        <p style="color:#00e5ff;font-weight:700;margin-bottom:6px">ðŸ“„ Archivo seleccionado</p>
-        <p class="sub" id="importFileName" style="word-break:break-all">â€”</p>
-        <p class="sub" id="importFileInfo" style="margin-top:6px;color:#4a7090">â€”</p>
+        <p style="color:#00e5ff;font-weight:700;margin-bottom:6px">📄 Archivo seleccionado</p>
+        <p class="sub" id="importFileName" style="word-break:break-all">"</p>
+        <p class="sub" id="importFileInfo" style="margin-top:6px;color:#4a7090">"</p>
       </div>
 
-      <p class="sub" style="margin-bottom:12px">Introduce el PIN con el que se cifrÃ³ este respaldo:</p>
+      <p class="sub" style="margin-bottom:12px">Introduce el PIN con el que se cifró este respaldo:</p>
 
       <div class="inp-wrap" style="margin-bottom:16px">
         <input type="password" id="importPinInput" class="inp" placeholder="PIN del respaldo..." 
@@ -692,7 +692,7 @@
       </div>
 
       <div id="importPinError" style="color:#ff6b6b;font-size:13px;margin-bottom:12px;display:none">
-        âŒ PIN incorrecto o respaldo invÃ¡lido
+        ❌ PIN incorrecto o respaldo inválido
       </div>
 
       <button class="btn" onclick="doImportStep1()" style="width:100%;margin-bottom:10px">
@@ -704,17 +704,17 @@
     <!-- Step 2: Confirmation -->
     <div id="importStep2" style="display:none">
       <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:14px;margin-bottom:16px">
-        <p style="color:#22c55e;font-weight:700;margin-bottom:8px">âœ… Respaldo verificado</p>
+        <p style="color:#22c55e;font-weight:700;margin-bottom:8px">✅ Respaldo verificado</p>
         <div id="importSummary" class="sub"></div>
       </div>
 
       <div id="importWarning" style="background:rgba(255,159,10,.08);border:1px solid rgba(255,159,10,.2);border-radius:12px;padding:14px;margin-bottom:16px;display:none">
-        <p style="color:#f59e0b;font-weight:700;margin-bottom:6px">âš ï¸ AtenciÃ³n</p>
+        <p style="color:#f59e0b;font-weight:700;margin-bottom:6px">⚠️ï¸ Atención</p>
         <p class="sub" id="importWarningText"></p>
       </div>
 
       <button class="btn" onclick="doImportConfirm()" style="width:100%;margin-bottom:10px">
-        âœ… Importar ahora
+        ✅ Importar ahora
       </button>
       <button class="ghost" onclick="closeImportModal()" style="width:100%">Cancelar</button>
     </div>
@@ -725,9 +725,9 @@
 <div class="modal" id="healthModal">
   <div class="sheet" style="max-height:92vh;overflow-y:auto">
     <div class="sheetHead">
-      <div class="sheetTitle">ðŸ›¡ï¸ Panel de salud</div>
+      <div class="sheetTitle">🛡️ Panel de salud</div>
       <div class="spacer"></div>
-      <button class="iconBtn" onclick="closeModals()">âœ•</button>
+      <button class="iconBtn" onclick="closeModals()">✕</button>
     </div>
 
     <div id="healthContent" style="padding:0 4px">
@@ -740,9 +740,9 @@
 <div class="modal" id="csvImportModal">
   <div class="sheet" style="max-height:92dvh;overflow-y:auto">
     <div class="sheetHead">
-      <div class="sheetTitle">ðŸ“‹ Importar desde CSV</div>
+      <div class="sheetTitle">📋 Importar desde CSV</div>
       <div class="spacer"></div>
-      <button class="iconBtn" onclick="closeModals()">âœ•</button>
+      <button class="iconBtn" onclick="closeModals()">✕</button>
     </div>
     <div id="csvImportBody" style="padding:0 4px"></div>
   </div>
