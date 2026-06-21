@@ -796,3 +796,96 @@ input[type=range]::-moz-range-thumb {
 #fieldId select, #fieldLicense select, #fieldWifi select {
   color:#e8f6ff;
 }
+
+/* ── Fondo de partículas en todas las pantallas ── */
+.screen {
+  background: radial-gradient(ellipse at 50% 20%, #0a1f3d 0%, #040c1a 55%, #020810 100%);
+}
+#pin.screen {
+  background: linear-gradient(180deg, #060e1f 0%, #020810 100%);
+}
+.screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 8% 8%, rgba(0,212,255,.9) 0%, transparent 100%),
+    radial-gradient(1px 1px at 18% 22%, rgba(68,153,255,.8) 0%, transparent 100%),
+    radial-gradient(2px 2px at 88% 6%, rgba(0,212,255,.95) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 81% 16%, rgba(136,187,255,.7) 0%, transparent 100%),
+    radial-gradient(2px 2px at 4% 25%, rgba(0,170,255,.85) 0%, transparent 100%),
+    radial-gradient(1px 1px at 95% 31%, rgba(0,212,255,.75) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 25% 12%, rgba(102,153,255,.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 73% 11%, rgba(0,212,255,.9) 0%, transparent 100%),
+    radial-gradient(1px 1px at 43% 5%, rgba(136,204,255,.65) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 59% 9%, rgba(0,170,255,.8) 0%, transparent 100%),
+    radial-gradient(2px 2px at 10% 42%, rgba(68,136,255,.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 91% 48%, rgba(0,212,255,.6) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 3% 61%, rgba(0,212,255,.85) 0%, transparent 100%),
+    radial-gradient(2px 2px at 97% 66%, rgba(136,170,255,.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 34% 73%, rgba(0,212,255,.55) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 67% 79%, rgba(68,153,255,.75) 0%, transparent 100%),
+    radial-gradient(2px 2px at 15% 88%, rgba(0,212,255,.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 84% 91%, rgba(0,170,255,.65) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 50% 96%, rgba(136,204,255,.55) 0%, transparent 100%),
+    radial-gradient(1px 1px at 76% 52%, rgba(0,212,255,.7) 0%, transparent 100%),
+    radial-gradient(2px 2px at 28% 45%, rgba(0,170,255,.85) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 55% 35%, rgba(68,153,255,.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 58%, rgba(0,212,255,.5) 0%, transparent 100%),
+    radial-gradient(2px 2px at 62% 68%, rgba(136,187,255,.7) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 7% 77%, rgba(0,212,255,.75) 0%, transparent 100%),
+    radial-gradient(1px 1px at 93% 82%, rgba(0,170,255,.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 22% 95%, rgba(0,212,255,.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 78% 98%, rgba(68,136,255,.65) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 47% 84%, rgba(0,212,255,.55) 0%, transparent 100%),
+    radial-gradient(2px 2px at 2% 50%, rgba(0,212,255,.7) 0%, transparent 100%);
+  animation: vkStars 8s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes vkStars {
+  0%   { opacity: .6; }
+  50%  { opacity: 1;  }
+  100% { opacity: .7; }
+}
+
+/* Glow central sutil */
+.screen::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,100,220,.12) 0%, rgba(0,50,150,.06) 50%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Escudo watermark solo en vault y fav */
+#vault .vkShieldBg,
+#fav .vkShieldBg {
+  display: block;
+}
+.vkShieldBg {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 75%;
+  max-width: 280px;
+  opacity: .055;
+  filter: blur(1.5px) saturate(1.5);
+  pointer-events: none;
+  z-index: 0;
+  user-select: none;
+}
+
+/* Asegurar que contenido va por encima del fondo */
+.screen > *:not(.vkShieldBg) {
+  position: relative;
+  z-index: 1;
+}
