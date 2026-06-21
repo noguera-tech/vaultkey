@@ -246,7 +246,7 @@ function resolveConfirm(ok){$('confirmModal').classList.remove('open');if(confir
 function initPin(){let m=defaultSecurity(meta());mode=(m&&m.hash)?'unlock':'setup1';let left=lockRemaining();const plen=getPinLen();$('pinMsg').className='pinSub';$('pinMsg').textContent=mode==='unlock'?(left?'Bóveda bloqueada. Espera '+left+' s':'Introduce tu PIN'):'Crea un PIN de '+plen+' dígitos';if(left)$('pinMsg').classList.add('pinLocked');renderDots();renderKeys();syncSettingsUI();updateLockCountdown()}
 function getPinLen(){const m=meta();return(m&&m.pinLen===8)?8:6;}
 function renderDots(){const len=getPinLen();let d=$('dots');d.innerHTML='';d.className='dots'+(len===8?' dots8':'');for(let i=0;i<len;i++){let x=document.createElement('div');x.className='dot'+(i<pin.length?' on':'');d.appendChild(x)}}
-function renderKeys(){let k=$('keys');k.innerHTML='';['1','2','3','4','5','6','7','8','9','bio','0','del'].forEach(n=>{let b=document.createElement('button');b.className='key';if(n==='bio'){b.innerHTML='<svg class="fingerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 11c0 5-2 7-2 10"/><path d="M16 8a4 4 0 0 0-8 0c0 1.3.5 2.7 1 4"/><path d="M6 12c.5 2.5 1.5 4 3 5"/><path d="M18 12c-.4 3.2-1.4 5.4-3.2 7"/><path d="M8 6.5A6 6 0 0 1 18 11"/><path d="M5 9a8 8 0 0 1 14.5-4"/><path d="M20 14c-.4 2.4-1.2 4.4-2.5 6"/></svg>';b.classList.add('bioKey');b.onclick=tryBio;b.title='Huella / biometría';b.setAttribute('aria-label','Biometría')}else if(n==='del'){b.innerHTML='<svg class="delIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13z"/><path d="M18 9l-6 6M12 9l6 6"/></svg>';b.onclick=delPin;b.setAttribute('aria-label','Borrar')}else{b.textContent=n;b.onclick=()=>pressPin(n)}k.appendChild(b)})}
+function renderKeys(){let k=$('keys');k.innerHTML='';['1','2','3','4','5','6','7','8','9','bio','0','del'].forEach(n=>{let b=document.createElement('button');b.className='key';if(n==='bio'){b.innerHTML='<svg class="fingerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 11c0 5-2 7-2 10"/><path d="M16 8a4 4 0 0 0-8 0c0 1.3.5 2.7 1 4"/><path d="M6 12c.5 2.5 1.5 4 3 5"/><path d="M18 12c-.4 3.2-1.4 5.4-3.2 7"/><path d="M8 6.5A6 6 0 0 1 18 11"/><path d="M5 9a8 8 0 0 1 14.5-4"/><path d="M20 14c-.4 2.4-1.2 4.4-2.5 6"/></svg>';b.classList.add('bioKey');b.onclick=tryBio;b.title='Biometría del dispositivo';b.setAttribute('aria-label','Biometría del dispositivo')}else if(n==='del'){b.innerHTML='<svg class="delIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13z"/><path d="M18 9l-6 6M12 9l6 6"/></svg>';b.onclick=delPin;b.setAttribute('aria-label','Borrar')}else{b.textContent=n;b.onclick=()=>pressPin(n)}k.appendChild(b)})}
 async function pressPin(n){vibe(28);soundPin();let left=lockRemaining();if(left){$('pinMsg').textContent='Bóveda bloqueada. Espera '+left+' s';$('pinMsg').className='pinSub pinLocked';updateLockCountdown();return;}const len=getPinLen();if(pin.length>=len)return;pin+=n;renderDots();if(pin.length===len)await handlePin()}
 function delPin(){vibe(18);soundPinDel();pin=pin.slice(0,-1);renderDots()}
 async function handlePin(){return window.handlePin?window.handlePin():undefined;}
@@ -275,12 +275,12 @@ async function tryBioRegister(pinKey){
     const enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},aesKey,new TextEncoder().encode(pinKey));
     localStorage.setItem(LS_BIO_BLOB,JSON.stringify({iv:b64e(iv),data:b64e(enc)}));
     vibe([30,20,60,20,80]);soundPinOk();
-    toast('✓ Huella activada. Úsala la próxima vez que abras la app.');
+    toast('✓ Biometría activada. El PIN sigue protegiendo tu bóveda.');
   }catch(e){
     localStorage.removeItem(LS_BIO_CRED);
     vibe([40,30,40]);soundPinErr();
-    if(e.name==='NotAllowedError')toast('Registro de huella cancelado.');
-    else toast('No se pudo activar la huella. Inténtalo de nuevo.');
+    if(e.name==='NotAllowedError')toast('Registro biométrico cancelado.');
+    else toast('No se pudo activar la biometría. Inténtalo de nuevo.');
   }
 }
 async function persist(p=lastKey){if(!p)return;localStorage.setItem(LS_DATA,JSON.stringify(await encryptData(vault,p)))}
@@ -457,7 +457,7 @@ function syncSettingsUI(){
   // Estado de huella
   const bioActive=!!(localStorage.getItem('vk_bio_cred_id')&&localStorage.getItem('vk_bio_blob'));
   const span=$('bioSettingsSpan');const pill=$('bioSettingsPill');
-  if(span)span.textContent=bioActive?'Activa — pulsa para desactivar':'Introduce el PIN una vez para activarla';
+  if(span)span.textContent=bioActive?'Activa en este dispositivo':'Introduce el PIN una vez para activarla';
   if(pill){pill.textContent=bioActive?'Activa':'Inactiva';pill.style.background=bioActive?'rgba(0,210,100,.15)':'';pill.style.borderColor=bioActive?'rgba(0,210,100,.4)':'';pill.style.color=bioActive?'#00d46a':'';}
   // Estado borrado automático
   const awToggle=$('autoWipeToggle');if(awToggle&&m)awToggle.checked=!!(m.autoWipe);
@@ -489,12 +489,12 @@ async function confirmAutoWipe(checked){if(checked){const ok=await vkConfirm('Ac
 async function bioSettingsAction(){
   const bioActive=!!(localStorage.getItem('vk_bio_cred_id')&&localStorage.getItem('vk_bio_blob'));
   if(bioActive){
-    const ok=await vkConfirm('Desactivar huella','¿Desactivar la huella dactilar? Tendrás que usar el PIN para entrar.');
-    if(ok){localStorage.removeItem('vk_bio_cred_id');localStorage.removeItem('vk_bio_blob');localStorage.removeItem('vk_bio_offer_dismissed');syncSettingsUI();toast('Huella desactivada.');}
+    const ok=await vkConfirm('Desactivar biometría','¿Desactivar la biometría de este dispositivo? Tendrás que usar el PIN para entrar.');
+    if(ok){localStorage.removeItem('vk_bio_cred_id');localStorage.removeItem('vk_bio_blob');localStorage.removeItem('vk_bio_offer_dismissed');syncSettingsUI();toast('Biometría desactivada.');}
   } else if(lastKey){
     await tryBioRegister(lastKey);syncSettingsUI();
   } else {
-    toast('Introduce el PIN primero para activar la huella.');
+    toast('Introduce el PIN primero para activar la biometría.');
   }
 }
 function clearAutoLockTimer(){if(autoLockTimer){clearTimeout(autoLockTimer);autoLockTimer=null}}
@@ -1326,12 +1326,12 @@ async function tryBio(){
   const LS_BIO_BLOB='vk_bio_blob';
   const b64e=buf=>btoa(String.fromCharCode(...new Uint8Array(buf)));
   const b64d=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-  if(!window.PublicKeyCredential){toast('Tu dispositivo no soporta biometría.');return;}
+  if(!window.PublicKeyCredential){toast('Tu dispositivo no soporta biometría compatible.');return;}
   const m=meta();
   if(!m||!m.hash){toast('Configura primero un PIN.');return;}
   const storedCredId=localStorage.getItem(LS_BIO_CRED);
   if(!storedCredId||!localStorage.getItem(LS_BIO_BLOB)){
-    toast('Introduce el PIN una vez para activar la huella.');return;
+    toast('Introduce el PIN una vez para activar la biometría.');return;
   }
   // Verificar huella y desbloquear
   try{
@@ -1354,13 +1354,13 @@ async function tryBio(){
     const recoveredPin=new TextDecoder().decode(dec);
     const pinOk=m.pinSalt?(await hashPin(recoveredPin,m.pinSalt))===m.hash:(await digest(recoveredPin))===m.hash;
     if(!pinOk){
-      toast('Error de verificación. Vuelve a entrar con el PIN para reactivar la huella.');
+      toast('Error de verificación. Vuelve a entrar con el PIN para reactivar la biometría.');
       localStorage.removeItem(LS_BIO_CRED);localStorage.removeItem(LS_BIO_BLOB);return;
     }
     await unlockOk(recoveredPin);
   }catch(e){
     if(e.name==='NotAllowedError')toast('Verificación cancelada.');
-    else{toast('Huella no reconocida. Usa el PIN.');localStorage.removeItem(LS_BIO_CRED);localStorage.removeItem(LS_BIO_BLOB);}
+    else{toast('Biometría no reconocida. Usa el PIN.');localStorage.removeItem(LS_BIO_CRED);localStorage.removeItem(LS_BIO_BLOB);}
   }
 }
 function shareApp(){
@@ -2447,7 +2447,7 @@ function rankIcon(ic){
       if(localStorage.getItem('vk_bio_cred_id')||localStorage.getItem('vk_bio_offer_dismissed')) return;
       setTimeout(async()=>{
         if(localStorage.getItem(REC_PENDING)==='1') return;
-        const ok=await vkConfirm('Activar huella dactilar','¿Quieres usar tu huella para desbloquear VaultKey la próxima vez?');
+        const ok=await vkConfirm('Activar biometría del dispositivo','VaultKey seguirá usando tu PIN como protección principal. La biometría solo acelera el desbloqueo en este dispositivo. ¿Activarla?');
         if(ok){await tryBioRegister(lastKey)} else {localStorage.setItem('vk_bio_offer_dismissed','1')}
       },650);
     }catch(e){}

@@ -28,7 +28,7 @@
     <p class="pinSub" id="pinMsg">Crea un PIN de 6 dígitos</p>
     <div class="dots" id="dots"></div>
     <div class="keys" id="keys"></div>
-    <div class="bioHint" id="bioHint">Huella preparada para biometría</div>
+    <div class="bioHint" id="bioHint">Biometría del dispositivo disponible</div>
     <div class="pinActions"></div>
   </div>
 </section>
@@ -203,7 +203,7 @@
 <section id="settings" class="screen"><div class="top"><div><div class="title">Ajustes</div><div class="sub">Seguridad, respaldos y apariencia</div></div></div><div class="content">
   <div class="settingBlock"><div class="label">Seguridad</div><div class="settingsGrid">
     <div class="settingsRow" onclick="lock()"><div class="sico">🔒</div><div class="stxt"><b>Bloquear ahora</b><span>Pide el PIN al volver a entrar</span></div><div>›</div></div>
-    <div class="settingsRow" id="bioSettingsRow" onclick="bioSettingsAction()"><div class="sico">👆</div><div class="stxt"><b>Huella dactilar</b><span id="bioSettingsSpan">Introduce el PIN una vez para activarla</span></div><div id="bioSettingsPill" class="pill">Inactiva</div></div>
+    <div class="settingsRow" id="bioSettingsRow" onclick="bioSettingsAction()"><div class="sico">👆</div><div class="stxt"><b>Biometría del dispositivo</b><span id="bioSettingsSpan">Introduce el PIN una vez para activarla</span></div><div id="bioSettingsPill" class="pill">Inactiva</div></div>
     <div class="settingsRow" onclick="showRecoveryCode()"><div class="sico">🧩</div><div class="stxt"><b>Código de recuperación</b><span>Ver o copiar el código creado con la bóveda</span></div><div>›</div></div>
     <div class="settingsRow" data-vk-kind="recovery" onclick="regenerateRecoveryCode()"><div class="sico">🔄</div><div class="stxt"><b>Regenerar código de recuperación</b><span>Crea uno nuevo e invalida el anterior</span></div><div>›</div></div>
     <div class="settingsRow"><div class="sico">🔢</div><div class="stxt"><b>Longitud del PIN</b><span id="pinLenSpan">PIN de 6 dígitos (actual)</span></div><div style="display:flex;gap:6px"><button id="pinLen6Btn" class="pill" onclick="setPinLen(6)" style="cursor:pointer">6</button><button id="pinLen8Btn" class="pill" onclick="setPinLen(8)" style="cursor:pointer">8</button></div></div>
@@ -656,7 +656,7 @@
 
       <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:14px;margin-bottom:24px">
         <p style="color:#22c55e;font-weight:700;margin-bottom:8px">✅ Recomendaciones</p>
-        <p class="sub">1. Usa un PIN de 8 dígitos<br>2. Activa la huella dactilar<br>3. Exporta respaldos regularmente<br>4. Activa sync con Google Drive<br>5. Activa el auto-bloqueo</p>
+        <p class="sub">1. Usa un PIN de 8 dígitos<br>2. Activa la biometría del dispositivo<br>3. Exporta respaldos regularmente<br>4. Activa sync con Google Drive<br>5. Activa el auto-bloqueo</p>
       </div>
 
       <button class="btn" onclick="closeModals()" style="width:100%">Entendido</button>
