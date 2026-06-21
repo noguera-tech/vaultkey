@@ -2618,6 +2618,7 @@ function showReminderBanner(msg, id){
 
   const now=new Date();
   const timeStr=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  const safeMsg=safeEsc(msg);
 
   const banner=document.createElement('div');
   banner.id='vkReminderBanner';
@@ -2637,7 +2638,7 @@ function showReminderBanner(msg, id){
           <span style="font-size:10px;font-weight:900;letter-spacing:1.2px;color:#00d9ff;text-transform:uppercase">Recordatorio</span>
           <span style="font-size:10px;color:rgba(0,200,255,.45);font-weight:600">${timeStr}</span>
         </div>
-        <div style="font-size:15px;font-weight:700;color:#e8f6ff;line-height:1.45;word-break:break-word">${msg}</div>
+        <div style="font-size:15px;font-weight:700;color:#e8f6ff;line-height:1.45;word-break:break-word">${safeMsg}</div>
         ${id?`<button class="vkBannerBtn" onclick="closeModals();hideReminderBanner();setTimeout(()=>quick('${id}'),200)">
           <span>Ver nota</span><span style="opacity:.7">→</span>
         </button>`:''}
