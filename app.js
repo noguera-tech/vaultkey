@@ -1216,11 +1216,18 @@ async function doImportStep1() {
   }
 }
 
+function normalizeEntryId(id){
+  const v=String(id||'').trim();
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)
+    ? v
+    : crypto.randomUUID();
+}
+
 async function doImportConfirm() {
   if(!_importDecrypted) { closeImportModal(); return; }
   try {
     vault = _importDecrypted.filter(e=>e&&typeof e==='object').map(e=>({
-      id: String(e.id||crypto.randomUUID()),
+      id: normalizeEntryId(e.id),
       service: String(e.service||''),
       entryType: String(e.entryType||'password'),
       user: String(e.user||''),
