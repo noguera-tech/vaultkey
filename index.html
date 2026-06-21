@@ -33,29 +33,81 @@
   </div>
 </section>
 <section id="home" class="screen homeHeroPremium targetHome">
-  <div class="mockTop"><button class="mockIconBtn" onclick="toggleHomeMenu()">☰</button><button class="mockIconBtn" onclick="show('vault')">⌕</button></div>
-  <div id="homeMenu" style="display:none;position:absolute;top:54px;left:12px;background:#0d1e38;border:1px solid rgba(0,210,255,.2);border-radius:14px;padding:8px;z-index:50;min-width:180px;box-shadow:0 8px 32px rgba(0,0,0,.6)">
-    <button onclick="show('settings');toggleHomeMenu()" style="width:100%;text-align:left;padding:12px 14px;border:0;background:transparent;color:#e8f4ff;font-size:14px;border-radius:10px">⚙️ Ajustes</button>
-    <button onclick="show('fav');toggleHomeMenu()" style="width:100%;text-align:left;padding:12px 14px;border:0;background:transparent;color:#e8f4ff;font-size:14px;border-radius:10px">⭐ Favoritos</button>
-    <button onclick="exportBackup&&exportBackup();toggleHomeMenu()" style="width:100%;text-align:left;padding:12px 14px;border:0;background:transparent;color:#e8f4ff;font-size:14px;border-radius:10px">☁️ Respaldo</button>
-    <button onclick="lock();toggleHomeMenu()" style="width:100%;text-align:left;padding:12px 14px;border:0;background:transparent;color:#ff6b75;font-size:14px;border-radius:10px">🔒 Bloquear</button>
+
+  <!-- ── Header con saludo y menú ── -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px 0;position:relative;z-index:10">
+    <div>
+      <div style="font-size:12px;color:rgba(0,210,255,.6);font-weight:700;letter-spacing:.5px" id="homeGreeting">BIENVENIDO</div>
+      <div style="font-size:20px;font-weight:900;color:#e8f6ff;letter-spacing:-.3px">VaultKey</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="show('vault')" style="width:38px;height:38px;border-radius:12px;border:1.5px solid rgba(0,180,255,.2);background:rgba(0,20,50,.6);color:#7ab0d0;font-size:17px;display:flex;align-items:center;justify-content:center">⌕</button>
+      <button onclick="toggleHomeMenu()" style="width:38px;height:38px;border-radius:12px;border:1.5px solid rgba(0,180,255,.2);background:rgba(0,20,50,.6);color:#7ab0d0;font-size:17px;display:flex;align-items:center;justify-content:center">⋮</button>
+    </div>
+    <!-- Menú desplegable -->
+    <div id="homeMenu" style="display:none;position:absolute;top:54px;right:18px;background:linear-gradient(135deg,#0d1e38,#0a1628);border:1px solid rgba(0,210,255,.2);border-radius:16px;padding:6px;z-index:50;min-width:190px;box-shadow:0 12px 40px rgba(0,0,0,.7)">
+      <button onclick="show('settings');toggleHomeMenu()" style="width:100%;text-align:left;padding:11px 14px;border:0;background:transparent;color:#e8f4ff;font-size:13px;border-radius:10px;display:flex;align-items:center;gap:10px"><span style="font-size:16px">⚙️</span>Ajustes</button>
+      <button onclick="show('fav');toggleHomeMenu()" style="width:100%;text-align:left;padding:11px 14px;border:0;background:transparent;color:#e8f4ff;font-size:13px;border-radius:10px;display:flex;align-items:center;gap:10px"><span style="font-size:16px">⭐</span>Favoritos</button>
+      <button onclick="exportBackup&&exportBackup();toggleHomeMenu()" style="width:100%;text-align:left;padding:11px 14px;border:0;background:transparent;color:#e8f4ff;font-size:13px;border-radius:10px;display:flex;align-items:center;gap:10px"><span style="font-size:16px">☁️</span>Exportar respaldo</button>
+      <div style="height:1px;background:rgba(0,180,255,.1);margin:4px 8px"></div>
+      <button onclick="lock();toggleHomeMenu()" style="width:100%;text-align:left;padding:11px 14px;border:0;background:transparent;color:#ff6b75;font-size:13px;border-radius:10px;display:flex;align-items:center;gap:10px"><span style="font-size:16px">🔒</span>Bloquear bóveda</button>
+    </div>
   </div>
-  <div class="content homePremium targetHomeContent">
-    <div class="homeBrand targetHero"><img class="heroShield" src="vaultkey-shield-scene.png?v=221" alt="Escudo premium VaultKey"></div>
-    <div class="controlText targetHomeText"><b class="heroBrandTitle">Vault<span>Key</span></b><strong>Tu bóveda digital privada</strong><p>Protege tus contraseñas,<br>códigos y datos importantes.</p></div>
-    <div style="display:flex;gap:8px;margin:12px 0;width:100%"><div style="flex:1;background:rgba(0,14,32,.6);border:1px solid rgba(0,210,255,.15);border-radius:14px;padding:12px 8px;text-align:center"><div style="font-size:22px;font-weight:700;color:#00e5ff" id="statTotal">0</div><div style="font-size:11px;color:#4a7090;margin-top:2px">Credenciales</div></div><div style="flex:1;background:rgba(0,14,32,.6);border:1px solid rgba(0,210,255,.15);border-radius:14px;padding:12px 8px;text-align:center"><div style="font-size:22px;font-weight:700;color:#f59e0b" id="statFav">0</div><div style="font-size:11px;color:#4a7090;margin-top:2px">Favoritos</div></div><div style="flex:1;background:rgba(0,14,32,.6);border:1px solid rgba(0,210,255,.15);border-radius:14px;padding:12px 8px;text-align:center"><div style="font-size:22px;font-weight:700;color:#ff6b75" id="statWeak">0</div><div style="font-size:11px;color:#4a7090;margin-top:2px">Débiles</div></div></div>
-    <div onclick="showHealthPanel()" style="margin:12px 0;padding:14px 16px;background:rgba(0,14,32,.6);border:1px solid rgba(0,210,255,.15);border-radius:16px;cursor:pointer;display:flex;align-items:center;gap:12px">
-      <div style="font-size:24px">🛡️</div>
-      <div style="flex:1">
-        <div style="font-weight:700;color:#e0f0ff;font-size:14px">Panel de salud</div>
+
+  <div class="content homePremium targetHomeContent" style="padding-top:8px">
+
+    <!-- ── Hero escudo ── -->
+    <div class="homeBrand targetHero" style="margin:0 0 8px">
+      <img class="heroShield" src="vaultkey-shield-scene.png?v=221" alt="VaultKey">
+    </div>
+
+    <!-- ── Stats cards ── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+      <div onclick="show('vault')" style="background:linear-gradient(135deg,rgba(0,100,200,.2),rgba(0,60,140,.15));border:1px solid rgba(0,180,255,.2);border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer">
+        <div style="font-size:26px;font-weight:900;color:#00e5ff;line-height:1" id="statTotal">0</div>
+        <div style="font-size:10px;color:rgba(0,200,255,.6);margin-top:4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px">Entradas</div>
+      </div>
+      <div onclick="show('fav')" style="background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(180,100,0,.1));border:1px solid rgba(245,158,11,.25);border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer">
+        <div style="font-size:26px;font-weight:900;color:#f59e0b;line-height:1" id="statFav">0</div>
+        <div style="font-size:10px;color:rgba(245,158,11,.6);margin-top:4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px">Favoritos</div>
+      </div>
+      <div onclick="showHealthPanel()" style="background:linear-gradient(135deg,rgba(255,80,100,.15),rgba(180,20,40,.1));border:1px solid rgba(255,80,100,.25);border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer">
+        <div style="font-size:26px;font-weight:900;color:#ff6b75;line-height:1" id="statWeak">0</div>
+        <div style="font-size:10px;color:rgba(255,100,120,.6);margin-top:4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px">Débiles</div>
+      </div>
+    </div>
+
+    <!-- ── Panel de salud ── -->
+    <div onclick="showHealthPanel()" style="margin-bottom:12px;padding:14px 16px;background:linear-gradient(135deg,rgba(0,40,90,.6),rgba(0,20,55,.7));border:1px solid rgba(0,180,255,.18);border-radius:16px;cursor:pointer;display:flex;align-items:center;gap:14px;box-shadow:0 4px 20px rgba(0,0,0,.3)">
+      <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,rgba(0,150,255,.2),rgba(0,80,200,.15));border:1px solid rgba(0,180,255,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🛡️</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;color:#e0f0ff;font-size:14px;margin-bottom:2px">Panel de salud</div>
         <div style="font-size:12px;color:#4a7090" id="healthSummaryText">Analizar contraseñas</div>
       </div>
-      <div style="color:rgba(0,210,255,.4);font-size:18px">›</div>
+      <div style="color:rgba(0,210,255,.4);font-size:20px;font-weight:300">›</div>
     </div>
+
+    <!-- ── Accesos rápidos ── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <button onclick="openEntry()" style="padding:14px 12px;border-radius:14px;border:1px solid rgba(100,80,255,.35);background:linear-gradient(135deg,rgba(80,60,255,.2),rgba(40,20,180,.15));color:#a89fff;font-size:13px;font-weight:800;text-align:left;display:flex;align-items:center;gap:8px">
+        <span style="font-size:18px">➕</span>Nueva entrada
+      </button>
+      <button onclick="show('vault')" style="padding:14px 12px;border-radius:14px;border:1px solid rgba(0,180,255,.25);background:linear-gradient(135deg,rgba(0,80,200,.2),rgba(0,40,120,.15));color:#7ab0d0;font-size:13px;font-weight:800;text-align:left;display:flex;align-items:center;gap:8px">
+        <span style="font-size:18px">🔑</span>Mis entradas
+      </button>
+      <button onclick="show('fav')" style="padding:14px 12px;border-radius:14px;border:1px solid rgba(245,158,11,.25);background:linear-gradient(135deg,rgba(180,100,0,.15),rgba(120,60,0,.1));color:#c8880a;font-size:13px;font-weight:800;text-align:left;display:flex;align-items:center;gap:8px">
+        <span style="font-size:18px">⭐</span>Favoritos
+      </button>
+      <button onclick="showHealthPanel()" style="padding:14px 12px;border-radius:14px;border:1px solid rgba(0,200,120,.25);background:linear-gradient(135deg,rgba(0,160,80,.15),rgba(0,100,40,.1));color:#00c875;font-size:13px;font-weight:800;text-align:left;display:flex;align-items:center;gap:8px">
+        <span style="font-size:18px">🛡️</span>Salud
+      </button>
+    </div>
+
+    <!-- ── Recientes ── -->
     <div id="recentList" class="targetRecent"></div>
-    <button onclick="show('vault')" style="display:block;width:100%;margin-top:16px;padding:16px;border-radius:14px;border:none;background:linear-gradient(135deg,#5544ff,#0066ff);color:#fff;font-size:16px;font-weight:900;box-shadow:0 8px 28px rgba(0,100,255,.5)">Ver mis contraseñas →</button>
+
   </div>
-  
+
   <nav class="vkNav"><button onclick="show('vault')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="9" x2="12" y2="7"/><line x1="12" y1="15" x2="12" y2="17"/><line x1="9" y1="12" x2="7" y2="12"/><line x1="15" y1="12" x2="17" y2="12"/></svg></span>Entradas</button><button onclick="show('fav')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>Favoritos</button><button onclick="openEntry()"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24" style="stroke-width:2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><button class="active" onclick="show('home')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><polyline points="9,21 9,12 15,12 15,21"/></svg></span>Inicio</button><button onclick="show('settings')"><span class="ico"><svg class="vkSvgIcon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Ajustes</button></nav>
 </section>
 <section id="vault" class="screen targetVault">
