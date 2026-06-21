@@ -219,7 +219,7 @@
   </div></div>
 
   <div class="settingBlock"><div class="label">Google Drive</div><div class="settingsGrid">
-    <div class="settingsRow" id="driveConnectRow" onclick="driveConnect()"><div class="sico">☁️</div><div class="stxt"><b>Conectar Google Drive</b><span>Sincronización automática activada por defecto</span></div><div>›</div></div>
+    <div class="settingsRow" id="driveConnectRow" onclick="driveConnect()"><div class="sico">☁️</div><div class="stxt"><b>Conectar Google Drive</b><span>Respaldo cifrado opcional con Google Drive</span></div><div>›</div></div>
     <div class="settingsRow" id="driveStatusRow" style="display:none"><div class="sico" id="driveStatusIco">✅</div><div class="stxt"><b id="driveStatusTxt">Drive conectado</b><span id="driveStatusSub">Última sync: nunca</span></div><div id="driveStatusArrow">›</div></div>
     <div class="settingsRow" id="driveSyncRow" onclick="driveSyncNow()" style="display:none"><div class="sico">🔄</div><div class="stxt"><b>Sincronizar ahora</b><span>Subir respaldo cifrado a Drive</span></div><div>›</div></div>
     <div class="settingsRow" id="driveRestoreRow" onclick="driveRestore()" style="display:none"><div class="sico">⬇️</div><div class="stxt"><b>Restaurar desde Drive</b><span>Descargar y restaurar último respaldo</span></div><div>›</div></div>
@@ -246,7 +246,7 @@
     <div class="settingsRow" id="soundStyleRow" style="display:none"><div class="sico">🎵</div><div class="stxt"><b>Estilo de sonido</b><span id="soundStyleHint">Suave</span></div><div onclick="event.stopPropagation()"><select id="soundStyleSelect" onchange="setSoundStyle(this.value)" style="background:transparent;border:none;color:var(--cyan);font-weight:800;font-size:14px;text-align:right"><option value="suave">Suave</option><option value="cristal">Cristal</option><option value="retro">Retro</option><option value="minimo">Mínimo</option></select></div></div>
   </div></div>
   <div class="settingBlock"><div class="label">General</div><div class="settingsGrid">
-    <div class="settingsRow" onclick="shareApp()"><div class="sico">📲</div><div class="stxt"><b>Compartir aplicación</b><span>Enviar enlace cuando esté publicada</span></div><div>›</div></div>
+    <div class="settingsRow" onclick="shareApp()"><div class="sico">📲</div><div class="stxt"><b>Compartir aplicación</b><span>Enviar enlace de VaultKey</span></div><div>›</div></div>
     <div class="settingsRow" onclick="showSecurityInfo()"><div class="sico">📋</div><div class="stxt"><b>Privacidad y seguridad</b><span>Cómo protege VaultKey tus datos</span></div><div>›</div></div>
     <div class="settingsRow" onclick="window.open('https://noguera-tech.github.io/vaultkey/privacy.html','_blank','noopener,noreferrer')"><div class="sico">📄</div><div class="stxt"><b>Política de privacidad</b><span>Ver documento legal de privacidad</span></div><div>›</div></div>
     <div class="settingsRow" id="versionRow" style="cursor:pointer"><div class="sico">ℹ️</div><div class="stxt"><b>VaultKey V2.3.0</b><span id="versionRowHint">Pulsa para ver información de la bóveda</span></div><div>›</div></div>
