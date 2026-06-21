@@ -457,7 +457,7 @@ function syncSettingsUI(){
   // Estado de huella
   const bioActive=!!(localStorage.getItem('vk_bio_cred_id')&&localStorage.getItem('vk_bio_blob'));
   const span=$('bioSettingsSpan');const pill=$('bioSettingsPill');
-  if(span)span.textContent=bioActive?'Activa en este dispositivo':'Introduce el PIN una vez para activarla';
+  if(span)span.textContent=bioActive?'Activa en este dispositivo':'Introduce el PIN de VaultKey una vez para activarla';
   if(pill){pill.textContent=bioActive?'Activa':'Inactiva';pill.style.background=bioActive?'rgba(0,210,100,.15)':'';pill.style.borderColor=bioActive?'rgba(0,210,100,.4)':'';pill.style.color=bioActive?'#00d46a':'';}
   // Estado borrado automático
   const awToggle=$('autoWipeToggle');if(awToggle&&m)awToggle.checked=!!(m.autoWipe);
@@ -2447,7 +2447,7 @@ function rankIcon(ic){
       if(localStorage.getItem('vk_bio_cred_id')||localStorage.getItem('vk_bio_offer_dismissed')) return;
       setTimeout(async()=>{
         if(localStorage.getItem(REC_PENDING)==='1') return;
-        const ok=await vkConfirm('Activar biometría del dispositivo','VaultKey seguirá usando tu PIN como protección principal. La biometría solo acelera el desbloqueo en este dispositivo. ¿Activarla?');
+        const ok=await vkConfirm('Activar biometría del dispositivo','VaultKey seguirá usando tu PIN como protección principal. Cuando el sistema lo pida, usa la huella o el PIN de desbloqueo del dispositivo. No es el PIN de VaultKey. ¿Activarla?');
         if(ok){await tryBioRegister(lastKey)} else {localStorage.setItem('vk_bio_offer_dismissed','1')}
       },650);
     }catch(e){}
