@@ -252,6 +252,7 @@ function delPin(){vibe(18);soundPinDel();pin=pin.slice(0,-1);renderDots()}
 async function handlePin(){return window.handlePin?window.handlePin():undefined;}
 async function unlockOk(p){return window.unlockOk?window.unlockOk(p):undefined;}
 async function tryBioRegister(pinKey){
+  beginBiometricFlow();
   const LS_BIO_CRED='vk_bio_cred_id';
   const LS_BIO_BLOB='vk_bio_blob';
   const b64e=buf=>btoa(String.fromCharCode(...new Uint8Array(buf)));
@@ -281,6 +282,8 @@ async function tryBioRegister(pinKey){
     vibe([40,30,40]);soundPinErr();
     if(e.name==='NotAllowedError')toast('Registro biométrico cancelado.');
     else toast('No se pudo activar la biometría. Inténtalo de nuevo.');
+  }finally{
+    endBiometricFlow();
   }
 }
 async function persist(p=lastKey){if(!p)return;localStorage.setItem(LS_DATA,JSON.stringify(await encryptData(vault,p)))}
@@ -514,12 +517,14 @@ function toggleHomeMenu(){
 document.addEventListener('click',e=>{const m=$('homeMenu');if(m&&m.style.display==='block'&&!e.target.closest('#homeMenu')&&!e.target.closest('[onclick*="toggleHomeMenu"]'))m.style.display='none';});
 function openBackup(){show('settings');setTimeout(()=>{document.querySelector('[onclick*="exportBackup"]')?.closest('.settingsRow')?.scrollIntoView({behavior:'smooth',block:'center'})},200)}
 function markActivity(){if(unlocked){hidePrivacyOverlay();resetAutoLockTimer()}}
+function beginBiometricFlow(){window._vkBiometricFlow=true;hidePrivacyOverlay()}
+function endBiometricFlow(){setTimeout(()=>{window._vkBiometricFlow=false;if(unlocked&&!document.hidden)hidePrivacyOverlay()},700)}
 function showPrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.add('show');document.body.classList.add('vk-locked')}
 function hidePrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.remove('show');document.body.classList.remove('vk-locked')}
 function handleVisibilityChange(){
   if(!appBooted)return;
   // BUG5 FIX: ignorar si estamos en medio de compartir app
-  if(window._vkSharing)return;
+  if(window._vkSharing||window._vkBiometricFlow)return;
   if(document.hidden){
     if(unlocked){
       // Guardar borrador del formulario si está abierto
@@ -579,7 +584,7 @@ window.addEventListener('pageshow',(e)=>{
 // Mostrar privacy overlay inmediatamente en blur/pagehide
 // para evitar que Android capture contenido sensible en recientes
 window.addEventListener('blur', () => {
-  if(!appBooted || !unlocked || window._vkSharing) return;
+  if(!appBooted || !unlocked || window._vkSharing || window._vkBiometricFlow) return;
   showPrivacyOverlay();
 });
 window.addEventListener('pagehide',()=>{if(unlocked){unlocked=false;lastKey=null;pin='';showPrivacyOverlay();}});
@@ -1335,6 +1340,7 @@ async function tryBio(){
   }
   // Verificar huella y desbloquear
   try{
+    beginBiometricFlow();
     const challenge=crypto.getRandomValues(new Uint8Array(32));
     const rawId=b64d(storedCredId);
     const assertion=await navigator.credentials.get({publicKey:{
@@ -1361,6 +1367,8 @@ async function tryBio(){
   }catch(e){
     if(e.name==='NotAllowedError')toast('Verificación cancelada.');
     else{toast('Biometría no reconocida. Usa el PIN.');localStorage.removeItem(LS_BIO_CRED);localStorage.removeItem(LS_BIO_BLOB);}
+  }finally{
+    endBiometricFlow();
   }
 }
 function shareApp(){
