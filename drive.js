@@ -143,6 +143,82 @@ async function driveSyncNow(silent) {
   }
 }
 
+
+function driveAskPin(title, msg) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal open';
+
+    const sheet = document.createElement('div');
+    sheet.className = 'sheet';
+
+    const head = document.createElement('div');
+    head.className = 'sheetHead';
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'sheetTitle';
+    titleEl.textContent = title;
+
+    const spacer = document.createElement('div');
+    spacer.className = 'spacer';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'iconBtn';
+    closeBtn.textContent = '\u2715';
+
+    const msgEl = document.createElement('p');
+    msgEl.className = 'sub';
+    msgEl.textContent = msg;
+
+    const input = document.createElement('input');
+    input.className = 'inp';
+    input.type = 'password';
+    input.inputMode = 'numeric';
+    input.autocomplete = 'current-password';
+    input.placeholder = 'PIN del respaldo';
+
+    const row = document.createElement('div');
+    row.className = 'rowBtns';
+
+    const cancel = document.createElement('button');
+    cancel.className = 'ghost';
+    cancel.textContent = 'Cancelar';
+
+    const ok = document.createElement('button');
+    ok.className = 'primary';
+    ok.textContent = 'Continuar';
+
+    function close(value) {
+      overlay.remove();
+      resolve(value);
+    }
+
+    closeBtn.onclick = () => close(null);
+    cancel.onclick = () => close(null);
+    ok.onclick = () => {
+      const value = input.value.trim();
+      if(!value) {
+        toast('Introduce el PIN del respaldo');
+        input.focus();
+        return;
+      }
+      close(value);
+    };
+
+    input.addEventListener('keydown', e => {
+      if(e.key === 'Enter') ok.click();
+      if(e.key === 'Escape') close(null);
+    });
+
+    head.append(titleEl, spacer, closeBtn);
+    row.append(cancel, ok);
+    sheet.append(head, msgEl, input, row);
+    overlay.appendChild(sheet);
+    document.body.appendChild(overlay);
+    setTimeout(() => input.focus(), 50);
+  });
+}
+
 // Restaurar desde Drive
 async function driveRestore() {
   if(!driveToken) { toast('Primero conecta Google Drive'); return; }
@@ -160,7 +236,8 @@ async function driveRestore() {
     const modified = new Date(searchData.files[0].modifiedTime).toLocaleString('es-ES');
     const localCount = vault ? vault.length : 0;
     const confirmMsg = `Respaldo de Drive del ${modified}\n\n• Entradas locales actuales: ${localCount}\n\nSi restauras se reemplazarán todas las entradas locales con las del respaldo.\n\n¿Continuar?`;
-    if(!confirm(confirmMsg)) return;
+    const okRestore = await vkConfirm('Restaurar desde Drive', confirmMsg);
+    if(!okRestore) return;
 
     // Descargar archivo
     const dl = await fetch(
@@ -168,7 +245,7 @@ async function driveRestore() {
       {headers: {Authorization: 'Bearer ' + driveToken}}
     );
     const text = await dl.text();
-    const pinForImport = prompt('Introduce el PIN con el que se cifró este respaldo:');
+    const pinForImport = await driveAskPin('PIN del respaldo', 'Introduce el PIN con el que se cifr\u00f3 este respaldo.');
     if(pinForImport === null) return;
     const data = JSON.parse(text);
     if(!data.payload) throw new Error('Sin payload');
@@ -186,8 +263,9 @@ async function driveRestore() {
 }
 
 // Desconectar Drive
-function driveDisconnect() {
-  if(!confirm('¿Desconectar Google Drive? No se borrarán los datos guardados en Drive.')) return;
+async function driveDisconnect() {
+  const okDisconnect = await vkConfirm('Desconectar Google Drive', 'No se borrar\u00e1n los datos guardados en Drive. \u00bfContinuar?');
+  if(!okDisconnect) return;
   driveToken = null;
   localStorage.removeItem(LS_DRIVE_LAST);
   driveSyncUI(false);
