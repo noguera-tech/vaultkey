@@ -207,8 +207,8 @@
     <div class="settingsRow" onclick="showRecoveryCode()"><div class="sico">🧩</div><div class="stxt"><b>Código de recuperación</b><span>Ver o copiar el código creado con la bóveda</span></div><div>›</div></div>
     <div class="settingsRow" data-vk-kind="recovery" onclick="regenerateRecoveryCode()"><div class="sico">🔄</div><div class="stxt"><b>Regenerar código de recuperación</b><span>Crea uno nuevo e invalida el anterior</span></div><div>›</div></div>
     <div class="settingsRow"><div class="sico">🔢</div><div class="stxt"><b>Longitud del PIN</b><span id="pinLenSpan">PIN de 6 dígitos (actual)</span></div><div style="display:flex;gap:6px"><button id="pinLen6Btn" class="pill" onclick="setPinLen(6)" style="cursor:pointer">6</button><button id="pinLen8Btn" class="pill" onclick="setPinLen(8)" style="cursor:pointer">8</button></div></div>
-    <div class="settingsRow" onclick="toast('Auto bloqueo inmediato al cerrar o bloquear manualmente')"><div class="sico">⏱ï¸</div><div class="stxt"><b>Auto bloqueo</b><span>Recomendado: inmediato</span></div><div class="pill">Seguro</div></div>
-    <div class="settingsRow" style="flex-direction:column;align-items:flex-start;gap:8px"><div style="display:flex;align-items:center;gap:10px;width:100%"><div class="sico" style="background:rgba(255,77,85,.12);font-size:20px">🗑️</div><div class="stxt"><b>Borrado automático</b><span>Borra toda la bóveda tras 10 intentos fallidos de PIN</span></div><label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0"><input type="checkbox" id="autoWipeToggle" style="width:18px;height:18px;accent-color:#ff4d55;cursor:pointer" onchange="confirmAutoWipe(this.checked)"></label></div><p style="font-size:11px;color:rgba(255,77,85,.8);margin:0;line-height:1.4">⚠️ï¸ Acción irreversible. Asegúrate de tener un respaldo cifrado antes de activar esta opción.</p></div>
+    <div class="settingsRow" onclick="toast('Auto bloqueo inmediato al cerrar o bloquear manualmente')"><div class="sico">⏱️</div><div class="stxt"><b>Auto bloqueo</b><span>Recomendado: inmediato</span></div><div class="pill">Seguro</div></div>
+    <div class="settingsRow" style="flex-direction:column;align-items:flex-start;gap:8px"><div style="display:flex;align-items:center;gap:10px;width:100%"><div class="sico" style="background:rgba(255,77,85,.12);font-size:20px">🗑️</div><div class="stxt"><b>Borrado automático</b><span>Borra toda la bóveda tras 10 intentos fallidos de PIN</span></div><label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0"><input type="checkbox" id="autoWipeToggle" style="width:18px;height:18px;accent-color:#ff4d55;cursor:pointer" onchange="confirmAutoWipe(this.checked)"></label></div><p style="font-size:11px;color:rgba(255,77,85,.8);margin:0;line-height:1.4">⚠️ Acción irreversible. Asegúrate de tener un respaldo cifrado antes de activar esta opción.</p></div>
   </div></div>
   <div class="settingBlock"><div class="label">Respaldos</div><div class="settingsGrid">
     <div class="settingsRow" onclick="exportBackup()"><div class="sico">📤</div><div class="stxt"><b>Exportar respaldo cifrado</b><span>Guarda una copia protegida de la bóveda</span></div><div>›</div></div>
@@ -249,9 +249,9 @@
     <div class="settingsRow" onclick="shareApp()"><div class="sico">📲</div><div class="stxt"><b>Compartir aplicación</b><span>Enviar enlace cuando esté publicada</span></div><div>›</div></div>
     <div class="settingsRow" onclick="showSecurityInfo()"><div class="sico">📋</div><div class="stxt"><b>Privacidad y seguridad</b><span>Cómo protege VaultKey tus datos</span></div><div>›</div></div>
     <div class="settingsRow" onclick="window.open('https://noguera-tech.github.io/vaultkey/privacy.html','_blank','noopener,noreferrer')"><div class="sico">📄</div><div class="stxt"><b>Política de privacidad</b><span>Ver documento legal de privacidad</span></div><div>›</div></div>
-    <div class="settingsRow" id="versionRow" style="cursor:pointer"><div class="sico">ℹï¸</div><div class="stxt"><b>VaultKey V2.2.1 Clean</b><span id="versionRowHint">Pulsa para ver información de la bóveda</span></div><div>›</div></div>
+    <div class="settingsRow" id="versionRow" style="cursor:pointer"><div class="sico">ℹ️</div><div class="stxt"><b>VaultKey V2.2.1 Clean</b><span id="versionRowHint">Pulsa para ver información de la bóveda</span></div><div>›</div></div>
   </div></div>
-  <div class="settingBlock"><div class="label">Zona de peligro</div><div class="settingsRow" style="flex-direction:column;align-items:flex-start;gap:8px;border-color:rgba(255,77,85,.3);background:rgba(255,77,85,.06)"><div style="display:flex;align-items:center;gap:10px;width:100%"><div class="sico" style="background:rgba(255,77,85,.15);font-size:20px">⚠️ï¸</div><div class="stxt"><b style="color:#ff6b75">Borrar todos los datos</b><span>Elimina el PIN, todas las contraseñas y el código de recuperación. Irreversible.</span></div></div><button class="ghost danger" onclick="wipe()" style="width:100%;margin-top:4px">Borrar y restablecer app</button></div></div>
+  <div class="settingBlock"><div class="label">Zona de peligro</div><div class="settingsRow" style="flex-direction:column;align-items:flex-start;gap:8px;border-color:rgba(255,77,85,.3);background:rgba(255,77,85,.06)"><div style="display:flex;align-items:center;gap:10px;width:100%"><div class="sico" style="background:rgba(255,77,85,.15);font-size:20px">⚠️</div><div class="stxt"><b style="color:#ff6b75">Borrar todos los datos</b><span>Elimina el PIN, todas las contraseñas y el código de recuperación. Irreversible.</span></div></div><button class="ghost danger" onclick="wipe()" style="width:100%;margin-top:4px">Borrar y restablecer app</button></div></div>
 </div></section>
 <div class="modal" id="entryModal"><div class="sheet">
 <div class="sheetHead entryTargetHead">
@@ -488,7 +488,7 @@
 </div></div>
 <div class="modal" id="quickModal" style="align-items:stretch;background:#060D1E"><div class="sheet" style="height:100dvh;max-height:none;border-radius:0;border:0;padding:0;background:linear-gradient(180deg,#071428 0%,#060D1E 40%,#030810 100%);display:flex;flex-direction:column"><div id="quickBody" style="flex:1;overflow:auto;padding:0 16px 24px"></div></div></div>
 <div class="modal" id="recoveryModal"><div class="sheet" style="max-height:92dvh"><div class="sheetHead"><div class="sheetTitle">Código de recuperación</div><div class="spacer"></div><button class="iconBtn" id="recoveryCloseBtn" onclick="closeModals()">✕</button></div><div style="text-align:center;margin:-8px 0 8px"><img src="vaultkey-shield-scene.png?v=221" style="width:min(42vw,155px);mix-blend-mode:screen;display:block;margin:0 auto"></div>
-<p class="sub" style="color:#00e5ff;font-weight:700;margin-bottom:8px">⚠️ï¸ Información importante</p>
+<p class="sub" style="color:#00e5ff;font-weight:700;margin-bottom:8px">⚠️ Información importante</p>
 <p class="sub" style="margin-bottom:12px">Este código identifica tu bóveda pero <b>no puede recuperar tus contraseñas</b> si olvidas el PIN.</p>
 <p class="sub" style="margin-bottom:12px">VaultKey <b>no conoce tu PIN</b> y no puede acceder a tus datos. Si olvidas el PIN, la única forma de recuperar tus contraseñas es tener un <b>respaldo cifrado</b> exportado previamente.</p>
 <p class="sub" style="color:#f59e0b;margin-bottom:16px">💡 Recomendación: Exporta un respaldo cifrado regularmente desde Ajustes → Respaldos o activa la sync con Google Drive.</p>
@@ -562,7 +562,7 @@
       <div class="obCheckWrap">
         <div class="obCheckRow" style="opacity:0"><span class="obCheckIco">🔑</span><span class="obCheckTxt">Crea un PIN fuerte y memorízalo</span></div>
         <div class="obCheckRow" style="opacity:0"><span class="obCheckIco">🧩</span><span class="obCheckTxt">Guarda tu código de recuperación</span></div>
-        <div class="obCheckRow" style="opacity:0"><span class="obCheckIco">⚠️ï¸</span><span class="obCheckTxt">Sin PIN no hay recuperación posible</span></div>
+        <div class="obCheckRow" style="opacity:0"><span class="obCheckIco">⚠️</span><span class="obCheckTxt">Sin PIN no hay recuperación posible</span></div>
         <div class="obCheckRow" style="opacity:0"><span class="obCheckIco">☁️</span><span class="obCheckTxt">Google Drive es opcional pero recomendado</span></div>
       </div>
     </div>
@@ -641,7 +641,7 @@
       </div>
 
       <div style="background:rgba(255,159,10,.08);border:1px solid rgba(255,159,10,.2);border-radius:12px;padding:14px;margin-bottom:16px">
-        <p style="color:#f59e0b;font-weight:700;margin-bottom:8px">⚠️ï¸ Si olvidas el PIN</p>
+        <p style="color:#f59e0b;font-weight:700;margin-bottom:8px">⚠️ Si olvidas el PIN</p>
         <p class="sub"><b>No podremos recuperar tus contraseñas.</b> La bóveda está cifrada con tu PIN y sin él es inaccesible incluso para nosotros.</p>
         <p class="sub" style="margin-top:8px">💡 Solución: exporta respaldos cifrados regularmente o activa la sync con Google Drive.</p>
       </div>
@@ -709,7 +709,7 @@
       </div>
 
       <div id="importWarning" style="background:rgba(255,159,10,.08);border:1px solid rgba(255,159,10,.2);border-radius:12px;padding:14px;margin-bottom:16px;display:none">
-        <p style="color:#f59e0b;font-weight:700;margin-bottom:6px">⚠️ï¸ Atención</p>
+        <p style="color:#f59e0b;font-weight:700;margin-bottom:6px">⚠️ Atención</p>
         <p class="sub" id="importWarningText"></p>
       </div>
 
