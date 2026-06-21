@@ -3,7 +3,7 @@
 //  Versión auto-generada: no editar CACHE_VERSION manualmente.
 //  Para forzar actualización en usuarios: incrementar el número.
 // ─────────────────────────────────────────────────────────────
-const CACHE_VERSION = 14;
+const CACHE_VERSION = 15;
 const CACHE = `vaultkey-v${CACHE_VERSION}`;
 
 const FILES = [
@@ -63,7 +63,7 @@ self.addEventListener('fetch', event => {
   if (event.request.headers.get('Authorization')) return;
 
   // index.html — Network first, caché como fallback
-  if (url.pathname === '/' || url.pathname.endsWith('index.html')) {
+  if (url.pathname === '/' || url.pathname.endsWith('/vaultkey/') || url.pathname.endsWith('index.html')) {
     event.respondWith(
       fetch(event.request, { cache: 'no-store' })
         .then(response => {
