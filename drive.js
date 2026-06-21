@@ -143,82 +143,6 @@ async function driveSyncNow(silent) {
   }
 }
 
-
-function driveAskPin(title, msg) {
-  return new Promise(resolve => {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal open';
-
-    const sheet = document.createElement('div');
-    sheet.className = 'sheet';
-
-    const head = document.createElement('div');
-    head.className = 'sheetHead';
-
-    const titleEl = document.createElement('div');
-    titleEl.className = 'sheetTitle';
-    titleEl.textContent = title;
-
-    const spacer = document.createElement('div');
-    spacer.className = 'spacer';
-
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'iconBtn';
-    closeBtn.textContent = '\u2715';
-
-    const msgEl = document.createElement('p');
-    msgEl.className = 'sub';
-    msgEl.textContent = msg;
-
-    const input = document.createElement('input');
-    input.className = 'inp';
-    input.type = 'password';
-    input.inputMode = 'numeric';
-    input.autocomplete = 'current-password';
-    input.placeholder = 'PIN del respaldo';
-
-    const row = document.createElement('div');
-    row.className = 'rowBtns';
-
-    const cancel = document.createElement('button');
-    cancel.className = 'ghost';
-    cancel.textContent = 'Cancelar';
-
-    const ok = document.createElement('button');
-    ok.className = 'primary';
-    ok.textContent = 'Continuar';
-
-    function close(value) {
-      overlay.remove();
-      resolve(value);
-    }
-
-    closeBtn.onclick = () => close(null);
-    cancel.onclick = () => close(null);
-    ok.onclick = () => {
-      const value = input.value.trim();
-      if(!value) {
-        toast('Introduce el PIN del respaldo');
-        input.focus();
-        return;
-      }
-      close(value);
-    };
-
-    input.addEventListener('keydown', e => {
-      if(e.key === 'Enter') ok.click();
-      if(e.key === 'Escape') close(null);
-    });
-
-    head.append(titleEl, spacer, closeBtn);
-    row.append(cancel, ok);
-    sheet.append(head, msgEl, input, row);
-    overlay.appendChild(sheet);
-    document.body.appendChild(overlay);
-    setTimeout(() => input.focus(), 50);
-  });
-}
-
 // Restaurar desde Drive
 async function driveRestore() {
   if(!driveToken) { toast('Primero conecta Google Drive'); return; }
@@ -236,8 +160,7 @@ async function driveRestore() {
     const modified = new Date(searchData.files[0].modifiedTime).toLocaleString('es-ES');
     const localCount = vault ? vault.length : 0;
     const confirmMsg = `Respaldo de Drive del ${modified}\n\n• Entradas locales actuales: ${localCount}\n\nSi restauras se reemplazarán todas las entradas locales con las del respaldo.\n\n¿Continuar?`;
-    const okRestore = await vkConfirm('Restaurar desde Drive', confirmMsg);
-    if(!okRestore) return;
+    if(!confirm(confirmMsg)) return;
 
     // Descargar archivo
     const dl = await fetch(
@@ -245,7 +168,7 @@ async function driveRestore() {
       {headers: {Authorization: 'Bearer ' + driveToken}}
     );
     const text = await dl.text();
-    const pinForImport = await driveAskPin('PIN del respaldo', 'Introduce el PIN con el que se cifr\u00f3 este respaldo.');
+    const pinForImport = prompt('Introduce el PIN con el que se cifró este respaldo:');
     if(pinForImport === null) return;
     const data = JSON.parse(text);
     if(!data.payload) throw new Error('Sin payload');
@@ -263,9 +186,8 @@ async function driveRestore() {
 }
 
 // Desconectar Drive
-async function driveDisconnect() {
-  const okDisconnect = await vkConfirm('Desconectar Google Drive', 'No se borrar\u00e1n los datos guardados en Drive. \u00bfContinuar?');
-  if(!okDisconnect) return;
+function driveDisconnect() {
+  if(!confirm('¿Desconectar Google Drive? No se borrarán los datos guardados en Drive.')) return;
   driveToken = null;
   localStorage.removeItem(LS_DRIVE_LAST);
   driveSyncUI(false);
@@ -294,8 +216,131 @@ function showSecurityInfo(){
   if(m){ m.classList.add('open'); }
 }
 
-// Nota P0: el filtro de categorías y el panel de salud viven en app.js.
-// drive.js debe quedar reservado para Google Drive y utilidades relacionadas.
+// Category filter — moved to app.js
+
+// ============================================================
+// PANEL DE SALUD DE CONTRASEÑAS
+// ============================================================
+function showHealthPanel() {
+  const modal = document.getElementById('healthModal');
+  if(!modal) return;
+  modal.classList.add('open');
+  renderHealthPanel();
+}
+
+function renderHealthPanel() {
+  const content = document.getElementById('healthContent');
+  if(!content) return;
+
+  const entries = vault || [];
+  if(!entries.length) {
+    content.innerHTML = '<div style="text-align:center;padding:30px;color:#4a7090"><div style="font-size:48px;margin-bottom:12px">🔐</div><p>No hay entradas en tu bóveda todavía.</p></div>';
+    return;
+  }
+
+  // Analysis
+  const total = entries.length;
+  const weak = entries.filter(e => score(e.pass) < 3);
+  const strong = entries.filter(e => score(e.pass) >= 4);
+
+  // Duplicate passwords
+  const passCounts = {};
+  entries.forEach(e => {
+    if(e.pass && e.pass.length > 0) {
+      passCounts[e.pass] = (passCounts[e.pass] || []);
+      passCounts[e.pass].push(e);
+    }
+  });
+  const duplicated = Object.values(passCounts).filter(group => group.length > 1).flat();
+
+  // Old passwords (> 180 days)
+  const now = Date.now();
+  const old180 = entries.filter(e => e.updated && (now - e.updated) > 180 * 24 * 60 * 60 * 1000);
+
+  // No URL
+  const noUrl = entries.filter(e => !e.url || !e.url.trim());
+
+  // No user/email
+  const noUser = entries.filter(e => (!e.user || !e.user.trim()) && (!e.email || !e.email.trim()));
+
+  // Score
+  let healthScore = 100;
+  healthScore -= weak.length * 10;
+  healthScore -= duplicated.length * 8;
+  healthScore -= old180.length * 3;
+  healthScore = Math.max(0, Math.min(100, healthScore));
+
+  const scoreColor = healthScore >= 80 ? '#22c55e' : healthScore >= 50 ? '#f59e0b' : '#ff4444';
+  const scoreLabel = healthScore >= 80 ? 'Buena' : healthScore >= 50 ? 'Mejorable' : 'Crítica';
+  const scoreEmoji = healthScore >= 80 ? '✅' : healthScore >= 50 ? '⚠️' : '🔴';
+
+  // Update home summary
+  const summaryEl = document.getElementById('healthSummaryText');
+  if(summaryEl) {
+    if(weak.length === 0 && duplicated.length === 0) {
+      summaryEl.textContent = '✅ Todo en orden';
+    } else {
+      const issues = [];
+      if(weak.length) issues.push(weak.length + ' débil' + (weak.length>1?'es':''));
+      if(duplicated.length) issues.push(duplicated.length + ' duplicada' + (duplicated.length>1?'s':''));
+      summaryEl.textContent = '⚠️ ' + issues.join(', ');
+    }
+  }
+
+  const makeSection = (title, items, color, emptyMsg, showPass) => {
+    if(!items.length) return `<div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:12px;padding:12px;margin-bottom:12px"><p style="color:#22c55e;font-size:13px">✅ ${emptyMsg}</p></div>`;
+    return `<div style="background:rgba(${color},.08);border:1px solid rgba(${color},.2);border-radius:12px;padding:12px;margin-bottom:12px">
+      <p style="font-weight:700;font-size:13px;margin-bottom:8px;color:rgb(${color})">${title} (${items.length})</p>
+      ${items.map(e => `<div onclick="closeModals();setTimeout(()=>quick('${e.id}'),300)" style="padding:8px;background:rgba(0,14,32,.4);border-radius:8px;margin-bottom:6px;cursor:pointer">
+        <div style="font-weight:700;font-size:13px;color:#e0f0ff">${safeEsc(e.service)}</div>
+        ${showPass ? `<div style="font-size:11px;color:#4a7090;font-family:monospace">${e.pass ? '••••••••' : 'Sin contraseña'}</div>` : ''}
+      </div>`).join('')}
+    </div>`;
+  };
+
+  content.innerHTML = `
+    <!-- Score -->
+    <div style="text-align:center;padding:20px 0 16px">
+      <div style="font-size:64px;font-weight:900;color:${scoreColor};line-height:1">${healthScore}</div>
+      <div style="font-size:16px;color:${scoreColor};font-weight:700;margin-top:4px">${scoreEmoji} Salud ${scoreLabel}</div>
+      <div style="font-size:12px;color:#4a7090;margin-top:4px">${total} entradas analizadas</div>
+    </div>
+
+    <!-- Stats grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+      <div style="background:rgba(0,14,32,.6);border:1px solid rgba(0,210,255,.1);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:24px;font-weight:900;color:#22c55e">${strong.length}</div>
+        <div style="font-size:11px;color:#4a7090">Fuertes</div>
+      </div>
+      <div style="background:rgba(0,14,32,.6);border:1px solid rgba(0,210,255,.1);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:24px;font-weight:900;color:#ff4444">${weak.length}</div>
+        <div style="font-size:11px;color:#4a7090">Débiles</div>
+      </div>
+      <div style="background:rgba(0,14,32,.6);border:1px solid rgba(0,210,255,.1);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:24px;font-weight:900;color:#f59e0b">${duplicated.length}</div>
+        <div style="font-size:11px;color:#4a7090">Duplicadas</div>
+      </div>
+      <div style="background:rgba(0,14,32,.6);border:1px solid rgba(0,210,255,.1);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:24px;font-weight:900;color:#8b5cf6">${old180.length}</div>
+        <div style="font-size:11px;color:#4a7090">+6 meses</div>
+      </div>
+    </div>
+
+    <!-- Weak passwords -->
+    ${makeSection('🔴 Contraseñas débiles', weak, '255,68,68', 'Sin contraseñas débiles', true)}
+    
+    <!-- Duplicated -->
+    ${makeSection('🟡 Contraseñas duplicadas', duplicated, '245,158,11', 'Sin contraseñas duplicadas', true)}
+    
+    <!-- Old -->
+    ${makeSection('🟣 Más de 6 meses sin cambiar', old180, '139,92,246', 'Todas actualizadas recientemente', false)}
+
+    <!-- No URL -->
+    ${noUrl.length ? makeSection('ℹ️ Sin URL registrada', noUrl, '74,112,144', 'Todas tienen URL', false) : ''}
+
+    <button class="btn" onclick="closeModals()" style="width:100%;margin-top:8px">Cerrar</button>
+  `;
+}
 
 function toggleHistPass(btn) {
   const el = btn.previousElementSibling && btn.previousElementSibling.querySelector('.histPassEl') 

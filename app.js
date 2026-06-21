@@ -1,6 +1,14 @@
 let confirmResolver=null;
 let appBooted=false;
 const LS_META='vk_meta_v1',LS_DATA='vk_data_v1',LS_REC='vk_recovery_v1';let pin='',mode='unlock',tempPin='',unlocked=false,vault=[],current=null,editId=null,lastKey=null,useGenTarget=false,autoLockTimer=null,lockCountdownTimer=null,_entryType='password',_catFilter='',_vaultTab='todas';
+
+// Category filter
+function setCatFilter(cat, btn) {
+  _catFilter = cat;
+  document.querySelectorAll('.catChip').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  render();
+}
 function setEntryType(type){
   _entryType=type;
   const isNote=type==='note';
