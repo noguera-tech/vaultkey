@@ -2287,18 +2287,22 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     if(window.applyVisualLook) window.applyVisualLook();
     appBooted=true;
     if('serviceWorker'in navigator){
+      const _swInstallTime = Date.now();
       navigator.serviceWorker.register('./sw.js').catch(()=>{});
       navigator.serviceWorker.addEventListener('message',e=>{
         if(!e.data)return;
         // Nueva versión detectada
         if(e.data.type==='SW_UPDATED'){
+          // Ignorar si han pasado menos de 8 segundos — es la primera instalación
+          const _swAge = Date.now() - _swInstallTime;
+          if(_swAge < 8000) return;
           if(!unlocked){
             // App bloqueada — recargar silenciosamente
             window.location.reload();
           } else {
             // App desbloqueada — avisar sin interrumpir
             const v=e.data.version||'';
-            toast(`✨ VaultKey actualizado${v?' (v'+v+')':''} — reinicia para aplicar`,5000);
+            toast('✨ VaultKey actualizado'+(v?' (v'+v+')':'')+'  — reinicia para aplicar',5000);
           }
         }
         // Respuesta a GET_VERSION
