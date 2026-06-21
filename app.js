@@ -315,6 +315,19 @@ function show(id,dir){
   if(id!=='pin')render();
   syncSettingsUI();
   if(id!=='pin')resetAutoLockTimer();
+  // FAB — solo visible en vault
+  const fab=document.getElementById('fabAdd');
+  if(fab){fab.style.display=id==='vault'?'flex':'none';}
+  // Dots — marcar pantalla activa
+  document.querySelectorAll('.dot').forEach(d=>{
+    const active=d.dataset.screen===id;
+    d.style.width=active?'20px':'6px';
+    d.style.background=active?'rgba(0,210,255,.8)':'rgba(255,255,255,.2)';
+    d.style.borderRadius='3px';
+  });
+  // Dots visibles solo en pantallas principales
+  const dotsEl=document.getElementById('screenDots');
+  if(dotsEl) dotsEl.style.display=['vault','fav','home','settings'].includes(id)?'flex':'none';
 }
 /* Swipe lateral entre pantallas principales */
 (function(){
@@ -331,10 +344,16 @@ function show(id,dir){
     const dx=e.changedTouches[0].clientX-sx;
     const dy=e.changedTouches[0].clientY-sy;
     const dt=Date.now()-stime;
-    if(Math.abs(dx)<60||Math.abs(dy)>Math.abs(dx)*0.8||dt>400)return;
+    // Umbral: 50px mínimo, no demasiado vertical, no demasiado lento
+    if(Math.abs(dx)<50||Math.abs(dy)>Math.abs(dx)*0.75||dt>500)return;
+    // No swipear si hay un modal abierto
+    if(document.querySelector('.modal.open'))return;
+    // No swipear si el toque empezó en un elemento scrollable horizontal
+    const target=e.target;
+    if(target.closest('#catFilterRow,.genSliders'))return;
     const idx=SWIPEABLE.indexOf(cur.id);
-    if(dx<0&&idx<SWIPEABLE.length-1)show(SWIPEABLE[idx+1],'right');
-    else if(dx>0&&idx>0)show(SWIPEABLE[idx-1],'left');
+    if(dx<0&&idx<SWIPEABLE.length-1){vibe(10);show(SWIPEABLE[idx+1],'right');}
+    else if(dx>0&&idx>0){vibe(10);show(SWIPEABLE[idx-1],'left');}
   },{passive:true});
 })();
 function lock(){vibe(30);soundLock();unlocked=false;lastKey=null;pin='';clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay()}
@@ -3189,3 +3208,12 @@ function _getEntryTags(){
 // resetEntryTags ya está definida arriba — se llama desde closeModals
 
 // ══════════════════════════════════════════════════════════════
+
+// FAB press effect
+document.addEventListener('DOMContentLoaded',()=>{
+  const fab=document.getElementById('fabAdd');
+  if(fab){
+    fab.addEventListener('touchstart',()=>{fab.style.transform='scale(.92)';},{passive:true});
+    fab.addEventListener('touchend',()=>{fab.style.transform='scale(1)';},{passive:true});
+  }
+});

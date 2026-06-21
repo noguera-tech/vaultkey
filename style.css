@@ -105,10 +105,10 @@ input, textarea, select { cursor:text; }
   background:var(--grad-bg); z-index:1;
 }
 .screen.active { display:flex; z-index:2; }
-.screen.slide-in-right  { display:flex; z-index:3; animation:slideInR  .24s cubic-bezier(.4,0,.2,1) both; }
-.screen.slide-in-left   { display:flex; z-index:3; animation:slideInL  .24s cubic-bezier(.4,0,.2,1) both; }
-.screen.slide-out-left  { display:flex; z-index:1; animation:slideOutL .24s cubic-bezier(.4,0,.2,1) both; }
-.screen.slide-out-right { display:flex; z-index:1; animation:slideOutR .24s cubic-bezier(.4,0,.2,1) both; }
+.screen.slide-in-right  { display:flex; z-index:3; animation:slideInR  .28s cubic-bezier(.22,1,.36,1) both; }
+.screen.slide-in-left   { display:flex; z-index:3; animation:slideInL  .28s cubic-bezier(.22,1,.36,1) both; }
+.screen.slide-out-left  { display:flex; z-index:2; animation:slideOutL .22s cubic-bezier(.4,0,1,1)  both; }
+.screen.slide-out-right { display:flex; z-index:2; animation:slideOutR .22s cubic-bezier(.4,0,1,1)  both; }
 @keyframes slideInR  { from{transform:translateX(100%);opacity:.7} to{transform:translateX(0);opacity:1} }
 @keyframes slideInL  { from{transform:translateX(-100%);opacity:.7} to{transform:translateX(0);opacity:1} }
 @keyframes slideOutL { from{transform:translateX(0);opacity:1} to{transform:translateX(-30%);opacity:0} }
@@ -422,47 +422,11 @@ select option { background:#001830; color:#e8f6ff; }
    NAVBAR â€” V2.0.3 sin cortes
    Un solo nav real, sin botÃ³n flotante superpuesto.
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-.vkNav {
-  position:absolute; left:0; right:0; bottom:0;
-  height:calc(84px + env(safe-area-inset-bottom,0px));
-  padding:7px 4px calc(8px + env(safe-area-inset-bottom,0px));
-  display:flex; align-items:center; justify-content:space-around; overflow:visible;
-  background:rgba(0,11,28,.96); border-top:1px solid rgba(0,150,200,.18);
-  backdrop-filter:blur(24px); z-index:20;
-  box-shadow:0 -4px 24px rgba(0,0,0,.7);
-}
-.vkNav button {
-  flex:1; min-width:0; height:64px; border:0; background:transparent;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:3px; padding:0 2px; font-size:10px; line-height:1; font-weight:800; letter-spacing:.1px;
-  color:rgba(255,255,255,.52); transition:color .15s; overflow:visible;
-}
-.vkNav button.active { color:var(--cyan); }
-.vkNav .ico { width:40px; height:40px; border-radius:13px; display:grid; place-items:center; border:1.5px solid transparent; transition:all .15s; flex-shrink:0; }
-.vkNav button:nth-child(3) { transform:translateY(-10px); }
-.vkNav button:nth-child(3)::after { content:''; display:none; }
-.vkNav button:nth-child(3) .ico {
-  width:58px; height:58px; border-radius:50%;
-  background:linear-gradient(135deg,#005BFF,#128CFF);
-  border:1px solid rgba(0,217,255,.35);
-  box-shadow:0 0 0 4px rgba(0,123,255,.18), 0 6px 18px rgba(0,123,255,.5);
-}
-.vkNav button:nth-child(3) .ico svg { width:32px!important; height:32px!important; stroke:#fff!important; }
 
 /* Iconos por tab */
-.vkNav button:nth-child(1) .ico { background:rgba(0,80,200,.35); border-color:rgba(0,130,255,.18); }
-.vkNav button:nth-child(2) .ico { background:rgba(160,80,0,.35);  border-color:rgba(230,140,0,.18); }
-.vkNav button:nth-child(4) .ico { background:rgba(0,100,140,.35); border-color:rgba(0,170,210,.18); }
-.vkNav button:nth-child(5) .ico { background:rgba(90,30,210,.35); border-color:rgba(150,80,250,.18); }
 
-.vkNav button:nth-child(1).active .ico { background:linear-gradient(135deg,#3d8eff,#1255c0); border-color:rgba(80,160,255,.5); box-shadow:0 0 18px rgba(0,123,255,.6),0 3px 10px rgba(0,0,0,.4); }
-.vkNav button:nth-child(2).active .ico { background:linear-gradient(135deg,#ffb020,#d97006); border-color:rgba(255,180,30,.5); box-shadow:0 0 18px rgba(240,150,10,.6),0 3px 10px rgba(0,0,0,.4); }
-.vkNav button:nth-child(4).active .ico { background:linear-gradient(135deg,#22d3ee,#0d7490); border-color:rgba(34,210,238,.5); box-shadow:0 0 18px rgba(0,217,255,.6),0 3px 10px rgba(0,0,0,.4); }
-.vkNav button:nth-child(5).active .ico { background:linear-gradient(135deg,#c084fc,#7c3aed); border-color:rgba(192,130,252,.5); box-shadow:0 0 18px rgba(168,85,247,.6),0 3px 10px rgba(0,0,0,.4); }
 
 .vkSvgIcon { width:22px; height:22px; display:block; fill:none; stroke:rgba(255,255,255,.80); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-.vkNav button.active .vkSvgIcon { stroke:var(--cyan); filter:drop-shadow(0 0 4px rgba(0,217,255,.5)); }
-.vkNav button span:not(.ico) { display:block; max-width:100%; white-space:nowrap; overflow:visible; text-align:center; }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    VAULT (Entradas)
