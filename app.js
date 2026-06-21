@@ -474,11 +474,11 @@ async function setPinLen(len){
   if(len===currentLen){toast('Ya estás usando PIN de '+len+' dígitos');return;}
   const hasPin=!!(m&&m.hash);
   if(hasPin){
-    const ok=await vkConfirm('Cambiar a PIN de '+len+' dígitos','Se cerrará la sesión y deberás crear un nuevo PIN de '+len+' dígitos. Tus entradas guardadas NO se borran. ¿Continuar?');
-    if(!ok){syncSettingsUI();return;}
-    m.pinLen=len;m.hash=null;m.pinSalt=null;
-    saveMeta(m);
-    lock();
+    await vkConfirm(
+      'Cambio de PIN no disponible',
+      'Por seguridad, el cambio de longitud del PIN estara disponible en una version posterior con re-cifrado completo. Tus datos no se han modificado.'
+    );
+    syncSettingsUI();
     return;
   }
   m.pinLen=len;saveMeta(m);syncSettingsUI();
