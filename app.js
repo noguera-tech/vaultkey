@@ -338,12 +338,12 @@ function show(id,dir){
   });
   // Dots visibles solo en pantallas principales
   const dotsEl=document.getElementById('screenDots');
-  if(dotsEl) dotsEl.style.display=['vault','fav','home','settings'].includes(id)?'flex':'none';
+  if(dotsEl) dotsEl.style.display=['home','vault','fav','settings'].includes(id)?'flex':'none';
 }
 /* Swipe lateral entre pantallas principales */
 (function(){
   let sx=0,sy=0,stime=0;
-  const SWIPEABLE=['vault','fav','home','settings'];
+  const SWIPEABLE=['home','vault','fav','settings'];
   document.addEventListener('touchstart',e=>{
     sx=e.touches[0].clientX;
     sy=e.touches[0].clientY;
