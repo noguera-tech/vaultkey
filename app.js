@@ -1819,7 +1819,12 @@ function render(){
       $('recentList').appendChild(hdr);
       recent.forEach(e=>{try{$('recentList').appendChild(row(e))}catch(err){console.warn('row fav error',e?.id,err)}});
     }
-  }$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
+  }$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);
+  // Empty states
+  const _ves=$('vaultEmptyState');
+  if(_ves)_ves.style.display=vault.length===0?'block':'none';
+  const _fes=$('favEmptyState');
+  if(_fes)_fes.style.display=vault.filter(e=>e.fav).length===0?'block':'none';$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length);let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
 
 function vk128SvgText(label,bg,fg='#fff',fs=18){return {bg,svg:`<svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="${bg}"/><text x="24" y="31" font-size="${fs}" font-weight="900" fill="${fg}" text-anchor="middle" font-family="Arial, sans-serif">${label}</text></svg>`}}
 function vk128Match(n,k){k=(k||'').toLowerCase().trim();if(!k)return false;if(k.length<=2)return n===k;return n===k||n.includes(k)}
