@@ -1401,33 +1401,12 @@ function showAppInfo(){
   ).catch(()=>{});
 }
 
-/* Easter egg: 7 toques en la versión → reiniciar intro/onboarding */
+/* Toque en la fila de versión → mostrar info de la bóveda */
 (function(){
-  let tapCount=0,tapTimer=null;
   document.addEventListener('DOMContentLoaded',()=>{
     const row=document.getElementById('versionRow');
     if(!row)return;
-    row.addEventListener('click',()=>{
-      tapCount++;
-      clearTimeout(tapTimer);
-      const hint=document.getElementById('versionRowHint');
-      if(tapCount>=7){
-        tapCount=0;
-        if(hint)hint.textContent='Pulsa para ver información de la bóveda';
-        localStorage.removeItem('vk_splash_v1');
-        localStorage.removeItem('vaultkey_onboarding_v130');
-        toast('🎬 Demo reiniciada — recargando...');
-        setTimeout(()=>location.reload(),1200);
-      } else {
-        const left=7-tapCount;
-        if(hint)hint.textContent=left===1?'¡Un toque más!':left+' toques para reiniciar demo';
-        tapTimer=setTimeout(()=>{
-          tapCount=0;
-          if(hint)hint.textContent='Pulsa para ver información de la bóveda';
-        },2000);
-        if(tapCount===1)showAppInfo();
-      }
-    });
+    row.addEventListener('click',()=>showAppInfo());
   });
 })();
 function setGeneratorRangeFill(el){
