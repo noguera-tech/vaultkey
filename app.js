@@ -473,6 +473,26 @@ function syncSettingsUI(){
   if(pill){pill.textContent=bioActive?'Activa':'Inactiva';pill.style.background=bioActive?'rgba(0,210,100,.15)':'';pill.style.borderColor=bioActive?'rgba(0,210,100,.4)':'';pill.style.color=bioActive?'#00d46a':'';}
   // Estado borrado automático
   const awToggle=$('autoWipeToggle');if(awToggle&&m)awToggle.checked=!!(m.autoWipe);
+  // Estado respaldo
+  const exportSpan=$('exportBackupSpan');
+  const importSpan=$('importBackupSpan');
+  if(exportSpan){
+    const lastBackup=m&&m.lastBackup;
+    const entryCount=vault?vault.length:0;
+    if(lastBackup){
+      const d=new Date(lastBackup).toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'});
+      exportSpan.textContent='Último respaldo: '+d+' · '+entryCount+' entrada'+(entryCount!==1?'s':'');
+    } else {
+      const warnTxt=entryCount>0?'⚠️ Sin respaldo · '+entryCount+' entrada'+(entryCount!==1?'s':'')+' sin guardar':'Sin entradas todavía';
+      exportSpan.textContent=warnTxt;
+      if(entryCount>0) exportSpan.style.color='#f59e0b';
+    }
+  }
+  if(importSpan){
+    const entryCount=vault?vault.length:0;
+    importSpan.textContent=entryCount>0?'Tienes '+entryCount+' entrada'+(entryCount!==1?'s':'')+' en la bóveda':'Restaurar desde archivo cifrado (.json)';
+  }
+
   // Longitud PIN
   const plen=(m&&m.pinLen===8)?8:6;
   const sp=$('pinLenSpan');if(sp)sp.textContent='PIN de '+plen+' dígitos'+(m&&m.hash?' (activo)':' (pendiente)');
