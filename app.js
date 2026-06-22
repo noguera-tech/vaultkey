@@ -2543,6 +2543,7 @@ function rankIcon(ic){
     lastKey=p;unlocked=true;pin='';renderDots();hidePrivacyOverlay();show('home');render();syncSettingsUI();resetAutoLockTimer();
     setTimeout(()=>{try{checkVaultReminders();}catch(e){}},2000);
     setTimeout(()=>{try{maybeShowAutofillPicker();}catch(e){}},300);
+    setTimeout(()=>{try{checkAutofillSetupBanner();}catch(e){}},1500);
     if(localStorage.getItem(REC_PENDING)==='1' || (localStorage.getItem(LS_REC)&&localStorage.getItem(REC_SAVED)!=='1')){
       setTimeout(()=>showRecoveryCode(true),120);
     }else{
@@ -2618,6 +2619,105 @@ function rankIcon(ic){
 })();
 
 
+
+
+// ══════════════════════════════════════════════════════
+//  BANNER DE CONFIGURACIÓN DE AUTOFILL
+// ══════════════════════════════════════════════════════
+
+function checkAutofillSetupBanner() {
+  // Detectar si LauncherActivity pasó el flag vk_autofill_setup=1
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('vk_autofill_setup') !== '1') return;
+
+  // No mostrar si ya fue descartado en esta sesión
+  if (sessionStorage.getItem('vk_autofill_banner_dismissed')) return;
+
+  // Esperar a que la app esté desbloqueada antes de mostrar
+  const waitForUnlock = setInterval(() => {
+    if (!unlocked) return;
+    clearInterval(waitForUnlock);
+    showAutofillSetupBanner();
+  }, 500);
+}
+
+function showAutofillSetupBanner() {
+  // No mostrar si ya existe
+  if (document.getElementById('vkAutofillBanner')) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'vkAutofillBanner';
+  banner.style.cssText = [
+    'position:fixed;bottom:80px;left:12px;right:12px;z-index:8000',
+    'background:linear-gradient(135deg,rgba(0,80,200,.95),rgba(0,40,120,.95))',
+    'border:1px solid rgba(0,180,255,.4);border-radius:16px',
+    'padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.5)',
+    'animation:vkSlideUp .3s ease'
+  ].join(';');
+
+  banner.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="font-size:24px;flex-shrink:0;margin-top:2px">🔐</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:900;color:#e0f0ff;font-size:14px;margin-bottom:4px">
+          Activa el autocompletado
+        </div>
+        <div style="font-size:12px;color:#7ab0d0;line-height:1.5;margin-bottom:10px">
+          VaultKey puede rellenar usuarios y contraseñas automáticamente en cualquier app.
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="openAutofillSettings()"
+            style="flex:1;padding:8px;border-radius:10px;border:none;
+                   background:rgba(0,210,255,.2);color:#00d2ff;
+                   font-size:12px;font-weight:800;cursor:pointer">
+            ⚡ Activar ahora
+          </button>
+          <button onclick="dismissAutofillBanner()"
+            style="padding:8px 12px;border-radius:10px;border:none;
+                   background:rgba(255,255,255,.06);color:#4a7090;
+                   font-size:12px;font-weight:700;cursor:pointer">
+            Ahora no
+          </button>
+        </div>
+      </div>
+      <button onclick="dismissAutofillBanner()"
+        style="background:none;border:none;color:#4a7090;
+               font-size:18px;cursor:pointer;flex-shrink:0;padding:0">✕</button>
+    </div>`;
+
+  // Añadir animación si no existe
+  if (!document.getElementById('vkAutofillBannerStyle')) {
+    const st = document.createElement('style');
+    st.id = 'vkAutofillBannerStyle';
+    st.textContent = '@keyframes vkSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}';
+    document.head.appendChild(st);
+  }
+
+  document.body.appendChild(banner);
+}
+
+function openAutofillSettings() {
+  // Abrir ajustes de autocompletado de Android directamente
+  try {
+    // Intent ACTION_REQUEST_SET_AUTOFILL_SERVICE — abre la pantalla correcta
+    window.location.href = 'intent:#Intent;action=android.settings.REQUEST_SET_AUTOFILL_SERVICE;package=com.nogueratech.vaultkey;end';
+  } catch(e) {
+    // Fallback: ajustes generales
+    try {
+      window.location.href = 'intent:#Intent;action=android.settings.SETTINGS;end';
+    } catch(e2) {}
+  }
+  dismissAutofillBanner();
+}
+
+function dismissAutofillBanner() {
+  sessionStorage.setItem('vk_autofill_banner_dismissed', '1');
+  const banner = document.getElementById('vkAutofillBanner');
+  if (banner) {
+    banner.style.animation = 'vkSlideUp .2s ease reverse';
+    setTimeout(() => banner.remove(), 200);
+  }
+}
 
 // ══════════════════════════════════════════════════════
 //  MODO AUTOFILL PICKER
