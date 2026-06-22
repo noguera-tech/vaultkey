@@ -144,6 +144,32 @@ async function driveSyncNow(silent) {
 }
 
 // Restaurar desde Drive
+// Resolver para el modal de PIN de Drive
+let _drivePinResolver = null;
+function resolveDrivePin(value) {
+  const modal = document.getElementById('drivePinModal');
+  if(modal) modal.classList.remove('open');
+  const input = document.getElementById('drivePinInput');
+  if(input) input.value = '';
+  if(_drivePinResolver) { _drivePinResolver(value); _drivePinResolver = null; }
+}
+function askDrivePin() {
+  return new Promise(res => {
+    _drivePinResolver = res;
+    const input = document.getElementById('drivePinInput');
+    if(input) input.value = '';
+    const modal = document.getElementById('drivePinModal');
+    if(modal) {
+      modal.classList.add('open');
+      setTimeout(() => { if(input) input.focus(); }, 150);
+    } else {
+      // Fallback si el modal no está en el DOM
+      const val = prompt('Introduce el PIN con el que se cifró este respaldo:');
+      res(val);
+    }
+  });
+}
+
 async function driveRestore() {
   if(!driveToken) { toast('Primero conecta Google Drive'); return; }
   try {
@@ -159,8 +185,11 @@ async function driveRestore() {
     const fileId = searchData.files[0].id;
     const modified = new Date(searchData.files[0].modifiedTime).toLocaleString('es-ES');
     const localCount = vault ? vault.length : 0;
-    const confirmMsg = `Respaldo de Drive del ${modified}\n\n• Entradas locales actuales: ${localCount}\n\nSi restauras se reemplazarán todas las entradas locales con las del respaldo.\n\n¿Continuar?`;
-    if(!confirm(confirmMsg)) return;
+    const ok = await vkConfirm(
+      'Restaurar desde Drive',
+      `Respaldo del ${modified}\n\n• Entradas locales actuales: ${localCount}\n\nSe reemplazarán todas las entradas locales con las del respaldo. ¿Continuar?`
+    );
+    if(!ok) return;
 
     // Descargar archivo
     const dl = await fetch(
@@ -168,8 +197,8 @@ async function driveRestore() {
       {headers: {Authorization: 'Bearer ' + driveToken}}
     );
     const text = await dl.text();
-    const pinForImport = prompt('Introduce el PIN con el que se cifró este respaldo:');
-    if(pinForImport === null) return;
+    const pinForImport = await askDrivePin();
+    if(pinForImport === null || pinForImport === '') return;
     const data = JSON.parse(text);
     if(!data.payload) throw new Error('Sin payload');
     const decrypted = await decryptData(data.payload, pinForImport);
@@ -186,8 +215,9 @@ async function driveRestore() {
 }
 
 // Desconectar Drive
-function driveDisconnect() {
-  if(!confirm('¿Desconectar Google Drive? No se borrarán los datos guardados en Drive.')) return;
+async function driveDisconnect() {
+  const ok = await vkConfirm('Desconectar Drive', '¿Desconectar Google Drive? No se borrarán los datos guardados en Drive.');
+  if(!ok) return;
   driveToken = null;
   localStorage.removeItem(LS_DRIVE_LAST);
   driveSyncUI(false);
