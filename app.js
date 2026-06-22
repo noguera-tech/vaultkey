@@ -1,3 +1,6 @@
+let _searchDebounce=null;
+const LS_BIO_CRED='vk_bio_cred_id';
+const LS_BIO_BLOB='vk_bio_blob';
 let confirmResolver=null;
 let appBooted=false;
 const LS_META='vk_meta_v1',LS_DATA='vk_data_v1',LS_REC='vk_recovery_v1';let pin='',mode='unlock',tempPin='',unlocked=false,vault=[],current=null,editId=null,lastKey=null,useGenTarget=false,autoLockTimer=null,lockCountdownTimer=null,_entryType='password',_catFilter='',_vaultTab='todas';
@@ -80,7 +83,7 @@ function fmtExpiry(el){
   else if(v.length===2 && el._lastLen!==1) v=v+'/';
   el._lastLen=el.value.length;
   el.value=v;
-}const byId=$;const enc=new TextEncoder(),dec=new TextDecoder();
+}const enc=new TextEncoder(),dec=new TextDecoder();
 function b64(buf){return btoa(String.fromCharCode(...new Uint8Array(buf)))}function ub64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
 async function digest(s){let h=await crypto.subtle.digest('SHA-256',enc.encode(s));return b64(h)}
 async function hashPin(p,salt){const key=await crypto.subtle.importKey('raw',enc.encode(p),'PBKDF2',false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:ub64(salt),iterations:200000,hash:'SHA-256'},key,256);return b64(bits);}
@@ -261,8 +264,6 @@ async function handlePin(){return window.handlePin?window.handlePin():undefined;
 async function unlockOk(p){return window.unlockOk?window.unlockOk(p):undefined;}
 async function tryBioRegister(pinKey){
   beginBiometricFlow();
-  const LS_BIO_CRED='vk_bio_cred_id';
-  const LS_BIO_BLOB='vk_bio_blob';
   const b64e=buf=>btoa(String.fromCharCode(...new Uint8Array(buf)));
   try{
     const challenge=crypto.getRandomValues(new Uint8Array(32));
@@ -1005,10 +1006,10 @@ function closeNoteModal(){$('noteModal')?.classList.remove('open');}
 
 
 function renderIconStrip(){
-  const strip=byId('iconStripRow');
+  const strip=$('iconStripRow');
   if(!strip)return;
   vkBuildIconMap();
-  const q=normService(byId('eIconSearch')?.value||'');
+  const q=normService($('eIconSearch')?.value||'');
   let list=(MANUAL_ICONS||[]).filter(ic=>ic&&ic.id);
   if(!q){
     const pri=['auto','gmail','google','facebook','instagram','whatsapp','telegram','youtube','netflix','spotify','amazon','paypal','github','discord','linkedin','x','microsoft','apple','chatgpt','bank','bbva','santander','caixa','ing','tiktok','revolut','wise','binance','coinbase','wifi','cloud','card','shopping','work','vpn','token','safe','zelle','stripe','outlook','yahoo','drive','dropbox','chrome','safari','firefox','twitch','reddit','pinterest','snapchat','signal'];
@@ -1016,7 +1017,7 @@ function renderIconStrip(){
     list=[...pri.map(id=>list.find(ic=>ic.id===id)).filter(Boolean),...list.filter(ic=>!priSet.has(ic.id))].slice(0,120);
   }else{
     list=list.filter(ic=>[ic.id,ic.label,ic.emoji||''].join(' ').toLowerCase().includes(q)).slice(0,120);
-    if(!list.length)list=[{id:'custom',label:byId('eIconSearch')?.value||'Servicio',bg:'#0a84ff'}];
+    if(!list.length)list=[{id:'custom',label:$('eIconSearch')?.value||'Servicio',bg:'#0a84ff'}];
   }
   strip.innerHTML=list.map(ic=>{
     const active=(selectedEntryIcon||'auto')===ic.id;
@@ -1335,8 +1336,6 @@ async function regenerateRecoveryCode(){
 }
 async function tryBio(){
   vibe(25);
-  const LS_BIO_CRED='vk_bio_cred_id';
-  const LS_BIO_BLOB='vk_bio_blob';
   const b64e=buf=>btoa(String.fromCharCode(...new Uint8Array(buf)));
   const b64d=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
   if(!window.PublicKeyCredential){toast('Tu dispositivo no soporta biometría compatible.');return;}
@@ -1506,8 +1505,6 @@ function isLikelyUrl(v){
   const clean=v.replace(/\s+/g,'');
   return /^(https?:\/\/)?(www\.)?([a-z0-9-]+\.)+[a-z]{2,}([\/\?#].*)?$/i.test(clean);
 }
-['eService','eUser','eUrl','ePass'].forEach(id=>document.addEventListener('input',ev=>{if(ev.target&&ev.target.id===id)clearFieldError(id)},true));
-
 function legacyEmailFromEntry(e){return (!e?.email && isValidEmail(e?.user||'')) ? (e.user||'') : (e?.email||'')}
 function userFromEntry(e){return (!e?.email && isValidEmail(e?.user||'')) ? '' : (e?.user||'')}
 function entryMainIdentity(e){
