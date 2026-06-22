@@ -2770,7 +2770,7 @@ function renderHealthPanel(){
   // Si no hay contraseñas, mostrar panel informativo sin score engañoso
   if(total===0){
     const sumEl=$('healthSummaryText');
-    if(sumEl)sumEl.textContent='Sin contraseñas que analizar';
+    if(sumEl){sumEl.textContent='Sin contraseñas que analizar';sumEl.style.color='#4a7090';}
     const el=$('healthContent');
     if(el)el.innerHTML=`
       <div style="text-align:center;padding:32px 16px">
@@ -2795,7 +2795,22 @@ function renderHealthPanel(){
 
   // Actualizar resumen en home
   const sumEl=$('healthSummaryText');
-  if(sumEl)sumEl.textContent=`Seguridad ${scoreLabel.toLowerCase()} · ${weak.length} débil${weak.length!==1?'es':''}`;
+  if(sumEl){
+    const hasIssues=weak.length>0||dupes.length>0||old.length>0||cardWarn.length>0||docWarn.length>0;
+    if(!hasIssues){
+      sumEl.textContent='✅ Todo en orden · Toca para ver detalles';
+      sumEl.style.color='#00e676';
+    } else {
+      const parts=[];
+      if(weak.length)   parts.push(weak.length+' débil'+(weak.length>1?'es':''));
+      if(dupes.length)  parts.push(dupes.length+' repetida'+(dupes.length>1?'s':''));
+      if(old.length)    parts.push(old.length+' antigua'+(old.length>1?'s':''));
+      if(cardWarn.length) parts.push(cardWarn.length+' tarjeta'+(cardWarn.length>1?'s':'')+' por caducar');
+      if(docWarn.length)  parts.push(docWarn.length+' doc'+(docWarn.length>1?'s':'')+' por caducar');
+      sumEl.textContent='⚠️ '+parts.join(', ')+' · Toca para ver';
+      sumEl.style.color=clampedScore>=50?'#f59e0b':'#ff5252';
+    }
+  }
 
   let h='';
 
