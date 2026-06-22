@@ -882,3 +882,21 @@ input[type=range]::-moz-range-thumb {
 
 /* Contenido por encima del fondo */
 .screen > * { position: relative; z-index: 1; }
+
+/* Desktop navigation fallback */
+#screenDots {
+  pointer-events: none !important;
+}
+
+#screenDots .dot {
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+
+/* FAB global dentro del shell principal */
+.app > #fabAdd {
+  position: absolute !important;
+  right: 20px !important;
+  bottom: 28px !important;
+  z-index: 90 !important;
+}

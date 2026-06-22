@@ -271,8 +271,55 @@ async function tryBioRegister(pinKey){
   toast('Biometría web desactivada por seguridad. Usa el PIN de VaultKey.');
 }
 async function persist(p=lastKey){if(!p)return;localStorage.setItem(LS_DATA,JSON.stringify(await encryptData(vault,p)))}
-const NAV_ORDER=['vault','fav','home','settings'];
+const NAV_ORDER=['home','vault','fav','settings'];
+
+function ensureFabInAppShell(){
+  const fab=document.getElementById('fabAdd');
+  const app=document.querySelector('.app');
+  if(fab&&app&&fab.parentElement!==app){
+    app.appendChild(fab);
+  }
+}
+
+function hasOpenModal(){
+  return !!document.querySelector('.modal.open');
+}
+
+function syncFabVisibility(){
+  ensureFabInAppShell();
+  const fab=document.getElementById('fabAdd');
+  if(!fab)return;
+
+  const active=document.querySelector('.screen.active');
+  const shouldShow=!!(active&&active.id==='vault'&&!hasOpenModal());
+
+  fab.style.display=shouldShow?'flex':'none';
+}
+
+function initFabVisibilityObserver(){
+  if(window.__vkFabVisibilityObserverReady)return;
+  window.__vkFabVisibilityObserverReady=true;
+
+  const observer=new MutationObserver(()=>syncFabVisibility());
+
+  document.querySelectorAll('.modal').forEach(m=>{
+    observer.observe(m,{attributes:true,attributeFilter:['class','style']});
+  });
+
+  document.querySelectorAll('.screen').forEach(s=>{
+    observer.observe(s,{attributes:true,attributeFilter:['class','style']});
+  });
+
+  syncFabVisibility();
+}
 function show(id,dir){
+  ensureFabInAppShell();
+
+  const activeBefore=document.querySelector('.screen.active');
+  if(hasOpenModal()&&id!=='pin'&&activeBefore&&activeBefore.id!==id){
+    return;
+  }
+
   vibe(18);soundNav();
   if(id==='settings') try{driveInit();}catch(e){}
   const current=document.querySelector('.screen.active');
@@ -289,6 +336,8 @@ function show(id,dir){
   if(id==='pin'||current?.id==='pin'){
     next.classList.add('active');
     current&&(current.style.display='none');
+    const fabImmediate=document.getElementById('fabAdd');
+    if(fabImmediate){fabImmediate.style.display=id==='vault'?'flex':'none';}
   } else {
     next.classList.add(goRight?'slide-in-right':'slide-in-left');
     current?.classList.add(goRight?'slide-out-left':'slide-out-right');
@@ -297,14 +346,15 @@ function show(id,dir){
       next.classList.add('active');
       current&&(current.style.display='none');
       current?.classList.remove('slide-out-right','slide-out-left');
+      const fabAfter=document.getElementById('fabAdd');
+      if(fabAfter){fabAfter.style.display=id==='vault'?'flex':'none';}
     },250);
   }
   if(id!=='pin')render();
   syncSettingsUI();
   if(id!=='pin')resetAutoLockTimer();
-  // FAB — solo visible en vault
-  const fab=document.getElementById('fabAdd');
-  if(fab){fab.style.display=id==='vault'?'flex':'none';}
+  // FAB — visible solo en Entradas y nunca encima de modales
+  syncFabVisibility();
   // Dots — marcar pantalla activa
   document.querySelectorAll('.dot').forEach(d=>{
     const active=d.dataset.screen===id;
@@ -326,6 +376,7 @@ function show(id,dir){
     stime=Date.now();
   },{passive:true});
   document.addEventListener('touchend',e=>{
+    if(hasOpenModal())return;
     const cur=document.querySelector('.screen.active');
     if(!cur||!SWIPEABLE.includes(cur.id))return;
     const dx=e.changedTouches[0].clientX-sx;
@@ -342,6 +393,46 @@ function show(id,dir){
     if(dx<0&&idx<SWIPEABLE.length-1){vibe(10);show(SWIPEABLE[idx+1],'right');}
     else if(dx>0&&idx>0){vibe(10);show(SWIPEABLE[idx-1],'left');}
   },{passive:true});
+
+  // Fallback escritorio: navegación por click en los puntos inferiores
+  document.addEventListener('click', e => {
+    if(hasOpenModal())return;
+    const dot = e.target.closest('#screenDots .dot[data-screen]');
+    if (!dot) return;
+
+    const id = dot.dataset.screen;
+    if (!SWIPEABLE.includes(id)) return;
+
+    vibe(10);
+    show(id);
+  });
+
+  // Fallback escritorio: navegación con flechas izquierda/derecha
+  document.addEventListener('keydown', e => {
+    if (!['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+    if (hasOpenModal()) return;
+
+    const t = e.target;
+    if (t && (t.closest('input, textarea, select, button') || t.isContentEditable)) return;
+
+    const cur = document.querySelector('.screen.active');
+    if (!cur || !SWIPEABLE.includes(cur.id)) return;
+
+    const idx = SWIPEABLE.indexOf(cur.id);
+
+    if (e.key === 'ArrowRight' && idx < SWIPEABLE.length - 1) {
+      e.preventDefault();
+      vibe(10);
+      show(SWIPEABLE[idx + 1], 'right');
+    }
+
+    if (e.key === 'ArrowLeft' && idx > 0) {
+      e.preventDefault();
+      vibe(10);
+      show(SWIPEABLE[idx - 1], 'left');
+    }
+  });
+
 })();
 function lock(){vibe(30);soundLock();unlocked=false;lastKey=null;pin='';clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay()}
 async function wipe(){if(await vkConfirm('Borrar todos los datos','⚠️ Se eliminarán el PIN, todas las contraseñas y el código de recuperación. Esta acción es irreversible. ¿Continuar?')){soundError();vibe([60,30,60,30,100]);localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];lock()}}
@@ -353,7 +444,7 @@ function closeModals(){
     }
     m.classList.remove('open');
   });
-  editId=null;useGenTarget=false;selectedEntryIcon='';try{resetNoteReminder();}catch(e){}try{resetEntryTags();}catch(e){}
+  editId=null;useGenTarget=false;selectedEntryIcon='';try{resetNoteReminder();}catch(e){}try{resetEntryTags();}catch(e){}setTimeout(()=>{try{syncFabVisibility();}catch(e){}},0);
 }
 
 // ══ RECORDATORIO EN NOTAS ══
@@ -1100,6 +1191,7 @@ function useGen(){
     if(el){el.value=v;if(fieldId==='ePass')updateStrength();}
     $('genModal').classList.remove('open');
     $('entryModal').classList.add('open');
+  syncFabVisibility();
     toast('Contraseña añadida a la entrada');
   }else{
     closeModals();
@@ -1330,6 +1422,7 @@ function showAppInfo(){
 /* Toque en la fila de versión → mostrar info de la bóveda */
 (function(){
   document.addEventListener('DOMContentLoaded',()=>{
+  initFabVisibilityObserver();
     const row=document.getElementById('versionRow');
     if(!row)return;
     row.addEventListener('click',()=>showAppInfo());
@@ -1425,6 +1518,9 @@ function entrySearchText(e){return [e.service,userFromEntry(e),legacyEmailFromEn
 function clearEntryErrors(){document.querySelectorAll('.fieldErrorNote').forEach(x=>x.remove());['eService','eUser','eEmail','eUrl','ePass'].forEach(id=>$(id)?.classList.remove('fieldError'))}
 document.addEventListener('input',ev=>{if(ev.target&&['eService','eUser','eEmail','eUrl','ePass'].includes(ev.target.id))clearFieldError(ev.target.id)},true);
 function openEntry(e=null){
+  syncFabVisibility();
+  const fab=document.getElementById('fabAdd');
+  if(fab)fab.style.display='none';
   vibe(28);soundOpen();
   // Restaurar borrador si es nueva entrada y existe borrador
   if(!e){
