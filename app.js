@@ -263,37 +263,12 @@ function delPin(){vibe(18);soundPinDel();pin=pin.slice(0,-1);renderDots()}
 async function handlePin(){return window.handlePin?window.handlePin():undefined;}
 async function unlockOk(p){return window.unlockOk?window.unlockOk(p):undefined;}
 async function tryBioRegister(pinKey){
-  beginBiometricFlow();
-  const b64e=buf=>btoa(String.fromCharCode(...new Uint8Array(buf)));
-  try{
-    const challenge=crypto.getRandomValues(new Uint8Array(32));
-    const cred=await navigator.credentials.create({publicKey:{
-      challenge,
-      rp:{name:'VaultKey',id:location.hostname||'localhost'},
-      user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'vaultkey_user',displayName:'VaultKey'},
-      pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
-      authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
-      timeout:60000
-    }});
-    localStorage.setItem(LS_BIO_CRED,b64e(cred.rawId));
-    const baseKey=await crypto.subtle.importKey('raw',new Uint8Array(cred.rawId),'PBKDF2',false,['deriveKey']);
-    const aesKey=await crypto.subtle.deriveKey(
-      {name:'PBKDF2',salt:new TextEncoder().encode('vaultkey-bio-salt'),iterations:100000,hash:'SHA-256'},
-      baseKey,{name:'AES-GCM',length:256},false,['encrypt']
-    );
-    const iv=crypto.getRandomValues(new Uint8Array(12));
-    const enc=await crypto.subtle.encrypt({name:'AES-GCM',iv},aesKey,new TextEncoder().encode(pinKey));
-    localStorage.setItem(LS_BIO_BLOB,JSON.stringify({iv:b64e(iv),data:b64e(enc)}));
-    vibe([30,20,60,20,80]);soundPinOk();
-    toast('✓ Biometría activada. El PIN sigue protegiendo tu bóveda.');
-  }catch(e){
-    localStorage.removeItem(LS_BIO_CRED);
-    vibe([40,30,40]);soundPinErr();
-    if(e.name==='NotAllowedError')toast('Registro biométrico cancelado.');
-    else toast('No se pudo activar la biometría. Inténtalo de nuevo.');
-  }finally{
-    endBiometricFlow();
-  }
+  // Seguridad V2.3.1: no guardar PIN recuperable en localStorage.
+  // La biometría web basada en vk_bio_blob queda deshabilitada hasta migrar a Android Keystore.
+  localStorage.removeItem(LS_BIO_CRED);
+  localStorage.removeItem(LS_BIO_BLOB);
+  localStorage.setItem('vk_bio_offer_dismissed','1');
+  toast('Biometría web desactivada por seguridad. Usa el PIN de VaultKey.');
 }
 async function persist(p=lastKey){if(!p)return;localStorage.setItem(LS_DATA,JSON.stringify(await encryptData(vault,p)))}
 const NAV_ORDER=['vault','fav','home','settings'];
@@ -467,9 +442,9 @@ function syncSettingsUI(){
   if(sel&&m){defaultSecurity(m);const ms=Number(m.autoLockMs||0);sel.value=String(ms);// Forzar opción visible
   if(!sel.querySelector('option[value="'+ms+'"]'))sel.value='30000';}
   // Estado de huella
-  const bioActive=!!(localStorage.getItem('vk_bio_cred_id')&&localStorage.getItem('vk_bio_blob'));
+  const bioActive=false;
   const span=$('bioSettingsSpan');const pill=$('bioSettingsPill');
-  if(span)span.textContent=bioActive?'Activa en este dispositivo':'Introduce el PIN de VaultKey una vez para activarla';
+  if(span)span.textContent='Biometría web desactivada por seguridad. El PIN de VaultKey sigue siendo obligatorio.';
   if(pill){pill.textContent=bioActive?'Activa':'Inactiva';pill.style.background=bioActive?'rgba(0,210,100,.15)':'';pill.style.borderColor=bioActive?'rgba(0,210,100,.4)':'';pill.style.color=bioActive?'#00d46a':'';}
   // Estado borrado automático
   const awToggle=$('autoWipeToggle');if(awToggle&&m)awToggle.checked=!!(m.autoWipe);
@@ -519,7 +494,7 @@ async function setPinLen(len){
 function setAutoWipe(val){let m=defaultSecurity(meta());if(!m)return;m.autoWipe=val;saveMeta(m);syncSettingsUI();toast(val?'⚠️ Borrado automático activado tras 10 intentos fallidos':'Borrado automático desactivado');}
 async function confirmAutoWipe(checked){if(checked){const ok=await vkConfirm('Activar borrado automático','⚠️ Tras 10 intentos fallidos de PIN, toda la bóveda se borrará sin posibilidad de recuperación. Asegúrate de tener un respaldo cifrado. ¿Activar?');if(ok){setAutoWipe(true);}else{const t=$('autoWipeToggle');if(t)t.checked=false;}}else{setAutoWipe(false);}}
 async function bioSettingsAction(){
-  const bioActive=!!(localStorage.getItem('vk_bio_cred_id')&&localStorage.getItem('vk_bio_blob'));
+  const bioActive=false;
   if(bioActive){
     const ok=await vkConfirm('Desactivar biometría','¿Desactivar la biometría de este dispositivo? Tendrás que usar el PIN para entrar.');
     if(ok){localStorage.removeItem('vk_bio_cred_id');localStorage.removeItem('vk_bio_blob');localStorage.removeItem('vk_bio_offer_dismissed');syncSettingsUI();toast('Biometría desactivada.');}
@@ -563,7 +538,6 @@ function handleVisibilityChange(){
           service:document.getElementById('eService')?.value||'',
           user:document.getElementById('eUser')?.value||'',
           email:document.getElementById('eEmail')?.value||'',
-          pass:document.getElementById('ePass')?.value||'',
           url:document.getElementById('eUrl')?.value||'',
           icon:selectedEntryIcon||''
         };
@@ -1325,48 +1299,10 @@ async function regenerateRecoveryCode(){
   await showRecoveryCode(true);
 }
 async function tryBio(){
-  vibe(25);
-  const b64e=buf=>btoa(String.fromCharCode(...new Uint8Array(buf)));
-  const b64d=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-  if(!window.PublicKeyCredential){toast('Tu dispositivo no soporta biometría compatible.');return;}
-  const m=meta();
-  if(!m||!m.hash){toast('Configura primero un PIN.');return;}
-  const storedCredId=localStorage.getItem(LS_BIO_CRED);
-  if(!storedCredId||!localStorage.getItem(LS_BIO_BLOB)){
-    toast('Introduce el PIN una vez para activar la biometría.');return;
-  }
-  // Verificar huella y desbloquear
-  try{
-    beginBiometricFlow();
-    const challenge=crypto.getRandomValues(new Uint8Array(32));
-    const rawId=b64d(storedCredId);
-    const assertion=await navigator.credentials.get({publicKey:{
-      challenge,
-      allowCredentials:[{type:'public-key',id:rawId}],
-      userVerification:'required',
-      timeout:60000
-    }});
-    const blob=localStorage.getItem(LS_BIO_BLOB);
-    const {iv,data}=JSON.parse(blob);
-    const baseKey=await crypto.subtle.importKey('raw',new Uint8Array(assertion.rawId),'PBKDF2',false,['deriveKey']);
-    const aesKey=await crypto.subtle.deriveKey(
-      {name:'PBKDF2',salt:new TextEncoder().encode('vaultkey-bio-salt'),iterations:100000,hash:'SHA-256'},
-      baseKey,{name:'AES-GCM',length:256},false,['decrypt']
-    );
-    const dec=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(iv)},aesKey,b64d(data));
-    const recoveredPin=new TextDecoder().decode(dec);
-    const pinOk=m.pinSalt?(await hashPin(recoveredPin,m.pinSalt))===m.hash:(await digest(recoveredPin))===m.hash;
-    if(!pinOk){
-      toast('Error de verificación. Vuelve a entrar con el PIN para reactivar la biometría.');
-      localStorage.removeItem(LS_BIO_CRED);localStorage.removeItem(LS_BIO_BLOB);return;
-    }
-    await unlockOk(recoveredPin);
-  }catch(e){
-    if(e.name==='NotAllowedError')toast('Verificación cancelada.');
-    else{toast('Biometría no reconocida. Usa el PIN.');localStorage.removeItem(LS_BIO_CRED);localStorage.removeItem(LS_BIO_BLOB);}
-  }finally{
-    endBiometricFlow();
-  }
+  // Seguridad V2.3.1: no desbloquear la bóveda recuperando el PIN desde localStorage.
+  localStorage.removeItem(LS_BIO_CRED);
+  localStorage.removeItem(LS_BIO_BLOB);
+  toast('Biometría web desactivada por seguridad. Introduce tu PIN de VaultKey.');
 }
 function shareApp(){
   const url=location.origin&&location.origin!=='null'?location.origin:location.href;
@@ -1387,7 +1323,7 @@ function showAppInfo(){
   const debiles=vault?vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length:0;
   vkConfirm(
     'VaultKey V2.3.0',
-    `📦 Entradas guardadas: ${total}\n⭐ Favoritos: ${favs}\n⚠️ Contraseñas débiles: ${debiles}\n📅 PIN creado: ${creado}\n☁️ Último respaldo: ${backup}\n\n🔒 Cifrado AES-GCM 256 bits\n🔑 PBKDF2 · 200.000 iteraciones`
+    `📦 Entradas guardadas: ${total}\n⭐ Favoritos: ${favs}\n⚠️ Contraseñas débiles: ${debiles}\n📅 PIN creado: ${creado}\n☁️ Último respaldo: ${backup}\n\n🔒 Cifrado AES-GCM 256 bits\n🔑 PBKDF2 · PIN 200.000 / bóveda 150.000 iteraciones`
   ).catch(()=>{});
 }
 
@@ -1501,7 +1437,6 @@ function openEntry(e=null){
           if(d.service)document.getElementById('eService')&&(document.getElementById('eService').value=d.service);
           if(d.user)document.getElementById('eUser')&&(document.getElementById('eUser').value=d.user);
           if(d.email)document.getElementById('eEmail')&&(document.getElementById('eEmail').value=d.email);
-          if(d.pass)document.getElementById('ePass')&&(document.getElementById('ePass').value=d.pass);
           if(d.url)document.getElementById('eUrl')&&(document.getElementById('eUrl').value=d.url);
           if(d.icon){selectedEntryIcon=d.icon;typeof renderIconStrip==='function'&&renderIconStrip();}
           toast('Borrador restaurado ✓');
@@ -2311,7 +2246,7 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
   const lines=[
     'Iniciando cifrado AES-256...',
     'Generando clave segura...',
-    'Aplicando PBKDF2 × 200.000...',
+    'Aplicando PBKDF2 y AES-GCM...',
     'Protegiendo tu bóveda...',
     'Listo. Bóveda cifrada ✓'
   ];
@@ -2506,7 +2441,8 @@ function rankIcon(ic){
       setTimeout(async()=>{
         if(localStorage.getItem(REC_PENDING)==='1') return;
         const ok=await vkConfirm('Activar biometría del dispositivo','VaultKey seguirá usando tu PIN como protección principal. Cuando el sistema lo pida, usa la huella o el PIN de desbloqueo del dispositivo. No es el PIN de VaultKey. ¿Activarla?');
-        if(ok){await tryBioRegister(lastKey)} else {localStorage.setItem('vk_bio_offer_dismissed','1')}
+        localStorage.setItem('vk_bio_offer_dismissed','1');
+        toast('Biometría web no se activará hasta migrar a Android Keystore.');
       },650);
     }catch(e){}
   }

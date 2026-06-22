@@ -1,4 +1,4 @@
-﻿
+
 
 // ============================================================
 // GOOGLE DRIVE SYNC — VaultKey
@@ -11,6 +11,34 @@ const LS_DRIVE_AUTO = 'vk_drive_auto';
 const LS_DRIVE_LAST = 'vk_drive_last_sync';
 
 let driveToken = null;
+
+function driveNormalizeEntryId(id){
+  const v = String(id || '').trim();
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)
+    ? v
+    : crypto.randomUUID();
+}
+
+function driveSanitizeRestoredEntries(entries){
+  return entries.filter(e => e && typeof e === 'object').map(e => ({
+    ...e,
+    id: driveNormalizeEntryId(e.id),
+    service: String(e.service || ''),
+    entryType: String(e.entryType || 'password'),
+    category: String(e.category || 'general'),
+    user: String(e.user || ''),
+    email: String(e.email || ''),
+    pass: String(e.pass || ''),
+    url: String(e.url || ''),
+    note: String(e.note || ''),
+    fav: !!e.fav,
+    used: Number(e.used || 0),
+    updated: Number(e.updated || 0),
+    tags: Array.isArray(e.tags) ? e.tags.filter(t => typeof t === 'string').slice(0, 10) : [],
+    passHistory: Array.isArray(e.passHistory) ? e.passHistory : [],
+  }));
+}
+
 
 // Inicializar Drive al arrancar
 function driveInit() {
@@ -203,7 +231,7 @@ async function driveRestore() {
     if(!data.payload) throw new Error('Sin payload');
     const decrypted = await decryptData(data.payload, pinForImport);
     if(!decrypted || !Array.isArray(decrypted)) throw new Error('PIN incorrecto o datos inválidos');
-    vault = decrypted;
+    vault = driveSanitizeRestoredEntries(decrypted);
     await persist();
     render();
     soundSuccess(); vibe([30,20,60,20,80]);
