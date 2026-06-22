@@ -2400,8 +2400,17 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
       localStorage.removeItem('vaultkey_onboarding_v130'); // limpiar flag si no hay PIN
       openOnboardingHard();
     } else {
-      initPin();
-      show('pin');
+      // Comprobar si estamos en modo autofill picker
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('autofill') === '1' && window.VaultKeyBridge) {
+        // Modo picker: desbloquear y mostrar selector directamente
+        initPin();
+        show('pin');
+        window._autofillPickerMode = true;
+      } else {
+        initPin();
+        show('pin');
+      }
     }
   }
 
@@ -2533,6 +2542,7 @@ function rankIcon(ic){
     try{vibe([30,20,60]);soundPinOk()}catch(e){}
     lastKey=p;unlocked=true;pin='';renderDots();hidePrivacyOverlay();show('home');render();syncSettingsUI();resetAutoLockTimer();
     setTimeout(()=>{try{checkVaultReminders();}catch(e){}},2000);
+    setTimeout(()=>{try{maybeShowAutofillPicker();}catch(e){}},300);
     if(localStorage.getItem(REC_PENDING)==='1' || (localStorage.getItem(LS_REC)&&localStorage.getItem(REC_SAVED)!=='1')){
       setTimeout(()=>showRecoveryCode(true),120);
     }else{
@@ -2607,6 +2617,94 @@ function rankIcon(ic){
   });
 })();
 
+
+
+// ══════════════════════════════════════════════════════
+//  MODO AUTOFILL PICKER
+// ══════════════════════════════════════════════════════
+
+// Llamado después de desbloquear cuando estamos en modo autofill
+function maybeShowAutofillPicker() {
+  if (!window._autofillPickerMode) return;
+  if (!window.VaultKeyBridge) return;
+  showAutofillPicker();
+}
+
+function showAutofillPicker() {
+  // Construir UI de selección simplificada sobre la bóveda
+  const overlay = document.createElement('div');
+  overlay.id = 'autofillPickerOverlay';
+  overlay.style.cssText = [
+    'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999',
+    'background:#071428;display:flex;flex-direction:column;overflow:hidden'
+  ].join(';');
+
+  const entries = (vault || []).filter(e =>
+    !e.entryType || e.entryType === 'password'
+  );
+
+  let rows = '';
+  entries.forEach(e => {
+    const ic = iconForEntry(e);
+    const user = e.user || e.email || '';
+    rows += `<div onclick="autofillSelectEntry('${safeEsc(e.id)}')"
+      style="display:flex;align-items:center;gap:12px;padding:14px 16px;
+             border-bottom:1px solid rgba(0,180,255,.08);cursor:pointer;
+             transition:.15s;background:rgba(0,14,32,.4)"
+      onmousedown="this.style.background='rgba(0,100,255,.15)'"
+      onmouseup="this.style.background='rgba(0,14,32,.4)'">
+      ${vkLogoHTML(ic, 'logo', 40)}
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;color:#e0f0ff;font-size:14px">${safeEsc(e.service)}</div>
+        ${user ? `<div style="font-size:12px;color:#4a7090;margin-top:2px">${safeEsc(user)}</div>` : ''}
+      </div>
+      <div style="color:rgba(0,210,255,.4);font-size:20px">›</div>
+    </div>`;
+  });
+
+  overlay.innerHTML = `
+    <div style="padding:16px;background:rgba(0,14,32,.9);
+                border-bottom:1px solid rgba(0,180,255,.15);
+                display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <div style="font-size:24px">🔐</div>
+      <div>
+        <div style="font-weight:900;color:#e0f0ff;font-size:15px">VaultKey</div>
+        <div style="font-size:12px;color:#4a7090">Selecciona una credencial para autocompletar</div>
+      </div>
+      <button onclick="autofillCancel()"
+        style="margin-left:auto;background:none;border:none;
+               color:#4a7090;font-size:22px;cursor:pointer;padding:4px">✕</button>
+    </div>
+    <div style="flex:1;overflow-y:auto">
+      ${entries.length ? rows :
+        '<div style="text-align:center;padding:40px 16px;color:#4a7090">' +
+        '<div style="font-size:40px;margin-bottom:12px">🔐</div>' +
+        '<p>No tienes contraseñas guardadas todavía</p></div>'}
+    </div>`;
+
+  document.body.appendChild(overlay);
+}
+
+function autofillSelectEntry(id) {
+  const e = vault.find(x => x.id === id);
+  if (!e) { autofillCancel(); return; }
+  const username = e.user || e.email || '';
+  const password = e.pass || '';
+  try {
+    window.VaultKeyBridge.onEntrySelected(username, password);
+  } catch(err) {
+    console.error('AutofillBridge error:', err);
+    autofillCancel();
+  }
+}
+
+function autofillCancel() {
+  try {
+    if (window.VaultKeyBridge) window.VaultKeyBridge.onCancel();
+  } catch(err) {}
+  const overlay = document.getElementById('autofillPickerOverlay');
+  if (overlay) overlay.remove();
+}
 
 // ══════════════════════════════════════════════════════
 //  SISTEMA DE NOTIFICACIONES LOCALES — VaultKey
