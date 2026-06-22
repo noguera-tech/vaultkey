@@ -1792,7 +1792,7 @@ function render(){
     }
   })());
   }
-  renderFav();try{renderTagFilterChips();}catch(e){}let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);
+  renderFav();try{renderTagFilterChips();}catch(e){}try{updateCatChipCounts();}catch(e){}let recent=[...vault].sort((a,b)=>(b.used||0)-(a.used||0)).slice(0,4);
   if($('recentList')){
     $('recentList').innerHTML='';
     if(recent.length){
@@ -3186,6 +3186,47 @@ function setTagFilter(tag){
   _activeTagFilter = _activeTagFilter === tag ? null : tag;
   renderTagFilterChips();
   render();
+}
+
+function updateCatChipCounts(){
+  if(!vault||!vault.length) return;
+  // Count entries per category chip using same logic as _catMatch
+  const counts={};
+  vault.forEach(e=>{
+    const cat=(e.category||'otros').toLowerCase();
+    // Direct category match
+    counts[cat]=(counts[cat]||0)+1;
+    // entryType mappings
+    if(e.entryType==='wifi')       counts['wifi']=(counts['wifi']||0)+1;
+    if(e.entryType==='card')       counts['banco']=(counts['banco']||0)+1;
+    if(e.entryType==='id'||e.entryType==='license') counts['documentos']=(counts['documentos']||0)+1;
+    if(e.entryType==='medical')    counts['salud']=(counts['salud']||0)+1;
+  });
+  // Deduplicate: cap each entry to 1 count per category
+  // (rebuild cleanly using _catMatch logic)
+  const cleanCounts={};
+  vault.forEach(e=>{
+    const keys=new Set();
+    const cat=(e.category||'otros').toLowerCase();
+    keys.add(cat);
+    if(e.entryType==='wifi')    keys.add('wifi');
+    if(e.entryType==='card')    keys.add('banco');
+    if(['id','license'].includes(e.entryType)) keys.add('documentos');
+    if(e.entryType==='medical') keys.add('salud');
+    keys.forEach(k=>{ cleanCounts[k]=(cleanCounts[k]||0)+1; });
+  });
+  // Update chip text — preserve emoji, add count
+  document.querySelectorAll('.catChip[onclick]').forEach(btn=>{
+    const match=btn.getAttribute('onclick').match(/setCatFilter\('([^']+)'/);
+    if(!match) return;
+    const cat=match[1];
+    if(!cat) return; // skip "Todas"
+    const n=cleanCounts[cat]||0;
+    if(!n) return; // don't show (0)
+    // Extract emoji+label (text before any existing count in parentheses)
+    const base=btn.textContent.replace(/\s*\(\d+\)$/,'').trim();
+    btn.textContent=base+' ('+n+')';
+  });
 }
 
 function renderTagFilterChips(){
