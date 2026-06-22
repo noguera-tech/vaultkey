@@ -2478,21 +2478,31 @@ function rankIcon(ic){
       if(mode==='setup2'){
         if(typedPin!==tempPin){pin='';mode='setup1';tempPin='';$('pinMsg').className='pinSub pinWarn';$('pinMsg').textContent='No coincide. Crea un PIN de '+getPinLen()+' dígitos';renderDots();return;}
         const hp=await makeHashedPin(typedPin);
-        // Preservar metadatos existentes (respaldo, autoLock, etc.) si los hay
+        // ── Re-cifrado atómico de PIN ────────────────────────────────────────
+        // Fase 1: backup de los datos actuales antes de tocar nada
+        const LS_PIN_BACKUP='vk_pin_change_backup';
+        const existingData=localStorage.getItem(LS_DATA);
+        if(existingData) localStorage.setItem(LS_PIN_BACKUP, existingData);
+        // Fase 2: re-cifrar la bóveda con el PIN nuevo
+        // (persist() escribe en LS_DATA — si falla aquí, el backup sigue intacto
+        //  y el hash TODAVÍA NO se ha actualizado, por lo que el PIN viejo sigue funcionando)
+        try{
+          if(vault && vault.length>0){
+            await persist(typedPin);
+          } else {
+            vault=[];await persist(typedPin);
+          }
+        }catch(persistErr){
+          // Re-cifrado fallido — restaurar backup y abortar
+          if(existingData) localStorage.setItem(LS_DATA, existingData);
+          localStorage.removeItem(LS_PIN_BACKUP);
+          throw persistErr;
+        }
+        // Fase 3: commit — solo ahora actualizamos el hash (operación atómica final)
         const existingMeta=meta()||{};
         saveMeta({...existingMeta,hash:hp.hash,pinSalt:hp.salt,pinLen:getPinLen(),created:existingMeta.created||Date.now(),lastBackup:existingMeta.lastBackup||null,autoLockMs:existingMeta.autoLockMs||30000,failedAttempts:0,lockLevel:0,lockedUntil:0,lastOk:null,lastFail:null,autoWipe:existingMeta.autoWipe||false,totalFailed:0});
-        // BUG1 FIX: Si ya había datos cifrados con otra clave (cambio de PIN),
-        // re-cifrar la vault existente con el nuevo PIN en lugar de borrarla.
-        const existingData=localStorage.getItem(LS_DATA);
-        if(existingData && vault && vault.length>0){
-          // vault ya está en memoria (cargada antes del cambio de PIN), re-cifrar con nuevo PIN
-          await persist(typedPin);
-        } else if(existingData && (!vault || vault.length===0)){
-          // vault vacía en memoria pero hay datos — podría ser primer setup real
-          vault=[];await persist(typedPin);
-        } else {
-          vault=[];await persist(typedPin);
-        }
+        // Fase 4: limpiar backup — cambio completado con éxito
+        localStorage.removeItem(LS_PIN_BACKUP);
         const rec=makeRecoveryCode();
         const recEnc=await encryptRec(rec,typedPin);
         localStorage.setItem(LS_REC,JSON.stringify(recEnc));
@@ -2756,7 +2766,23 @@ function renderHealthPanel(){
 
   // Score global (0-100)
   const total=passes.length;
-  const globalScore=total===0?100:Math.round(
+
+  // Si no hay contraseñas, mostrar panel informativo sin score engañoso
+  if(total===0){
+    const sumEl=$('healthSummaryText');
+    if(sumEl)sumEl.textContent='Sin contraseñas que analizar';
+    const el=$('healthContent');
+    if(el)el.innerHTML=`
+      <div style="text-align:center;padding:32px 16px">
+        <div style="font-size:48px;margin-bottom:12px">🔐</div>
+        <div style="font-size:16px;font-weight:800;color:#c0d8f0;margin-bottom:8px">Sin contraseñas que analizar</div>
+        <div style="font-size:13px;color:#4a7090;line-height:1.5">El panel de salud analiza tus entradas de tipo contraseña.<br>Tus notas, tarjetas y documentos están guardados correctamente.</div>
+        <button class="btn" onclick="closeModals()" style="margin-top:24px;width:100%">Cerrar</button>
+      </div>`;
+    return;
+  }
+
+  const globalScore=Math.round(
     ((strong.length*100+medium.length*60+weak.length*20)/total)
     - (dupes.length/total)*20
     - (old.length/total)*15
