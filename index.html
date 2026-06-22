@@ -108,7 +108,7 @@
 <div style="display:flex;align-items:center;gap:10px;padding:12px 16px 8px;position:relative;z-index:5">
   <div style="flex:1;position:relative">
     <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;color:#4a7090;pointer-events:none">✕</span>
-    <input id="search" placeholder="Buscar entradas..." oninput="clearTimeout(_searchDebounce);_searchDebounce=setTimeout(()=>render(),150)"
+    <input id="search" aria-label="Buscar entradas en la bóveda" placeholder="Buscar entradas..." oninput="clearTimeout(_searchDebounce);_searchDebounce=setTimeout(()=>render(),150)"
       style="width:100%;background:rgba(0,20,50,.7);border:1.5px solid rgba(0,150,210,.2);border-radius:14px;padding:10px 12px 10px 36px;color:#e8f4ff;font-size:14px;outline:none;transition:.2s"
       onfocus="this.style.borderColor='rgba(0,210,255,.5)'" onblur="this.style.borderColor='rgba(0,150,210,.2)'">
   </div>
@@ -132,24 +132,24 @@
 <!-- ┬┬ Chips de categoría ┬┬ -->
 <div style="position:relative">
   <div id="catFilterRow" style="display:flex;gap:6px;overflow-x:auto;padding:4px 16px 8px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x mandatory">
-    <button class="catChip active" onclick="setCatFilter('',this)">✦ Todas</button>
-    <button class="catChip" onclick="setCatFilter('banco',this)">🏦 Banco</button>
-    <button class="catChip" onclick="setCatFilter('correo',this)">📧 Correo</button>
-    <button class="catChip" onclick="setCatFilter('social',this)">💬 Social</button>
-    <button class="catChip" onclick="setCatFilter('trabajo',this)">💼 Trabajo</button>
-    <button class="catChip" onclick="setCatFilter('streaming',this)">🎬 Stream</button>
-    <button class="catChip" onclick="setCatFilter('compras',this)">🛒 Compras</button>
-    <button class="catChip" onclick="setCatFilter('gaming',this)">🎮 Gaming</button>
-    <button class="catChip" onclick="setCatFilter('cripto',this)">₿ Cripto</button>
-    <button class="catChip" onclick="setCatFilter('wifi',this)">📶 WiFi</button>
-    <button class="catChip" onclick="setCatFilter('gobierno',this)">🏛️ Gobierno</button>
-    <button class="catChip" onclick="setCatFilter('salud',this)">🏥 Salud</button>
-    <button class="catChip" onclick="setCatFilter('documentos',this)">🪪 Docs</button>
-    <button class="catChip" onclick="setCatFilter('viajes',this)">✈️ Viajes</button>
-    <button class="catChip" onclick="setCatFilter('educacion',this)">🎓 Educación</button>
-    <button class="catChip" onclick="setCatFilter('familia',this)">👨‍👩‍👧 Familia</button>
-    <button class="catChip" onclick="setCatFilter('servidor',this)">🖥️ Servidor</button>
-    <button class="catChip" onclick="setCatFilter('otros',this)">📁 Otros</button>
+    <button class="catChip active" aria-label="Mostrar todas las entradas" onclick="setCatFilter('',this)">✦ Todas</button>
+    <button class="catChip" aria-label="Filtrar por banco" onclick="setCatFilter('banco',this)">🏦 Banco</button>
+    <button class="catChip" aria-label="Filtrar por correo" onclick="setCatFilter('correo',this)">📧 Correo</button>
+    <button class="catChip" aria-label="Filtrar por redes sociales" onclick="setCatFilter('social',this)">💬 Social</button>
+    <button class="catChip" aria-label="Filtrar por trabajo" onclick="setCatFilter('trabajo',this)">💼 Trabajo</button>
+    <button class="catChip" aria-label="Filtrar por streaming" onclick="setCatFilter('streaming',this)">🎬 Stream</button>
+    <button class="catChip" aria-label="Filtrar por compras" onclick="setCatFilter('compras',this)">🛒 Compras</button>
+    <button class="catChip" aria-label="Filtrar por gaming" onclick="setCatFilter('gaming',this)">🎮 Gaming</button>
+    <button class="catChip" aria-label="Filtrar por cripto" onclick="setCatFilter('cripto',this)">₿ Cripto</button>
+    <button class="catChip" aria-label="Filtrar por WiFi" onclick="setCatFilter('wifi',this)">📶 WiFi</button>
+    <button class="catChip" aria-label="Filtrar por gobierno" onclick="setCatFilter('gobierno',this)">🏛️ Gobierno</button>
+    <button class="catChip" aria-label="Filtrar por salud" onclick="setCatFilter('salud',this)">🏥 Salud</button>
+    <button class="catChip" aria-label="Filtrar por documentos" onclick="setCatFilter('documentos',this)">🪪 Docs</button>
+    <button class="catChip" aria-label="Filtrar por viajes" onclick="setCatFilter('viajes',this)">✈️ Viajes</button>
+    <button class="catChip" aria-label="Filtrar por educación" onclick="setCatFilter('educacion',this)">🎓 Educación</button>
+    <button class="catChip" aria-label="Filtrar por familia" onclick="setCatFilter('familia',this)">👨‍👩‍👧 Familia</button>
+    <button class="catChip" aria-label="Filtrar por servidor" onclick="setCatFilter('servidor',this)">🖥️ Servidor</button>
+    <button class="catChip" aria-label="Filtrar por otros" onclick="setCatFilter('otros',this)">📁 Otros</button>
   </div>
 </div>
 
@@ -185,7 +185,7 @@
   <div id="recentListVault" style="display:none;position:relative;z-index:2"></div>
 </div>
   <!-- FAB nueva entrada -->
-  <button onclick="openEntry()" id="fabAdd" style="position:fixed;bottom:28px;right:20px;width:56px;height:56px;border-radius:28px;background:linear-gradient(135deg,#5544ff,#0066ff);border:none;color:#fff;font-size:28px;font-weight:200;box-shadow:0 6px 24px rgba(0,100,255,.5);display:none;align-items:center;justify-content:center;z-index:90;transition:transform .15s,opacity .2s">+</button>
+  <button onclick="openEntry()" id="fabAdd" aria-label="Nueva entrada" style="position:fixed;bottom:28px;right:20px;width:56px;height:56px;border-radius:28px;background:linear-gradient(135deg,#5544ff,#0066ff);border:none;color:#fff;font-size:28px;font-weight:200;box-shadow:0 6px 24px rgba(0,100,255,.5);display:none;align-items:center;justify-content:center;z-index:90;transition:transform .15s,opacity .2s">+</button>
 </section>
 <section id="fav" class="screen"><div class="vaultHeader"><button style="opacity:0;pointer-events:none;width:36px;height:36px;border:0;background:transparent">☰</button><span class="vaultTitle">Favoritos</span><span id="favCount" style="font-size:12px;color:var(--muted);font-weight:700;background:rgba(0,210,255,.1);border:1px solid rgba(0,210,255,.2);border-radius:20px;padding:3px 10px"></span></div><div class="content" style="padding-top:8px"><div id="favGrid" class="favGrid" style="position:relative;z-index:2">
     <!-- Empty state fav -->
