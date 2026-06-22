@@ -1885,7 +1885,46 @@ function setIconCat(cat,btn){window._setIconCat(cat,btn);}
 document.addEventListener('click',function(e){const btn=e.target.closest('[data-cat]');if(btn&&btn.classList.contains('iconCat')){e.stopPropagation();window._setIconCat(btn.dataset.cat,btn);}});
 
 
-function row(e){let div=document.createElement('div');div.className='entry';div.onclick=()=>quick(e.id);let ic=iconForEntry(e);const weak=e?.entryType==='password'&&score(e.pass)<3;const typeEmoji=e?.entryType==='note'?'📝':e?.entryType==='card'?'💳':e?.entryType==='id'?'🪪':e?.entryType==='license'?'🚗':e?.entryType==='medical'?'🏥':e?.entryType==='wifi'?'📶':'🔑';div.innerHTML=`${vkLogoHTML(ic)}<div style="flex:1;min-width:0"><h3 style="display:flex;align-items:center;gap:6px">${safeEsc(e.service)}${e.fav?'<span style="font-size:11px">⭐</span>':''} ${weak?'<span style="font-size:9px;background:rgba(255,77,85,.2);color:#ff8c94;border:1px solid rgba(255,77,85,.3);border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.3px">DÉBIL</span>':''}</h3><p style="color:#7a9ec0">${esc(entryMainIdentity(e))}</p></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:14px;opacity:.7">${typeEmoji}</span><div class="go" style="color:rgba(0,210,255,.4);font-size:18px">›</div></div>`;return div}
+function currentPassFor(id){const e=vault.find(x=>x.id===id);return e&&e.pass?e.pass:'';}
+function currentUserFor(id){const e=vault.find(x=>x.id===id);return e&&(e.user||e.email)?e.user||e.email:'';}
+function row(e){
+  let div=document.createElement('div');
+  div.className='entry';
+  div.onclick=()=>quick(e.id);
+  let ic=iconForEntry(e);
+  const weak=e?.entryType==='password'&&score(e.pass)<3;
+  const isPass=!e?.entryType||e?.entryType==='password';
+  const typeEmoji=e?.entryType==='note'?'📝':e?.entryType==='card'?'💳':e?.entryType==='id'?'🪷':e?.entryType==='license'?'🚗':e?.entryType==='medical'?'🏥':e?.entryType==='wifi'?'📶':'🔑';
+  const hasUser=!!(e.user||e.email);
+  const hasPass=!!e.pass;
+  const eid=e.id;
+  const BTN='cursor:pointer;border:none;border-radius:8px;padding:5px 7px;font-size:13px;display:flex;align-items:center;justify-content:center;transition:.15s;background:rgba(0,180,255,.08);color:#4a9ec0;';
+  let rightCol;
+  if(isPass){
+    const uBtn=document.createElement('button');
+    uBtn.title='Copiar usuario';
+    uBtn.setAttribute('aria-label','Copiar usuario');
+    uBtn.style.cssText=BTN+(hasUser?'':'opacity:.25;pointer-events:none;');
+    uBtn.textContent='👤';
+    uBtn.onclick=ev=>{ev.stopPropagation();if(!hasUser)return;vibe(25);soundCopy();copyText(currentUserFor(eid));toast('👤 Usuario copiado');};
+    const pBtn=document.createElement('button');
+    pBtn.title='Copiar contraseña';
+    pBtn.setAttribute('aria-label','Copiar contraseña');
+    pBtn.style.cssText=BTN+(hasPass?'':'opacity:.25;pointer-events:none;');
+    pBtn.textContent='🔑';
+    pBtn.onclick=ev=>{ev.stopPropagation();if(!hasPass)return;vibe(25);soundCopy();copyText(currentPassFor(eid));toast('🔑 Contraseña copiada');};
+    rightCol=document.createElement('div');
+    rightCol.style.cssText='display:flex;flex-direction:column;gap:5px;flex-shrink:0';
+    rightCol.appendChild(uBtn);
+    rightCol.appendChild(pBtn);
+  } else {
+    rightCol=document.createElement('div');
+    rightCol.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
+    rightCol.innerHTML='<span style="font-size:14px;opacity:.7">'+typeEmoji+'</span><div class="go" style="color:rgba(0,210,255,.4);font-size:18px">›</div>';
+  }
+  div.innerHTML=`${vkLogoHTML(ic)}<div style="flex:1;min-width:0"><h3 style="display:flex;align-items:center;gap:6px">${safeEsc(e.service)}${e.fav?'<span style="font-size:11px">⭐</span>':''} ${weak?'<span style="font-size:9px;background:rgba(255,77,85,.2);color:#ff8c94;border:1px solid rgba(255,77,85,.3);border-radius:6px;padding:1px 5px;font-weight:900;letter-spacing:.3px">DÉBIL</span>':''}</h3><p style="color:#7a9ec0">${esc(entryMainIdentity(e))}</p></div>`;
+  div.appendChild(rightCol);
+  return div}
 
 function renderFav(){
   const grid=$('favGrid');
