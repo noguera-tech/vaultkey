@@ -1421,7 +1421,170 @@ function showAppInfo(){
 
 /* Toque en la fila de versión → mostrar info de la bóveda */
 (function(){
-  document.addEventListener('DOMContentLoaded',()=>{
+  function initCategoryPagedCarousel(){
+  const row=document.getElementById('catFilterRow');
+  if(!row)return;
+
+  if(row.dataset.vkPagedCarouselReady==='1'){
+    renderCategoryPage();
+    return;
+  }
+
+  row.dataset.vkPagedCarouselReady='1';
+  row.setAttribute('tabindex','0');
+  row.setAttribute('aria-label','Carrusel de categorías');
+
+  let currentPage=0;
+  const PER_PAGE=4;
+
+  const chips=()=>[...row.children].filter(el=>el.nodeType===1);
+
+  function pages(){
+    const list=chips();
+    const out=[];
+    for(let i=0;i<list.length;i+=PER_PAGE){
+      out.push(list.slice(i,i+PER_PAGE));
+    }
+    return out;
+  }
+
+  function activeChip(){
+    return row.querySelector('.active,.selected,[aria-pressed="true"]');
+  }
+
+  function activePageIndex(allPages){
+    const active=activeChip();
+    if(!active)return -1;
+    return allPages.findIndex(page=>page.includes(active));
+  }
+
+  function renderCategoryPage(forceActive=false){
+    const allPages=pages();
+    if(!allPages.length)return;
+
+    if(forceActive){
+      const idx=activePageIndex(allPages);
+      if(idx>=0)currentPage=idx;
+    }
+
+    currentPage=Math.max(0,Math.min(currentPage,allPages.length-1));
+
+    const visible=new Set(allPages[currentPage]);
+
+    chips().forEach(chip=>{
+      chip.style.display=visible.has(chip)?'':'none';
+      chip.style.flex='0 0 auto';
+      if(!chip.hasAttribute('tabindex'))chip.setAttribute('tabindex','0');
+    });
+
+    row.dataset.catPage=String(currentPage+1);
+    row.dataset.catPages=String(allPages.length);
+  }
+
+  function pageBy(delta){
+    const allPages=pages();
+    if(allPages.length<=1)return;
+
+    const next=Math.max(0,Math.min(currentPage+delta,allPages.length-1));
+    if(next===currentPage)return;
+
+    currentPage=next;
+    renderCategoryPage();
+  }
+
+  window.renderCategoryPage=renderCategoryPage;
+
+  let startX=0;
+  let dragging=false;
+  let moved=false;
+
+  row.addEventListener('wheel',e=>{
+    const allPages=pages();
+    if(allPages.length<=1)return;
+
+    const delta=Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX;
+    if(Math.abs(delta)<8)return;
+
+    e.preventDefault();
+    pageBy(delta>0?1:-1);
+  },{passive:false});
+
+  row.addEventListener('pointerdown',e=>{
+    const allPages=pages();
+    if(allPages.length<=1)return;
+
+    dragging=true;
+    moved=false;
+    startX=e.clientX;
+    row.setPointerCapture?.(e.pointerId);
+  });
+
+  row.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    if(Math.abs(e.clientX-startX)>10)moved=true;
+  });
+
+  row.addEventListener('pointerup',e=>{
+    if(!dragging)return;
+
+    dragging=false;
+    row.releasePointerCapture?.(e.pointerId);
+
+    const dx=e.clientX-startX;
+
+    if(Math.abs(dx)>35){
+      row.dataset.dragging='1';
+      pageBy(dx<0?1:-1);
+      setTimeout(()=>{delete row.dataset.dragging;},120);
+    }
+  });
+
+  row.addEventListener('pointercancel',()=>{
+    dragging=false;
+  });
+
+  row.addEventListener('click',e=>{
+    if(row.dataset.dragging==='1'){
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
+    setTimeout(()=>renderCategoryPage(true),0);
+  },true);
+
+  row.addEventListener('keydown',e=>{
+    if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+
+    e.preventDefault();
+
+    const allPages=pages();
+
+    if(e.key==='Home'){
+      currentPage=0;
+      renderCategoryPage();
+      return;
+    }
+
+    if(e.key==='End'){
+      currentPage=Math.max(0,allPages.length-1);
+      renderCategoryPage();
+      return;
+    }
+
+    if(e.key==='ArrowRight')pageBy(1);
+    if(e.key==='ArrowLeft')pageBy(-1);
+  });
+
+  new MutationObserver(()=>setTimeout(()=>renderCategoryPage(true),0))
+    .observe(row,{childList:true,subtree:true,characterData:true});
+
+  setTimeout(()=>renderCategoryPage(true),0);
+}
+
+
+document.addEventListener('DOMContentLoaded',()=>{
+  initCategoryPagedCarousel();
   initFabVisibilityObserver();
     const row=document.getElementById('versionRow');
     if(!row)return;

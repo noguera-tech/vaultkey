@@ -131,7 +131,7 @@
 
 <!-- ┬┬ Chips de categoría ┬┬ -->
 <div style="position:relative">
-  <div id="catFilterRow" style="display:flex;gap:6px;overflow-x:auto;padding:4px 16px 8px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x mandatory">
+  <div id="catFilterRow" tabindex="0" aria-label="Carrusel de categorías" style="display:flex;gap:6px;overflow-x:auto;padding:4px 16px 8px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x mandatory">
     <button class="catChip active" aria-label="Mostrar todas las entradas" onclick="setCatFilter('',this)">✦ Todas</button>
     <button class="catChip" aria-label="Filtrar por banco" onclick="setCatFilter('banco',this)">🏦 Banco</button>
     <button class="catChip" aria-label="Filtrar por correo" onclick="setCatFilter('correo',this)">📧 Correo</button>

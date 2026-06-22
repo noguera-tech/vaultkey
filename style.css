@@ -900,3 +900,56 @@ input[type=range]::-moz-range-thumb {
   bottom: 28px !important;
   z-index: 90 !important;
 }
+
+/* Category paged carousel */
+#catFilterRow {
+  overflow: hidden !important;
+  flex-wrap: nowrap !important;
+  justify-content: center;
+  align-items: center;
+  scroll-snap-type: none !important;
+  overscroll-behavior-x: contain;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+#catFilterRow .catChip {
+  flex: 0 0 auto;
+}
+
+#catFilterRow:focus {
+  outline: none;
+}
+
+#catFilterRow:focus-visible {
+  box-shadow: inset 0 0 0 1px rgba(0,210,255,.45);
+}
+
+/* Category fixed paged carousel: 4 complete chips per page */
+#catFilterRow {
+  overflow: hidden !important;
+  flex-wrap: nowrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 8px !important;
+  scroll-snap-type: none !important;
+  overscroll-behavior-x: contain;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+#catFilterRow > * {
+  max-width: calc((100% - 30px) / 4);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+#catFilterRow:focus {
+  outline: none;
+}
+
+#catFilterRow:focus-visible {
+  box-shadow: inset 0 0 0 1px rgba(0,210,255,.45);
+}
