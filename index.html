@@ -32,74 +32,54 @@
     <div class="pinActions"></div>
   </div>
 </section>
-<section id="home" class="screen homeHeroPremium targetHome">
+<section id="home" class="screen homeHeroPremium targetHome vkHomeSplash">
 
-  <!-- ┬┬ Header con saludo y menú ┬┬ -->
-  <div style="padding:12px 18px 0;position:relative;z-index:10;text-align:center">
-    <div style="font-size:11px;color:rgba(0,210,255,.6);font-weight:700;letter-spacing:1px" id="homeGreeting">BIENVENIDO</div>
+  <div class="vkHomeTop">
+    <button class="vkHomeTopBtn" onclick="toggleHomeMenu()" aria-label="Menú">☰</button>
+    <div class="vkHomeGreeting" id="homeGreeting">BIENVENIDO</div>
+    <button class="vkHomeTopBtn" onclick="show('vault')" aria-label="Buscar">⌕</button>
   </div>
 
-  <div class="content homePremium targetHomeContent" style="padding-top:8px;padding-bottom:24px">
+  <div class="content vkHomeSplashContent">
 
-    <!-- ┬┬ Hero escudo ┬┬ -->
-    <div class="homeBrand targetHero" style="margin:0 0 0">
-      <img class="heroShield" src="vaultkey-shield-scene.png?v=221" alt="VaultKey">
+    <div class="vkHomeShieldWrap">
+      <img class="vkHomeShieldImg" src="vaultkey-shield-scene.png?v=221" alt="VaultKey">
     </div>
 
-    <!-- ┬┬ Título bajo escudo ┬┬ -->
-    <div style="text-align:center;padding:0 16px 12px;margin-top:-4px">
-      <b class="heroBrandTitle">Vault<span>Key</span></b>
-      <strong style="display:block;font-size:13px;color:rgba(160,210,240,.65);font-weight:600;margin-top:2px">Tu bóveda digital privada</strong>
+    <div class="vkHomeBrandBlock">
+      <b class="vkHomeBrandTitle">Vault<span>Key</span></b>
+      <strong>Tu bóveda digital privada</strong>
+      <p>Protege tus contraseñas, códigos y datos importantes.</p>
     </div>
 
-    <!-- ┬┬ Stats cards ┬┬ -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
-      <div onclick="show('vault')" style="background:linear-gradient(135deg,rgba(0,100,200,.2),rgba(0,60,140,.15));border:1px solid rgba(0,180,255,.2);border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer">
-        <div style="font-size:26px;font-weight:900;color:#00e5ff;line-height:1" id="statTotal">0</div>
-        <div style="font-size:10px;color:rgba(0,200,255,.6);margin-top:4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px">Entradas</div>
-      </div>
-      <div onclick="show('fav')" style="background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(180,100,0,.1));border:1px solid rgba(245,158,11,.25);border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer">
-        <div style="font-size:26px;font-weight:900;color:#f59e0b;line-height:1" id="statFav">0</div>
-        <div style="font-size:10px;color:rgba(245,158,11,.6);margin-top:4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px">Favoritos</div>
-      </div>
-      <div onclick="showHealthPanel()" style="background:linear-gradient(135deg,rgba(255,80,100,.15),rgba(180,20,40,.1));border:1px solid rgba(255,80,100,.25);border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer">
-        <div style="font-size:26px;font-weight:900;color:#ff6b75;line-height:1" id="statWeak">0</div>
-        <div style="font-size:10px;color:rgba(255,100,120,.6);margin-top:4px;font-weight:700;text-transform:uppercase;letter-spacing:.4px">Débiles</div>
-      </div>
-    </div>
-
-    <!-- ┬┬ Panel de salud ┬┬ -->
-    <div onclick="showHealthPanel()" style="margin-bottom:12px;padding:14px 16px;background:linear-gradient(135deg,rgba(0,40,90,.6),rgba(0,20,55,.7));border:1px solid rgba(0,180,255,.18);border-radius:16px;cursor:pointer;display:flex;align-items:center;gap:14px;box-shadow:0 4px 20px rgba(0,0,0,.3)">
-      <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,rgba(0,150,255,.2),rgba(0,80,200,.15));border:1px solid rgba(0,180,255,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🛡️</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:800;color:#e0f0ff;font-size:14px;margin-bottom:2px">Panel de salud</div>
-        <div style="font-size:12px;color:#4a7090" id="healthSummaryText">Analizar contraseñas</div>
-      </div>
-      <div style="color:rgba(0,210,255,.4);font-size:20px;font-weight:300">›</div>
-    </div>
-
-    <!-- ┬┬ Accesos rápidos ┬┬ -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      <button onclick="openEntry()" style="padding:14px 12px;border-radius:14px;border:1px solid rgba(100,80,255,.35);background:linear-gradient(135deg,rgba(80,60,255,.2),rgba(40,20,180,.15));color:#a89fff;font-size:13px;font-weight:800;text-align:left;display:flex;align-items:center;gap:8px">
-        <span style="font-size:18px">➕</span>Nueva entrada
+    <div class="vkHomePrimaryActions">
+      <button class="vkHomeMainAction" onclick="openEntry()">
+        <span>＋</span>
+        <b>Nueva entrada</b>
       </button>
-      <button onclick="show('vault')" style="padding:14px 12px;border-radius:14px;border:1px solid rgba(0,180,255,.25);background:linear-gradient(135deg,rgba(0,80,200,.2),rgba(0,40,120,.15));color:#7ab0d0;font-size:13px;font-weight:800;text-align:left;display:flex;align-items:center;gap:8px">
-        <span style="font-size:18px">🔑</span>Mis entradas
+      <button class="vkHomeSecondAction" onclick="show('vault')">
+        <span>🔑</span>
+        <b>Mis entradas</b>
       </button>
-      <button onclick="show('fav')" style="padding:14px 12px;border-radius:14px;border:1px solid rgba(245,158,11,.25);background:linear-gradient(135deg,rgba(180,100,0,.15),rgba(120,60,0,.1));color:#c8880a;font-size:13px;font-weight:800;text-align:left;display:flex;align-items:center;gap:8px">
-        <span style="font-size:18px">⭐</span>Favoritos
-      </button>
-      <button onclick="showHealthPanel()" style="padding:14px 12px;border-radius:14px;border:1px solid rgba(0,200,120,.25);background:linear-gradient(135deg,rgba(0,160,80,.15),rgba(0,100,40,.1));color:#00c875;font-size:13px;font-weight:800;text-align:left;display:flex;align-items:center;gap:8px">
-        <span style="font-size:18px">🛡️</span>Salud
-      </button>
-
     </div>
 
-    <!-- ┬┬ Recientes ┬┬ -->
+    <div class="vkHomeMiniActions">
+      <button onclick="show('fav')">⭐ <span>Favoritos</span></button>
+      <button onclick="showHealthPanel()">🛡️ <span>Salud</span></button>
+      <button onclick="openBackup()">☁️ <span>Respaldos</span></button>
+    </div>
+
+    <!-- IDs conservados para app.js/render sin mostrar dashboard en Home -->
+    <div class="vkHomeHiddenStats" aria-hidden="true">
+      <span id="statTotal">0</span>
+      <span id="statFav">0</span>
+      <span id="statWeak">0</span>
+      <span id="healthSummaryText">Analizar contraseñas</span>
+    </div>
+
     <div id="recentList" class="targetRecent"></div>
 
   </div>
-
 
 </section>
 <section id="vault" class="screen targetVault">
