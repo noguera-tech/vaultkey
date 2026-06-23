@@ -572,8 +572,15 @@ select option { background:#001830; color:#e8f6ff; }
 .fieldErrorNote { display:block; margin-top:5px; color:#ff8888; font-size:11px; font-weight:700; }
 
 /* Icon strip */
-#iconStripRow { overflow-x:auto; white-space:nowrap; scrollbar-width:none; padding:4px 0 8px; }
+#iconStripRow { overflow-x:auto; overflow-y:hidden; white-space:nowrap; scrollbar-width:none; padding:4px 0 8px; cursor:grab; scroll-behavior:smooth; touch-action:pan-x; }
+#iconStripRow.dragging { cursor:grabbing; user-select:none; }
 #iconStripRow::-webkit-scrollbar { display:none; }
+@media (pointer:fine){
+  #iconStripRow { scrollbar-width:thin; padding-bottom:10px; }
+  #iconStripRow::-webkit-scrollbar { display:block; height:8px; }
+  #iconStripRow::-webkit-scrollbar-track { background:rgba(255,255,255,.06); border-radius:999px; }
+  #iconStripRow::-webkit-scrollbar-thumb { background:rgba(0,217,255,.38); border-radius:999px; }
+}
 .vkStripIconBtn {
   display:inline-flex; align-items:center; justify-content:center;
   width:54px; height:54px; border-radius:13px;

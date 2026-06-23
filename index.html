@@ -132,24 +132,24 @@
 <!-- ┬┬ Chips de categoría ┬┬ -->
 <div style="position:relative">
   <div id="catFilterRow" tabindex="0" aria-label="Carrusel de categorías" style="display:flex;gap:6px;overflow-x:auto;padding:4px 16px 8px;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x mandatory">
-    <button class="catChip active" aria-label="Mostrar todas las entradas" onclick="setCatFilter('',this)">✦ Todas</button>
-    <button class="catChip" aria-label="Filtrar por banco" onclick="setCatFilter('banco',this)">🏦 Banco</button>
-    <button class="catChip" aria-label="Filtrar por correo" onclick="setCatFilter('correo',this)">📧 Correo</button>
-    <button class="catChip" aria-label="Filtrar por redes sociales" onclick="setCatFilter('social',this)">💬 Social</button>
-    <button class="catChip" aria-label="Filtrar por trabajo" onclick="setCatFilter('trabajo',this)">💼 Trabajo</button>
-    <button class="catChip" aria-label="Filtrar por streaming" onclick="setCatFilter('streaming',this)">🎬 Stream</button>
-    <button class="catChip" aria-label="Filtrar por compras" onclick="setCatFilter('compras',this)">🛒 Compras</button>
-    <button class="catChip" aria-label="Filtrar por gaming" onclick="setCatFilter('gaming',this)">🎮 Gaming</button>
-    <button class="catChip" aria-label="Filtrar por cripto" onclick="setCatFilter('cripto',this)">₿ Cripto</button>
-    <button class="catChip" aria-label="Filtrar por WiFi" onclick="setCatFilter('wifi',this)">📶 WiFi</button>
-    <button class="catChip" aria-label="Filtrar por gobierno" onclick="setCatFilter('gobierno',this)">🏛️ Gobierno</button>
-    <button class="catChip" aria-label="Filtrar por salud" onclick="setCatFilter('salud',this)">🏥 Salud</button>
-    <button class="catChip" aria-label="Filtrar por documentos" onclick="setCatFilter('documentos',this)">🪪 Docs</button>
-    <button class="catChip" aria-label="Filtrar por viajes" onclick="setCatFilter('viajes',this)">✈️ Viajes</button>
-    <button class="catChip" aria-label="Filtrar por educación" onclick="setCatFilter('educacion',this)">🎓 Educación</button>
-    <button class="catChip" aria-label="Filtrar por familia" onclick="setCatFilter('familia',this)">👨‍👩‍👧 Familia</button>
-    <button class="catChip" aria-label="Filtrar por servidor" onclick="setCatFilter('servidor',this)">🖥️ Servidor</button>
-    <button class="catChip" aria-label="Filtrar por otros" onclick="setCatFilter('otros',this)">📁 Otros</button>
+    <button class="catChip active" data-cat="" aria-label="Mostrar todas las entradas" onclick="setCatFilter('',this)">✦ Todas</button>
+    <button class="catChip" data-cat="banco" aria-label="Filtrar por banco" onclick="setCatFilter('banco',this)">🏦 Banco</button>
+    <button class="catChip" data-cat="correo" aria-label="Filtrar por correo" onclick="setCatFilter('correo',this)">📧 Correo</button>
+    <button class="catChip" data-cat="social" aria-label="Filtrar por redes sociales" onclick="setCatFilter('social',this)">💬 Social</button>
+    <button class="catChip" data-cat="trabajo" aria-label="Filtrar por trabajo" onclick="setCatFilter('trabajo',this)">💼 Trabajo</button>
+    <button class="catChip" data-cat="streaming" aria-label="Filtrar por streaming" onclick="setCatFilter('streaming',this)">🎬 Stream</button>
+    <button class="catChip" data-cat="compras" aria-label="Filtrar por compras" onclick="setCatFilter('compras',this)">🛒 Compras</button>
+    <button class="catChip" data-cat="gaming" aria-label="Filtrar por gaming" onclick="setCatFilter('gaming',this)">🎮 Gaming</button>
+    <button class="catChip" data-cat="cripto" aria-label="Filtrar por cripto" onclick="setCatFilter('cripto',this)">₿ Cripto</button>
+    <button class="catChip" data-cat="wifi" aria-label="Filtrar por WiFi" onclick="setCatFilter('wifi',this)">📶 WiFi</button>
+    <button class="catChip" data-cat="gobierno" aria-label="Filtrar por gobierno" onclick="setCatFilter('gobierno',this)">🏛️ Gobierno</button>
+    <button class="catChip" data-cat="salud" aria-label="Filtrar por salud" onclick="setCatFilter('salud',this)">🏥 Salud</button>
+    <button class="catChip" data-cat="documentos" aria-label="Filtrar por documentos" onclick="setCatFilter('documentos',this)">🪪 Docs</button>
+    <button class="catChip" data-cat="viajes" aria-label="Filtrar por viajes" onclick="setCatFilter('viajes',this)">✈️ Viajes</button>
+    <button class="catChip" data-cat="educacion" aria-label="Filtrar por educación" onclick="setCatFilter('educacion',this)">🎓 Educación</button>
+    <button class="catChip" data-cat="familia" aria-label="Filtrar por familia" onclick="setCatFilter('familia',this)">👨‍👩‍👧 Familia</button>
+    <button class="catChip" data-cat="servidor" aria-label="Filtrar por servidor" onclick="setCatFilter('servidor',this)">🖥️ Servidor</button>
+    <button class="catChip" data-cat="otros" aria-label="Filtrar por otros" onclick="setCatFilter('otros',this)">📁 Otros</button>
   </div>
 </div>
 

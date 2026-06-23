@@ -5,13 +5,97 @@ let confirmResolver=null;
 let appBooted=false;
 const LS_META='vk_meta_v1',LS_DATA='vk_data_v1',LS_REC='vk_recovery_v1';let pin='',mode='unlock',tempPin='',unlocked=false,vault=[],current=null,editId=null,lastKey=null,useGenTarget=false,autoLockTimer=null,lockCountdownTimer=null,_entryType='password',_catFilter='',_vaultTab='todas';
 
-// Category filter
+// Category filter — IDs estables + compatibilidad con categorías legacy
+const CATEGORY_ALIASES={
+  '':'',all:'',todas:'',todos:'',
+  general:'general',otros:'otros',other:'otros',others:'otros',misc:'otros',miscellaneous:'otros',
+  banco:'banco',bank:'banco',banking:'banco',finanzas:'banco',finance:'banco',financial:'banco',inversion:'banco',investment:'banco',seguro:'banco',insurance:'banco',card:'banco',cards:'banco',tarjeta:'banco',tarjetas:'banco',
+  correo:'correo',correos:'correo',email:'correo',emails:'correo',mail:'correo',gmail:'correo',outlook:'correo',
+  social:'social',redes:'social','redes sociales':'social',rrss:'social',socialmedia:'social','social-media':'social','social_networks':'social',mensajeria:'social',messaging:'social',chat:'social',
+  trabajo:'trabajo',work:'trabajo',job:'trabajo',empresa:'trabajo',business:'trabajo',office:'trabajo',
+  streaming:'streaming',stream:'streaming',ocio:'streaming',musica:'streaming',music:'streaming',entertainment:'streaming',video:'streaming',
+  compras:'compras',shopping:'compras',shop:'compras',ecommerce:'compras','e-commerce':'compras',tienda:'compras',tiendas:'compras',
+  gaming:'gaming',game:'gaming',games:'gaming',juegos:'gaming',videojuegos:'gaming',
+  cripto:'cripto',crypto:'cripto',cryptocurrency:'cripto',bitcoin:'cripto',btc:'cripto',
+  wifi:'wifi','wi-fi':'wifi',red:'wifi',redeswifi:'wifi',network:'wifi',networks:'wifi',
+  gobierno:'gobierno',gov:'gobierno',government:'gobierno',administracion:'gobierno',admin:'gobierno',
+  salud:'salud',health:'salud',medical:'salud',medico:'salud',médico:'salud',sanidad:'salud',
+  documentos:'documentos',documento:'documentos',documents:'documentos',docs:'documentos',identity:'documentos',identidad:'documentos',id:'documentos',licencia:'documentos',license:'documentos',
+  viajes:'viajes',travel:'viajes',transport:'viajes',transporte:'viajes',
+  educacion:'educacion',educación:'educacion',education:'educacion',edu:'educacion',school:'educacion',
+  familia:'familia',family:'familia',personal:'familia',
+  servidor:'servidor',server:'servidor',servers:'servidor',hosting:'servidor',devops:'servidor',cloud:'servidor',nube:'servidor',dominio:'servidor',dominios:'servidor',domain:'servidor',domains:'servidor',dns:'servidor',desarrollo:'servidor',development:'servidor',developer:'servidor',dev:'servidor',codigo:'servidor',code:'servidor'
+};
+const CATEGORY_LABELS={
+  '':'Todas',general:'General',otros:'Otros',banco:'Banco',correo:'Correo',social:'Social',trabajo:'Trabajo',streaming:'Stream',compras:'Compras',gaming:'Gaming',cripto:'Cripto',wifi:'WiFi',gobierno:'Gobierno',salud:'Salud',documentos:'Documentos',viajes:'Viajes',educacion:'Educación',familia:'Familia',servidor:'Servidor'
+};
+function normalizeCategoryId(cat){
+  let k=String(cat||'').trim().toLowerCase();
+  if(!k)return '';
+  k=k.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[\s_]+/g,' ').replace(/-/g,'-');
+  return CATEGORY_ALIASES[k]||k;
+}
+function catFromChip(btn){
+  if(!btn)return '';
+  if(btn.dataset&&Object.prototype.hasOwnProperty.call(btn.dataset,'cat'))return btn.dataset.cat||'';
+  const onclick=btn.getAttribute&&btn.getAttribute('onclick');
+  const m=onclick&&onclick.match(/setCatFilter\('([^']*)'/);
+  return m?m[1]:'';
+}
+function categoryLabelFromId(cat){return CATEGORY_LABELS[normalizeCategoryId(cat)]||String(cat||'Todas');}
+function categoryKeysForEntry(e){
+  const keys=new Set();
+  const rawCat=(e&&Object.prototype.hasOwnProperty.call(e,'category'))?e.category:'';
+  const cat=normalizeCategoryId(rawCat);
+
+  // La categoría asignada en el formulario es la fuente de verdad.
+  // No mezclar automáticamente por entryType, porque descoordina el filtro:
+  // una tarjeta asignada a "Correo" no debe aparecer en "Banco" solo por ser tipo card.
+  if(cat){
+    keys.add(cat);
+    return keys;
+  }
+
+  // Fallback solo para entradas antiguas que no tengan categoría guardada.
+  if(e?.entryType==='wifi')keys.add('wifi');
+  else if(e?.entryType==='card')keys.add('banco');
+  else if(e?.entryType==='id'||e?.entryType==='license')keys.add('documentos');
+  else if(e?.entryType==='medical')keys.add('salud');
+  else keys.add('general');
+  return keys;
+}
+function categoryMatchesFilter(e, filterCat){
+  const f=normalizeCategoryId(filterCat);
+  return !f || categoryKeysForEntry(e).has(f);
+}
+window.vkDebugCategories=function(){
+  return (vault||[]).map(e=>({service:e.service,entryType:e.entryType,category:e.category,normalized:normalizeCategoryId(e.category),filterKeys:[...categoryKeysForEntry(e)]}));
+};
 function setCatFilter(cat, btn) {
-  _catFilter = cat;
-  document.querySelectorAll('.catChip').forEach(b => b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
+  _catFilter = normalizeCategoryId(cat);
+  document.querySelectorAll('.catChip').forEach(b=>{
+    b.classList.remove('active');
+    b.setAttribute('aria-pressed','false');
+  });
+  const buttons=[...document.querySelectorAll('.catChip')];
+  const target=btn||buttons.find(b=>normalizeCategoryId(catFromChip(b))===_catFilter);
+  if(target){
+    target.classList.add('active');
+    target.setAttribute('aria-pressed','true');
+  }
+  if(typeof renderCategoryPage==='function')setTimeout(()=>renderCategoryPage(true),0);
   render();
 }
+window.setCatFilter=setCatFilter;
+
+// Click robusto para chips de categorías: evita que el carrusel bloquee el onclick.
+document.addEventListener('click',function(e){
+  const chip=e.target.closest&&e.target.closest('#catFilterRow .catChip');
+  if(!chip)return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  setCatFilter(catFromChip(chip), chip);
+},true);
 function setEntryType(type){
   _entryType=type;
   const isNote=type==='note';
@@ -1060,9 +1144,58 @@ function closeNoteModal(){$('noteModal')?.classList.remove('open');}
 /* Icon strip - ordered by brand recognition */
 
 
+function initIconStripDesktopScroll(){
+  const strip=document.getElementById('iconStripRow');
+  if(!strip || strip.dataset.pcScrollReady==='1')return;
+  strip.dataset.pcScrollReady='1';
+
+  // PC-friendly: mouse wheel scrolls the horizontal icon strip.
+  strip.addEventListener('wheel',function(e){
+    if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){
+      e.preventDefault();
+      strip.scrollLeft += e.deltaY;
+    }
+  },{passive:false});
+
+  // PC-friendly: allow both click selection and drag-scroll.
+  // Important: do NOT use pointer capture on the strip, because it can steal
+  // the final click from the icon button on desktop browsers.
+  let down=false,startX=0,startScroll=0,moved=false;
+  strip.addEventListener('pointerdown',function(e){
+    if(e.button!==0)return;
+    down=true;moved=false;startX=e.clientX;startScroll=strip.scrollLeft;
+    strip.classList.add('dragging');
+  });
+  strip.addEventListener('pointermove',function(e){
+    if(!down)return;
+    const dx=e.clientX-startX;
+    if(Math.abs(dx)>6){
+      moved=true;
+      strip.scrollLeft=startScroll-dx;
+    }
+  });
+  function endDrag(){down=false;strip.classList.remove('dragging');}
+  strip.addEventListener('pointerup',endDrag);
+  strip.addEventListener('pointercancel',endDrag);
+  strip.addEventListener('pointerleave',endDrag);
+  strip.addEventListener('click',function(e){
+    const btn=e.target.closest&&e.target.closest('.vkStripIconBtn');
+    if(!btn || !strip.contains(btn))return;
+    if(moved){e.preventDefault();e.stopPropagation();moved=false;return;}
+    const iconId=btn.getAttribute('data-icon');
+    if(iconId){
+      e.preventDefault();
+      e.stopPropagation();
+      selectEntryIcon(iconId);
+      renderIconStrip();
+    }
+  },true);
+}
+
 function renderIconStrip(){
   const strip=$('iconStripRow');
   if(!strip)return;
+  initIconStripDesktopScroll();
   vkBuildIconMap();
   const q=normService($('eIconSearch')?.value||'');
   let list=(MANUAL_ICONS||[]).filter(ic=>ic&&ic.id);
@@ -1077,9 +1210,9 @@ function renderIconStrip(){
   strip.innerHTML=list.map(ic=>{
     const active=(selectedEntryIcon||'auto')===ic.id;
     const obj=vkGetIcon(ic.id,ic.label,ic.bg);
-    const safeId=String(ic.id||'').replace(/'/g,"\'");
+    const dataIcon=safeEsc(String(ic.id||''));
     const svgStr=obj.svg.replace(/<svg ([^>]*?)width="[^"]*"\s*/g,'<svg $1').replace(/<svg ([^>]*?)height="[^"]*"\s*/g,'<svg $1').replace(/<svg /g,'<svg style="width:100%;height:100%;display:block" ');
-    return `<button type="button" class="vkStripIconBtn ${active?'active':''}" title="${safeEsc(ic.label||ic.id)}" onclick="selectEntryIcon('${safeId}');renderIconStrip()">${svgStr}</button>`;
+    return `<button type="button" class="vkStripIconBtn ${active?'active':''}" data-icon="${dataIcon}" title="${safeEsc(ic.label||ic.id)}">${svgStr}</button>`;
   }).join('');
 }function updateEntryIconPreview(){renderIconStrip();}
 function entryShowStep(n){$('entryStep1').style.display=n===1?'block':'none';$('entryStep2').style.display=n===2?'block':'none';$('dot1').style.width=n===1?'32px':'8px';$('dot1').style.background=n===1?'var(--cyan)':'rgba(255,255,255,.2)';$('dot1').style.boxShadow=n===1?'0 0 14px rgba(0,210,255,.7)':'none';$('dot2').style.width=n===2?'32px':'8px';$('dot2').style.background=n===2?'var(--cyan)':'rgba(255,255,255,.2)';$('dot2').style.boxShadow=n===2?'0 0 14px rgba(0,210,255,.7)':'none';$('entryBackBtn').textContent=n===1?'Cancelar':'\u2190 Atr\xe1s';$('entryNextBtn').textContent=n===2?'Guardar':'Siguiente \u2192';if(n===2){updateEntryStep2Header();renderIconStrip();}$('entryModal')?.querySelector('.sheet')?.scrollTo({top:0,behavior:'smooth'});}
@@ -1510,6 +1643,7 @@ function showAppInfo(){
   },{passive:false});
 
   row.addEventListener('pointerdown',e=>{
+    if(e.target.closest&&e.target.closest('.catChip'))return;
     const allPages=pages();
     if(allPages.length<=1)return;
 
@@ -1544,6 +1678,10 @@ function showAppInfo(){
   });
 
   row.addEventListener('click',e=>{
+    if(e.target.closest&&e.target.closest('.catChip')){
+      setTimeout(()=>renderCategoryPage(true),0);
+      return;
+    }
     if(row.dataset.dragging==='1'){
       e.preventDefault();
       e.stopPropagation();
@@ -1757,7 +1895,13 @@ function openEntry(e=null){
   if($('eWifiIp'))$('eWifiIp').value=e?.wifiIp||'';
   if($('eIconSearch'))$('eIconSearch').value='';
   // FIX: Resetear categoría a 'general' en nueva entrada, o restaurar la guardada
-  if($('eCategory'))$('eCategory').value=e?.category||'general';
+  if($('eCategory')){
+    const rawCat=e?.category||'general';
+    $('eCategory').value=rawCat;
+    if($('eCategory').value!==rawCat){
+      $('eCategory').value=normalizeCategoryId(rawCat)||'general';
+    }
+  }
   const btn=$('favToggleBtn');const thumb=$('favThumb');
   if(btn)btn.style.background=_entryFav?'var(--cyan)':'rgba(255,255,255,.15)';
   if(thumb)thumb.style.left=_entryFav?'25px':'3px';
@@ -1894,7 +2038,7 @@ async function saveEntry(){
     wifiIp:($('eWifiIp')?.value||'').trim(),
   }:{};
   const isPassType=_entryType==='password';
-  let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,...cardData,...idData,...licData,...medData,...wifiData,type:'Cuenta',category:($('eCategory')?.value||'general'),user:isPassType?userVal:'',email:isPassType?emailVal:'',pass:isPassType?pass:'',url:isPassType?urlVal:'',note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),reminder:reminderData||null,tags:_getEntryTags(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
+  let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,...cardData,...idData,...licData,...medData,...wifiData,type:'Cuenta',category:normalizeCategoryId($('eCategory')?.value||'general')||'general',user:isPassType?userVal:'',email:isPassType?emailVal:'',pass:isPassType?pass:'',url:isPassType?urlVal:'',note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),reminder:reminderData||null,tags:_getEntryTags(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
   let i=vault.findIndex(x=>x.id===entry.id);
   if(i>=0)vault[i]=entry;else vault.unshift(entry);
   _catFilter='';_vaultTab='todas';document.querySelectorAll('.catChip').forEach(c=>c.classList.remove('active'));const _fc=document.querySelectorAll('.catChip')[0];if(_fc)_fc.classList.add('active');
@@ -1952,6 +2096,7 @@ function render(){
     const _gel=$('homeGreeting');if(_gel)_gel.textContent=_g;
   }catch(e){}
   let q=($('search')?.value||'').toLowerCase();
+  let _visibleEntryCount=null;
   const rvault=$('recentListVault');
   const elist=$('entryList');
   // Mostrar/ocultar listas según tab activo
@@ -1970,23 +2115,11 @@ function render(){
   } else {
     if(elist) elist.style.display='';
     if(rvault) rvault.style.display='none';
-    const _cf=_catFilter||'';const _catMatch=(e)=>{
-  if(!_cf)return true;
-  const cat=e.category||'general';
-  if(cat===_cf)return true;
-  // Mapeos entryType → catChip
-  if(e.entryType==='wifi'&&_cf==='wifi')return true;
-  if(e.entryType==='card'&&_cf==='banco')return true;
-  if(e.entryType==='id'&&_cf==='documentos')return true;
-  if(e.entryType==='license'&&_cf==='documentos')return true;
-  if(e.entryType==='medical'&&_cf==='salud')return true;
-  // Mapeos categoría legacy → catChip nuevo
-  if(cat==='otros'&&_cf==='documentos'&&['id','license'].includes(e.entryType))return true;
-  if(cat==='otros'&&_cf==='salud'&&e.entryType==='medical')return true;
-  return false;
-};let list=vault.filter(e=>entrySearchText(e).includes(q)&&_catMatch(e));
+    const _cf=normalizeCategoryId(_catFilter||'');
+    let list=vault.filter(e=>entrySearchText(e).includes(q)&&categoryMatchesFilter(e,_cf));
     // Filtrar por etiqueta activa
     if(_activeTagFilter) list=list.filter(e=>(e.tags||[]).includes(_activeTagFilter));
+    _visibleEntryCount=list.length;
     // Ordenar según preferencia
     if(_sortOrder==='name') list.sort((a,b)=>(a.service||'').localeCompare(b.service||'','es',{sensitivity:'base'}));
     else if(_sortOrder==='used') list.sort((a,b)=>(b.used||0)-(a.used||0));
@@ -1998,7 +2131,7 @@ function render(){
     if(_q && vault.length>0){
       return WRAP+'<div style="font-size:40px;margin-bottom:12px">\uD83D\uDD0D</div><b style="color:#e0f0ff;font-size:15px">Sin resultados para \u00ab'+safeEsc(_q)+'\u00bb</b><p style="color:#4a7090;margin-top:8px;font-size:13px">Prueba con otro t\u00e9rmino o revisa la ortograf\u00eda</p><button style="'+BTN_STYLE+'" onclick="if($(\'search\'))$(\'search\').value=\'\';render()">\u2715 Limpiar b\u00fasqueda</button></div>';
     } else if(_catFilter && vault.length>0){
-      return WRAP+'<div style="font-size:40px;margin-bottom:12px">\uD83D\uDCC2</div><b style="color:#e0f0ff;font-size:15px">Nada en esta categor\u00eda</b><p style="color:#4a7090;margin-top:8px;font-size:13px">No tienes entradas en \u00ab'+safeEsc(_catFilter)+'\u00bb todav\u00eda</p><button style="'+BTN_STYLE+'" onclick="setCatFilter(\'\',null)">\u2715 Quitar filtro</button></div>';
+      return WRAP+'<div style="font-size:40px;margin-bottom:12px">\uD83D\uDCC2</div><b style="color:#e0f0ff;font-size:15px">Nada en esta categor\u00eda</b><p style="color:#4a7090;margin-top:8px;font-size:13px">No tienes entradas en \u00ab'+safeEsc(categoryLabelFromId(_catFilter))+'\u00bb todav\u00eda</p><button style="'+BTN_STYLE+'" onclick="setCatFilter(\'\',null)">\u2715 Quitar filtro</button></div>';
     } else if(_activeTagFilter && vault.length>0){
       return WRAP+'<div style="font-size:40px;margin-bottom:12px">\uD83C\uDFF7\uFE0F</div><b style="color:#e0f0ff;font-size:15px">Nada con esta etiqueta</b><p style="color:#4a7090;margin-top:8px;font-size:13px">No hay entradas con la etiqueta \u00ab'+safeEsc(_activeTagFilter)+'\u00bb</p><button style="'+BTN_STYLE+'" onclick="window._activeTagFilter=\'\';render()">\u2715 Quitar etiqueta</button></div>';
     } else {
@@ -2016,7 +2149,7 @@ function render(){
       $('recentList').appendChild(hdr);
       recent.forEach(e=>{try{$('recentList').appendChild(row(e))}catch(err){console.warn('row fav error',e?.id,err)}});
     }
-  }$('vaultSub')&&($('vaultSub').textContent=vault.length+' entradas');$('statTotal')&&($('statTotal').textContent=vault.length);
+  }$('vaultSub')&&($('vaultSub').textContent=(_visibleEntryCount!==null&&(_catFilter||_activeTagFilter||q)?_visibleEntryCount+' filtradas':vault.length+' entradas'));$('statTotal')&&($('statTotal').textContent=vault.length);
   // Empty states
   const _ves=$('vaultEmptyState');
   if(_ves)_ves.style.display=vault.length===0?'block':'none';
@@ -3641,46 +3774,30 @@ function setTagFilter(tag){
 }
 
 function updateCatChipCounts(){
-  if(!vault||!vault.length) return;
-  // Count entries per category chip using same logic as _catMatch
-  const counts={};
-  vault.forEach(e=>{
-    const cat=(e.category||'otros').toLowerCase();
-    // Direct category match
-    counts[cat]=(counts[cat]||0)+1;
-    // entryType mappings
-    if(e.entryType==='wifi')       counts['wifi']=(counts['wifi']||0)+1;
-    if(e.entryType==='card')       counts['banco']=(counts['banco']||0)+1;
-    if(e.entryType==='id'||e.entryType==='license') counts['documentos']=(counts['documentos']||0)+1;
-    if(e.entryType==='medical')    counts['salud']=(counts['salud']||0)+1;
-  });
-  // Deduplicate: cap each entry to 1 count per category
-  // (rebuild cleanly using _catMatch logic)
+  const buttons=[...document.querySelectorAll('.catChip')];
+  if(!buttons.length)return;
+
   const cleanCounts={};
-  vault.forEach(e=>{
-    const keys=new Set();
-    const cat=(e.category||'otros').toLowerCase();
-    keys.add(cat);
-    if(e.entryType==='wifi')    keys.add('wifi');
-    if(e.entryType==='card')    keys.add('banco');
-    if(['id','license'].includes(e.entryType)) keys.add('documentos');
-    if(e.entryType==='medical') keys.add('salud');
-    keys.forEach(k=>{ cleanCounts[k]=(cleanCounts[k]||0)+1; });
+  (vault||[]).forEach(e=>{
+    categoryKeysForEntry(e).forEach(k=>{
+      cleanCounts[k]=(cleanCounts[k]||0)+1;
+    });
   });
-  // Update chip text — preserve emoji, add count
-  document.querySelectorAll('.catChip[onclick]').forEach(btn=>{
-    const match=btn.getAttribute('onclick').match(/setCatFilter\('([^']+)'/);
-    if(!match) return;
-    const cat=match[1];
-    if(!cat) return; // skip "Todas"
-    const n=cleanCounts[cat]||0;
-    if(!n) return; // don't show (0)
-    // Extract emoji+label (text before any existing count in parentheses)
-    const base=btn.textContent.replace(/\s*\(\d+\)$/,'').trim();
-    btn.textContent=base+' ('+n+')';
+
+  buttons.forEach(btn=>{
+    if(!btn.dataset.baseLabel){
+      btn.dataset.baseLabel=btn.textContent.replace(/\s*\(\d+\)$/,'').trim();
+    }
+    if(!Object.prototype.hasOwnProperty.call(btn.dataset,'cat')){
+      btn.dataset.cat=catFromChip(btn);
+    }
+
+    const cat=normalizeCategoryId(btn.dataset.cat||'');
+    const n=cat===''?(vault||[]).length:(cleanCounts[cat]||0);
+    const base=btn.dataset.baseLabel||btn.textContent.replace(/\s*\(\d+\)$/,'').trim();
+    btn.textContent=n?base+' ('+n+')':base;
   });
 }
-
 function renderTagFilterChips(){
   // Recoger todas las etiquetas del vault
   const allTags = {};
