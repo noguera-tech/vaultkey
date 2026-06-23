@@ -2624,3 +2624,27 @@ body:has(#genModal.open) #screenDots,
     margin-top: 13px !important;
   }
 }
+
+/* ==========================================================================
+   VAULTKEY UI v4.9 — Ajuste final posición botones Home
+   Microajuste sobre v4.8: baja un poco más el bloque de botones
+   sin tocar escudo, fondo, título ni lógica.
+   ========================================================================== */
+
+#home.vkHomeSplash .vkHomePrimaryActions {
+  margin-top: 44px !important;
+}
+
+#home.vkHomeSplash .vkHomeMiniActions {
+  margin-top: 15px !important;
+}
+
+@media (max-height: 760px) {
+  #home.vkHomeSplash .vkHomePrimaryActions {
+    margin-top: 34px !important;
+  }
+
+  #home.vkHomeSplash .vkHomeMiniActions {
+    margin-top: 13px !important;
+  }
+}
