@@ -961,410 +961,624 @@ input[type=range]::-moz-range-thumb {
   box-shadow: inset 0 0 0 1px rgba(0,210,255,.45);
 }
 
-
 /* ==========================================================================
-   VAULTKEY PRO DARK v1 — UI/UX professional redesign
-   Fase segura: solo overrides visuales. No cambia lógica ni estructura.
-   Objetivo: menos gamer/neón, más gestor de contraseñas premium.
+   VAULTKEY UI v2.1 — Nueva entrada compacta + fondo limpio
+   Corrección: elimina puntos brillantes y hace más visible el cambio del formulario.
+   Solo CSS. No toca lógica, JS, cifrado, categorías ni guardado.
    ========================================================================== */
 
-:root {
-  --bg-top: #071426;
-  --bg-mid: #06101f;
-  --bg-bot: #030812;
-  --grad-bg: linear-gradient(180deg, #08172a 0%, #050e1c 54%, #030812 100%);
-  --grad-glow:
-    radial-gradient(circle at 50% 0%, rgba(32,126,255,.12) 0%, rgba(32,126,255,.055) 34%, rgba(0,0,0,0) 68%);
-
-  --cyan: #5cc8ff;
-  --blue: #237bff;
-  --blue-deep: #1462dd;
-  --cyan-a20: rgba(92,200,255,.16);
-  --cyan-a10: rgba(92,200,255,.075);
-
-  --btn-grad: linear-gradient(135deg, #256dff 0%, #1264f3 100%);
-  --btn-shadow: 0 10px 24px rgba(0,0,0,.30);
-
-  --card-bg: linear-gradient(180deg, rgba(14,32,55,.86), rgba(7,20,38,.94));
-  --card-bdr: rgba(132,178,220,.16);
-  --card-shd: 0 10px 28px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.045);
-  --card-bg-hi: linear-gradient(180deg, rgba(18,42,72,.92), rgba(8,24,46,.96));
-  --card-bdr-hi: rgba(92,200,255,.24);
-  --card-shd-hi: 0 12px 28px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.06);
-
-  --border: rgba(132,178,220,.16);
-  --border2: rgba(132,178,220,.10);
-
-  --t1: #F4F7FB;
-  --t2: #D5E0EC;
-  --t3: rgba(213,224,236,.70);
-  --t4: rgba(213,224,236,.42);
-
-  --green: #22C55E;
-  --yellow: #F5B82E;
-  --red: #EF4444;
-  --purple: #7C6DFF;
-  --orange: #F59E0B;
-
-  --key-bg: rgba(12,30,54,.76);
-  --key-bdr: rgba(132,178,220,.18);
-  --key-shd: inset 0 1px 0 rgba(255,255,255,.05), 0 8px 18px rgba(0,0,0,.22);
+/* 1) Fondo limpio: cero partículas en pantallas y modales */
+.screen::before,
+#entryModal .sheet::before,
+#genModal .sheet::before,
+#quickModal .sheet::before,
+.modal .sheet::before {
+  background-image: none !important;
+  background: none !important;
+  opacity: 0 !important;
+  animation: none !important;
+  display: none !important;
+  content: none !important;
 }
 
-/* Fondo general: sobrio, menos cyberpunk */
-html, body,
-.app,
-.screen,
-.targetVault,
-.homeHeroPremium,
-.targetHome {
-  background: var(--grad-bg) !important;
+.screen::after,
+#entryModal .sheet::after,
+.modal .sheet::after {
+  background: none !important;
+  opacity: 0 !important;
+  display: none !important;
+  content: none !important;
 }
 
 .app::before {
-  background: var(--grad-glow) !important;
-  opacity: .9;
-}
-
-/* Quitar lluvia de partículas en pantallas internas; queda un brillo muy suave */
-.screen::before {
-  background-image: none !important;
   background:
-    radial-gradient(1px 1px at 12% 18%, rgba(92,200,255,.28) 0%, transparent 100%),
-    radial-gradient(1px 1px at 86% 12%, rgba(92,200,255,.20) 0%, transparent 100%),
-    radial-gradient(1px 1px at 78% 72%, rgba(180,210,240,.16) 0%, transparent 100%) !important;
-  opacity: .55 !important;
-  animation: none !important;
+    radial-gradient(circle at 50% 0%, rgba(35,123,255,.09) 0%, rgba(35,123,255,.035) 34%, transparent 66%) !important;
+  opacity: .75 !important;
 }
 
-.screen::after {
-  background: radial-gradient(circle, rgba(35,123,255,.075) 0%, rgba(35,123,255,.035) 42%, transparent 70%) !important;
-  width: 240px !important;
-  height: 240px !important;
-  opacity: .85;
+/* 2) Nueva entrada: layout más limpio y notablemente más compacto */
+#entryModal .sheet {
+  padding: 0 12px calc(20px + env(safe-area-inset-bottom,0px)) !important;
+  background: linear-gradient(180deg, #071426 0%, #050e1c 54%, #030812 100%) !important;
 }
 
-/* Estructura más premium y compacta */
-.top,
-.vaultHeader {
-  background: rgba(5,14,28,.86) !important;
+.entryTargetHead {
+  height: 48px !important;
+  margin-bottom: 6px !important;
   border-bottom: 1px solid rgba(132,178,220,.10) !important;
-  backdrop-filter: blur(18px);
+  background: rgba(5,14,28,.78) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  backdrop-filter: blur(16px) !important;
 }
 
-.title,
-.vaultTitle,
-.sheetTitle {
+.entryTargetHead .sheetTitle {
+  font-size: 15.5px !important;
   font-weight: 800 !important;
-  letter-spacing: -.25px !important;
-  text-shadow: none !important;
 }
 
-.sub,
-.stxt span,
-.entry p,
-.favRowId {
-  color: var(--t3) !important;
+.entryTargetHead .linkBtn {
+  font-size: 13px !important;
+  padding: 6px 0 !important;
+  font-weight: 760 !important;
 }
 
-/* Tarjetas: menos glow, bordes suaves */
-.card,
-.entry,
-.favRow,
-.settingsRow,
-#entryModal .field,
+/* Botones de tipo: menos altos, más estilo segmented control */
+#entryModal .sheet > div[style*="grid-template-columns:1fr 1fr 1fr"],
+#entryModal .sheet > div[style*="grid-template-columns:1fr 1fr"] {
+  gap: 6px !important;
+  margin-bottom: 7px !important;
+}
+
+#typeBtnPass,
+#typeBtnNote,
+#typeBtnCard,
+#typeBtnId,
+#typeBtnLicense,
+#typeBtnMedical,
+#typeBtnWifi {
+  min-height: 34px !important;
+  padding: 6px 5px !important;
+  border-radius: 11px !important;
+  font-size: 11px !important;
+  line-height: 1.15 !important;
+  font-weight: 760 !important;
+  background: rgba(9,27,50,.78) !important;
+  border: 1px solid rgba(132,178,220,.16) !important;
+  color: rgba(213,224,236,.74) !important;
+  box-shadow: none !important;
+}
+
+#typeBtnPass[style*="var(--cyan)"],
+#typeBtnNote[style*="var(--cyan)"],
+#typeBtnCard[style*="var(--cyan)"],
+#typeBtnId[style*="var(--cyan)"],
+#typeBtnLicense[style*="var(--cyan)"],
+#typeBtnMedical[style*="var(--cyan)"],
+#typeBtnWifi[style*="var(--cyan)"] {
+  background: rgba(35,123,255,.22) !important;
+  border-color: rgba(92,200,255,.48) !important;
+  color: #F4F7FB !important;
+}
+
+/* 3) Barra de iconos: más baja, menos protagonista */
+#entryModal .sheet > div:has(#iconStripRow) {
+  margin-bottom: 8px !important;
+  padding: 8px 9px 7px !important;
+  border: 1px solid rgba(132,178,220,.12) !important;
+  border-radius: 15px !important;
+  background: rgba(7,20,38,.70) !important;
+}
+
+#iconStripRow {
+  padding: 2px 0 6px !important;
+  gap: 6px !important;
+  min-height: 44px !important;
+}
+
+.vkStripIconBtn {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 11px !important;
+  padding: 2px !important;
+  margin-right: 4px !important;
+  background: rgba(9,27,50,.80) !important;
+}
+
+.vkStripIconBtn svg,
+.vkStripIconBtn img {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 9px !important;
+}
+
+#eIconSearch {
+  height: 34px !important;
+  min-height: 34px !important;
+  margin-top: 2px !important;
+  padding: 7px 10px !important;
+  font-size: 12.5px !important;
+}
+
+/* 4) Campos base: más pequeños, menos tarjetas gigantes */
+#entryModal .field {
+  padding: 9px 10px !important;
+  margin-bottom: 7px !important;
+  border-radius: 13px !important;
+  background: rgba(8,22,40,.76) !important;
+  border-color: rgba(132,178,220,.12) !important;
+  box-shadow: 0 7px 18px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.035) !important;
+}
+
+#entryModal .label {
+  font-size: 9.8px !important;
+  margin-bottom: 5px !important;
+  letter-spacing: .48px !important;
+  color: rgba(143,215,255,.86) !important;
+}
+
+#entryModal .inp,
+#entryModal .txt,
+#entryModal select,
+#entryModal textarea {
+  min-height: 36px !important;
+  padding: 8px 10px !important;
+  border-radius: 10px !important;
+  font-size: 13.5px !important;
+  background: rgba(5,14,28,.86) !important;
+}
+
+#entryModal textarea.inp,
+#entryModal .txt {
+  min-height: 72px !important;
+  line-height: 1.42 !important;
+}
+
+#fieldPass .sub,
+#strTxt {
+  font-size: 11px !important;
+  margin-top: 5px !important;
+  line-height: 1.25 !important;
+}
+
+.strength {
+  height: 4px !important;
+  margin-top: 6px !important;
+}
+
+#fieldPass .smallBtn,
+#fieldWifi .smallBtn {
+  width: 42px !important;
+  min-width: 42px !important;
+  padding: 0 !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+}
+
+/* 5) Bloques especiales: compactos y separados con borde sobrio */
 #fieldCard,
 #fieldSecureNote,
 #fieldId,
 #fieldLicense,
 #fieldMedical,
-#fieldWifi,
-.rangeField,
-.qvFieldRow {
-  background: var(--card-bg) !important;
-  border-color: var(--card-bdr) !important;
-  box-shadow: var(--card-shd) !important;
-}
-
-.card,
-.settingsRow,
-.favRow {
-  border-radius: 16px !important;
-}
-
-/* Entradas más serias y legibles */
-.entry {
-  min-height: 66px;
-  padding: 11px 12px !important;
+#fieldWifi {
+  padding: 9px 9px 2px !important;
   margin-bottom: 8px !important;
-  border-radius: 15px !important;
-}
-
-.entry h3 {
-  font-size: 15px !important;
-  font-weight: 750 !important;
-}
-
-.logo {
-  border-radius: 11px !important;
-}
-
-/* Inputs limpios */
-.inp,
-.txt,
-select,
-.targetSearch input,
-.search input,
-.settingSelect,
-.genOut,
-.recCode {
-  background: rgba(7,22,40,.88) !important;
-  border: 1px solid rgba(132,178,220,.18) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.035) !important;
-  color: var(--t1) !important;
-}
-
-.inp:focus,
-.txt:focus,
-select:focus,
-.targetSearch input:focus,
-.search input:focus,
-.settingSelect:focus {
-  border-color: rgba(92,200,255,.55) !important;
-  box-shadow: 0 0 0 3px rgba(92,200,255,.10), inset 0 1px 0 rgba(255,255,255,.04) !important;
-  background: rgba(9,27,50,.94) !important;
-}
-
-.inp::placeholder,
-.txt::placeholder,
-.targetSearch input::placeholder,
-.search input::placeholder {
-  color: rgba(213,224,236,.46) !important;
-}
-
-/* Etiquetas menos neón */
-.label,
-#entryModal .label,
-.settingBlock > .label,
-#genModal .label {
-  color: #70D1FF !important;
-  text-shadow: none !important;
-  letter-spacing: .55px !important;
-}
-
-/* Botones: más producto, menos arcade */
-.primary,
-.qvBotEdit,
-.targetHomeContent > button[onclick*="vault"] {
-  background: var(--btn-grad) !important;
-  box-shadow: var(--btn-shadow) !important;
   border-radius: 14px !important;
-  font-weight: 800 !important;
+  background: rgba(8,22,40,.70) !important;
+  border: 1px solid rgba(132,178,220,.13) !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.035) !important;
 }
 
-.ghost,
-.smallBtn,
-.qvActionBtn,
-.iconBtn,
-.favRowBtn,
-.favRowBtn2 {
-  background: rgba(9,27,50,.82) !important;
-  border-color: rgba(132,178,220,.18) !important;
-  color: var(--t2) !important;
+#fieldCard .field,
+#fieldSecureNote .field,
+#fieldId .field,
+#fieldLicense .field,
+#fieldMedical .field,
+#fieldWifi .field {
+  background: rgba(5,14,28,.45) !important;
   box-shadow: none !important;
 }
 
-.linkBtn {
-  color: #65CFFF !important;
-  text-shadow: none !important;
+/* 6) Favorito / Extras / Categoría / Etiquetas más profesionales */
+#favToggleBtn {
+  width: 42px !important;
+  height: 24px !important;
+  background: rgba(132,178,220,.14) !important;
 }
 
-/* Categorías: chips compactos y sobrios */
-.catChip,
-.vaultTabs button {
-  background: rgba(10,28,50,.84) !important;
-  border-color: rgba(132,178,220,.16) !important;
-  color: rgba(244,247,251,.78) !important;
-  box-shadow: none !important;
-  text-shadow: none !important;
+#favThumb {
+  width: 18px !important;
+  height: 18px !important;
 }
 
-.catChip.active,
-.vaultTabs button.active {
-  background: rgba(35,123,255,.20) !important;
-  border-color: rgba(92,200,255,.45) !important;
-  color: #EAF6FF !important;
-  box-shadow: none !important;
-  text-shadow: none !important;
+#entryModal .sheet > div[style*="Favorito"],
+#fieldExtraBtns,
+#entryModal .field:has(#eCategory),
+#entryModal .field:has(#tagInputWrap) {
+  margin-bottom: 8px !important;
 }
 
-.vaultTabs span {
-  color: #8FD7FF !important;
-  text-shadow: none !important;
-}
-
-/* Nueva entrada: menos pesada */
-#entryModal {
-  background: rgba(3,8,18,.98) !important;
-}
-
-#entryModal .sheet {
-  background: var(--grad-bg) !important;
-}
-
-#entryModal .sheet::before {
-  background: var(--grad-glow) !important;
-  opacity: .65 !important;
-}
-
-#entryModal .field {
-  padding: 12px 13px !important;
-  margin-bottom: 9px !important;
-}
-
-.vkStripIconBtn {
-  background: rgba(8,22,40,.76) !important;
-  border-color: rgba(132,178,220,.16) !important;
-  box-shadow: none !important;
-}
-
-.vkStripIconBtn.active {
-  border-color: rgba(92,200,255,.70) !important;
-  box-shadow: 0 0 0 2px rgba(92,200,255,.12) !important;
-}
-
-/* Generador: herramienta profesional */
-#genModal .sheet {
-  background: var(--grad-bg) !important;
-}
-
-#genModal .ghost {
-  letter-spacing: .04em !important;
-}
-
-.rangeField {
-  padding: 14px 15px !important;
-}
-
-.rangeTop b {
-  color: var(--t2) !important;
-  text-shadow: none !important;
-}
-
-.rangeTop span {
-  color: #8FD7FF !important;
-  text-shadow: none !important;
-}
-
-input[type=range]::-webkit-slider-runnable-track {
-  background: linear-gradient(90deg,
-    #5cc8ff 0%,
-    #237bff var(--fill,0%),
-    rgba(132,178,220,.22) var(--fill,0%),
-    rgba(132,178,220,.22) 100%) !important;
-  box-shadow: none !important;
-}
-
-input[type=range]::-webkit-slider-thumb {
-  background: linear-gradient(135deg,#EAF6FF 0%,#5cc8ff 45%,#237bff 100%) !important;
-  box-shadow: 0 5px 12px rgba(0,0,0,.28) !important;
-}
-
-.presetBtns button {
-  background: rgba(9,27,50,.82) !important;
-  border-color: rgba(132,178,220,.16) !important;
-  box-shadow: none !important;
-}
-
-.presetBtns button:active,
-.presetBtns button.presetActive {
-  background: rgba(35,123,255,.22) !important;
-  color: #EAF6FF !important;
-  border-color: rgba(92,200,255,.48) !important;
-  box-shadow: none !important;
-}
-
-/* Ajustes: lista menos pesada */
-.settingBlock {
-  margin-bottom: 16px !important;
-}
-
-.settingsGrid {
+#fieldExtraBtns {
   gap: 7px !important;
 }
 
-.settingsRow {
-  padding: 12px 13px !important;
-  border-radius: 15px !important;
-}
-
-.sico {
-  width: 38px !important;
-  height: 38px !important;
+#fieldExtraBtns button {
+  padding: 9px 10px !important;
   border-radius: 12px !important;
-  background: rgba(13,34,60,.88) !important;
-  border-color: rgba(132,178,220,.14) !important;
+  font-size: 12.5px !important;
+  background: rgba(8,22,40,.72) !important;
+  border-color: rgba(132,178,220,.13) !important;
+  color: rgba(213,224,236,.76) !important;
 }
 
-.stxt b {
-  font-size: 14.5px !important;
-  font-weight: 760 !important;
+#tagInputWrap {
+  min-height: 36px !important;
+  padding: 6px 8px !important;
+  border-radius: 10px !important;
+  background: rgba(5,14,28,.86) !important;
+  border-color: rgba(132,178,220,.16) !important;
 }
 
-/* Detalle: más limpio */
-.qvFieldRow {
-  padding: 13px 14px !important;
+#tagInput {
+  font-size: 12.5px !important;
 }
 
-.qvFieldIcon {
-  background: rgba(13,34,60,.9) !important;
-  border-color: rgba(132,178,220,.14) !important;
-}
-
-.qvBotDel,
-.danger {
-  background: rgba(239,68,68,.075) !important;
-  border-color: rgba(239,68,68,.32) !important;
-  color: #FF7B7B !important;
-}
-
-.qvBotFav,
-.qvBotFavActive {
-  background: rgba(245,184,46,.075) !important;
-  border-color: rgba(245,184,46,.30) !important;
-  color: #FFD166 !important;
-}
-
-/* Panel salud */
-.strength i,
-.obStrengthFill {
-  background: linear-gradient(90deg, #22C55E, #16A34A) !important;
-}
-
-/* Scroll menos llamativo */
-* {
-  scrollbar-color: rgba(132,178,220,.24) transparent !important;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(132,178,220,.24) !important;
-}
-
-/* Botón flotante más premium */
-.app > #fabAdd {
-  box-shadow: 0 14px 30px rgba(0,0,0,.34) !important;
-  background: linear-gradient(135deg, #2F7DFF, #155EEF) !important;
-}
-
-/* Menos saturación en estados activos */
-*:focus-visible {
-  outline-color: rgba(92,200,255,.55) !important;
-}
-
-/* En escritorio, mantener marco oscuro elegante */
-@media (min-width:431px) {
-  html, body {
-    background: #050B14 !important;
+/* 7) Reduce campos en pantallas bajas */
+@media (max-height: 760px) {
+  #entryModal .field {
+    padding: 8px 9px !important;
+    margin-bottom: 6px !important;
+  }
+  #entryModal .inp,
+  #entryModal select,
+  #entryModal textarea {
+    min-height: 34px !important;
+    padding-top: 7px !important;
+    padding-bottom: 7px !important;
+  }
+  .vkStripIconBtn {
+    width: 38px !important;
+    height: 38px !important;
+  }
+  .vkStripIconBtn svg,
+  .vkStripIconBtn img {
+    width: 32px !important;
+    height: 32px !important;
   }
 }
 
+/* ========================================================================== 
+   VAULTKEY UI v2.2 — Generator + detail polish
+   Fase segura: solo overrides visuales. No cambia lógica.
+   Objetivo: generador menos brillante/gigante y detalle más premium.
+   ========================================================================== */
+
+/* Blindaje: puntitos brillantes fuera en todas las pantallas */
+.screen::before,
+#entryModal .sheet::before,
+#genModal .sheet::before,
+#quickModal .sheet::before {
+  background-image: none !important;
+  animation: none !important;
+}
+.screen::before {
+  opacity: 0 !important;
+}
+
+/* ============================
+   GENERADOR PROFESIONAL — v2.2
+   ============================ */
+#genModal .sheet {
+  padding: 18px 18px calc(22px + env(safe-area-inset-bottom,0px)) !important;
+  background: linear-gradient(180deg,#061426 0%,#040c18 100%) !important;
+}
+
+#genModal .sheetHead {
+  margin-bottom: 14px !important;
+  padding-bottom: 8px !important;
+  border-bottom: 1px solid rgba(132,178,220,.10) !important;
+}
+
+#genModal .sheetTitle {
+  font-size: 20px !important;
+  font-weight: 820 !important;
+  color: #F4F7FB !important;
+  letter-spacing: -.35px !important;
+  text-shadow: none !important;
+}
+
+#genModal .iconBtn {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 15px !important;
+  font-size: 22px !important;
+  background: rgba(8,25,46,.88) !important;
+  border-color: rgba(132,178,220,.18) !important;
+  color: rgba(244,247,251,.82) !important;
+}
+
+#genModal .rangeField {
+  padding: 14px 16px !important;
+  margin-bottom: 10px !important;
+  border-radius: 17px !important;
+  background: linear-gradient(180deg,rgba(11,34,61,.90),rgba(7,22,42,.96)) !important;
+  border-color: rgba(132,178,220,.17) !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.04) !important;
+}
+
+#genModal .rangeTop {
+  margin-bottom: 10px !important;
+}
+
+#genModal .rangeTop b {
+  font-size: 11px !important;
+  color: rgba(244,247,251,.86) !important;
+  letter-spacing: .65px !important;
+}
+
+#genModal .rangeTop span {
+  font-size: 20px !important;
+  color: #6ED0FF !important;
+  text-shadow: none !important;
+}
+
+#genModal .grid2 {
+  gap: 10px !important;
+}
+
+#genModal .presetBtns {
+  gap: 9px !important;
+  margin: 10px 0 14px !important;
+}
+
+#genModal .presetBtns button {
+  padding: 12px 4px !important;
+  border-radius: 15px !important;
+  background: rgba(8,25,46,.90) !important;
+  border-color: rgba(132,178,220,.16) !important;
+  color: rgba(244,247,251,.88) !important;
+  font-size: 15px !important;
+  font-weight: 760 !important;
+}
+
+#genModal .presetBtns button.presetActive,
+#genModal .presetBtns button:active {
+  background: rgba(35,123,255,.18) !important;
+  border-color: rgba(92,200,255,.35) !important;
+  color: #F4F7FB !important;
+}
+
+#genModal .checkrow,
+#genModal div[onclick*="gPinMode"] {
+  margin: 8px 0 !important;
+  padding: 10px 12px !important;
+  border-radius: 14px !important;
+  background: rgba(7,22,42,.72) !important;
+  border: 1px solid rgba(132,178,220,.12) !important;
+  color: rgba(244,247,251,.86) !important;
+  font-size: 14px !important;
+  line-height: 1.3 !important;
+}
+
+#genModal .checkrow input,
+#genModal div[onclick*="gPinMode"] input {
+  width: 19px !important;
+  height: 19px !important;
+  filter: none !important;
+}
+
+#genModal .field {
+  margin-top: 8px !important;
+  margin-bottom: 10px !important;
+}
+
+#genModal .inp {
+  height: 50px !important;
+  border-radius: 15px !important;
+  font-size: 15px !important;
+  background: rgba(7,22,42,.92) !important;
+}
+
+#genModal .sub,
+#genModal #genInfo {
+  color: rgba(213,224,236,.64) !important;
+  font-size: 13px !important;
+  margin: 8px 0 12px !important;
+}
+
+#genModal .primary {
+  height: 58px !important;
+  border-radius: 18px !important;
+  font-size: 15px !important;
+  font-weight: 820 !important;
+  background: linear-gradient(135deg,#4D3DFF 0%,#147CFF 100%) !important;
+  box-shadow: 0 12px 24px rgba(0,0,0,.28) !important;
+}
+
+#genModal .genOut {
+  min-height: 58px !important;
+  margin: 12px 0 12px !important;
+  border-radius: 16px !important;
+  background: rgba(3,13,25,.94) !important;
+  border-color: rgba(92,200,255,.24) !important;
+  color: #4ED9FF !important;
+  font-size: 16px !important;
+  letter-spacing: 1.6px !important;
+  box-shadow: none !important;
+}
+
+#genModal .rowBtns {
+  gap: 10px !important;
+}
+
+#genModal .rowBtns .ghost {
+  min-height: 48px !important;
+  border-radius: 15px !important;
+  font-size: 14px !important;
+  color: #BEEAFF !important;
+  background: rgba(8,25,46,.90) !important;
+  border-color: rgba(92,200,255,.18) !important;
+  letter-spacing: .02em !important;
+}
+
+/* Sliders menos brillantes */
+#genModal input[type=range]::-webkit-slider-runnable-track {
+  height: 7px !important;
+  background: linear-gradient(90deg,
+    #5cc8ff 0%,
+    #237bff var(--fill,0%),
+    rgba(132,178,220,.24) var(--fill,0%),
+    rgba(132,178,220,.24) 100%) !important;
+  box-shadow: none !important;
+}
+
+#genModal input[type=range]::-webkit-slider-thumb {
+  width: 20px !important;
+  height: 20px !important;
+  margin-top: -7px !important;
+  border-radius: 8px !important;
+  clip-path: none !important;
+  box-shadow: 0 5px 12px rgba(0,0,0,.28) !important;
+}
+
+/* ============================
+   DETALLE DE ENTRADA — v2.2
+   ============================ */
+#quickModal .sheet {
+  background: linear-gradient(180deg,#061426 0%,#030812 100%) !important;
+}
+
+#quickModal .sheetHead,
+#quickModal [style*="Detalle"] {
+  text-shadow: none !important;
+}
+
+#quickBody {
+  padding: 0 16px 22px !important;
+}
+
+/* Evita el duplicado: ya hay Editar arriba */
+#quickModal .qvBotEdit {
+  display: none !important;
+}
+
+/* Tarjeta de campos del detalle */
+#quickModal .qvFieldRow {
+  padding: 13px 14px !important;
+  background: linear-gradient(180deg,rgba(11,34,61,.92),rgba(7,22,42,.97)) !important;
+  border-bottom-color: rgba(132,178,220,.11) !important;
+}
+
+#quickModal .qvFieldRow:first-child {
+  border-radius: 18px 18px 0 0 !important;
+}
+
+#quickModal .qvFieldRow:last-child {
+  border-radius: 0 0 18px 18px !important;
+}
+
+#quickModal .qvFieldIcon {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 13px !important;
+  background: linear-gradient(135deg,rgba(35,123,255,.28),rgba(92,200,255,.10)) !important;
+  border-color: rgba(92,200,255,.24) !important;
+  color: #DDF5FF !important;
+  font-size: 19px !important;
+}
+
+#quickModal .qvFieldLabel {
+  color: #82CFFF !important;
+  opacity: .88 !important;
+  font-size: 10.5px !important;
+  letter-spacing: .65px !important;
+}
+
+#quickModal .qvFieldValue {
+  color: #F4F7FB !important;
+  font-weight: 650 !important;
+  font-size: 15px !important;
+}
+
+#quickModal .qvActionBtn {
+  height: 38px !important;
+  min-width: 72px !important;
+  border-radius: 13px !important;
+  background: rgba(35,123,255,.18) !important;
+  border-color: rgba(92,200,255,.22) !important;
+  color: #74D7FF !important;
+  font-size: 13px !important;
+  font-weight: 780 !important;
+}
+
+#quickModal .qvTimestamp {
+  color: rgba(213,224,236,.48) !important;
+  font-size: 12px !important;
+  margin: 12px 0 18px !important;
+}
+
+#quickModal .rowBtns {
+  gap: 12px !important;
+}
+
+#quickModal .qvBotBtn {
+  min-height: 54px !important;
+  border-radius: 17px !important;
+  font-size: 14px !important;
+  font-weight: 780 !important;
+  background: rgba(7,22,42,.88) !important;
+  box-shadow: none !important;
+}
+
+#quickModal .qvBotFav,
+#quickModal .qvBotFavActive {
+  color: #FFD166 !important;
+  border-color: rgba(245,184,46,.32) !important;
+  background: rgba(245,184,46,.07) !important;
+}
+
+#quickModal .qvBotDel {
+  color: #FF7B7B !important;
+  border-color: rgba(239,68,68,.32) !important;
+  background: rgba(239,68,68,.07) !important;
+}
+
+/* El badge CUENTA / tipo de entrada más visible si cae dentro del quick modal */
+#quickModal .pill,
+#quickModal [class*="pill"] {
+  background: rgba(92,200,255,.10) !important;
+  border-color: rgba(92,200,255,.25) !important;
+  color: #8FD7FF !important;
+  font-weight: 800 !important;
+}
+
+/* Logo del detalle: un poco más elegante y menos gigante en móvil */
+#quickModal .logo {
+  border-radius: 22px !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,.28), 0 0 0 1px rgba(92,200,255,.16) !important;
+}
+
+/* ============================
+   ICON STRIP — contención visual
+   La paginación real tipo categorías queda para v3 con app.js.
+   ============================ */
+#entryModal #iconStripRow {
+  padding: 3px 0 8px !important;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+}
+
+#entryModal .vkStripIconBtn {
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 14px !important;
+  margin-right: 7px !important;
+}
+
+#entryModal .vkStripIconBtn svg {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 12px !important;
+}
