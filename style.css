@@ -960,3 +960,411 @@ input[type=range]::-moz-range-thumb {
 #catFilterRow:focus-visible {
   box-shadow: inset 0 0 0 1px rgba(0,210,255,.45);
 }
+
+
+/* ==========================================================================
+   VAULTKEY PRO DARK v1 — UI/UX professional redesign
+   Fase segura: solo overrides visuales. No cambia lógica ni estructura.
+   Objetivo: menos gamer/neón, más gestor de contraseñas premium.
+   ========================================================================== */
+
+:root {
+  --bg-top: #071426;
+  --bg-mid: #06101f;
+  --bg-bot: #030812;
+  --grad-bg: linear-gradient(180deg, #08172a 0%, #050e1c 54%, #030812 100%);
+  --grad-glow:
+    radial-gradient(circle at 50% 0%, rgba(32,126,255,.12) 0%, rgba(32,126,255,.055) 34%, rgba(0,0,0,0) 68%);
+
+  --cyan: #5cc8ff;
+  --blue: #237bff;
+  --blue-deep: #1462dd;
+  --cyan-a20: rgba(92,200,255,.16);
+  --cyan-a10: rgba(92,200,255,.075);
+
+  --btn-grad: linear-gradient(135deg, #256dff 0%, #1264f3 100%);
+  --btn-shadow: 0 10px 24px rgba(0,0,0,.30);
+
+  --card-bg: linear-gradient(180deg, rgba(14,32,55,.86), rgba(7,20,38,.94));
+  --card-bdr: rgba(132,178,220,.16);
+  --card-shd: 0 10px 28px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.045);
+  --card-bg-hi: linear-gradient(180deg, rgba(18,42,72,.92), rgba(8,24,46,.96));
+  --card-bdr-hi: rgba(92,200,255,.24);
+  --card-shd-hi: 0 12px 28px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.06);
+
+  --border: rgba(132,178,220,.16);
+  --border2: rgba(132,178,220,.10);
+
+  --t1: #F4F7FB;
+  --t2: #D5E0EC;
+  --t3: rgba(213,224,236,.70);
+  --t4: rgba(213,224,236,.42);
+
+  --green: #22C55E;
+  --yellow: #F5B82E;
+  --red: #EF4444;
+  --purple: #7C6DFF;
+  --orange: #F59E0B;
+
+  --key-bg: rgba(12,30,54,.76);
+  --key-bdr: rgba(132,178,220,.18);
+  --key-shd: inset 0 1px 0 rgba(255,255,255,.05), 0 8px 18px rgba(0,0,0,.22);
+}
+
+/* Fondo general: sobrio, menos cyberpunk */
+html, body,
+.app,
+.screen,
+.targetVault,
+.homeHeroPremium,
+.targetHome {
+  background: var(--grad-bg) !important;
+}
+
+.app::before {
+  background: var(--grad-glow) !important;
+  opacity: .9;
+}
+
+/* Quitar lluvia de partículas en pantallas internas; queda un brillo muy suave */
+.screen::before {
+  background-image: none !important;
+  background:
+    radial-gradient(1px 1px at 12% 18%, rgba(92,200,255,.28) 0%, transparent 100%),
+    radial-gradient(1px 1px at 86% 12%, rgba(92,200,255,.20) 0%, transparent 100%),
+    radial-gradient(1px 1px at 78% 72%, rgba(180,210,240,.16) 0%, transparent 100%) !important;
+  opacity: .55 !important;
+  animation: none !important;
+}
+
+.screen::after {
+  background: radial-gradient(circle, rgba(35,123,255,.075) 0%, rgba(35,123,255,.035) 42%, transparent 70%) !important;
+  width: 240px !important;
+  height: 240px !important;
+  opacity: .85;
+}
+
+/* Estructura más premium y compacta */
+.top,
+.vaultHeader {
+  background: rgba(5,14,28,.86) !important;
+  border-bottom: 1px solid rgba(132,178,220,.10) !important;
+  backdrop-filter: blur(18px);
+}
+
+.title,
+.vaultTitle,
+.sheetTitle {
+  font-weight: 800 !important;
+  letter-spacing: -.25px !important;
+  text-shadow: none !important;
+}
+
+.sub,
+.stxt span,
+.entry p,
+.favRowId {
+  color: var(--t3) !important;
+}
+
+/* Tarjetas: menos glow, bordes suaves */
+.card,
+.entry,
+.favRow,
+.settingsRow,
+#entryModal .field,
+#fieldCard,
+#fieldSecureNote,
+#fieldId,
+#fieldLicense,
+#fieldMedical,
+#fieldWifi,
+.rangeField,
+.qvFieldRow {
+  background: var(--card-bg) !important;
+  border-color: var(--card-bdr) !important;
+  box-shadow: var(--card-shd) !important;
+}
+
+.card,
+.settingsRow,
+.favRow {
+  border-radius: 16px !important;
+}
+
+/* Entradas más serias y legibles */
+.entry {
+  min-height: 66px;
+  padding: 11px 12px !important;
+  margin-bottom: 8px !important;
+  border-radius: 15px !important;
+}
+
+.entry h3 {
+  font-size: 15px !important;
+  font-weight: 750 !important;
+}
+
+.logo {
+  border-radius: 11px !important;
+}
+
+/* Inputs limpios */
+.inp,
+.txt,
+select,
+.targetSearch input,
+.search input,
+.settingSelect,
+.genOut,
+.recCode {
+  background: rgba(7,22,40,.88) !important;
+  border: 1px solid rgba(132,178,220,.18) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035) !important;
+  color: var(--t1) !important;
+}
+
+.inp:focus,
+.txt:focus,
+select:focus,
+.targetSearch input:focus,
+.search input:focus,
+.settingSelect:focus {
+  border-color: rgba(92,200,255,.55) !important;
+  box-shadow: 0 0 0 3px rgba(92,200,255,.10), inset 0 1px 0 rgba(255,255,255,.04) !important;
+  background: rgba(9,27,50,.94) !important;
+}
+
+.inp::placeholder,
+.txt::placeholder,
+.targetSearch input::placeholder,
+.search input::placeholder {
+  color: rgba(213,224,236,.46) !important;
+}
+
+/* Etiquetas menos neón */
+.label,
+#entryModal .label,
+.settingBlock > .label,
+#genModal .label {
+  color: #70D1FF !important;
+  text-shadow: none !important;
+  letter-spacing: .55px !important;
+}
+
+/* Botones: más producto, menos arcade */
+.primary,
+.qvBotEdit,
+.targetHomeContent > button[onclick*="vault"] {
+  background: var(--btn-grad) !important;
+  box-shadow: var(--btn-shadow) !important;
+  border-radius: 14px !important;
+  font-weight: 800 !important;
+}
+
+.ghost,
+.smallBtn,
+.qvActionBtn,
+.iconBtn,
+.favRowBtn,
+.favRowBtn2 {
+  background: rgba(9,27,50,.82) !important;
+  border-color: rgba(132,178,220,.18) !important;
+  color: var(--t2) !important;
+  box-shadow: none !important;
+}
+
+.linkBtn {
+  color: #65CFFF !important;
+  text-shadow: none !important;
+}
+
+/* Categorías: chips compactos y sobrios */
+.catChip,
+.vaultTabs button {
+  background: rgba(10,28,50,.84) !important;
+  border-color: rgba(132,178,220,.16) !important;
+  color: rgba(244,247,251,.78) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+.catChip.active,
+.vaultTabs button.active {
+  background: rgba(35,123,255,.20) !important;
+  border-color: rgba(92,200,255,.45) !important;
+  color: #EAF6FF !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+.vaultTabs span {
+  color: #8FD7FF !important;
+  text-shadow: none !important;
+}
+
+/* Nueva entrada: menos pesada */
+#entryModal {
+  background: rgba(3,8,18,.98) !important;
+}
+
+#entryModal .sheet {
+  background: var(--grad-bg) !important;
+}
+
+#entryModal .sheet::before {
+  background: var(--grad-glow) !important;
+  opacity: .65 !important;
+}
+
+#entryModal .field {
+  padding: 12px 13px !important;
+  margin-bottom: 9px !important;
+}
+
+.vkStripIconBtn {
+  background: rgba(8,22,40,.76) !important;
+  border-color: rgba(132,178,220,.16) !important;
+  box-shadow: none !important;
+}
+
+.vkStripIconBtn.active {
+  border-color: rgba(92,200,255,.70) !important;
+  box-shadow: 0 0 0 2px rgba(92,200,255,.12) !important;
+}
+
+/* Generador: herramienta profesional */
+#genModal .sheet {
+  background: var(--grad-bg) !important;
+}
+
+#genModal .ghost {
+  letter-spacing: .04em !important;
+}
+
+.rangeField {
+  padding: 14px 15px !important;
+}
+
+.rangeTop b {
+  color: var(--t2) !important;
+  text-shadow: none !important;
+}
+
+.rangeTop span {
+  color: #8FD7FF !important;
+  text-shadow: none !important;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  background: linear-gradient(90deg,
+    #5cc8ff 0%,
+    #237bff var(--fill,0%),
+    rgba(132,178,220,.22) var(--fill,0%),
+    rgba(132,178,220,.22) 100%) !important;
+  box-shadow: none !important;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  background: linear-gradient(135deg,#EAF6FF 0%,#5cc8ff 45%,#237bff 100%) !important;
+  box-shadow: 0 5px 12px rgba(0,0,0,.28) !important;
+}
+
+.presetBtns button {
+  background: rgba(9,27,50,.82) !important;
+  border-color: rgba(132,178,220,.16) !important;
+  box-shadow: none !important;
+}
+
+.presetBtns button:active,
+.presetBtns button.presetActive {
+  background: rgba(35,123,255,.22) !important;
+  color: #EAF6FF !important;
+  border-color: rgba(92,200,255,.48) !important;
+  box-shadow: none !important;
+}
+
+/* Ajustes: lista menos pesada */
+.settingBlock {
+  margin-bottom: 16px !important;
+}
+
+.settingsGrid {
+  gap: 7px !important;
+}
+
+.settingsRow {
+  padding: 12px 13px !important;
+  border-radius: 15px !important;
+}
+
+.sico {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
+  background: rgba(13,34,60,.88) !important;
+  border-color: rgba(132,178,220,.14) !important;
+}
+
+.stxt b {
+  font-size: 14.5px !important;
+  font-weight: 760 !important;
+}
+
+/* Detalle: más limpio */
+.qvFieldRow {
+  padding: 13px 14px !important;
+}
+
+.qvFieldIcon {
+  background: rgba(13,34,60,.9) !important;
+  border-color: rgba(132,178,220,.14) !important;
+}
+
+.qvBotDel,
+.danger {
+  background: rgba(239,68,68,.075) !important;
+  border-color: rgba(239,68,68,.32) !important;
+  color: #FF7B7B !important;
+}
+
+.qvBotFav,
+.qvBotFavActive {
+  background: rgba(245,184,46,.075) !important;
+  border-color: rgba(245,184,46,.30) !important;
+  color: #FFD166 !important;
+}
+
+/* Panel salud */
+.strength i,
+.obStrengthFill {
+  background: linear-gradient(90deg, #22C55E, #16A34A) !important;
+}
+
+/* Scroll menos llamativo */
+* {
+  scrollbar-color: rgba(132,178,220,.24) transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(132,178,220,.24) !important;
+}
+
+/* Botón flotante más premium */
+.app > #fabAdd {
+  box-shadow: 0 14px 30px rgba(0,0,0,.34) !important;
+  background: linear-gradient(135deg, #2F7DFF, #155EEF) !important;
+}
+
+/* Menos saturación en estados activos */
+*:focus-visible {
+  outline-color: rgba(92,200,255,.55) !important;
+}
+
+/* En escritorio, mantener marco oscuro elegante */
+@media (min-width:431px) {
+  html, body {
+    background: #050B14 !important;
+  }
+}
+
