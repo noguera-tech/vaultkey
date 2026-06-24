@@ -2704,3 +2704,156 @@ body:has(#genModal.open) #screenDots,
     font-size: 10.5px !important;
   }
 }
+/* ==========================================================================
+   VAULTKEY UI v7 — Balance visual Home
+   Baja un poco los botones y reparte mejor el contenido vertical.
+   Solo CSS. No toca lógica, PIN, cifrado ni entradas.
+   ========================================================================== */
+
+#home.vkHomeSplash .vkHomeBrandBlock strong {
+  font-size: 17px !important;
+  line-height: 1.25 !important;
+}
+
+#home.vkHomeSplash .vkHomeBrandBlock p {
+  font-size: 15.5px !important;
+  line-height: 1.55 !important;
+  max-width: 330px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+#home.vkHomeSplash .vkHomePrimaryActions {
+  margin-top: 68px !important;
+}
+
+#home.vkHomeSplash .vkHomeMiniActions {
+  margin-top: 18px !important;
+}
+
+@media (max-height: 760px) {
+  #home.vkHomeSplash .vkHomePrimaryActions {
+    margin-top: 46px !important;
+  }
+
+  #home.vkHomeSplash .vkHomeMiniActions {
+    margin-top: 14px !important;
+  }
+
+  #home.vkHomeSplash .vkHomeBrandBlock p {
+    font-size: 14.5px !important;
+  }
+}
+
+@media (min-height: 900px) {
+  #home.vkHomeSplash .vkHomePrimaryActions {
+    margin-top: 82px !important;
+  }
+}
+
+/* ==========================================================================
+   VAULTKEY UI v7.1 — Home más equilibrado
+   Ajuste más visible: baja acciones y reparte mejor el espacio inferior.
+   ========================================================================== */
+
+#home.vkHomeSplash .vkHomeSplashContent {
+  padding-top: 20px !important;
+}
+
+#home.vkHomeSplash .vkHomeShieldWrap {
+  margin-top: 8px !important;
+}
+
+#home.vkHomeSplash .vkHomeBrandBlock {
+  margin-top: 12px !important;
+}
+
+#home.vkHomeSplash .vkHomeBrandBlock strong {
+  font-size: 17.5px !important;
+}
+
+#home.vkHomeSplash .vkHomeBrandBlock p {
+  font-size: 16px !important;
+  line-height: 1.55 !important;
+  max-width: 340px !important;
+  margin-top: 18px !important;
+}
+
+#home.vkHomeSplash .vkHomePrimaryActions {
+  margin-top: 92px !important;
+}
+
+#home.vkHomeSplash .vkHomeMiniActions {
+  margin-top: 22px !important;
+}
+
+@media (max-height: 820px) {
+  #home.vkHomeSplash .vkHomeSplashContent {
+    padding-top: 12px !important;
+  }
+
+  #home.vkHomeSplash .vkHomePrimaryActions {
+    margin-top: 72px !important;
+  }
+
+  #home.vkHomeSplash .vkHomeMiniActions {
+    margin-top: 18px !important;
+  }
+}
+
+@media (max-height: 740px) {
+  #home.vkHomeSplash .vkHomePrimaryActions {
+    margin-top: 52px !important;
+  }
+
+  #home.vkHomeSplash .vkHomeBrandBlock p {
+    font-size: 14.5px !important;
+    margin-top: 12px !important;
+  }
+}
+
+/* ==========================================================================
+   VAULTKEY UI v7.2 — Ajuste final Home
+   Baja un poco más los botones y mejora aire del subtítulo.
+   ========================================================================== */
+
+#home.vkHomeSplash .vkHomeBrandBlock strong {
+  display: block !important;
+  font-size: 17.5px !important;
+  line-height: 1.35 !important;
+  margin-top: 4px !important;
+}
+
+#home.vkHomeSplash .vkHomeBrandBlock p {
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  margin-top: 22px !important;
+}
+
+#home.vkHomeSplash .vkHomePrimaryActions {
+  margin-top: 108px !important;
+}
+
+#home.vkHomeSplash .vkHomeMiniActions {
+  margin-top: 24px !important;
+}
+
+@media (max-height: 820px) {
+  #home.vkHomeSplash .vkHomePrimaryActions {
+    margin-top: 86px !important;
+  }
+
+  #home.vkHomeSplash .vkHomeMiniActions {
+    margin-top: 20px !important;
+  }
+}
+
+@media (max-height: 740px) {
+  #home.vkHomeSplash .vkHomePrimaryActions {
+    margin-top: 60px !important;
+  }
+
+  #home.vkHomeSplash .vkHomeMiniActions {
+    margin-top: 16px !important;
+  }
+}
