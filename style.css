@@ -1,4 +1,4 @@
-/*
+﻿/*
  * VaultKey â€” Design System V2.1 ESCUDO ESCENA
  * Base limpia: un solo asset maestro del escudo, sin parches, sin halos CSS, sin capturas montadas.
  */
@@ -3122,4 +3122,286 @@ body:has(#genModal.open) #screenDots,
 /* VAULTKEY UI v10.1 — Ocultar dots de navegación dentro del detalle */
 body:has(#quickModal.open) #screenDots {
   display: none !important;
+}/* ==========================================================================
+   VAULTKEY UI v11 — Pulido visual Nueva entrada
+   Solo CSS. No toca guardado, saveEntry, cifrado, PIN, Drive, categorías ni iconos.
+   Objetivo: formulario más limpio, menos pesado y más premium.
+   ========================================================================== */
+
+/* Oculta dots inferiores mientras se crea una entrada */
+body:has(#entryModal.open) #screenDots,
+.app:has(#entryModal.open) #screenDots {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
+
+/* Fondo de Nueva entrada más sobrio */
+#entryModal .sheet {
+  padding: 0 13px calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0, 120, 255, .13), transparent 34%),
+    linear-gradient(180deg, #061527 0%, #030812 100%) !important;
+}
+
+/* Barra superior más premium */
+#entryModal .entryTargetHead {
+  height: 56px !important;
+  margin: 0 -13px 10px !important;
+  padding: 0 14px !important;
+  background: rgba(3, 10, 22, .88) !important;
+  border-bottom: 1px solid rgba(118, 178, 224, .10) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+#entryModal .entryTargetHead .sheetTitle {
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  letter-spacing: -.25px !important;
+  color: #F4F8FF !important;
+}
+
+#entryModal .entryTargetHead .linkBtn {
+  font-size: 13.5px !important;
+  font-weight: 850 !important;
+  color: #24EFFF !important;
+}
+
+/* Selector de tipo: mantiene 2 filas, pero más limpio */
+#entryModal #entryTypeRow {
+  margin-bottom: 11px !important;
+  padding: 8px !important;
+  gap: 7px !important;
+  border-radius: 18px !important;
+  background: linear-gradient(180deg, rgba(9, 27, 50, .74), rgba(5, 16, 32, .84)) !important;
+  border: 1px solid rgba(118, 178, 224, .12) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .035) !important;
+}
+
+#entryModal #entryTypeRow > button {
+  min-height: 35px !important;
+  border-radius: 12px !important;
+  font-size: 11.5px !important;
+  font-weight: 820 !important;
+  background: rgba(6, 20, 40, .78) !important;
+  border: 1px solid rgba(118, 178, 224, .14) !important;
+  color: rgba(226, 240, 255, .78) !important;
+}
+
+/* Barra de iconos: menos pesada, más ordenada */
+#entryModal .sheet > div:has(#iconStripRow) {
+  margin-bottom: 10px !important;
+  padding: 10px 10px 9px !important;
+  border-radius: 20px !important;
+  background: linear-gradient(180deg, rgba(9, 27, 50, .70), rgba(5, 16, 32, .82)) !important;
+  border: 1px solid rgba(118, 178, 224, .12) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .035) !important;
+}
+
+#entryModal #iconStripRow {
+  padding: 2px 0 8px !important;
+}
+
+#entryModal .vkStripIconBtn {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 15px !important;
+  margin-right: 7px !important;
+  background: rgba(4, 14, 28, .72) !important;
+  border-color: rgba(118, 178, 224, .13) !important;
+}
+
+#entryModal .vkStripIconBtn svg,
+#entryModal .vkStripIconBtn img {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 12px !important;
+}
+
+#entryModal .vkStripIconBtn.active {
+  border-color: rgba(0, 217, 255, .74) !important;
+  box-shadow:
+    0 0 0 2px rgba(0, 217, 255, .16),
+    0 0 18px rgba(0, 217, 255, .18) !important;
+}
+
+#entryModal #eIconSearch {
+  height: 38px !important;
+  min-height: 38px !important;
+  border-radius: 13px !important;
+  font-size: 13.5px !important;
+  background: rgba(4, 14, 28, .82) !important;
+}
+
+/* Campos principales: menos caja dentro de caja */
+#entryModal .field {
+  margin-bottom: 7px !important;
+  padding: 9px 11px !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, rgba(10, 30, 56, .80), rgba(5, 16, 34, .90)) !important;
+  border: 1px solid rgba(118, 178, 224, .12) !important;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, .18),
+    inset 0 1px 0 rgba(255, 255, 255, .035) !important;
+}
+
+#entryModal .label {
+  margin-bottom: 5px !important;
+  font-size: 10.3px !important;
+  font-weight: 900 !important;
+  letter-spacing: .62px !important;
+  color: rgba(128, 215, 255, .92) !important;
+  text-shadow: none !important;
+}
+
+#entryModal .inp,
+#entryModal .txt,
+#entryModal select,
+#entryModal textarea {
+  min-height: 40px !important;
+  padding: 9px 11px !important;
+  border-radius: 13px !important;
+  font-size: 14px !important;
+  background: rgba(3, 13, 26, .88) !important;
+  border: 1px solid rgba(118, 178, 224, .14) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025) !important;
+}
+
+#entryModal .inp::placeholder,
+#entryModal .txt::placeholder {
+  color: rgba(150, 181, 210, .54) !important;
+}
+
+#entryModal .inp:focus,
+#entryModal .txt:focus,
+#entryModal select:focus,
+#entryModal textarea:focus {
+  border-color: rgba(0, 217, 255, .58) !important;
+  box-shadow: 0 0 0 3px rgba(0, 217, 255, .10) !important;
+}
+
+/* Textareas más cómodos sin ocupar demasiado */
+#entryModal textarea.inp,
+#entryModal .txt {
+  min-height: 86px !important;
+  line-height: 1.4 !important;
+}
+
+/* Bloques especiales: tarjeta, documento, licencia, médico, wifi */
+#entryModal #fieldCard,
+#entryModal #fieldSecureNote,
+#entryModal #fieldId,
+#entryModal #fieldLicense,
+#entryModal #fieldMedical,
+#entryModal #fieldWifi {
+  margin-bottom: 10px !important;
+  padding: 10px 10px 3px !important;
+  border-radius: 20px !important;
+  background: linear-gradient(180deg, rgba(10, 30, 56, .68), rgba(5, 16, 34, .82)) !important;
+  border: 1px solid rgba(118, 178, 224, .12) !important;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, .18),
+    inset 0 1px 0 rgba(255, 255, 255, .035) !important;
+}
+
+#entryModal #fieldCard .field,
+#entryModal #fieldSecureNote .field,
+#entryModal #fieldId .field,
+#entryModal #fieldLicense .field,
+#entryModal #fieldMedical .field,
+#entryModal #fieldWifi .field {
+  background: rgba(3, 13, 26, .34) !important;
+  border-color: rgba(118, 178, 224, .09) !important;
+  box-shadow: none !important;
+}
+
+/* Botones Favorito / URL / Nota más finos */
+#entryModal #fieldExtraBtns {
+  gap: 8px !important;
+  margin: 10px 0 !important;
+}
+
+#entryModal #fieldExtraBtns button,
+#entryModal #favToggleBtn {
+  min-height: 44px !important;
+  padding: 10px 8px !important;
+  border-radius: 16px !important;
+  font-size: 13px !important;
+  font-weight: 820 !important;
+  background: rgba(7, 22, 42, .82) !important;
+  border: 1px solid rgba(118, 178, 224, .13) !important;
+  color: rgba(226, 240, 255, .80) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .03) !important;
+}
+
+/* Categoría y etiquetas: secundarios, no deben dominar la pantalla */
+#entryModal .field:has(#eCategory),
+#entryModal .field:has(#tagInputWrap) {
+  padding: 9px 11px !important;
+  margin-bottom: 9px !important;
+  background: rgba(8, 24, 46, .70) !important;
+}
+
+#entryModal #eCategory {
+  min-height: 40px !important;
+}
+
+#entryModal #tagInputWrap {
+  min-height: 40px !important;
+  padding: 7px 9px !important;
+  border-radius: 13px !important;
+  background: rgba(3, 13, 26, .88) !important;
+}
+
+#entryModal #tagInput {
+  font-size: 13px !important;
+}
+
+/* Ayudas de texto más discretas */
+#entryModal .sub,
+#entryModal #strTxt,
+#entryModal .securityNote {
+  color: rgba(150, 181, 210, .66) !important;
+  font-size: 11.5px !important;
+  line-height: 1.35 !important;
+}
+
+/* Mejor ajuste en pantallas bajas */
+@media (max-height: 760px) {
+  #entryModal .entryTargetHead {
+    height: 52px !important;
+    margin-bottom: 8px !important;
+  }
+
+  #entryModal #entryTypeRow {
+    padding: 7px !important;
+    margin-bottom: 8px !important;
+  }
+
+  #entryModal .field {
+    padding: 8px 10px !important;
+    margin-bottom: 6px !important;
+  }
+
+  #entryModal .inp,
+  #entryModal .txt,
+  #entryModal select,
+  #entryModal textarea {
+    min-height: 38px !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+
+  #entryModal .vkStripIconBtn {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  #entryModal .vkStripIconBtn svg,
+  #entryModal .vkStripIconBtn img {
+    width: 38px !important;
+    height: 38px !important;
+  }
+}
+
