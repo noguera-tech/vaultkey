@@ -1579,7 +1579,8 @@ async function doImportConfirm() {
       medDoctor: String(e.medDoctor||''), medNotes: String(e.medNotes||''),
       wifiSsid: String(e.wifiSsid||''), wifiPass: String(e.wifiPass||''),
       wifiSec: String(e.wifiSec||''), wifiRouter: String(e.wifiRouter||''), wifiIp: String(e.wifiIp||''),
-    }));
+        }));
+    await persist();
     render();
     const count = vault.length;
     closeImportModal();
