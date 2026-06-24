@@ -3404,4 +3404,374 @@ body:has(#entryModal.open) #screenDots,
     height: 38px !important;
   }
 }
+/* ==========================================================================
+   VAULTKEY UI v12 — Pulido visual pantalla Ajustes
+   Solo CSS. No toca PIN, biometría, cifrado, Drive, autobloqueo ni lógica.
+   Objetivo: Ajustes más premium, compacto y consistente con v10/v11.
+   ========================================================================== */
+
+/* Fondo general de Ajustes */
+#settings {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0, 120, 255, .12), transparent 34%),
+    linear-gradient(180deg, #061527 0%, #030812 100%) !important;
+}
+
+/* Contenido */
+#settings .content {
+  padding: 14px 14px calc(26px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* Header superior */
+#settings .top {
+  height: 70px !important;
+  padding: 10px 18px 9px !important;
+  align-items: flex-start !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  background: rgba(3, 10, 22, .88) !important;
+  border-bottom: 1px solid rgba(118, 178, 224, .10) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+#settings .title {
+  font-size: 24px !important;
+  line-height: 1.05 !important;
+  font-weight: 950 !important;
+  letter-spacing: -.55px !important;
+  color: #F4F8FF !important;
+}
+
+#settings .sub {
+  margin-top: 4px !important;
+  font-size: 14px !important;
+  line-height: 1.25 !important;
+  color: rgba(190, 210, 230, .74) !important;
+}
+
+/* Bloques */
+#settings .settingBlock {
+  margin-bottom: 20px !important;
+}
+
+#settings .settingBlock > .label {
+  margin: 0 0 9px 4px !important;
+  padding: 0 !important;
+  font-size: 11.5px !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: .85px !important;
+  color: #24EFFF !important;
+  text-shadow: 0 0 10px rgba(0, 217, 255, .22) !important;
+}
+
+/* Grid */
+#settings .settingsGrid {
+  gap: 9px !important;
+}
+
+/* Filas de ajustes */
+#settings .settingsRow {
+  min-height: 76px !important;
+  padding: 13px 16px !important;
+  gap: 14px !important;
+  border-radius: 20px !important;
+  background:
+    linear-gradient(135deg, rgba(10, 30, 56, .92), rgba(5, 16, 34, .97)) !important;
+  border: 1px solid rgba(118, 178, 224, .14) !important;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, .22),
+    inset 0 1px 0 rgba(255, 255, 255, .04) !important;
+}
+
+#settings .settingsRow:active {
+  background:
+    linear-gradient(135deg, rgba(12, 42, 76, .96), rgba(5, 18, 38, .98)) !important;
+  border-color: rgba(0, 217, 255, .30) !important;
+  transform: scale(.99);
+}
+
+/* Iconos */
+#settings .sico {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 16px !important;
+  font-size: 24px !important;
+  flex-shrink: 0 !important;
+  background:
+    linear-gradient(135deg, rgba(0, 217, 255, .18), rgba(0, 100, 255, .12)) !important;
+  border: 1px solid rgba(0, 217, 255, .20) !important;
+  color: #F4F8FF !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .06),
+    0 8px 18px rgba(0, 0, 0, .22) !important;
+}
+
+/* Texto */
+#settings .stxt b {
+  font-size: 16px !important;
+  line-height: 1.15 !important;
+  font-weight: 900 !important;
+  letter-spacing: -.20px !important;
+  color: rgba(244, 248, 255, .98) !important;
+}
+
+#settings .stxt span {
+  margin-top: 4px !important;
+  font-size: 13.2px !important;
+  line-height: 1.35 !important;
+  color: rgba(190, 210, 230, .72) !important;
+}
+
+/* Flechas / indicadores derecha */
+#settings .settingsRow > div:last-child {
+  font-size: 19px !important;
+  color: rgba(128, 215, 255, .52) !important;
+}
+
+/* Badges tipo Inactiva / Seguro */
+#settings .pill,
+#settings .settingsRow [class*="pill"] {
+  min-height: 38px !important;
+  padding: 8px 14px !important;
+  border-radius: 999px !important;
+  background: rgba(4, 14, 28, .66) !important;
+  border: 1px solid rgba(118, 178, 224, .14) !important;
+  color: rgba(220, 232, 245, .72) !important;
+  font-weight: 850 !important;
+}
+
+/* Selector de longitud PIN */
+#settings .settingsRow button,
+#settings .settingsRow .smallBtn {
+  min-width: 38px !important;
+  height: 38px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+}
+
+/* Select de autobloqueo inteligente */
+#settings .settingSelect {
+  height: 58px !important;
+  margin-top: 14px !important;
+  border-radius: 16px !important;
+  padding: 0 18px !important;
+  background: rgba(3, 13, 26, .88) !important;
+  border: 1px solid rgba(118, 178, 224, .16) !important;
+  color: #F4F8FF !important;
+  font-size: 16px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025) !important;
+}
+
+#settings .settingSelect:focus {
+  border-color: rgba(0, 217, 255, .58) !important;
+  box-shadow: 0 0 0 3px rgba(0, 217, 255, .10) !important;
+}
+
+/* Caja de configuración especial */
+#settings .settingBlock .card {
+  border-radius: 22px !important;
+  padding: 18px 20px !important;
+  background:
+    linear-gradient(180deg, rgba(10, 30, 56, .90), rgba(5, 16, 34, .96)) !important;
+  border: 1px solid rgba(118, 178, 224, .14) !important;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, .22),
+    inset 0 1px 0 rgba(255, 255, 255, .04) !important;
+}
+
+#settings .settingBlock .card b,
+#settings .settingBlock .card strong {
+  font-size: 17px !important;
+  line-height: 1.2 !important;
+  color: #F4F8FF !important;
+}
+
+#settings .settingBlock .card p,
+#settings .settingBlock .card .sub {
+  color: rgba(190, 210, 230, .72) !important;
+}
+
+/* Alertas dentro de ajustes */
+#settings .securityNote,
+#settings .settingBlock .danger,
+#settings .settingBlock [style*="red"],
+#settings .settingBlock [style*="#ff"] {
+  font-size: 12.2px !important;
+  line-height: 1.35 !important;
+}
+
+/* Checks / toggles pequeños a la derecha */
+#settings input[type="checkbox"] {
+  width: 20px !important;
+  height: 20px !important;
+  accent-color: #24EFFF !important;
+}
+
+/* Zona de peligro */
+#settings .danger,
+#settings .settingsRow.danger,
+#settings .settingBlock:last-child .settingsRow,
+#settings .settingBlock:last-child .card {
+  background:
+    linear-gradient(135deg, rgba(58, 14, 28, .76), rgba(24, 8, 18, .94)) !important;
+  border-color: rgba(255, 90, 110, .34) !important;
+}
+
+#settings .settingBlock:last-child .label {
+  color: #24EFFF !important;
+}
+
+#settings .settingBlock:last-child .stxt b,
+#settings .settingBlock:last-child b {
+  color: #FF6F82 !important;
+}
+
+#settings .settingBlock:last-child button {
+  min-height: 54px !important;
+  border-radius: 17px !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  color: #FF6F82 !important;
+  background: rgba(255, 90, 110, .08) !important;
+  border: 1px solid rgba(255, 90, 110, .36) !important;
+}
+
+/* Ajuste en pantallas bajas */
+@media (max-height: 760px) {
+  #settings .top {
+    height: 64px !important;
+  }
+
+  #settings .content {
+    padding-top: 12px !important;
+  }
+
+  #settings .settingsRow {
+    min-height: 70px !important;
+    padding: 11px 14px !important;
+  }
+
+  #settings .sico {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 15px !important;
+    font-size: 22px !important;
+  }
+
+  #settings .stxt b {
+    font-size: 15px !important;
+  }
+
+  #settings .stxt span {
+    font-size: 12.5px !important;
+  }
+}
+
+/* ==========================================================================
+   VAULTKEY UI v12.1 — Fix navegación + acentos sutiles en Ajustes
+   Solo CSS. Restaura los dots de navegación en Ajustes y da color suave
+   a los iconos por sección sin tocar lógica.
+   ========================================================================== */
+
+/* En Ajustes los dots son navegación real: deben permanecer visibles y clicables */
+body:has(#settings.active) #screenDots,
+.app:has(#settings.active) #screenDots {
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+
+body:has(#settings.active) #screenDots .dot,
+.app:has(#settings.active) #screenDots .dot {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* Base de iconos: color visible pero no chillón */
+#settings .sico {
+  color: #EAF7FF !important;
+}
+
+/* Seguridad */
+#settings .settingBlock:nth-of-type(1) .settingsRow:nth-child(1) .sico {
+  background: linear-gradient(135deg, rgba(0, 123, 255, .35), rgba(0, 36, 92, .72)) !important;
+  border-color: rgba(82, 180, 255, .34) !important;
+  color: #DDF3FF !important;
+}
+
+#settings .settingBlock:nth-of-type(1) .settingsRow:nth-child(2) .sico {
+  background: linear-gradient(135deg, rgba(0, 200, 160, .26), rgba(0, 62, 72, .72)) !important;
+  border-color: rgba(92, 255, 220, .30) !important;
+  color: #B9FFF0 !important;
+}
+
+#settings .settingBlock:nth-of-type(1) .settingsRow:nth-child(3) .sico,
+#settings .settingBlock:nth-of-type(1) .settingsRow:nth-child(4) .sico {
+  background: linear-gradient(135deg, rgba(255, 196, 65, .24), rgba(70, 48, 10, .76)) !important;
+  border-color: rgba(255, 216, 100, .30) !important;
+  color: #FFE7A3 !important;
+}
+
+#settings .settingBlock:nth-of-type(1) .settingsRow:nth-child(5) .sico {
+  background: linear-gradient(135deg, rgba(0, 217, 255, .24), rgba(0, 60, 110, .76)) !important;
+  border-color: rgba(0, 217, 255, .32) !important;
+  color: #BDEFFF !important;
+}
+
+#settings .settingBlock:nth-of-type(1) .settingsRow:nth-child(6) .sico {
+  background: linear-gradient(135deg, rgba(132, 92, 255, .26), rgba(44, 24, 100, .76)) !important;
+  border-color: rgba(172, 140, 255, .30) !important;
+  color: #DCD1FF !important;
+}
+
+#settings .settingBlock:nth-of-type(1) .settingsRow:nth-child(7) .sico {
+  background: linear-gradient(135deg, rgba(255, 90, 110, .24), rgba(70, 18, 32, .76)) !important;
+  border-color: rgba(255, 120, 140, .34) !important;
+  color: #FFD0D8 !important;
+}
+
+/* Respaldos */
+#settings .settingBlock:nth-of-type(2) .settingsRow .sico {
+  background: linear-gradient(135deg, rgba(0, 190, 165, .26), rgba(0, 54, 70, .78)) !important;
+  border-color: rgba(92, 255, 220, .26) !important;
+  color: #C7FFF2 !important;
+}
+
+/* Google Drive */
+#settings .settingBlock:nth-of-type(3) .settingsRow .sico {
+  background: linear-gradient(135deg, rgba(0, 132, 255, .28), rgba(0, 38, 90, .78)) !important;
+  border-color: rgba(110, 200, 255, .28) !important;
+  color: #DDF3FF !important;
+}
+
+/* Configuración */
+#settings .settingBlock:nth-of-type(4) .sico {
+  background: linear-gradient(135deg, rgba(0, 217, 255, .20), rgba(0, 52, 90, .74)) !important;
+  border-color: rgba(0, 217, 255, .25) !important;
+  color: #C8F6FF !important;
+}
+
+/* Preferencias */
+#settings .settingBlock:nth-of-type(5) .settingsRow .sico {
+  background: linear-gradient(135deg, rgba(92, 200, 255, .20), rgba(20, 42, 78, .78)) !important;
+  border-color: rgba(92, 200, 255, .22) !important;
+  color: #EAF7FF !important;
+}
+
+/* General */
+#settings .settingBlock:nth-of-type(6) .settingsRow .sico {
+  background: linear-gradient(135deg, rgba(210, 232, 255, .14), rgba(16, 34, 62, .80)) !important;
+  border-color: rgba(180, 220, 255, .18) !important;
+  color: #F4F8FF !important;
+}
+
+/* Zona de peligro */
+#settings .settingBlock:last-child .sico {
+  background: linear-gradient(135deg, rgba(255, 90, 110, .28), rgba(70, 18, 32, .82)) !important;
+  border-color: rgba(255, 120, 140, .40) !important;
+  color: #FFD0D8 !important;
+}
 
