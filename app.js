@@ -1214,7 +1214,126 @@ function renderIconStrip(){
     const svgStr=obj.svg.replace(/<svg ([^>]*?)width="[^"]*"\s*/g,'<svg $1').replace(/<svg ([^>]*?)height="[^"]*"\s*/g,'<svg $1').replace(/<svg /g,'<svg style="width:100%;height:100%;display:block" ');
     return `<button type="button" class="vkStripIconBtn ${active?'active':''}" data-icon="${dataIcon}" title="${safeEsc(ic.label||ic.id)}">${svgStr}</button>`;
   }).join('');
+  // After rendering, re-init paged carousel
+  if(typeof initIconPagedCarousel==='function') initIconPagedCarousel();
 }function updateEntryIconPreview(){renderIconStrip();}
+
+function initIconPagedCarousel(){
+  const row=document.getElementById('iconStripRow');
+  if(!row)return;
+
+  // Reset on each renderIconStrip call so new icons are paginated
+  row.dataset.vkIconCarouselReady='0';
+
+  if(row.dataset.vkIconCarouselReady==='1') return;
+  row.dataset.vkIconCarouselReady='1';
+
+  let currentPage=0;
+  const PER_PAGE=6;
+
+  const btns=()=>[...row.children].filter(el=>el.nodeType===1);
+
+  function pages(){
+    const list=btns();
+    const out=[];
+    for(let i=0;i<list.length;i+=PER_PAGE) out.push(list.slice(i,i+PER_PAGE));
+    return out;
+  }
+
+  function activePageIndex(allPages){
+    const active=row.querySelector('.active');
+    if(!active)return -1;
+    return allPages.findIndex(p=>p.includes(active));
+  }
+
+  function renderIconPage(forceActive=false){
+    const allPages=pages();
+    if(!allPages.length)return;
+
+    if(forceActive){
+      const idx=activePageIndex(allPages);
+      if(idx>=0)currentPage=idx;
+    }
+
+    currentPage=Math.max(0,Math.min(currentPage,allPages.length-1));
+    const visible=new Set(allPages[currentPage]);
+
+    btns().forEach(btn=>{
+      btn.style.display=visible.has(btn)?'':'none';
+      btn.style.flex='0 0 auto';
+    });
+
+    row.dataset.iconPage=String(currentPage+1);
+    row.dataset.iconPages=String(allPages.length);
+  }
+
+  function pageBy(delta){
+    const allPages=pages();
+    if(allPages.length<=1)return;
+    const next=Math.max(0,Math.min(currentPage+delta,allPages.length-1));
+    if(next===currentPage)return;
+    currentPage=next;
+    renderIconPage();
+  }
+
+  window.renderIconPage=renderIconPage;
+
+  // Wheel
+  row.addEventListener('wheel',e=>{
+    const allPages=pages();
+    if(allPages.length<=1)return;
+    const delta=Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX;
+    if(Math.abs(delta)<8)return;
+    e.preventDefault();
+    pageBy(delta>0?1:-1);
+  },{passive:false});
+
+  // Swipe/drag
+  let startX=0,dragging=false;
+  row.addEventListener('pointerdown',e=>{
+    if(e.target.closest&&e.target.closest('.vkStripIconBtn'))return;
+    const allPages=pages();
+    if(allPages.length<=1)return;
+    dragging=true;
+    startX=e.clientX;
+    row.setPointerCapture?.(e.pointerId);
+  });
+  row.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    if(Math.abs(e.clientX-startX)>10) row.dataset.dragging='1';
+  });
+  row.addEventListener('pointerup',e=>{
+    if(!dragging)return;
+    dragging=false;
+    row.releasePointerCapture?.(e.pointerId);
+    const dx=e.clientX-startX;
+    if(Math.abs(dx)>35){
+      pageBy(dx<0?1:-1);
+      setTimeout(()=>{delete row.dataset.dragging;},120);
+    }
+  });
+  row.addEventListener('pointercancel',()=>{dragging=false;});
+
+  // Click on icon — keep selection, re-render to show active page
+  row.addEventListener('click',e=>{
+    if(row.dataset.dragging==='1'){e.preventDefault();e.stopPropagation();return;}
+    setTimeout(()=>renderIconPage(true),0);
+  },true);
+
+  // Keyboard
+  row.setAttribute('tabindex','0');
+  row.addEventListener('keydown',e=>{
+    if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+    e.preventDefault();
+    const allPages=pages();
+    if(e.key==='Home'){currentPage=0;renderIconPage();return;}
+    if(e.key==='End'){currentPage=Math.max(0,allPages.length-1);renderIconPage();return;}
+    if(e.key==='ArrowRight')pageBy(1);
+    if(e.key==='ArrowLeft')pageBy(-1);
+  });
+
+  renderIconPage(true);
+}
 function entryShowStep(n){$('entryStep1').style.display=n===1?'block':'none';$('entryStep2').style.display=n===2?'block':'none';$('dot1').style.width=n===1?'32px':'8px';$('dot1').style.background=n===1?'var(--cyan)':'rgba(255,255,255,.2)';$('dot1').style.boxShadow=n===1?'0 0 14px rgba(0,210,255,.7)':'none';$('dot2').style.width=n===2?'32px':'8px';$('dot2').style.background=n===2?'var(--cyan)':'rgba(255,255,255,.2)';$('dot2').style.boxShadow=n===2?'0 0 14px rgba(0,210,255,.7)':'none';$('entryBackBtn').textContent=n===1?'Cancelar':'\u2190 Atr\xe1s';$('entryNextBtn').textContent=n===2?'Guardar':'Siguiente \u2192';if(n===2){updateEntryStep2Header();renderIconStrip();}$('entryModal')?.querySelector('.sheet')?.scrollTo({top:0,behavior:'smooth'});}
 $('ePass')?.addEventListener('input',updateStrength);
 
