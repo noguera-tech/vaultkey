@@ -3993,3 +3993,95 @@ document.addEventListener('DOMContentLoaded',()=>{
     fab.addEventListener('touchend',()=>{fab.style.transform='scale(1)';},{passive:true});
   }
 });
+
+/* ==========================================================================
+   VAULTKEY UI v5.1 — Fix selector de tipos de entrada
+   Causa corregida:
+   - El selector Contraseña / Nota / Tarjeta / Documento dependía solo de onclick inline.
+   - setEntryType existía, pero no estaba expuesto explícitamente como window.setEntryType.
+   - Después de los intentos de carrusel/drag, el click podía quedar bloqueado o no llegar al onclick.
+   Solución:
+   - Exponer setEntryType.
+   - Delegar pointerup/click directamente sobre #entryTypeRow.
+   - No toca cifrado, guardado, Drive, PIN ni biometría.
+   ========================================================================== */
+
+try {
+  window.setEntryType = setEntryType;
+} catch(e) {}
+
+(function(){
+  function initEntryTypeSelectorFix(){
+    const row = document.getElementById('entryTypeRow');
+    if(!row || row.dataset.vkEntryTypeSelectorFix === '1') return;
+
+    row.dataset.vkEntryTypeSelectorFix = '1';
+
+    const typeById = {
+      typeBtnPass: 'password',
+      typeBtnNote: 'note',
+      typeBtnCard: 'card',
+      typeBtnId: 'id',
+      typeBtnLicense: 'license',
+      typeBtnMedical: 'medical',
+      typeBtnWifi: 'wifi'
+    };
+
+    let startX = 0;
+    let startY = 0;
+    let moved = false;
+
+    function buttonFromEvent(e){
+      return e.target && e.target.closest
+        ? e.target.closest('#entryTypeRow button')
+        : null;
+    }
+
+    function typeFromButton(btn){
+      return btn ? typeById[btn.id] : '';
+    }
+
+    row.addEventListener('pointerdown', function(e){
+      startX = Number(e.clientX || 0);
+      startY = Number(e.clientY || 0);
+      moved = false;
+    }, true);
+
+    row.addEventListener('pointermove', function(e){
+      const dx = Math.abs(Number(e.clientX || 0) - startX);
+      const dy = Math.abs(Number(e.clientY || 0) - startY);
+      if(dx > 8 || dy > 8) moved = true;
+    }, true);
+
+    row.addEventListener('pointerup', function(e){
+      const btn = buttonFromEvent(e);
+      const type = typeFromButton(btn);
+
+      if(!btn || !type || moved) return;
+
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      setEntryType(type);
+    }, true);
+
+    row.addEventListener('click', function(e){
+      const btn = buttonFromEvent(e);
+      const type = typeFromButton(btn);
+
+      if(!btn || !type) return;
+
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      setEntryType(type);
+    }, true);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initEntryTypeSelectorFix);
+  } else {
+    initEntryTypeSelectorFix();
+  }
+})();
+
