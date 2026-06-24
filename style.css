@@ -1,4 +1,4 @@
-﻿/*
+/*
  * VaultKey â€” Design System V2.1 ESCUDO ESCENA
  * Base limpia: un solo asset maestro del escudo, sin parches, sin halos CSS, sin capturas montadas.
  */
@@ -2940,4 +2940,186 @@ body:has(#genModal.open) #screenDots,
   border: 1px solid rgba(118, 178, 224, .10);
   border-radius: 22px;
   background: linear-gradient(180deg, rgba(8, 22, 42, .42), rgba(4, 12, 26, .18));
+}
+
+
+/* ==========================================================================
+   VAULTKEY UI v10 — Pulido premium del detalle de entrada
+   Solo CSS. No toca guardado, cifrado, PIN, Drive ni categorías.
+   ========================================================================== */
+
+#quickModal .sheet {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0, 140, 255, .16), transparent 34%),
+    linear-gradient(180deg, #061527 0%, #030812 100%) !important;
+}
+
+#quickModal #quickBody {
+  padding: 0 14px calc(30px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* Barra superior del detalle */
+#quickModal #quickBody > div:first-child {
+  position: sticky !important;
+  top: 0;
+  z-index: 30;
+  margin: 0 -14px 8px !important;
+  padding: 0 14px !important;
+  background: rgba(3, 10, 22, .82) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(118, 178, 224, .10);
+}
+
+#quickModal #quickBody > div:first-child .linkBtn {
+  border-radius: 14px !important;
+  color: rgba(128, 215, 255, .92) !important;
+}
+
+#quickModal #quickBody > div:first-child .linkBtn:active {
+  background: rgba(0, 210, 255, .08) !important;
+}
+
+/* Hero del detalle */
+#quickModal #quickBody > div:nth-child(2) {
+  margin: 10px 0 14px !important;
+  padding: 24px 12px 25px !important;
+  border-radius: 28px !important;
+  overflow: hidden !important;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(0, 217, 255, .18), transparent 38%),
+    linear-gradient(180deg, rgba(9, 31, 58, .74), rgba(4, 13, 28, .42)) !important;
+  border: 1px solid rgba(118, 178, 224, .13) !important;
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, .26),
+    inset 0 1px 0 rgba(255, 255, 255, .045) !important;
+}
+
+#quickModal .qvHeroGlow {
+  position: absolute !important;
+  width: 190px;
+  height: 190px;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(0, 217, 255, .24), transparent 66%);
+  filter: blur(8px);
+  opacity: .9;
+  pointer-events: none;
+}
+
+#quickModal #quickBody > div:nth-child(2) .logo {
+  width: 94px !important;
+  height: 94px !important;
+  border-radius: 24px !important;
+  box-shadow:
+    0 0 0 2px rgba(0, 217, 255, .18),
+    0 18px 38px rgba(0, 0, 0, .42),
+    0 0 34px rgba(0, 140, 255, .16) !important;
+}
+
+#quickModal #quickBody > div:nth-child(2) > div[style*="font-size:26px"] {
+  max-width: 92%;
+  text-align: center;
+  font-size: 24px !important;
+  line-height: 1.08 !important;
+  letter-spacing: -.45px !important;
+}
+
+#quickModal #quickBody > div:nth-child(2) > div[style*="text-transform:uppercase"] {
+  color: rgba(130, 215, 255, .92) !important;
+  background: rgba(0, 217, 255, .09) !important;
+  border-color: rgba(0, 217, 255, .20) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+}
+
+/* Campos del detalle */
+#quickModal .qvFieldRow {
+  min-height: 68px !important;
+  padding: 13px 14px !important;
+  gap: 12px !important;
+  background:
+    linear-gradient(135deg, rgba(10, 30, 56, .94), rgba(5, 16, 34, .98)) !important;
+  border-bottom: 1px solid rgba(118, 178, 224, .105) !important;
+}
+
+#quickModal .qvFieldRow:active {
+  background:
+    linear-gradient(135deg, rgba(12, 42, 76, .96), rgba(5, 18, 38, .98)) !important;
+}
+
+#quickModal .qvFieldIcon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 14px !important;
+  background:
+    linear-gradient(135deg, rgba(0, 217, 255, .18), rgba(0, 100, 255, .10)) !important;
+  border: 1px solid rgba(0, 217, 255, .18) !important;
+  color: rgba(226, 247, 255, .96) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05);
+}
+
+#quickModal .qvFieldLabel {
+  color: rgba(128, 215, 255, .80) !important;
+  font-size: 10.4px !important;
+  letter-spacing: .72px !important;
+}
+
+#quickModal .qvFieldValue {
+  color: rgba(244, 248, 252, .98) !important;
+  font-size: 14.6px !important;
+  line-height: 1.28 !important;
+  font-weight: 680 !important;
+}
+
+/* Botones Ver / Copiar */
+#quickModal .qvActionBtn {
+  height: 36px !important;
+  min-width: 66px !important;
+  border-radius: 13px !important;
+  background: rgba(0, 217, 255, .085) !important;
+  border: 1px solid rgba(0, 217, 255, .18) !important;
+  color: rgba(120, 220, 255, .96) !important;
+  font-size: 12.4px !important;
+  font-weight: 850 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+}
+
+#quickModal .qvActionBtn:active {
+  transform: scale(.96);
+  background: rgba(0, 217, 255, .16) !important;
+}
+
+/* Fecha y botones inferiores */
+#quickModal .qvTimestamp {
+  margin: 13px 0 18px !important;
+  color: rgba(180, 205, 226, .48) !important;
+  font-size: 11.8px !important;
+}
+
+#quickModal .qvBotBtn {
+  min-height: 52px !important;
+  border-radius: 18px !important;
+  font-size: 13.8px !important;
+  font-weight: 850 !important;
+  background: rgba(6, 19, 39, .82) !important;
+}
+
+#quickModal .qvBotFav,
+#quickModal .qvBotFavActive {
+  color: #FFD166 !important;
+  border-color: rgba(245, 184, 46, .34) !important;
+  background: rgba(245, 184, 46, .075) !important;
+}
+
+#quickModal .qvBotDel {
+  color: #FF8585 !important;
+  border-color: rgba(239, 68, 68, .34) !important;
+  background: rgba(239, 68, 68, .075) !important;
+}
+
+/* VAULTKEY UI v10.1 — Ocultar dots de navegación dentro del detalle */
+body:has(#quickModal.open) #screenDots {
+  display: none !important;
 }
