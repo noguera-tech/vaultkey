@@ -114,7 +114,8 @@ input, textarea, select { cursor:text; }
 @keyframes slideOutL { from{transform:translateX(0);opacity:1} to{transform:translateX(-30%);opacity:0} }
 @keyframes slideOutR { from{transform:translateX(0);opacity:1} to{transform:translateX(30%);opacity:0} }
 
-.content { flex:1; overflow-y:auto; overflow-x:hidden; padding:16px 16px calc(var(--nav-h) + 20px); position:relative; z-index:1; scrollbar-gutter:stable; }
+.content { flex:1; overflow-y:auto; overflow-x:hidden; padding:16px 16px calc(var(--nav-h) + 20px); position:relative; z-index:1; scrollbar-width:none; }
+.content::-webkit-scrollbar { display:none; }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    COMPONENTES BASE
@@ -552,7 +553,8 @@ select option { background:#001830; color:#e8f6ff; }
 
 /* Nueva entrada fullscreen */
 #entryModal { position:absolute; inset:0; align-items:stretch; background:rgba(0,7,18,.96); backdrop-filter:none; }
-#entryModal .sheet { min-height:100dvh; height:auto; max-height:none; border-radius:0; border:0; padding:0 14px calc(32px + env(safe-area-inset-bottom,0px)); background:var(--grad-bg); position:relative; }
+#entryModal .sheet { min-height:100dvh; height:auto; max-height:none; border-radius:0; border:0; padding:0 14px calc(32px + env(safe-area-inset-bottom,0px)); background:var(--grad-bg); position:relative; scrollbar-width:none; }
+#entryModal .sheet::-webkit-scrollbar { display:none; }
 #entryModal .sheet::before { content:""; position:absolute; inset:0; background:var(--grad-glow); pointer-events:none; }
 
 .entryTargetHead { height:58px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; margin-bottom:10px; position:relative; z-index:1; }
@@ -1005,6 +1007,10 @@ input[type=range]::-moz-range-thumb {
 .entryTargetHead {
   height: 48px !important;
   margin-bottom: 6px !important;
+  margin-left: -14px !important;
+  margin-right: -14px !important;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
   border-bottom: 1px solid rgba(132,178,220,.10) !important;
   background: rgba(3,10,22,.97) !important;
   position: sticky !important;
@@ -1108,8 +1114,8 @@ input[type=range]::-moz-range-thumb {
 
 /* 4) Campos base: más pequeños, menos tarjetas gigantes */
 #entryModal .field {
-  padding: 9px 10px !important;
-  margin-bottom: 7px !important;
+  padding: 7px 10px !important;
+  margin-bottom: 5px !important;
   border-radius: 13px !important;
   background: rgba(8,22,40,.76) !important;
   border-color: rgba(132,178,220,.12) !important;
@@ -1118,7 +1124,7 @@ input[type=range]::-moz-range-thumb {
 
 #entryModal .label {
   font-size: 9.8px !important;
-  margin-bottom: 5px !important;
+  margin-bottom: 4px !important;
   letter-spacing: .48px !important;
   color: rgba(143,215,255,.86) !important;
 }
@@ -1581,8 +1587,6 @@ input[type=range]::-moz-range-thumb {
    ============================ */
 #entryModal #iconStripRow {
   padding: 3px 0 8px !important;
-  mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
 }
 
 #entryModal .vkStripIconBtn {
