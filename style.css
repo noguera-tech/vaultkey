@@ -2857,3 +2857,87 @@ body:has(#genModal.open) #screenDots,
     margin-top: 16px !important;
   }
 }
+/* ==========================================================================
+   VAULTKEY v8 — Pulido compacto de Mis entradas / listado
+   Solo CSS. No toca cifrado, guardado, filtros ni lógica de entradas.
+   ========================================================================== */
+
+.targetVault .targetListContent {
+  padding: 8px 14px calc(94px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+#entryList,
+#recentListVault {
+  display: flex;
+  flex-direction: column;
+  gap: 7px !important;
+}
+
+.targetVault .entry {
+  position: relative;
+  overflow: hidden;
+  min-height: 58px !important;
+  margin-bottom: 0 !important;
+  padding: 9px 10px !important;
+  border-radius: 16px !important;
+  background:
+    linear-gradient(135deg, rgba(10, 30, 56, .92), rgba(4, 13, 28, .96)) !important;
+  border: 1px solid rgba(118, 178, 224, .14) !important;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, .28),
+    inset 0 1px 0 rgba(255, 255, 255, .045) !important;
+  transition:
+    transform .14s ease,
+    border-color .14s ease,
+    background .14s ease,
+    box-shadow .14s ease;
+}
+
+.targetVault .entry::before {
+  content: "";
+  width: 3px;
+  align-self: stretch;
+  min-height: 34px !important;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(0, 217, 255, .75), rgba(0, 100, 255, .35));
+  box-shadow: 0 0 14px rgba(0, 217, 255, .18);
+  flex: 0 0 3px;
+}
+
+.targetVault .entry:active {
+  transform: scale(.985);
+  background:
+    linear-gradient(135deg, rgba(12, 42, 76, .96), rgba(5, 18, 38, .98)) !important;
+  border-color: rgba(0, 217, 255, .34) !important;
+}
+
+.targetVault .entry h3 {
+  font-size: 14.2px !important;
+  line-height: 1.16 !important;
+  font-weight: 850 !important;
+  letter-spacing: -.15px;
+  color: rgba(238, 247, 255, .98) !important;
+  margin: 0 !important;
+}
+
+.targetVault .entry p {
+  margin-top: 2px !important;
+  font-size: 11.6px !important;
+  line-height: 1.25 !important;
+  color: rgba(150, 181, 210, .78) !important;
+  max-width: 100%;
+}
+
+.targetVault .entry .go {
+  margin-left: auto;
+  color: rgba(110, 210, 255, .36) !important;
+  font-size: 17px !important;
+}
+
+.targetVault .empty,
+.targetVault .emptyVault {
+  padding: 54px 18px !important;
+  border: 1px solid rgba(118, 178, 224, .10);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(8, 22, 42, .42), rgba(4, 12, 26, .18));
+}
