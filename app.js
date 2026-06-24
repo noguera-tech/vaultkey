@@ -1950,6 +1950,57 @@ function suggestCategoryFromSelectedIcon(iconId){
   sel.dataset.vkAutoCategory = suggested;
 }
 
+
+/* ==========================================================================
+   VAULTKEY v9 — Aviso suave si icono y categoría no coinciden
+   No bloquea. No cambia la categoría manual. Solo confirma antes de guardar.
+   ========================================================================== */
+
+function iconCategoryMismatchInfo(iconId, selectedCat){
+  if (!iconId) return null;
+
+  const suggested = normalizeCategoryId(categoryFromEntryIconId(iconId) || '');
+  const actual = normalizeCategoryId(selectedCat || 'general') || 'general';
+
+  if (!suggested) return null;
+  if (!actual) return null;
+  if (suggested === actual) return null;
+
+  const iconLabel =
+    (typeof serviceLabel === 'function' ? serviceLabel(iconId) : '') ||
+    (typeof manualIconLabel === 'function' ? manualIconLabel(iconId) : '') ||
+    iconId;
+
+  return {
+    iconLabel,
+    suggested,
+    actual,
+    suggestedLabel: categoryLabelFromId(suggested),
+    actualLabel: categoryLabelFromId(actual)
+  };
+}
+
+async function confirmIconCategoryMismatch(){
+  const sel = $('eCategory');
+  if (!sel) return true;
+
+  const info = iconCategoryMismatchInfo(selectedEntryIcon, sel.value);
+  if (!info) return true;
+
+  const ok = await vkConfirm(
+    'Revisar categoría',
+    `El icono "${info.iconLabel}" suele pertenecer a "${info.suggestedLabel}", pero elegiste "${info.actualLabel}".
+
+Puedes guardar así si es intencional. ¿Quieres continuar?`
+  );
+
+  if (!ok) {
+    try { sel.focus(); } catch(e) {}
+    return false;
+  }
+
+  return true;
+}
 function selectEntryIcon(id){
   vibe(18);
   selectedEntryIcon=(id==='auto'||id==='custom')?'':id;
@@ -2155,6 +2206,8 @@ async function saveEntry(){
     if(urlRaw && !isLikelyUrl(urlRaw)){$('eUrl')?.classList.add('fieldError');vibe([30,30]);soundError();toast('La URL no es válida. Ej: https://google.com');$('eUrl')?.focus();return;}
     if(pass.length<6){$('ePass')?.classList.add('fieldError');vibe([30,30]);soundError();toast('La contraseña debe tener mínimo 6 caracteres');$('ePass')?.focus();updateStrength();return;}
   }
+  if (!(await confirmIconCategoryMismatch())) return;
+
   let urlVal=normalizeUrl?normalizeUrl(urlRaw):urlRaw;
   // Preservar historial de contraseñas (máx 3 versiones anteriores)
   const _prevEntry = editId ? vault.find(x=>x.id===editId) : null;
