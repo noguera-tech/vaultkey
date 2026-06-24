@@ -40,6 +40,15 @@
     <button class="vkHomeTopBtn" onclick="show('vault')" aria-label="Buscar">⌕</button>
   </div>
 
+  <div id="homeMenu" style="display:none;">
+    <button onclick="show('vault')">🔑 Mis entradas</button>
+    <button onclick="show('fav')">⭐ Favoritos</button>
+    <button onclick="showHealthPanel()">🛡️ Salud de la bóveda</button>
+    <button onclick="openBackup()">☁️ Respaldos</button>
+    <button onclick="show('settings')">⚙️ Ajustes</button>
+    <button onclick="lock()">🔒 Bloquear</button>
+  </div>
+
   <div class="content vkHomeSplashContent">
 
     <div class="vkHomeShieldWrap">
