@@ -1898,6 +1898,58 @@ function showFieldError(id,msg){
   },30);
 }
 function manualIconLabel(id){const ic=MANUAL_ICONS.find(x=>x.id===id&&x.id!=='auto');return ic?(ic.label||ic.id):''}
+
+function categoryFromEntryIconId(iconId){
+  const id = normService(iconId);
+  const label = normService((typeof serviceLabel === 'function' ? serviceLabel(iconId) : '') || manualIconLabel(iconId) || '');
+  const text = (id + ' ' + label).trim();
+
+  const groups = [
+    ['correo', ['gmail','outlook','hotmail','yahoo','proton','icloud','mail','correo','email','google']],
+    ['banco', ['bank','banco','bbva','santander','caixa','ing','revolut','wise','n26','banesco','mercantil','bancovenezuela','zelle','paypal','stripe','klarna','cashapp','venmo','card','tarjeta','bizum']],
+    ['social', ['facebook','instagram','whatsapp','telegram','x_twitter','twitter','x','linkedin','discord','reddit','tiktok','tiktok2','pinterest','snapchat','threads','bluesky','mastodon','bereal','tumblr','signal','social']],
+    ['streaming', ['netflix','spotify','youtube','disney','primevideo','hbo','appletv','crunchyroll','plex','dazn','mubi','movistar','atresplayer','rtve','filmin','rakuten','skyshowtime','stream','streaming']],
+    ['cripto', ['binance','coinbase','kraken','metamask','trustwallet','ethereum','ledger','phantom','kucoin','bybit','okx','crypto','cripto','wallet','bitcoin','btc']],
+    ['wifi', ['wifi','wi-fi','router','internet','network','red']],
+    ['compras', ['amazon','mercadolibre','aliexpress','wallapop','ebay','etsy','shein','temu','zalando','zara','hm','ikea','elcorteingles','fnac','mediamarkt','pccomponentes','lidl','decathlon','leroy','wish','vinted','depop','shopping','compras']],
+    ['gaming', ['gaming','game','steam','playstation','xbox','epic','riot','nintendo','gog','battlenet','ea','ubisoft','roblox','minecraft']],
+    ['servidor', ['github','github2','gitlab','bitbucket','datadog','netlify','vercel','aws','azure','gcloud','docker','heroku','railway','supabase','firebase','mongodb','sentry','postman','vscode','server','servidor','cloud','api','ssh','ftp','nas','database']],
+    ['salud', ['medical','medico','salud','health','hospital','clinica','farmacia','doctor']],
+    ['documentos', ['license','licencia','document','documento','documents','docs','dni','nie','pasaporte','cedula','identity','id','tax','impuestos']],
+    ['viajes', ['travel','viajes','airbnb','booking','ryanair','iberia','vueling','renfe','uber']],
+    ['educacion', ['school','educacion','education','estudio','universidad','campus','coursera','udemy']],
+    ['familia', ['family','familia','kids','ninos','pet','mascota']]
+  ];
+
+  for (const [cat, keys] of groups) {
+    if (keys.some(k => text.includes(k))) return cat;
+  }
+
+  return '';
+}
+
+function suggestCategoryFromSelectedIcon(iconId){
+  if (!iconId) return;
+  if (editId) return;
+
+  const sel = $('eCategory');
+  if (!sel) return;
+
+  const suggested = categoryFromEntryIconId(iconId);
+  if (!suggested) return;
+
+  const opt = Array.from(sel.options).find(o => normalizeCategoryId(o.value) === suggested);
+  if (!opt) return;
+
+  const current = normalizeCategoryId(sel.value || 'general') || 'general';
+  const lastAuto = normalizeCategoryId(sel.dataset.vkAutoCategory || '');
+
+  if (current !== 'general' && current !== lastAuto) return;
+
+  sel.value = opt.value;
+  sel.dataset.vkAutoCategory = suggested;
+}
+
 function selectEntryIcon(id){
   vibe(18);
   selectedEntryIcon=(id==='auto'||id==='custom')?'':id;
@@ -1908,6 +1960,7 @@ function selectEntryIcon(id){
       if($('eIconSearch')) $('eIconSearch').value=label;
     }
   }
+  suggestCategoryFromSelectedIcon(selectedEntryIcon);
   renderIconStrip();
   renderIconPicker();
   updateEntryIconPreview();
