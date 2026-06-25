@@ -113,6 +113,7 @@ function setEntryType(type){
   Object.entries(btnMap).forEach(([id,t])=>{
     const btn=$(id);if(!btn)return;
     const active=t===type;
+    btn.classList.toggle('entryTypeActive',active);
     btn.style.border=active?'2px solid var(--cyan)':'1px solid rgba(0,210,255,.2)';
     btn.style.background=active?'rgba(0,210,255,.20)':'rgba(0,14,32,.6)';
     btn.style.color=active?'#ffffff':'#7aa0c8';
