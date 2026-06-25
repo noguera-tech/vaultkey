@@ -99,6 +99,7 @@ document.addEventListener('click',function(e){
 },true);
 function setEntryType(type){
   _entryType=type;
+  vibe(18);
   const isNote=type==='note';
   const isCard=type==='card';
   const isPass=type==='password';
@@ -113,8 +114,9 @@ function setEntryType(type){
     const btn=$(id);if(!btn)return;
     const active=t===type;
     btn.style.border=active?'2px solid var(--cyan)':'1px solid rgba(0,210,255,.2)';
-    btn.style.background=active?'rgba(0,210,255,.12)':'rgba(0,14,32,.6)';
-    btn.style.color=active?'#00e5ff':'#7aa0c8';
+    btn.style.background=active?'rgba(0,210,255,.20)':'rgba(0,14,32,.6)';
+    btn.style.color=active?'#ffffff':'#7aa0c8';
+    btn.style.boxShadow=active?'0 0 8px rgba(0,210,255,.3)':'none';
   });
   // Iconos siempre visibles
   const iconSection=$('iconStripRow')?.parentElement;
@@ -1748,8 +1750,7 @@ function showAppInfo(){
 
   window.renderCategoryPage=renderCategoryPage;
 
-  let startX=0;
-  let dragging=false;
+  let startX=0,startY=0,dragging=false;
   let moved=false;
 
   row.addEventListener('wheel',e=>{
@@ -1764,20 +1765,25 @@ function showAppInfo(){
   },{passive:false});
 
   row.addEventListener('pointerdown',e=>{
-    if(e.target.closest&&e.target.closest('.catChip'))return;
     const allPages=pages();
     if(allPages.length<=1)return;
-
     dragging=true;
     moved=false;
     startX=e.clientX;
+    startY=e.clientY;
     row.setPointerCapture?.(e.pointerId);
   });
 
   row.addEventListener('pointermove',e=>{
     if(!dragging)return;
-    if(Math.abs(e.clientX-startX)>10)moved=true;
-  });
+    const dx=Math.abs(e.clientX-startX);
+    const dy=Math.abs(e.clientY-(startY||0));
+    if(dx>8&&dx>dy){
+      moved=true;
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  },{passive:false});
 
   row.addEventListener('pointerup',e=>{
     if(!dragging)return;
