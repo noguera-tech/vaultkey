@@ -2553,6 +2553,7 @@ body:has(#genModal.open) #screenDots,
    ========================================================================== */
 
 #home.vkHomeSplash {
+  overflow: hidden !important;
   background:
     radial-gradient(circle at 50% 10%, rgba(0,84,205,.14) 0%, rgba(0,43,112,.075) 32%, transparent 59%),
     linear-gradient(180deg, #000711 0%, #000711 28%, #00060D 58%, #00050A 100%) !important;
@@ -2831,30 +2832,30 @@ body:has(#genModal.open) #screenDots,
 }
 
 #home.vkHomeSplash .vkHomePrimaryActions {
-  margin-top: 108px !important;
+  margin-top: 48px !important;
 }
 
 #home.vkHomeSplash .vkHomeMiniActions {
-  margin-top: 24px !important;
+  margin-top: 16px !important;
 }
 
 @media (max-height: 820px) {
   #home.vkHomeSplash .vkHomePrimaryActions {
-    margin-top: 86px !important;
+    margin-top: 36px !important;
   }
 
   #home.vkHomeSplash .vkHomeMiniActions {
-    margin-top: 20px !important;
+    margin-top: 12px !important;
   }
 }
 
 @media (max-height: 740px) {
   #home.vkHomeSplash .vkHomePrimaryActions {
-    margin-top: 60px !important;
+    margin-top: 24px !important;
   }
 
   #home.vkHomeSplash .vkHomeMiniActions {
-    margin-top: 16px !important;
+    margin-top: 10px !important;
   }
 }
 /* ==========================================================================
