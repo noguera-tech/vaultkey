@@ -116,6 +116,7 @@ input, textarea, select { cursor:text; }
 
 .content { flex:1; overflow-y:auto; overflow-x:hidden; padding:16px 16px calc(var(--nav-h) + 20px); position:relative; z-index:1; scrollbar-width:none; }
 .content::-webkit-scrollbar { display:none; }
+#home .vkHomeSplashContent { overflow: hidden !important; }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    COMPONENTES BASE
@@ -2557,6 +2558,10 @@ body:has(#genModal.open) #screenDots,
   background:
     radial-gradient(circle at 50% 10%, rgba(0,84,205,.14) 0%, rgba(0,43,112,.075) 32%, transparent 59%),
     linear-gradient(180deg, #000711 0%, #000711 28%, #00060D 58%, #00050A 100%) !important;
+}
+
+#home.vkHomeSplash .vkHomeSplashContent {
+  overflow: hidden !important;
 }
 
 #home.vkHomeSplash .vkHomeTop {
