@@ -769,8 +769,8 @@ input[type=range]::-moz-range-thumb {
   body { background-attachment:fixed; }
 }
 .catChip{border:1px solid rgba(0,210,255,.4);background:rgba(0,40,80,.7);color:#e0f4ff;font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;white-space:nowrap;cursor:pointer;transition:.2s;flex-shrink:0;scroll-snap-align:center}
-.catChip.active{background:rgba(0,180,220,.35);color:#00e5ff;border-color:rgba(0,210,255,.7)}
-#catFilterRow .catChip.active{background:rgba(0,180,220,.35) !important;color:#00e5ff !important;border-color:rgba(0,210,255,.7) !important;}
+.catChip.active{background:rgba(0,180,220,.50);color:#fff;border-color:rgba(0,230,255,.9);box-shadow:0 0 8px rgba(0,210,255,.35);}
+#catFilterRow .catChip.active{background:rgba(0,180,220,.50) !important;color:#fff !important;border-color:rgba(0,230,255,.9) !important;box-shadow:0 0 8px rgba(0,210,255,.35) !important;}
 #catFilterRow::-webkit-scrollbar{display:none}
 
 /* ── Bloques de campos especiales — formularios nuevos ── */

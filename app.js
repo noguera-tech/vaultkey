@@ -73,6 +73,7 @@ window.vkDebugCategories=function(){
 };
 function setCatFilter(cat, btn) {
   _catFilter = normalizeCategoryId(cat);
+  vibe(18);
   document.querySelectorAll('.catChip').forEach(b=>{
     b.classList.remove('active');
     b.setAttribute('aria-pressed','false');
