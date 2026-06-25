@@ -1091,10 +1091,18 @@ input[type=range]::-moz-range-thumb {
 #typeBtnId[style*="var(--cyan)"],
 #typeBtnLicense[style*="var(--cyan)"],
 #typeBtnMedical[style*="var(--cyan)"],
-#typeBtnWifi[style*="var(--cyan)"] {
-  background: rgba(35,123,255,.22) !important;
-  border-color: rgba(92,200,255,.48) !important;
-  color: #F4F7FB !important;
+#typeBtnWifi[style*="var(--cyan)"],
+#typeBtnPass.entryTypeActive,
+#typeBtnNote.entryTypeActive,
+#typeBtnCard.entryTypeActive,
+#typeBtnId.entryTypeActive,
+#typeBtnLicense.entryTypeActive,
+#typeBtnMedical.entryTypeActive,
+#typeBtnWifi.entryTypeActive {
+  background: rgba(0,180,220,.45) !important;
+  border: 2px solid rgba(0,230,255,.9) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(0,210,255,.4) !important;
 }
 
 /* 3) Barra de iconos: más baja, menos protagonista */
