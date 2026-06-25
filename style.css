@@ -3804,3 +3804,62 @@ body:has(#settings.active) #screenDots .dot,
   color: #FFD0D8 !important;
 }
 
+/* FIX — Resaltado visible del tipo activo en Nueva entrada */
+#entryModal #entryTypeRow > button[style*="var(--cyan)"] {
+  border: 2px solid var(--cyan) !important;
+  background: rgba(0, 210, 255, .22) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(0, 210, 255, .35) !important;
+}
+
+/* FIX — Mis entradas: categoría activa y flecha simple del carrusel
+   Solo CSS. No toca Nueva entrada, JS, cifrado, PIN, Drive ni guardado. */
+
+/* Asegura que los chips del carrusel sigan recibiendo el click */
+#vault #catFilterRow .catChip {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 2;
+}
+
+/* Resaltado visual fuerte de la categoría realmente activa */
+#vault #catFilterRow .catChip.active,
+#vault #catFilterRow .catChip[aria-pressed="true"] {
+  border: 2px solid var(--cyan) !important;
+  background: linear-gradient(135deg, rgba(0, 217, 255, .28), rgba(0, 91, 255, .30)) !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 0 12px rgba(0, 210, 255, .40),
+    inset 0 1px 0 rgba(255, 255, 255, .18) !important;
+  text-shadow: 0 0 8px rgba(0, 217, 255, .35) !important;
+}
+
+/* Anula la flecha anterior con círculo dentro de #catFilterRow */
+#vault #catFilterRow::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Flecha limpia en el contenedor del carrusel, sin círculo y sin bloquear clicks */
+#vault > div:nth-of-type(2) {
+  position: relative !important;
+}
+
+#vault > div:nth-of-type(2)::after {
+  content: "›";
+  position: absolute;
+  right: 6px;
+  top: 45%;
+  transform: translateY(-50%);
+  color: var(--cyan);
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  text-shadow: 0 0 10px rgba(0, 217, 255, .65);
+  pointer-events: none !important;
+  z-index: 20;
+}
+

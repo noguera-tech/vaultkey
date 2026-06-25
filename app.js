@@ -90,13 +90,24 @@ function setCatFilter(cat, btn) {
 window.setCatFilter=setCatFilter;
 
 // Click robusto para chips de categorías: evita que el carrusel bloquee el onclick.
-document.addEventListener('click',function(e){
-  const chip=e.target.closest&&e.target.closest('#catFilterRow .catChip');
-  if(!chip)return;
+// Si el usuario arrastra el carrusel, NO debe seleccionarse ningún chip por accidente.
+document.addEventListener('click', function(e){
+  const chip = e.target.closest && e.target.closest('#catFilterRow .catChip');
+  if(!chip) return;
+
+  const row = chip.closest('#catFilterRow');
+
+  if(row && (row.dataset.dragging === '1' || row.dataset.suppressClick === '1')){
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    return;
+  }
+
   e.preventDefault();
   e.stopImmediatePropagation();
+
   setCatFilter(catFromChip(chip), chip);
-},true);
+}, true);
 function setEntryType(type){
   _entryType=type;
   vibe(18);
@@ -1748,10 +1759,11 @@ function showAppInfo(){
     renderCategoryPage();
   }
 
-  window.renderCategoryPage=renderCategoryPage;
+    window.renderCategoryPage=renderCategoryPage;
 
   let startX=0,startY=0,dragging=false;
   let moved=false;
+  let startChip=null;
 
   row.addEventListener('wheel',e=>{
     const allPages=pages();
@@ -1764,59 +1776,147 @@ function showAppInfo(){
     pageBy(delta>0?1:-1);
   },{passive:false});
 
-  row.addEventListener('pointerdown',e=>{
-    const allPages=pages();
-    if(allPages.length<=1)return;
-    dragging=true;
-    moved=false;
-    startX=e.clientX;
-    startY=e.clientY;
-    row.setPointerCapture?.(e.pointerId);
+  row.addEventListener('pointerdown', e => {
+    dragging = true;
+    moved = false;
+    startX = e.clientX;
+    startY = e.clientY;
+    startChip = e.target.closest && e.target.closest('#catFilterRow .catChip');
+
+    delete row.dataset.dragging;
+    delete row.dataset.suppressClick;
   });
 
-  row.addEventListener('pointermove',e=>{
-    if(!dragging)return;
-    const dx=Math.abs(e.clientX-startX);
-    const dy=Math.abs(e.clientY-(startY||0));
-    if(dx>8&&dx>dy){
-      moved=true;
-      e.stopPropagation();
-      e.preventDefault();
-    }
-  },{passive:false});
+  row.addEventListener('pointermove', e => {
+    if(!dragging) return;
 
-  row.addEventListener('pointerup',e=>{
-    if(!dragging)return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
 
-    dragging=false;
-    row.releasePointerCapture?.(e.pointerId);
-
-    const dx=e.clientX-startX;
-
-    if(Math.abs(dx)>35){
-      row.dataset.dragging='1';
-      pageBy(dx<0?1:-1);
-      setTimeout(()=>{delete row.dataset.dragging;},120);
+    if(Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.2){
+      moved = true;
+      row.dataset.dragging = '1';
     }
   });
 
-  row.addEventListener('pointercancel',()=>{
-    dragging=false;
-  });
+  row.addEventListener('pointerup', e => {
+    if(!dragging) return;
 
-  row.addEventListener('click',e=>{
-    if(e.target.closest&&e.target.closest('.catChip')){
-      setTimeout(()=>renderCategoryPage(true),0);
+    dragging = false;
+
+    const dx = e.clientX - startX;
+
+    if(!moved){
+      delete row.dataset.dragging;
+
+      if(startChip){
+        e.preventDefault();
+        e.stopPropagation();
+
+        row.dataset.suppressClick = '1';
+        setCatFilter(catFromChip(startChip), startChip);
+
+        setTimeout(() => {
+          delete row.dataset.suppressClick;
+        }, 180);
+      }
+
+      startChip = null;
       return;
     }
-    if(row.dataset.dragging==='1'){
+
+    if(Math.abs(dx) > 35){
+      pageBy(dx < 0 ? 1 : -1);
+    }
+
+    startChip = null;
+    row.dataset.suppressClick = '1';
+
+    setTimeout(() => {
+      delete row.dataset.dragging;
+      delete row.dataset.suppressClick;
+    }, 180);
+  });
+
+  row.addEventListener('pointercancel', () => {
+    dragging = false;
+    startChip = null;
+    delete row.dataset.dragging;
+
+    row.dataset.suppressClick = '1';
+
+    setTimeout(() => {
+      delete row.dataset.suppressClick;
+    }, 180);
+  });
+
+  row.addEventListener('click', e => {
+    if(row.dataset.dragging === '1' || row.dataset.suppressClick === '1'){
       e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation?.();
       return;
     }
 
-    setTimeout(()=>renderCategoryPage(true),0);
-  },true);
+    const chip = e.target.closest && e.target.closest('#catFilterRow .catChip');
+    if(chip){
+      e.preventDefault();
+      e.stopPropagation();
+      setCatFilter(catFromChip(chip), chip);
+    }
+  }, true);
+ 
+  row.addEventListener('pointerup', e => {
+    if(!dragging) return;
+
+    dragging = false;
+
+    try{
+      row.releasePointerCapture?.(e.pointerId);
+    }catch(err){}
+
+    if(!moved){
+      delete row.dataset.dragging;
+      return;
+    }
+
+    const dx = e.clientX - startX;
+
+    if(Math.abs(dx) > 35){
+      pageBy(dx < 0 ? 1 : -1);
+    }
+
+    row.dataset.suppressClick = '1';
+
+    setTimeout(() => {
+      delete row.dataset.dragging;
+      delete row.dataset.suppressClick;
+    }, 180);
+  });
+
+  row.addEventListener('pointercancel', () => {
+    dragging = false;
+    delete row.dataset.dragging;
+
+    row.dataset.suppressClick = '1';
+
+    setTimeout(() => {
+      delete row.dataset.suppressClick;
+    }, 180);
+  });
+
+  row.addEventListener('click', e => {
+    if(row.dataset.dragging === '1' || row.dataset.suppressClick === '1'){
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation?.();
+      return;
+    }
+
+    if(e.target.closest && e.target.closest('.catChip')){
+      setTimeout(() => renderCategoryPage(true), 0);
+    }
+  }, true);
 
   row.addEventListener('keydown',e=>{
     if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
