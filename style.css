@@ -773,6 +773,20 @@ input[type=range]::-moz-range-thumb {
 #catFilterRow .catChip.active{background:rgba(0,180,220,.50) !important;color:#fff !important;border-color:rgba(0,230,255,.9) !important;box-shadow:0 0 8px rgba(0,210,255,.35) !important;}
 
 /* Botón de tipo activo en Nueva entrada */
+#typeBtnPass.entryTypeActive,
+#typeBtnNote.entryTypeActive,
+#typeBtnCard.entryTypeActive,
+#typeBtnId.entryTypeActive,
+#typeBtnLicense.entryTypeActive,
+#typeBtnMedical.entryTypeActive,
+#typeBtnWifi.entryTypeActive {
+  border: 2px solid var(--cyan) !important;
+  background: rgba(0,210,255,.22) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(0,210,255,.35) !important;
+}
+
+/* Botón de tipo activo en Nueva entrada */
 .entryTypeActive {
   border: 2px solid var(--cyan) !important;
   background: rgba(0,210,255,.22) !important;
