@@ -1194,6 +1194,17 @@ function initIconStripDesktopScroll(){
   strip.addEventListener('pointerup',endDrag);
   strip.addEventListener('pointercancel',endDrag);
   strip.addEventListener('pointerleave',endDrag);
+}
+
+function initIconStripClickHandler(){
+  const strip=document.getElementById('iconStripRow');
+  if(!strip || strip.dataset.clickReady==='1')return;
+  strip.dataset.clickReady='1';
+  let moved=false;
+  strip.addEventListener('pointermove',function(e){
+    if(Math.abs((e.clientX||0))>6) moved=true;
+  });
+  strip.addEventListener('pointerdown',function(){moved=false;});
   strip.addEventListener('click',function(e){
     const btn=e.target.closest&&e.target.closest('.vkStripIconBtn');
     if(!btn || !strip.contains(btn))return;
@@ -1212,6 +1223,7 @@ function renderIconStrip(){
   const strip=$('iconStripRow');
   if(!strip)return;
   initIconStripDesktopScroll();
+  initIconStripClickHandler();
   vkBuildIconMap();
   const q=normService($('eIconSearch')?.value||'');
   let list=(MANUAL_ICONS||[]).filter(ic=>ic&&ic.id);
