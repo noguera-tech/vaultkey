@@ -1293,6 +1293,7 @@ function initIconPagedCarousel(){
   }
 
   window.renderIconPage=renderIconPage;
+  window.pageBy=pageBy;
 
   // Wheel
   row.addEventListener('wheel',e=>{
