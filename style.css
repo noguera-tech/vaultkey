@@ -3872,7 +3872,12 @@ body:has(#settings.active) #screenDots .dot,
   width: 100% !important;
 }
 
+#entryTypeRow {
+  flex-wrap: nowrap !important;
+}
+
 #entryTypeRow button {
   padding: 4px 8px !important;
   font-size: 11px !important;
+  white-space: nowrap !important;
 }
