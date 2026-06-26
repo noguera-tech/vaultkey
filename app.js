@@ -124,11 +124,10 @@ function setEntryType(type){
   Object.entries(btnMap).forEach(([id,t])=>{
     const btn=$(id);if(!btn)return;
     const active=t===type;
-    btn.classList.toggle('active',active);
-    btn.style.border='';
-    btn.style.background='';
-    btn.style.color='';
-    btn.style.boxShadow='';
+    btn.style.border=active?'2px solid var(--cyan)':'1px solid rgba(0,210,255,.2)';
+    btn.style.background=active?'rgba(0,210,255,.20)':'rgba(0,14,32,.6)';
+    btn.style.color=active?'#ffffff':'#7aa0c8';
+    btn.style.boxShadow=active?'0 0 8px rgba(0,210,255,.3)':'none';
   });
   // Iconos siempre visibles
   const iconSection=$('iconStripRow')?.parentElement;
@@ -2257,7 +2256,11 @@ function openEntry(e=null){
   ['eService','eUser','eEmail','eUrl','ePass'].forEach(id=>$(id)?.classList.remove('fieldError'));
   updateStrength();renderIconStrip();
   $('entryModal').classList.add('open');
-  setTimeout(()=>{$('entryModal')?.querySelector('.sheet')?.scrollTo({top:0,behavior:'auto'});},30);
+  setTimeout(()=>{
+    $('entryModal')?.querySelector('.sheet')?.scrollTo({top:0,behavior:'auto'});
+    if(window.initEntryTypeCarousel)window.initEntryTypeCarousel();
+    if(window.renderEntryTypePage)window.renderEntryTypePage();
+  },50);
   resetAutoLockTimer();
 }
 async function saveEntry(){
@@ -4239,78 +4242,107 @@ try {
   window.setEntryType = setEntryType;
 } catch(e) {}
 
+// ── Carrusel paginado para tipos de entrada ──────────────────
+// Reemplaza initEntryTypeSelectorFix con versión que incluye paginación
 (function(){
-  function initEntryTypeSelectorFix(){
-    const row = document.getElementById('entryTypeRow');
-    if(!row || row.dataset.vkEntryTypeSelectorFix === '1') return;
+  const PER_PAGE = 4;
+  let currentPage = 0;
 
-    row.dataset.vkEntryTypeSelectorFix = '1';
+  const typeById = {
+    typeBtnPass: 'password',
+    typeBtnNote: 'note',
+    typeBtnCard: 'card',
+    typeBtnId: 'id',
+    typeBtnLicense: 'license',
+    typeBtnMedical: 'medical',
+    typeBtnWifi: 'wifi'
+  };
 
-    const typeById = {
-      typeBtnPass: 'password',
-      typeBtnNote: 'note',
-      typeBtnCard: 'card',
-      typeBtnId: 'id',
-      typeBtnLicense: 'license',
-      typeBtnMedical: 'medical',
-      typeBtnWifi: 'wifi'
-    };
-
-    let startX = 0;
-    let startY = 0;
-    let moved = false;
-
-    function buttonFromEvent(e){
-      return e.target && e.target.closest
-        ? e.target.closest('#entryTypeRow button')
-        : null;
-    }
-
-    function typeFromButton(btn){
-      return btn ? typeById[btn.id] : '';
-    }
-
-    row.addEventListener('pointerdown', function(e){
-      startX = Number(e.clientX || 0);
-      startY = Number(e.clientY || 0);
-      moved = false;
-    }, true);
-
-    row.addEventListener('pointermove', function(e){
-      const dx = Math.abs(Number(e.clientX || 0) - startX);
-      const dy = Math.abs(Number(e.clientY || 0) - startY);
-      if(dx > 8 || dy > 8) moved = true;
-    }, true);
-
-    row.addEventListener('pointerup', function(e){
-      const btn = buttonFromEvent(e);
-      const type = typeFromButton(btn);
-
-      if(!btn || !type || moved) return;
-
-      e.preventDefault();
-      e.stopImmediatePropagation();
-
-      setEntryType(type);
-    }, true);
-
-    row.addEventListener('click', function(e){
-      const btn = buttonFromEvent(e);
-      const type = typeFromButton(btn);
-
-      if(!btn || !type) return;
-
-      e.preventDefault();
-      e.stopImmediatePropagation();
-
-      setEntryType(type);
-    }, true);
+  function btns(){
+    const row=document.getElementById('entryTypeRow');
+    if(!row)return[];
+    return [...row.children].filter(el=>el.nodeType===1);
   }
 
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', initEntryTypeSelectorFix);
+  function pages(){
+    const list=btns();
+    const out=[];
+    for(let i=0;i<list.length;i+=PER_PAGE)out.push(list.slice(i,i+PER_PAGE));
+    return out;
+  }
+
+  function renderPage(forceActive=false){
+    const allPages=pages();
+    if(!allPages.length)return;
+    if(forceActive){
+      const row=document.getElementById('entryTypeRow');
+      const active=row&&row.querySelector('[style*="2px solid"]');
+      if(active){const idx=allPages.findIndex(p=>p.includes(active));if(idx>=0)currentPage=idx;}
+    }
+    currentPage=Math.max(0,Math.min(currentPage,allPages.length-1));
+    const visible=new Set(allPages[currentPage]);
+    btns().forEach(btn=>{btn.style.display=visible.has(btn)?'':'none';});
+  }
+
+  function pageBy(delta){
+    const allPages=pages();
+    if(allPages.length<=1)return;
+    const next=Math.max(0,Math.min(currentPage+delta,allPages.length-1));
+    if(next===currentPage)return;
+    currentPage=next;
+    renderPage();
+  }
+
+  window.entryTypePageBy=pageBy;
+  window.renderEntryTypePage=()=>renderPage(true);
+
+  function initEntryTypeCarousel(){
+    const row=document.getElementById('entryTypeRow');
+    if(!row||row.dataset.vkTypeCarousel==='1')return;
+    row.dataset.vkTypeCarousel='1';
+    row.dataset.vkEntryTypeSelectorFix='1'; // evitar que el fix viejo se añada encima
+
+    let startX=0,startY=0,moved=false;
+
+    row.addEventListener('pointerdown',function(e){
+      startX=Number(e.clientX||0);
+      startY=Number(e.clientY||0);
+      moved=false;
+    },true);
+
+    row.addEventListener('pointermove',function(e){
+      const dx=Math.abs(Number(e.clientX||0)-startX);
+      const dy=Math.abs(Number(e.clientY||0)-startY);
+      if(dx>8||dy>8)moved=true;
+    },true);
+
+    row.addEventListener('pointerup',function(e){
+      const btn=e.target&&e.target.closest?e.target.closest('#entryTypeRow button'):null;
+      const type=btn?typeById[btn.id]:'';
+      if(!btn||!type||moved)return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      setEntryType(type);
+    },true);
+
+    row.addEventListener('click',function(e){
+      const btn=e.target&&e.target.closest?e.target.closest('#entryTypeRow button'):null;
+      const type=btn?typeById[btn.id]:'';
+      if(!btn||!type)return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      setEntryType(type);
+    },true);
+
+    renderPage(true);
+  }
+
+  window.initEntryTypeCarousel=initEntryTypeCarousel;
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',initEntryTypeCarousel);
   } else {
-    initEntryTypeSelectorFix();
+    initEntryTypeCarousel();
   }
 })();
 
