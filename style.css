@@ -3871,3 +3871,11 @@ body:has(#settings.active) #screenDots .dot,
   gap: 4px !important;
   width: 100% !important;
 }
+
+#entryTypeCarouselRow {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 4px !important;
+  width: 100% !important;
+}
