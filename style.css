@@ -3863,3 +3863,11 @@ body:has(#settings.active) #screenDots .dot,
   z-index: 20;
 }
 
+
+#iconStripWrapper {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 4px !important;
+  width: 100% !important;
+}
