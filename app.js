@@ -1159,6 +1159,8 @@ function closeNoteModal(){$('noteModal')?.classList.remove('open');}
 
 
 function initIconStripDesktopScroll(){
+  // Solo activar en PC — en móvil el carrusel paginado gestiona todo
+  if(window.matchMedia('(pointer:coarse)').matches)return;
   const strip=document.getElementById('iconStripRow');
   if(!strip || strip.dataset.pcScrollReady==='1')return;
   strip.dataset.pcScrollReady='1';
