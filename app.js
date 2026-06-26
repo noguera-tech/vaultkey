@@ -486,7 +486,7 @@ function show(id,dir){
     if(document.querySelector('.modal.open'))return;
     // No swipear si el toque empezó en un elemento scrollable horizontal
     const target=e.target;
-    if(target.closest('#catFilterRow,.genSliders'))return;
+    if(target.closest('#catFilterRow,.genSliders,#iconStripRow'))return;
     const idx=SWIPEABLE.indexOf(cur.id);
     if(dx<0&&idx<SWIPEABLE.length-1){vibe(10);show(SWIPEABLE[idx+1],'right');}
     else if(dx>0&&idx>0){vibe(10);show(SWIPEABLE[idx-1],'left');}
