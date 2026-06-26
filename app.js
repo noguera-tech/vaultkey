@@ -1305,7 +1305,6 @@ function initIconPagedCarousel(){
   // Swipe/drag
   let startX=0,dragging=false;
   row.addEventListener('pointerdown',e=>{
-    if(e.target.closest&&e.target.closest('.vkStripIconBtn'))return;
     const allPages=pages();
     if(allPages.length<=1)return;
     dragging=true;
@@ -1321,7 +1320,7 @@ function initIconPagedCarousel(){
     dragging=false;
     row.releasePointerCapture?.(e.pointerId);
     const dx=e.clientX-startX;
-    if(Math.abs(dx)>35){
+    if(Math.abs(dx)>25){
       pageBy(dx<0?1:-1);
       setTimeout(()=>{delete row.dataset.dragging;},120);
     }
