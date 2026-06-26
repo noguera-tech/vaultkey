@@ -3872,21 +3872,10 @@ body:has(#settings.active) #screenDots .dot,
   width: 100% !important;
 }
 
-/* ── Fix definitivo: entryTypeRow scroll horizontal ── */
-#entryTypeRow,
-#entryModal #entryTypeRow,
-#typeBtnPass, #typeBtnNote, #entryTypeRow {
-  display: flex !important;
-  flex-wrap: nowrap !important;
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-  touch-action: pan-x !important;
-}
-
-#entryTypeRow > button,
-#entryModal #entryTypeRow > button {
-  flex: 0 0 auto !important;
-  width: auto !important;
-  min-width: 0 !important;
-  white-space: nowrap !important;
+#entryTypeRow button.entryTypeActive {
+  box-sizing: border-box !important;
+  border: 2px solid var(--cyan) !important;
+  background: rgba(0,210,255,.22) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(0,210,255,.35) !important;
 }
