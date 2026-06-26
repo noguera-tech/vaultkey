@@ -125,12 +125,10 @@ function setEntryType(type){
     const btn=$(id);if(!btn)return;
     const active=t===type;
     btn.classList.toggle('entryTypeActive',active);
-    if(!active){
-      btn.style.border='';
-      btn.style.background='';
-      btn.style.color='';
-      btn.style.boxShadow='';
-    }
+    btn.style.border='';
+    btn.style.background='';
+    btn.style.color='';
+    btn.style.boxShadow='';
   });
   // Iconos siempre visibles
   const iconSection=$('iconStripRow')?.parentElement;
