@@ -3897,3 +3897,10 @@ body:has(#settings.active) #screenDots .dot,
   white-space: nowrap !important;
   box-sizing: border-box !important;
 }
+
+#entryModal #entryTypeRow > button.entryTypeActive {
+  border: 2px solid var(--cyan) !important;
+  background: rgba(0,210,255,.22) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(0,210,255,.35) !important;
+}
