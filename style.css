@@ -3879,3 +3879,21 @@ body:has(#settings.active) #screenDots .dot,
   color: #ffffff !important;
   box-shadow: 0 0 10px rgba(0,210,255,.35) !important;
 }
+
+/* ── Fix definitivo: entryTypeRow scroll horizontal ── */
+#entryTypeRow,
+#entryModal #entryTypeRow {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  touch-action: pan-x !important;
+}
+
+#entryTypeRow > button,
+#entryModal #entryTypeRow > button {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+}
