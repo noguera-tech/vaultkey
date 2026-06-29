@@ -356,9 +356,9 @@ select option { background:#001830; color:#e8f6ff; }
 .dots8 .dot { width:11px; height:11px; }
 
 /* Teclado PIN â€” spec exacta */
-.keys { display:grid; grid-template-columns:repeat(3,66px); gap:10px 20px; justify-content:center; }
+.keys { display:grid; grid-template-columns:repeat(3,58px); gap:8px 18px; justify-content:center; }
 .key  {
-  width:66px; height:66px; border-radius:50%;
+  width:58px; height:58px; border-radius:50%;
   background:var(--key-bg); border:1px solid var(--key-bdr);
   box-shadow:var(--key-shd);
   color:var(--t1); font-size:24px; font-weight:800;
@@ -372,7 +372,19 @@ select option { background:#001830; color:#e8f6ff; }
 .key:has(svg.delIcon)    { border-color:rgba(0,140,220,.35); }
 .key:has(svg.fingerIcon) { border-color:rgba(0,140,220,.30); }
 
-.pinActions { margin-top:14px; }
+.pinActions { margin-top:10px; }
+.pinLegal {
+  margin-top:8px;
+  font-size:10px;
+  color:var(--t4);
+  text-align:center;
+  line-height:1.5;
+  padding:0 16px;
+}
+.pinLegal a {
+  color:rgba(0,190,255,.6);
+  text-decoration:none;
+}
 .pinWarn    { color:#ffbd6b; }
 .pinLocked  { color:var(--red); }
 
