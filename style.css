@@ -339,18 +339,18 @@ select option { background:#001830; color:#e8f6ff; }
 .pinAura  { display:none; }
 .pinInner { width:100%; display:flex; flex-direction:column; align-items:center; }
 
-.shield { width:min(86vw,350px); min-width:min(80vw,280px); margin:0 auto 8px; overflow:visible; padding:0; }
+.shield { width:min(72vw,290px); min-width:min(65vw,230px); margin:0 auto 4px; overflow:visible; padding:0; }
 .pinLogo   { width:100%; height:auto; object-fit:contain; object-position:center; }
 .pinTitle, .pinTag, .bioHint { display:none; }
 
 .pinSub {
   font-size:16px; font-weight:700; color:var(--t1);
-  margin:6px 0 18px;
+  margin:4px 0 12px;
   text-shadow:0 0 20px rgba(0,217,255,.5);
 }
 
 /* Dots */
-.dots { display:flex; justify-content:center; gap:10px; margin-bottom:18px; }
+.dots { display:flex; justify-content:center; gap:10px; margin-bottom:12px; }
 .dot  { width:13px; height:13px; border-radius:50%; border:2px solid rgba(0,160,255,.45); background:transparent; transition:all .15s; }
 .dot.on { background:var(--cyan); border-color:var(--cyan); box-shadow:0 0 16px rgba(0,217,255,.85); }
 .dots8 .dot { width:11px; height:11px; }
