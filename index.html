@@ -1,1 +1,257 @@
-<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>VaultKey</title><style>body{font-family:Arial,sans-serif;background:#07111f;color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0}.c{max-width:700px;text-align:center;padding:40px}a.btn{display:inline-block;background:#0a84ff;color:#fff;padding:14px 28px;text-decoration:none;border-radius:8px;margin:20px 0}footer a{color:#8cc8ff;margin:0 10px}</style></head><body><div class='c'><h1>VaultKey</h1><p>VaultKey is a secure digital vault that stores your sensitive information locally with optional encrypted backups to your Google Drive.</p><p>The application only accesses its own private Application Data Folder when you choose to create or restore a backup. It never accesses your other Google Drive files.</p><a class='btn' href='app.html'>Open VaultKey</a><footer><p><a href='privacy.html'>Privacy Policy</a> | <a href='mailto:apps.nogueratech@gmail.com'>Contact</a></p></footer></div></body></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VaultKey | Bóveda digital segura - NogueraTech</title>
+  <meta name="description" content="VaultKey es tu bóveda digital para proteger contraseñas, notas e información importante de forma sencilla, privada y segura." />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="color-scheme" content="dark" />
+  <link rel="canonical" href="https://nogueratech.app/" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://nogueratech.app/" />
+  <meta property="og:title" content="VaultKey | Todo lo importante. Un solo lugar seguro." />
+  <meta property="og:description" content="Protege contraseñas, notas e información importante con una experiencia sencilla y segura." />
+  <meta property="og:image" content="https://nogueratech.app/vaultkey-shield-scene.png" />
+  <meta property="og:site_name" content="VaultKey" />
+
+  <style>
+    :root{
+      --bg-top:#111827;
+      --bg-bottom:#182F4E;
+      --text:#F8FAFC;
+      --muted:#A7B6C9;
+      --muted-2:#7F8EA3;
+      --blue:#2D6BFF;
+      --blue-hover:#3B7AFF;
+      --stroke:#A7B6C9;
+      --panel:#26364D;
+      --border:rgba(167,182,201,.18);
+    }
+
+    *{box-sizing:border-box}
+
+    html{scroll-behavior:smooth}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--text);
+      background:#111827;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:-2;
+      background:linear-gradient(150deg, var(--bg-top) 17%, var(--bg-bottom) 67%);
+    }
+
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      pointer-events:none;
+      background:radial-gradient(circle at 50% 42%, rgba(255,255,255,.035), transparent 34%);
+      opacity:.7;
+    }
+
+    .page{
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .hero{
+      min-height:100vh;
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:48px 22px 34px;
+    }
+
+    .hero-card{
+      width:min(412px,100%);
+      min-height:min(779px, calc(100vh - 68px));
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-end;
+      padding:42px 28px 32px;
+    }
+
+    .brand-block{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      margin-bottom:72px;
+    }
+
+    .shield{
+      width:132px;
+      height:132px;
+      margin-bottom:42px;
+      opacity:.96;
+    }
+
+    .shield svg{display:block;width:100%;height:100%}
+
+    h1{
+      margin:0;
+      font-size:40px;
+      line-height:1.05;
+      font-weight:800;
+      letter-spacing:-.035em;
+      color:var(--text);
+    }
+
+    .tagline{
+      margin:14px 0 0;
+      max-width:270px;
+      color:var(--muted);
+      font-size:17px;
+      line-height:1.18;
+      font-weight:700;
+      text-align:center;
+      letter-spacing:-.015em;
+    }
+
+    .actions{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:25px;
+    }
+
+    .primary-btn{
+      width:100%;
+      min-height:60px;
+      border:0;
+      border-radius:14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--blue);
+      color:white;
+      text-decoration:none;
+      font-size:20px;
+      font-weight:700;
+      letter-spacing:-.015em;
+      box-shadow:none;
+      transition:transform .18s ease, background .18s ease;
+    }
+
+    .primary-btn:hover{background:var(--blue-hover);transform:translateY(-1px)}
+    .primary-btn:focus-visible{outline:3px solid rgba(167,182,201,.8);outline-offset:4px}
+
+    .login-line{
+      margin:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:28px;
+      color:var(--muted);
+      font-size:14.5px;
+      line-height:1.2;
+      letter-spacing:-.01em;
+    }
+
+    .login-line a{
+      color:#8DB8F8;
+      text-decoration:none;
+      font-weight:700;
+    }
+
+    .login-line a:hover{text-decoration:underline}
+
+    .below{
+      width:min(880px, calc(100% - 44px));
+      margin:0 auto 44px;
+      padding:0 0 8px;
+      text-align:center;
+    }
+
+    .below p{
+      margin:0 auto;
+      max-width:560px;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.6;
+    }
+
+    .footer{
+      margin-top:auto;
+      padding:22px;
+      text-align:center;
+      color:var(--muted-2);
+      font-size:13px;
+    }
+
+    .footer a{color:var(--muted);text-decoration:none;margin:0 8px}
+    .footer a:hover{text-decoration:underline}
+
+    @media (min-width: 760px){
+      .hero{padding:64px 28px 40px}
+      .hero-card{min-height:700px;padding-bottom:34px}
+      .brand-block{margin-bottom:70px}
+      .shield{width:150px;height:150px;margin-bottom:44px}
+      h1{font-size:44px}
+      .tagline{font-size:18px}
+    }
+
+    @media (max-height: 720px){
+      .hero-card{justify-content:center;min-height:auto}
+      .brand-block{margin-bottom:46px}
+      .shield{width:112px;height:112px;margin-bottom:28px}
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero" aria-label="VaultKey">
+      <div class="hero-card">
+        <div class="brand-block">
+          <div class="shield" aria-hidden="true">
+            <svg viewBox="0 0 131 131" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M130.5 71.9909C130.5 104.485 102.062 120.733 68.2625 130.156C66.4926 130.636 64.57 130.613 62.8188 130.091C28.9375 120.733 0.5 104.485 0.5 71.9909V26.4986C0.5 24.7749 1.35603 23.1219 2.87976 21.9031C4.40349 20.6844 6.47012 19.9997 8.625 19.9997C24.875 19.9997 45.1875 12.201 59.325 2.32262C61.0463 1.14631 63.236 0.5 65.5 0.5C67.764 0.5 69.9537 1.14631 71.675 2.32262C85.8938 12.2659 106.125 19.9997 122.375 19.9997C124.53 19.9997 126.597 20.6844 128.12 21.9031C129.644 23.1219 130.5 24.7749 130.5 26.4986V71.9909Z" stroke="#A7B6C9" stroke-linecap="round" stroke-linejoin="round"/>
+              <g transform="translate(49.5 47.5)">
+                <path d="M27.6667 16.3334H4.33333C2.49238 16.3334 1 17.8258 1 19.6667V31.3334C1 33.1743 2.49238 34.6667 4.33333 34.6667H27.6667C29.5076 34.6667 31 33.1743 31 31.3334V19.6667C31 17.8258 29.5076 16.3334 27.6667 16.3334Z" stroke="#A7B6C9" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7.66667 16.3333V9.66668C7.66667 7.45654 8.54464 5.33692 10.1074 3.77412C11.6702 2.21132 13.7899 1.33334 16 1.33334C18.2101 1.33334 20.3298 2.21132 21.8926 3.77412C23.4554 5.33692 24.3333 7.45654 24.3333 9.66668V16.3333" stroke="#A7B6C9" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+            </svg>
+          </div>
+
+          <h1>VaultKey</h1>
+          <p class="tagline">Todo lo importante.<br>Un solo lugar seguro.</p>
+        </div>
+
+        <div class="actions">
+          <a class="primary-btn" href="app.html">Comenzar</a>
+          <p class="login-line"><span>¿Ya tienes una bóveda?</span><a href="app.html">Iniciar sesión</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="below" aria-label="Descripción de VaultKey">
+      <p>VaultKey protege tus contraseñas, notas e información personal con una experiencia sencilla, privada y pensada para no complicarte la vida.</p>
+    </section>
+
+    <footer class="footer">
+      <a href="privacy.html">Privacidad</a>
+      <a href="terms.html">Términos</a>
+      <a href="mailto:apps.nogueratech@gmail.com">Contacto</a>
+    </footer>
+  </main>
+</body>
+</html>
