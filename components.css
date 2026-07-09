@@ -1,0 +1,360 @@
+/* ============================================================
+   VaultKey 2.0 — components.css
+   Capa visual de los componentes base R1 (Plan Módulo 1 · 1.6)
+   Fuente de reglas: Especificación Final v1.0 §4/§14 + decisiones
+   congeladas de Figma (inputs 07-07, anatomía de filas, chevron).
+
+   REGLA: este fichero consume EXCLUSIVAMENTE tokens --vk-*
+   definidos en theme.css. Cero valores hex.
+
+   Commit 1: Header principal · AppBar secundaria · Botones ·
+   Cards/filas · Campos de texto.
+   (Bottom Sheet, Diálogo y Chips llegan en el Commit 2 junto a
+   components.js.)
+   ============================================================ */
+
+/* ---------- Base común ---------- */
+
+.vk-screen {
+  background: var(--vk-bg);
+  color: var(--vk-text);
+  font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   1 · HEADER PRINCIPAL
+   Solo pantallas raíz. Logo/título + Favoritos + Ajustes,
+   en ese orden. Sin flecha atrás. (Especificación §4)
+   ============================================================ */
+
+.vk-header {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 4px 0 16px;
+  background: var(--vk-header);
+  color: var(--vk-text);
+}
+
+.vk-header__title {
+  flex: 1;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vk-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Botón de icono compartido (Header y AppBar) */
+.vk-iconbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--vk-text);
+  cursor: pointer;
+}
+
+.vk-iconbtn:hover { background: var(--vk-card); }
+.vk-iconbtn:active { background: var(--vk-border); }
+.vk-iconbtn svg { width: 24px; height: 24px; }
+
+/* ============================================================
+   2 · APPBAR SECUNDARIA
+   Flecha atrás + título. Sin estrella, sin ajustes, sin logo,
+   sin handle. Pantallas de detalle/creación/edición/config.
+   ============================================================ */
+
+.vk-appbar {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 16px 0 4px;
+  background: var(--vk-header);
+  color: var(--vk-text);
+  gap: 4px;
+}
+
+.vk-appbar__title {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================
+   5 · BOTONES
+   Primario azul · secundario gris oscuro · destructivo rojo
+   (siempre con confirmación — el diálogo llega en Commit 2).
+   ============================================================ */
+
+.vk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: filter 120ms ease, opacity 120ms ease;
+}
+
+.vk-btn:active { filter: brightness(0.88); }
+
+.vk-btn--primary {
+  background: var(--vk-primary);
+  color: var(--vk-text);
+}
+
+.vk-btn--secondary {
+  background: var(--vk-card);
+  color: var(--vk-text);
+  border: 1px solid var(--vk-border);
+}
+
+.vk-btn--danger {
+  background: var(--vk-danger);
+  color: var(--vk-text);
+}
+
+.vk-btn--block { display: flex; width: 100%; }
+
+.vk-btn:disabled {
+  background: var(--vk-card);
+  color: var(--vk-text-disabled);
+  border: 1px solid var(--vk-border);
+  cursor: not-allowed;
+  filter: none;
+}
+
+/* Variante de texto (acciones ligeras, p. ej. "Cancelar" en pie) */
+.vk-btn--text {
+  background: transparent;
+  color: var(--vk-primary);
+}
+
+/* ============================================================
+   6 · CARDS Y FILAS
+   Regla congelada: fila con chevron SOLO si navega; fila con
+   toggle NO lleva chevron y no navega.
+   ============================================================ */
+
+.vk-card {
+  background: var(--vk-card);
+  border: 1px solid var(--vk-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Fila de lista genérica */
+.vk-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 16px;
+  background: var(--vk-card);
+  color: var(--vk-text);
+  border: none;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: default;
+}
+
+/* Separador entre filas dentro de una card */
+.vk-card .vk-row + .vk-row {
+  border-top: 1px solid var(--vk-border);
+}
+
+/* Fila que navega: cursor + chevron obligatorio */
+.vk-row--nav { cursor: pointer; }
+.vk-row--nav:active { background: var(--vk-border); }
+
+.vk-row__icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  color: var(--vk-text-muted);
+  flex: none;
+}
+.vk-row__icon svg { width: 24px; height: 24px; }
+
+.vk-row__body { flex: 1; min-width: 0; }
+
+.vk-row__title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--vk-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vk-row__subtitle {
+  font-size: 13px;
+  color: var(--vk-text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vk-row__chevron {
+  flex: none;
+  color: var(--vk-text-muted);
+}
+.vk-row__chevron svg { width: 20px; height: 20px; }
+
+/* Toggle (switch) — CSS puro con input[type=checkbox] */
+.vk-toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 26px;
+  flex: none;
+}
+
+.vk-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+.vk-toggle__track {
+  position: absolute;
+  inset: 0;
+  background: var(--vk-border);
+  border-radius: 13px;
+  transition: background 150ms ease;
+  pointer-events: none;
+}
+
+.vk-toggle__track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--vk-text-muted);
+  transition: transform 150ms ease, background 150ms ease;
+}
+
+.vk-toggle input:checked + .vk-toggle__track {
+  background: var(--vk-primary);
+}
+
+.vk-toggle input:checked + .vk-toggle__track::after {
+  transform: translateX(18px);
+  background: var(--vk-text);
+}
+
+/* ============================================================
+   7 · CAMPOS DE TEXTO
+   Estilo congelado de Figma (07-07): fondo --vk-input-bg,
+   borde --vk-input-border, radio 6 px, padding 8–12 px,
+   relleno horizontal. Variantes: normal · enmascarado con ojo ·
+   confirmación integrada (onboarding sin pantallas separadas).
+   ============================================================ */
+
+.vk-field { display: block; width: 100%; }
+
+.vk-field__label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--vk-text-muted);
+  margin-bottom: 6px;
+}
+
+.vk-field__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vk-input {
+  flex: 1;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  background: var(--vk-input-bg);
+  border: 1px solid var(--vk-input-border);
+  border-radius: 6px;
+  color: var(--vk-text);
+  font-size: 15px;
+  outline: none;
+}
+
+.vk-input::placeholder { color: var(--vk-text-disabled); }
+
+.vk-input:focus {
+  border-color: var(--vk-primary);
+}
+
+.vk-input:disabled {
+  color: var(--vk-text-disabled);
+  cursor: not-allowed;
+}
+
+/* Enmascarado con ojo: el input reserva sitio para el botón */
+.vk-field--masked .vk-input { padding-right: 48px; }
+
+.vk-field__eye {
+  position: absolute;
+  right: 2px;
+  width: 44px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--vk-text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+}
+.vk-field__eye:hover { color: var(--vk-text); }
+.vk-field__eye svg { width: 20px; height: 20px; }
+
+/* Mensajes de ayuda/estado bajo el campo */
+.vk-field__hint {
+  display: block;
+  font-size: 12px;
+  margin-top: 6px;
+  color: var(--vk-text-muted);
+}
+
+.vk-field__hint--ok { color: var(--vk-success); }
+.vk-field__hint--error { color: var(--vk-danger); }
+
+/* Confirmación integrada: estados de coincidencia */
+.vk-input--ok { border-color: var(--vk-success); }
+.vk-input--error { border-color: var(--vk-danger); }
+
+/* Espaciado vertical estándar entre campos de un formulario */
+.vk-form > .vk-field + .vk-field { margin-top: 16px; }

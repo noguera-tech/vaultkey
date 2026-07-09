@@ -29,3 +29,9 @@
   --vk-text-muted: #9CA3AF;     /* Texto secundario */
   --vk-text-disabled: #6B7280;  /* Texto deshabilitado */
 }
+
+:root {
+  /* Tokens de componente — campos de formulario (Figma 07-07) */
+  --vk-input-bg: #243246;
+  --vk-input-border: rgba(58, 74, 96, 0.6);
+}
