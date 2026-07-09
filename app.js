@@ -1,6 +1,4 @@
 let _searchDebounce=null;
-const LS_BIO_CRED='vk_bio_cred_id';
-const LS_BIO_BLOB='vk_bio_blob';
 let confirmResolver=null;
 let appBooted=false;
 const LS_META='vk_meta_v1',LS_DATA='vk_data_v1',LS_REC='vk_recovery_v1';let pin='',mode='unlock',tempPin='',unlocked=false,vault=[],current=null,editId=null,lastKey=null,useGenTarget=false,autoLockTimer=null,lockCountdownTimer=null,_entryType='password',_catFilter='',_vaultTab='todas';
@@ -364,8 +362,6 @@ async function unlockOk(p){return window.unlockOk?window.unlockOk(p):undefined;}
 async function tryBioRegister(pinKey){
   // Seguridad V2.3.1: no guardar PIN recuperable en localStorage.
   // La biometría web basada en vk_bio_blob queda deshabilitada hasta migrar a Android Keystore.
-  localStorage.removeItem(LS_BIO_CRED);
-  localStorage.removeItem(LS_BIO_BLOB);
   localStorage.setItem('vk_bio_offer_dismissed','1');
   toast('Biometría web desactivada por seguridad. Usa el PIN de VaultKey.');
 }
@@ -717,7 +713,6 @@ function showPrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.add('sh
 function hidePrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.remove('show');document.body.classList.remove('vk-locked')}
 function handleVisibilityChange(){
   if(!appBooted)return;
-  // BUG5 FIX: ignorar si estamos en medio de compartir app
   if(window._vkSharing||window._vkBiometricFlow)return;
   if(document.hidden){
     if(unlocked){
@@ -1674,14 +1669,11 @@ async function regenerateRecoveryCode(){
 }
 async function tryBio(){
   // Seguridad V2.3.1: no desbloquear la bóveda recuperando el PIN desde localStorage.
-  localStorage.removeItem(LS_BIO_CRED);
-  localStorage.removeItem(LS_BIO_BLOB);
   toast('Biometría web desactivada por seguridad. Introduce tu PIN de VaultKey.');
 }
 function shareApp(){
   const url=location.origin&&location.origin!=='null'?location.origin:location.href;
   if(navigator.share){
-    // BUG5 FIX: marcar que estamos compartiendo para ignorar visibilitychange
     window._vkSharing=true;
     navigator.share({title:'VaultKey',text:'VaultKey - Tu bóveda digital privada',url})
       .catch(()=>{})
@@ -3174,21 +3166,6 @@ function rankIcon(ic){
     }
   }
 
-  function maybeOfferBioAfterRecovery(){
-    try{
-      if(!lastKey) return;
-      if(localStorage.getItem(REC_SAVED)!=='1') return;
-      if(!window.PublicKeyCredential) return;
-      if(localStorage.getItem('vk_bio_cred_id')||localStorage.getItem('vk_bio_offer_dismissed')) return;
-      setTimeout(async()=>{
-        if(localStorage.getItem(REC_PENDING)==='1') return;
-        const ok=await vkConfirm('Activar biometría del dispositivo','VaultKey seguirá usando tu PIN como protección principal. Cuando el sistema lo pida, usa la huella o el PIN de desbloqueo del dispositivo. No es el PIN de VaultKey. ¿Activarla?');
-        localStorage.setItem('vk_bio_offer_dismissed','1');
-        toast('Biometría web no se activará hasta migrar a Android Keystore.');
-      },650);
-    }catch(e){}
-  }
-
   window.showRecoveryCode=async function(first=false){
     const code=await ensureRecoveryCode();
     document.querySelectorAll('.modal').forEach(m=>{ if(m.id!=='recoveryModal') m.classList.remove('open'); });
@@ -3210,7 +3187,6 @@ function rankIcon(ic){
     localStorage.removeItem(REC_PENDING);
     const modal=byId('recoveryModal');
     if(modal){modal.classList.remove('open','vkRecoveryBlocking');modal.style.display='';}
-    maybeOfferBioAfterRecovery();
   };
 
   const oldUnlockOk=window.unlockOk;
@@ -3225,7 +3201,6 @@ function rankIcon(ic){
     if(localStorage.getItem(REC_PENDING)==='1' || (localStorage.getItem(LS_REC)&&localStorage.getItem(REC_SAVED)!=='1')){
       setTimeout(()=>showRecoveryCode(true),120);
     }else{
-      maybeOfferBioAfterRecovery();
     }
   };
 
