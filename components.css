@@ -358,3 +358,195 @@
 
 /* Espaciado vertical estándar entre campos de un formulario */
 .vk-form > .vk-field + .vk-field { margin-top: 16px; }
+
+/* ============================================================
+   3 · BOTTOM SHEET  (Commit 2)
+   Handle superior + título + contenido. Superposición inferior;
+   cierra al tocar fuera (scrim). Transición 300 ms (Espec. §13).
+   ============================================================ */
+
+.vk-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.vk-sheet__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--vk-bg);
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.vk-sheet__panel {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--vk-card);
+  border: 1px solid var(--vk-border);
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+  padding: 8px 16px 24px;
+  transform: translateY(100%);
+  transition: transform 300ms ease;
+}
+
+.vk-sheet.vk-open {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.vk-sheet.vk-open .vk-sheet__scrim { opacity: 0.6; }
+.vk-sheet.vk-open .vk-sheet__panel { transform: translateY(0); }
+
+.vk-sheet__handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--vk-border);
+  margin: 4px auto 12px;
+}
+
+.vk-sheet__title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--vk-text);
+  margin-bottom: 16px;
+}
+
+/* Pie de acciones estándar de sheet/diálogo */
+.vk-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+.vk-actions > .vk-btn { flex: 1; }
+
+/* ============================================================
+   4 · DIÁLOGO DE CONFIRMACIÓN  (Commit 2)
+   Superposición centrada; cierra al tocar fuera; Cancelar cierra;
+   acción destructiva en rojo. Componente único reutilizable.
+   ============================================================ */
+
+.vk-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.vk-dialog__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--vk-bg);
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.vk-dialog__panel {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  background: var(--vk-card);
+  border: 1px solid var(--vk-border);
+  border-radius: 16px;
+  padding: 20px;
+  transform: scale(0.96);
+  opacity: 0;
+  transition: transform 300ms ease, opacity 300ms ease;
+}
+
+.vk-dialog.vk-open {
+  visibility: visible;
+  pointer-events: auto;
+}
+.vk-dialog.vk-open .vk-dialog__scrim { opacity: 0.6; }
+.vk-dialog.vk-open .vk-dialog__panel { transform: scale(1); opacity: 1; }
+
+.vk-dialog__title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--vk-text);
+  margin: 0 0 8px;
+}
+
+.vk-dialog__text {
+  font-size: 14px;
+  color: var(--vk-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   8 · CHIPS DE TIPO  (Commit 2)
+   Selector exclusivo Web / Wi-Fi / PIN / Recuperación.
+   Web por defecto (decisión congelada 05-07).
+   ============================================================ */
+
+.vk-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vk-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 17px;
+  border: 1px solid var(--vk-border);
+  background: transparent;
+  color: var(--vk-text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.vk-chip:hover { color: var(--vk-text); }
+
+.vk-chip.vk-chip--active {
+  background: var(--vk-primary);
+  border-color: var(--vk-primary);
+  color: var(--vk-text);
+}
+
+/* ============================================================
+   Auxiliares de componentes con comportamiento
+   ============================================================ */
+
+/* Slider (maqueta del generador) — nativo con acento por token */
+.vk-slider {
+  width: 100%;
+  accent-color: var(--vk-primary);
+}
+
+/* Caja de vista previa (maqueta del generador) */
+.vk-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 10px 12px;
+  background: var(--vk-input-bg);
+  border: 1px solid var(--vk-input-border);
+  border-radius: 6px;
+  color: var(--vk-text);
+  font-family: 'Roboto Mono', ui-monospace, monospace;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  word-break: break-all;
+}
+
+/* Bloqueo de scroll del fondo con capa abierta */
+body.vk-lock { overflow: hidden; }
