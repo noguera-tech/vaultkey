@@ -12,17 +12,10 @@ const LS_DRIVE_LAST = 'vk_drive_last_sync';
 
 let driveToken = null;
 
-function driveNormalizeEntryId(id){
-  const v = String(id || '').trim();
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)
-    ? v
-    : crypto.randomUUID();
-}
-
 function driveSanitizeRestoredEntries(entries){
   return entries.filter(e => e && typeof e === 'object').map(e => ({
     ...e,
-    id: driveNormalizeEntryId(e.id),
+    id: normalizeEntryId(e.id),
     service: String(e.service || ''),
     entryType: String(e.entryType || 'password'),
     category: String(e.category || 'general'),
