@@ -15,6 +15,18 @@
 
 /* ---------- Base común ---------- */
 
+/* Modelo de caja coherente: los contenedores de componente con
+   width + padding usan border-box (los <button> ya lo traen del
+   UA stylesheet; los <div>/<input> no, y desbordaban). */
+.vk-row,
+.vk-input,
+.vk-btn,
+.vk-card,
+.vk-sheet__panel,
+.vk-dialog__panel {
+  box-sizing: border-box;
+}
+
 .vk-screen {
   background: var(--vk-bg);
   color: var(--vk-text);
@@ -108,6 +120,7 @@
   justify-content: center;
   gap: 8px;
   min-height: 44px;
+  min-width: 112px;
   padding: 0 20px;
   border: none;
   border-radius: 8px;
@@ -171,7 +184,7 @@
   align-items: center;
   gap: 12px;
   min-height: 56px;
-  padding: 8px 16px;
+  padding: 10px 16px;
   background: var(--vk-card);
   color: var(--vk-text);
   border: none;
@@ -202,8 +215,10 @@
 .vk-row__body { flex: 1; min-width: 0; }
 
 .vk-row__title {
+  display: block;
   font-size: 15px;
   font-weight: 500;
+  line-height: 1.35;
   color: var(--vk-text);
   white-space: nowrap;
   overflow: hidden;
@@ -211,9 +226,11 @@
 }
 
 .vk-row__subtitle {
+  display: block;
   font-size: 13px;
+  line-height: 1.35;
   color: var(--vk-text-muted);
-  margin-top: 2px;
+  margin-top: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -232,6 +249,23 @@
   width: 44px;
   height: 26px;
   flex: none;
+  flex-shrink: 0;
+}
+
+/* Acción derecha de fila (toggle o chevron): anclada al extremo,
+   sin padding interno (deformaría el toggle: sus hijos absolutos
+   con inset:0 cubrirían también el padding). La separación con el
+   cuerpo la da el gap de .vk-row; la respiración con el borde,
+   el padding derecho de la fila. */
+.vk-row .vk-toggle,
+.vk-row .vk-row__chevron {
+  margin-left: auto;
+}
+
+/* Respiración de la acción derecha respecto al borde de la card */
+.vk-row:has(.vk-toggle),
+.vk-row:has(.vk-row__chevron) {
+  padding-right: 20px;
 }
 
 .vk-toggle input {
