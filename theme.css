@@ -1,0 +1,31 @@
+﻿/* ============================================================
+   VaultKey 2.0 — theme.css
+   Tokens de la paleta oficial R1 (congelada)
+   Fuente: Especificación Final para Desarrollo v1.0 (08-07-2026)
+   Registro de Decisiones v1.1+ — la paleta final de Figma
+   sustituye a la del Manual de Diseño v1.0.
+
+   REGLA (Plan Módulo 1, tarea 1.5): prohibido hardcodear
+   valores hex en componentes; todo color pasa por estos tokens.
+   Este fichero es la única fuente de verdad de color de la PWA.
+   ============================================================ */
+
+:root {
+  /* Acción / semánticos */
+  --vk-primary: #3B82F6;        /* Azul primario / acciones */
+  --vk-success: #22C55E;        /* Verde correcto */
+  --vk-warning: #F59E0B;        /* Naranja advertencia */
+  --vk-danger: #EF4444;         /* Rojo destructivo */
+  --vk-caution: #FACC15;        /* Amarillo precaución suave */
+
+  /* Superficies */
+  --vk-bg: #0F172A;             /* Fondo app */
+  --vk-header: #24354B;         /* Header */
+  --vk-card: #2B3B52;           /* Tarjetas */
+  --vk-border: #374151;         /* Bordes */
+
+  /* Texto */
+  --vk-text: #FFFFFF;           /* Texto primario */
+  --vk-text-muted: #9CA3AF;     /* Texto secundario */
+  --vk-text-disabled: #6B7280;  /* Texto deshabilitado */
+}
