@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>VaultKey · Navigation Test (herramienta interna)</title>
+<!-- ============================================================
+     HERRAMIENTA INTERNA DE DESARROLLO Y QA — NO DESPLEGAR
+     Arnés de la 1.7: valida router.js con pantallas placeholder.
+     Reglas: fuera del deploy/SW/manifest; sin datos reales;
+     sin app.js; sin localStorage de VaultKey.
+     ============================================================ -->
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  body { margin: 0; }
+  .nt-shell { max-width: 420px; margin: 0 auto; min-height: 100vh; }
+  #nt-screen { opacity: 1; }
+  #nt-screen.nt-fade { transition: opacity 150ms ease; opacity: 0; }
+  .nt-body { padding: 16px; }
+  .nt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .nt-note { font-size: 12px; color: var(--vk-text-disabled); margin-top: 16px; }
+  .nt-panel {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: var(--vk-header); border-top: 1px solid var(--vk-border);
+    padding: 8px 12px; font-size: 12px; color: var(--vk-text-muted);
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    max-width: 420px; margin: 0 auto;
+  }
+  .nt-panel code { color: var(--vk-text); }
+  .nt-panel .vk-btn { min-width: 0; min-height: 30px; padding: 0 10px; font-size: 12px; }
+</style>
+</head>
+<body class="vk-screen">
+<div class="nt-shell">
+  <div id="nt-screen"></div>
+</div>
+
+<!-- Panel de control del arnés -->
+<div class="nt-panel">
+  <span>Ruta: <code id="nt-route">—</code></span>
+  <span>Patrón: <code id="nt-pattern">—</code></span>
+  <span>Transición: <code id="nt-ms">—</code></span>
+  <button class="vk-btn vk-btn--secondary" id="nt-init-vault">vkInitialRoute(hasVault:true)</button>
+  <button class="vk-btn vk-btn--secondary" id="nt-init-novault">vkInitialRoute(hasVault:false)</button>
+</div>
+
+<script src="../router.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var TITLES = {
+    dashboard: 'VaultKey', passwords: 'Contraseñas', notes: 'Notas',
+    cards: 'Tarjetas', documents: 'Documentos', favorites: 'Favoritos',
+    settings: 'Ajustes', welcome: 'Bienvenida', unlock: 'Desbloqueo',
+    splash: 'Splash', 'onboarding-creating': 'Creando bóveda'
+  };
+
+  var ICON_STAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+  var ICON_GEAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+  var ICON_BACK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>';
+
+  function headerHtml(title) {
+    return '<header class="vk-header">' +
+      '<div class="vk-header__title">' + title + '</div>' +
+      '<div class="vk-header__actions">' +
+      '<button class="vk-iconbtn" aria-label="Favoritos" data-nav="/favorites">' + ICON_STAR + '</button>' +
+      '<button class="vk-iconbtn" aria-label="Ajustes" data-nav="/settings">' + ICON_GEAR + '</button>' +
+      '</div></header>';
+  }
+
+  function appbarHtml(title) {
+    return '<header class="vk-appbar">' +
+      '<button class="vk-iconbtn" aria-label="Atrás" id="nt-back">' + ICON_BACK + '</button>' +
+      '<div class="vk-appbar__title">' + title + '</div></header>';
+  }
+
+  function rootBody(route) {
+    var links = [
+      ['/dashboard', 'Dashboard'], ['/passwords', 'Contraseñas'], ['/notes', 'Notas'],
+      ['/cards', 'Tarjetas'], ['/documents', 'Documentos'], ['/favorites', 'Favoritos'],
+      ['/settings', 'Ajustes'], ['/passwords/add', 'Añadir contraseña (interna)'],
+      ['/passwords/demo-1', 'Detalle demo (interna)'],
+      ['/passwords/demo-1/edit', 'Editar demo (interna)'],
+      ['/settings/security', 'Ajustes · Seguridad (interna)']
+    ];
+    var btns = links.map(function (l) {
+      return '<button class="vk-btn vk-btn--secondary" data-nav="' + l[0] + '">' + l[1] + '</button>';
+    }).join('');
+    return '<div class="nt-body"><div class="vk-card" style="padding:16px;">' +
+      '<strong>Placeholder raíz:</strong> ' + route.name +
+      (route.meta.placeholder ? ' <em>(lógica en Módulo 2)</em>' : '') +
+      '</div><div class="nt-grid">' + btns + '</div>' +
+      '<p class="nt-note">Pantalla raíz → Header principal. Sin flecha atrás.</p></div>';
+  }
+
+  function innerBody(route) {
+    return '<div class="nt-body"><div class="vk-card" style="padding:16px;">' +
+      '<strong>Placeholder interna:</strong> ' + route.name +
+      '<br><small>params: ' + JSON.stringify(route.params) + '</small></div>' +
+      '<p class="nt-note">Pantalla interna → AppBar secundaria. Atrás del navegador/Android debe volver.</p></div>';
+  }
+
+  function titleFor(route) {
+    if (TITLES[route.name]) { return TITLES[route.name]; }
+    if (route.name === 'entry-add') { return 'Añadir'; }
+    if (route.name === 'entry-detail') { return 'Detalle'; }
+    if (route.name === 'entry-edit') { return 'Editar'; }
+    return route.name;
+  }
+
+  var screen = document.getElementById('nt-screen');
+
+  function render(route) {
+    var html = route.meta.root
+      ? headerHtml(titleFor(route)) + rootBody(route)
+      : appbarHtml(titleFor(route)) + innerBody(route);
+
+    /* Disolver simplificado: la duración real viene en
+       route.transitionMs (metadato); aquí solo se demuestra. */
+    screen.classList.add('nt-fade');
+    window.setTimeout(function () {
+      screen.innerHTML = html;
+      screen.classList.remove('nt-fade');
+    }, 60);
+
+    document.getElementById('nt-route').textContent = route.path;
+    document.getElementById('nt-pattern').textContent = route.meta.pattern;
+    document.getElementById('nt-ms').textContent = route.transitionMs + ' ms';
+  }
+
+  document.addEventListener('click', function (e) {
+    var nav = e.target.closest('[data-nav]');
+    if (nav) { vkRouter.navigate(nav.getAttribute('data-nav')); return; }
+    if (e.target.closest('#nt-back')) { vkRouter.back(); }
+  });
+
+  document.getElementById('nt-init-vault').addEventListener('click', function () {
+    vkRouter.navigate('/' + vkInitialRoute({ hasVault: true }));
+  });
+  document.getElementById('nt-init-novault').addEventListener('click', function () {
+    vkRouter.navigate('/' + vkInitialRoute({ hasVault: false }));
+  });
+
+  vkRouter.init({ onRender: render });
+})();
+</script>
+</body>
+</html>
