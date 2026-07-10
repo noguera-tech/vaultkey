@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>VaultKey · Pepper Test (IndexedDB real)</title>
+<!-- ============================================================
+     HERRAMIENTA INTERNA — NO DESPLEGAR
+     Cierra el test que Node no puede hacer: ciclo real del pepper
+     A+ en IndexedDB. Crear pepper → pin-wrap → wipe → openPinWrap
+     debe FALLAR. Sin datos reales, sin app.js, sin localStorage
+     de producción distinto de las claves vk2_ de prueba.
+     ============================================================ -->
+<style>
+  body { font-family: system-ui, sans-serif; background: #0F172A; color: #fff; padding: 16px; }
+  .ok { color: #22C55E; } .bad { color: #EF4444; }
+  pre { background: #1e293b; padding: 12px; border-radius: 8px; white-space: pre-wrap; }
+  button { background: #3B82F6; color: #fff; border: 0; border-radius: 8px; padding: 10px 16px; font-size: 15px; }
+</style>
+</head>
+<body>
+<h2>VaultKey · Pepper Test (IndexedDB real)</h2>
+<p>Valida el ciclo A+ que Node no puede: pepper en IndexedDB, pin-wrap, wipe y verificación de que el pin-wrap queda inservible.</p>
+<button id="run">Ejecutar prueba</button>
+<pre id="out">Pulsa «Ejecutar prueba».</pre>
+
+<script src="../vault-crypto.js"></script>
+<script src="../vault-store.js"></script>
+<script>
+(function () {
+  'use strict';
+  var out = document.getElementById('out');
+  var pass = 0, fail = 0, lines = [];
+  function t(name, cond) {
+    if (cond) { pass++; lines.push('<span class="ok">✔</span> ' + name); }
+    else { fail++; lines.push('<span class="bad">✘ FALLO:</span> ' + name); }
+    out.innerHTML = lines.join('\n');
+  }
+
+  document.getElementById('run').addEventListener('click', async function () {
+    lines = []; pass = 0; fail = 0;
+    try {
+      var PAYLOAD = JSON.stringify({ app: 'VaultKey', schemaVersion: 2, entries: [] });
+      var PIN = '482913';
+
+      // 1. pepper real en IndexedDB
+      var pepper = await vkCrypto.getOrCreatePepper();
+      t('getOrCreatePepper devuelve CryptoKey no extraíble', pepper && pepper.extractable === false);
+      var pepper2 = await vkCrypto.getOrCreatePepper();
+      t('segunda llamada devuelve el MISMO pepper persistido', pepper2 && pepper2.extractable === false);
+
+      // 2. DEK + pin-wrap con el pepper real
+      var dekRaw = vkCrypto.generateDEKBytes();
+      var dekKey = await vkCrypto.importDEK(dekRaw);
+      var vaultCt = await vkCrypto.encryptVault(dekKey, PAYLOAD);
+      var pinWrap = await vkCrypto.createPinWrap(dekRaw, PIN, pepper);
+      st_savePinWrap(pinWrap);
+      var dek1 = await vkCrypto.openPinWrap(pinWrap, PIN, pepper);
+      t('pin-wrap abre con PIN + pepper actual', (await vkCrypto.decryptVault(dek1, vaultCt)) === PAYLOAD);
+
+      // 3. wipe real → borra claves vk2_ + pepper de IndexedDB
+      vkStore.saveBlob({ app: 'VaultKey', schemaVersion: 2, cryptoVersion: 1, vault: vaultCt });
+      var res = await vkStore.wipeLocal();
+      t('wipeLocal reporta pepper borrado', res.deleted.indexOf('device-pepper') !== -1);
+      t('vk2_blob y vk2_pinwrap borrados', vkStore.loadBlob() === null && vkStore.loadPinWrap() === null);
+
+      // 4. tras el wipe, un pepper NUEVO no puede abrir el pin-wrap viejo
+      var pepperNew = await vkCrypto.getOrCreatePepper();
+      var failed = false;
+      try { await vkCrypto.openPinWrap(pinWrap, PIN, pepperNew); }
+      catch (e) { failed = true; }
+      t('pin-wrap viejo INSERVIBLE con pepper regenerado (borrado A+ efectivo)', failed === true);
+
+      // limpieza del arnés
+      await vkCrypto.deletePepper();
+
+      lines.push('');
+      lines.push('<b>Resultado: ' + pass + ' correctas, ' + fail + ' fallos</b>');
+      out.innerHTML = lines.join('\n');
+    } catch (e) {
+      out.innerHTML += '\n<span class="bad">ERROR FATAL: ' + (e && e.message) + '</span>';
+    }
+  });
+
+  function st_savePinWrap(pw) { vkStore.savePinWrap(pw); }
+})();
+</script>
+</body>
+</html>
