@@ -95,6 +95,34 @@ var favs = vk.favorites(lote);
 t('favoritos filtra fav === true', favs.length === 2 && favs.indexOf(pw) !== -1 && favs.indexOf(dc) !== -1);
 t('favoritos con entrada no-array devuelve []', Array.isArray(vk.favorites(null)) && vk.favorites(null).length === 0);
 
+
+console.log('== ajustes checkpoint Figma (08-07) ==');
+var dc2 = vk.create('document', { title: 'Pasaporte', docType: 'pasaporte', issuer: 'Ministerio', country: 'España' });
+t('document: issuer y country presentes', dc2.issuer === 'Ministerio' && dc2.country === 'España');
+t('document con issuer/country válido', vk.validate(dc2).ok);
+var dcOld = JSON.parse(JSON.stringify(dc2)); delete dcOld.issuer; delete dcOld.country;
+t('document sin issuer/country (esquema previo) sigue válido', vk.validate(dcOld).ok);
+var dcBadI = vk.create('document', { title: 'X' }); dcBadI.issuer = 123;
+t('document con issuer no-string rechazado', !vk.validate(dcBadI).ok);
+var cdNoTitle = vk.create('card', { holder: 'Demo', number: '4111', expiry: '12/30', cvv: '123' });
+t('card sin title es válida (Figma no muestra título)', vk.validate(cdNoTitle).ok);
+var ntNoTitle = vk.create('note', { body: 'x' });
+t('note sin title sigue siendo inválida', !vk.validate(ntNoTitle).ok);
+var cdParcial = JSON.parse(JSON.stringify(cdNoTitle)); delete cdParcial.brand;
+t('card sin campo opcional brand sigue válida', vk.validate(cdParcial).ok);
+var rt = vk.deserialize(vk.serialize([dc2, cdNoTitle]));
+t('round-trip con campos nuevos ok', rt.ok && rt.entries[0].country === 'España');
+var dcH = vk.create('document', { title: 'DNI', docType: 'dni', holder: 'Nombre del titular' });
+t('document.holder presente y respetado', dcH.holder === 'Nombre del titular');
+t('document.holder default vacío', vk.create('document', { title: 'x' }).holder === '');
+var dcHold = JSON.parse(JSON.stringify(dcH)); delete dcHold.holder;
+t('document sin holder sigue válido (opcional)', vk.validate(dcHold).ok);
+var dcHBad = vk.create('document', { title: 'x' }); dcHBad.holder = 99;
+t('document.holder no-string rechazado', !vk.validate(dcHBad).ok);
+var rtH = vk.deserialize(vk.serialize([dcH]));
+t('round-trip conserva holder', rtH.ok && rtH.entries[0].holder === 'Nombre del titular');
+t('schemaVersion sigue en 2', vk.SCHEMA_VERSION === 2);
+
 console.log('');
 console.log('Resultado: ' + pass + ' correctas, ' + fail + ' fallos');
 process.exit(fail === 0 ? 0 : 1);

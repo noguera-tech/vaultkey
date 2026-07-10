@@ -43,7 +43,7 @@
     password: ['subtype', 'username', 'password', 'url', 'notes', 'codes', 'passHistory'],
     note:     ['body'],
     card:     ['holder', 'number', 'expiry', 'cvv', 'brand', 'notes'],
-    document: ['docType', 'number', 'expiry', 'notes', 'attachmentRef']
+    document: ['docType', 'number', 'expiry', 'holder', 'issuer', 'country', 'notes', 'attachmentRef']
   };
 
   /* Defaults por tipo al crear */
@@ -51,7 +51,7 @@
     password: { subtype: 'web', username: '', password: '', url: '', notes: '', codes: '', passHistory: [] },
     note:     { body: '' },
     card:     { holder: '', number: '', expiry: '', cvv: '', brand: '', notes: '' },
-    document: { docType: 'otro', number: '', expiry: '', notes: '', attachmentRef: '' }
+    document: { docType: 'otro', number: '', expiry: '', holder: '', issuer: '', country: '', notes: '', attachmentRef: '' }
   };
 
   /* ---------- Utilidades ---------- */
@@ -132,7 +132,14 @@
     }
     /* Comunes */
     if (!isString(entry.id) || !entry.id) { errors.push('id requerido'); }
-    if (!isString(entry.title) || entry.title.trim() === '') { errors.push('title requerido'); }
+    /* title obligatorio salvo card: el frame congelado de Añadir
+       tarjeta no muestra campo de título; la etiqueta visible se
+       deriva en presentación (titular / últimos dígitos). */
+    if (entry.type === 'card') {
+      if (!isString(entry.title)) { errors.push('title debe ser string'); }
+    } else if (!isString(entry.title) || entry.title.trim() === '') {
+      errors.push('title requerido');
+    }
     if (typeof entry.fav !== 'boolean') { errors.push('fav debe ser boolean'); }
     if (!isStringArray(entry.tags)) { errors.push('tags debe ser array de strings'); }
     if (!isNumber(entry.createdAt)) { errors.push('createdAt debe ser número'); }
@@ -159,14 +166,23 @@
     if (entry.type === 'card') {
       var cardStr = ['holder', 'number', 'expiry', 'cvv', 'brand', 'notes'];
       for (var i = 0; i < cardStr.length; i++) {
-        if (!isString(entry[cardStr[i]])) { errors.push(cardStr[i] + ' debe ser string'); }
+        var ck = cardStr[i];
+        if (typeof entry[ck] !== 'undefined' && !isString(entry[ck])) {
+          errors.push(ck + ' debe ser string');
+        }
       }
     }
     if (entry.type === 'document') {
       if (DOC_TYPES.indexOf(entry.docType) === -1) {
         errors.push('docType inválido: ' + entry.docType);
       }
-      if (!isString(entry.attachmentRef)) { errors.push('attachmentRef debe ser string (solo referencia)'); }
+      var docStr = ['number', 'expiry', 'holder', 'issuer', 'country', 'notes', 'attachmentRef'];
+      for (var j = 0; j < docStr.length; j++) {
+        var dk = docStr[j];
+        if (typeof entry[dk] !== 'undefined' && !isString(entry[dk])) {
+          errors.push(dk + ' debe ser string');
+        }
+      }
     }
     return { ok: errors.length === 0, errors: errors };
   }
