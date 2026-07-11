@@ -455,6 +455,29 @@ window._vk2UnlockOk=async function(dekKey){
   setTimeout(function(){try{maybeShowAutofillPicker();}catch(e){}},300);
   setTimeout(function(){try{checkAutofillSetupBanner();}catch(e){}},1500);
 };
+// VK 2.0 — cambio de credenciales
+window.vk2ChangeMaster=async function(){
+  if(typeof vkCredentials==='undefined'||!vkStore.hasVault()){toast('No disponible.');return;}
+  const cur=prompt('Contraseña maestra actual:');if(!cur)return;
+  const nxt=prompt('Nueva contraseña maestra (mín. 12 caracteres):');
+  if(!nxt||nxt.length<12){toast('Contraseña demasiado corta.');return;}
+  const nxt2=prompt('Confirma la nueva contraseña:');
+  if(nxt!==nxt2){toast('Las contraseñas no coinciden.');return;}
+  vkCredentials.changeMaster({store:vkStore,crypto:vkCrypto,currentMaster:cur,newMaster:nxt})
+    .then(function(){toast('Contraseña maestra cambiada.');})
+    .catch(function(){toast('Contraseña actual incorrecta.');});
+};
+window.vk2ChangePIN=async function(){
+  if(typeof vkCredentials==='undefined'||!vkStore.hasVault()){toast('No disponible.');return;}
+  const m=prompt('Contraseña maestra:');if(!m)return;
+  const np=prompt('Nuevo PIN (6 dígitos):');
+  if(!np||!/^[0-9]{6}$/.test(np)){toast('PIN inválido.');return;}
+  const np2=prompt('Confirma el nuevo PIN:');
+  if(np!==np2){toast('Los PIN no coinciden.');return;}
+  vkCredentials.changePIN({store:vkStore,crypto:vkCrypto,master:m,newPin:np})
+    .then(function(){toast('PIN cambiado.');})
+    .catch(function(){toast('Contraseña maestra incorrecta.');});
+};
 function show(id,dir){
   ensureFabInAppShell();
 
@@ -577,7 +600,7 @@ function show(id,dir){
   });
 
 })();
-function lock(){vibe(30);soundLock();unlocked=false;lastKey=null;pin='';clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay()}
+function lock(){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();vibe(30);soundLock();unlocked=false;lastKey=null;pin='';clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay()}
 async function wipe(){if(await vkConfirm('Borrar todos los datos','⚠️ Se eliminarán el PIN, todas las contraseñas y el código de recuperación. Esta acción es irreversible. ¿Continuar?')){soundError();vibe([60,30,60,30,100]);localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];lock()}}
 function closeModals(){
   document.querySelectorAll('.modal').forEach(m=>{
@@ -1726,6 +1749,15 @@ async function showRecoveryCode(first=false){
   if(first)toast('📋 Guarda este código como identificador de tu bóveda. Recuerda: sin tu PIN, las contraseñas no se pueden recuperar.');
 }
 async function regenerateRecoveryCode(){
+  // VK 2.0: regenerar kit via vkKitManager
+  if(typeof vkStore!=='undefined'&&vkStore.hasVault()&&typeof vkKitManager!=='undefined'){
+    const m=prompt('Contraseña maestra para regenerar el kit:');
+    if(!m)return;
+    vkKitManager.regenerateKit({store:vkStore,crypto:vkCrypto,master:m})
+      .then(function(r){prompt('Nuevo kit de emergencia (cópialo ahora):',r.kitCode);toast('Kit regenerado. El anterior ha quedado invalidado.');})
+      .catch(function(){toast('Contraseña incorrecta o error al regenerar.');});
+    return;
+  }
   if(!lastKey)return;
   const ok=await vkConfirm('Regenerar código de recuperación','El código actual quedará inválido. Asegúrate de guardar el nuevo en un lugar seguro. ¿Continuar?');
   if(!ok)return;
@@ -3240,6 +3272,11 @@ function rankIcon(ic){
   }
 
   window.showRecoveryCode=async function(first=false){
+    // VK 2.0: el kit no se almacena en la app
+    if(typeof vkStore!=='undefined'&&vkStore.hasVault()){
+      toast('El kit de emergencia no se guarda en la app. Si lo perdiste, regenerálo desde este menú.');
+      return;
+    }
     const code=await ensureRecoveryCode();
     document.querySelectorAll('.modal').forEach(m=>{ if(m.id!=='recoveryModal') m.classList.remove('open'); });
     const txt=byId('recoveryText'); if(txt) txt.textContent=code;
