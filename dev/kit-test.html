@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>VaultKey · Kit Test (herramienta interna)</title>
+<!-- HERRAMIENTA INTERNA — NO DESPLEGAR. Bóveda de prueba sembrada
+     programáticamente. Sin datos reales. -->
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  body { margin: 0; padding: 0 0 80px; }
+  .kt-wrap { max-width: 420px; margin: 0 auto; padding: 0 16px 16px; }
+  .kt-panel { position: fixed; left: 0; right: 0; bottom: 0; max-width: 420px; margin: 0 auto;
+    background: var(--vk-header); border-top: 1px solid var(--vk-border);
+    padding: 8px 12px; font-size: 12px; color: var(--vk-text-muted);
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .kt-panel .vk-btn { min-width: 0; min-height: 30px; padding: 0 10px; font-size: 12px; }
+  pre { background: #1e293b; padding: 10px; border-radius: 8px;
+        white-space: pre-wrap; font-size: 12px; margin: 8px 0; }
+  .ok  { color: #22C55E; } .bad { color: #EF4444; }
+</style>
+</head>
+<body class="vk-screen">
+<div class="kt-wrap">
+  <h2 style="padding-top:16px; margin-bottom:4px;">VaultKey · Kit Test</h2>
+  <p class="vk-field__hint">Credenciales de prueba → master: <code>MasterFuerte#2026x</code> · PIN: <code>482913</code></p>
+  <pre id="auto-out">Pulsa «Sembrar + test automático».</pre>
+  <div id="kit-ui"></div>
+</div>
+
+<div class="kt-panel">
+  <button class="vk-btn vk-btn--primary"   id="btn-seed">Sembrar + test automático</button>
+  <button class="vk-btn vk-btn--secondary" id="btn-show">showKit (manual)</button>
+  <button class="vk-btn vk-btn--secondary" id="btn-regen">regenerateKit (manual)</button>
+  <button class="vk-btn vk-btn--danger"    id="btn-wipe">Wipe</button>
+</div>
+
+<script src="../vault-crypto.js"></script>
+<script src="../vault-store.js"></script>
+<script src="../kit-manager.js"></script>
+<script>
+(function () {
+  'use strict';
+  var MASTER = 'MasterFuerte#2026x', PIN = '482913';
+  var autoOut = document.getElementById('auto-out');
+  var kitUI   = document.getElementById('kit-ui');
+  var pass = 0, fail = 0, lines = [];
+  window.__seedKit = null; /* captura el kit inicial para tests */
+
+  function t(name, cond) {
+    if (cond) { pass++; lines.push('<span class="ok">✔</span> ' + name); }
+    else       { fail++; lines.push('<span class="bad">✘ FALLO:</span> ' + name); }
+    autoOut.innerHTML = lines.join('\n');
+  }
+
+  function uns(b64) {
+    var bin = atob(b64), u = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) { u[i] = bin.charCodeAt(i); }
+    return u;
+  }
+
+  function seed() {
+    var kitCode = vkCrypto.generateKitCode();
+    window.__seedKit = kitCode;
+    var payload = JSON.stringify({ app:'VaultKey', schemaVersion:2, entries:[] });
+    return vkCrypto.createVaultBlob({ master: MASTER, kitCode: kitCode, payloadStr: payload })
+      .then(function (alta) {
+        vkStore.saveBlob(alta.blob);
+        return vkCrypto.getOrCreatePepper().then(function (pepper) {
+          return vkCrypto.deriveKEK(MASTER, uns(alta.blob.kdf.saltMaster), alta.blob.kdf.iterMaster)
+            .then(function (kek) { return vkCrypto.unwrapDEKRaw(alta.blob.wraps.master, kek); })
+            .then(function (raw) {
+              return vkCrypto.createPinWrap(raw, PIN, pepper).then(function (pw) {
+                raw.fill(0); vkStore.savePinWrap(pw);
+                vkStore.setMeta({ onboardingDone: true }); vkStore.resetAttempts();
+              });
+            });
+        });
+      });
+  }
+
+  /* pinVerify usado por showKit: verifica el PIN real con pepper */
+  function makePinVerify() {
+    return function (pin) {
+      var pw = vkStore.loadPinWrap();
+      if (!pw) { return Promise.reject(new Error('sin pin-wrap')); }
+      /* Para devolver el kit: abrir el blob con master para extraer el kit-code
+         no es posible (no lo guardamos en claro). El kit solo puede extraerse
+         si el integrador lo tiene en sesión o si se vuelve a generar.
+         Aquí el pinVerify valida la identidad (PIN correcto) y devuelve el
+         kit-code del blob re-abierto por master (flujo real: session tiene la DEK,
+         y con ella se puede acceder al payload, pero en el arnés usamos master
+         directamente para simplicidad del test). */
+      return vkCrypto.getOrCreatePepper()
+        .then(function (pepper) { return vkCrypto.openPinWrap(pw, pin, pepper); })
+        .then(function () {
+          /* PIN OK: re-abrir blob por master para obtener el kit code del payload
+             (en integración real, la DEK ya está en sesión y el kit se obtiene del store) */
+          return vkCrypto.openVaultBlob(vkStore.loadBlob(), { master: MASTER })
+            .then(function () {
+              /* El kit real no se almacena en claro: aquí devolvemos el seedKit
+                 que el arnés capturó al alta. En la integración real, el kit code
+                 se guarda cifrado o se muestra solo en el onboarding. */
+              return window.__seedKit || '(kit no disponible en arnés)';
+            });
+        });
+    };
+  }
+
+  document.getElementById('btn-seed').addEventListener('click', async function () {
+    lines = []; pass = 0; fail = 0;
+    await vkStore.wipeLocal();
+    lines.push('Sembrando bóveda de prueba (2M iteraciones)…');
+    autoOut.innerHTML = lines.join('\n');
+    await seed();
+
+    /* Test 1: showKit con PIN incorrecto → no muestra código */
+    await new Promise(function (res) {
+      var tempDiv = document.createElement('div');
+      tempDiv.style.display = 'none';
+      document.body.appendChild(tempDiv);
+      var calls = 0;
+      vkKitManager.showKit({
+        container: tempDiv,
+        pinVerify: function (pin) { calls++; return Promise.reject(new Error('PIN incorrecto')); }
+      });
+      document.getElementById('km-verify-btn').click();
+      setTimeout(function () {
+        var section = document.getElementById('km-kit-section');
+        t('PIN incorrecto: código no visible', !section || section.style.display === 'none');
+        t('PIN incorrecto: pinVerify fue llamado', calls === 1);
+        document.body.removeChild(tempDiv);
+        res();
+      }, 300);
+    });
+
+    /* Test 2: showKit con PIN correcto → muestra código */
+    await new Promise(function (res) {
+      var tempDiv2 = document.createElement('div');
+      tempDiv2.style.display = 'none';
+      document.body.appendChild(tempDiv2);
+      vkKitManager.showKit({ container: tempDiv2, pinVerify: makePinVerify() });
+      var pinInput = document.getElementById('km-pin');
+      if (pinInput) { pinInput.value = PIN; }
+      document.getElementById('km-verify-btn').click();
+      var waited = 0;
+      var poll = setInterval(function () {
+        waited += 200;
+        var section = document.getElementById('km-kit-section');
+        if ((section && section.style.display !== 'none') || waited > 30000) {
+          clearInterval(poll);
+          var codeEl = document.getElementById('km-code');
+          t('PIN correcto: sección visible', !!section && section.style.display !== 'none');
+          t('PIN correcto: código no vacío', !!codeEl && codeEl.textContent.startsWith('VK2-'));
+          t('PIN correcto: código coincide con seedKit', codeEl && codeEl.textContent === window.__seedKit);
+          document.body.removeChild(tempDiv2);
+          res();
+        }
+      }, 200);
+    });
+
+    /* Test 3: regenerateKit con master correcta */
+    var oldKit = window.__seedKit;
+    var regenRes = await vkKitManager.regenerateKit({ store: vkStore, crypto: vkCrypto, master: MASTER });
+    t('regenerateKit: devuelve nuevo kitCode', !!regenRes.kitCode && regenRes.kitCode.startsWith('VK2-'));
+    t('regenerateKit: código nuevo distinto del anterior', regenRes.kitCode !== oldKit);
+
+    /* Test 4: kit anterior no abre el blob */
+    var oldFails = await vkCrypto.openVaultBlob(vkStore.loadBlob(), { kitCode: oldKit })
+      .then(function(){return false;}, function(){return true;});
+    t('kit anterior revocado (no abre blob nuevo)', oldFails === true);
+
+    /* Test 5: kit nuevo abre el blob */
+    var newOk = await vkCrypto.openVaultBlob(vkStore.loadBlob(), { kitCode: regenRes.kitCode })
+      .then(function(){return true;}, function(){return false;});
+    t('kit nuevo abre el blob correctamente', newOk === true);
+
+    /* Test 6: regenerateKit con master errónea → rechaza */
+    var regenFails = await vkKitManager.regenerateKit({ store: vkStore, crypto: vkCrypto, master: 'mala' })
+      .then(function(){return false;}, function(){return true;});
+    t('regenerateKit master errónea: rechaza', regenFails === true);
+
+    lines.push('');
+    lines.push('<b>Resultado: ' + pass + ' correctas, ' + fail + ' fallos</b>');
+    autoOut.innerHTML = lines.join('\n');
+  });
+
+  /* showKit manual (verificación visual + Copiar + PDF) */
+  document.getElementById('btn-show').addEventListener('click', function () {
+    if (!vkStore.hasVault()) { autoOut.textContent = 'Siembra la bóveda primero.'; return; }
+    vkKitManager.showKit({ container: kitUI, pinVerify: makePinVerify() });
+  });
+
+  /* regenerateKit manual */
+  document.getElementById('btn-regen').addEventListener('click', async function () {
+    if (!vkStore.hasVault()) { autoOut.textContent = 'Siembra la bóveda primero.'; return; }
+    var master = prompt('Contraseña maestra:');
+    if (!master) { return; }
+    try {
+      var r = await vkKitManager.regenerateKit({ store: vkStore, crypto: vkCrypto, master: master });
+      window.__seedKit = r.kitCode;
+      kitUI.innerHTML = '<div class="vk-card" style="padding:16px; margin-top:12px;">' +
+        '<p style="font-size:12px; color:var(--vk-text-muted);">Nuevo kit:</p>' +
+        '<p style="font-family:monospace; font-size:14px;">' + r.kitCode + '</p></div>';
+    } catch(e) { autoOut.textContent = 'Error: ' + e.message; }
+  });
+
+  document.getElementById('btn-wipe').addEventListener('click', function () {
+    vkStore.wipeLocal().then(function () { kitUI.innerHTML = ''; window.__seedKit = null; autoOut.textContent = 'Wipe completado.'; });
+  });
+})();
+</script>
+</body>
+</html>
