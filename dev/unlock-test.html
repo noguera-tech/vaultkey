@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>VaultKey · Unlock Test (herramienta interna)</title>
+<!-- HERRAMIENTA INTERNA — NO DESPLEGAR. Bóveda de PRUEBA sembrada
+     programáticamente (master/PIN conocidos, abajo). Botones de
+     siembra y wipe para repetir. Sin app.js, sin datos reales. -->
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  body { margin: 0; }
+  .ul-shell { max-width: 420px; margin: 0 auto; min-height: 100vh; }
+  .ul-panel { position: fixed; left: 0; right: 0; bottom: 0; max-width: 420px; margin: 0 auto;
+    background: var(--vk-header); border-top: 1px solid var(--vk-border);
+    padding: 8px 12px; font-size: 12px; color: var(--vk-text-muted);
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .ul-panel code { color: var(--vk-text); }
+  .ul-panel .vk-btn { min-width: 0; min-height: 30px; padding: 0 10px; font-size: 12px; }
+</style>
+</head>
+<body class="vk-screen">
+<div class="ul-shell"><div id="ul-screen"></div></div>
+
+<div class="ul-panel">
+  <span>Ruta: <code id="ul-route">—</code></span>
+  <span>Intentos: <code id="ul-att">—</code></span>
+  <span>hasVault: <code id="ul-hv">—</code></span>
+  <button class="vk-btn vk-btn--primary" id="ul-seed">Sembrar bóveda de prueba</button>
+  <button class="vk-btn vk-btn--danger" id="ul-wipebtn">Wipe</button>
+  <span>Credenciales de prueba → master: <code>MasterFuerte#2026x</code> · PIN: <code>482913</code></span>
+</div>
+
+<script src="../components.js"></script>
+<script src="../router.js"></script>
+<script src="../vault-crypto.js"></script>
+<script src="../vault-store.js"></script>
+<script src="../unlock.js"></script>
+<script>
+(function () {
+  'use strict';
+  var screen = document.getElementById('ul-screen');
+  var MASTER = 'MasterFuerte#2026x', PIN = '482913';
+  window.__unlockedDek = null; /* SOLO arnés: inspección */
+  var ctx = { router: vkRouter, crypto: vkCrypto, store: vkStore,
+    onUnlocked: function (s) { window.__unlockedDek = s.dekKey; } };
+
+  function panel() {
+    document.getElementById('ul-att').textContent = vkStore.getMeta().failedAttempts;
+    document.getElementById('ul-hv').textContent = String(vkStore.hasVault());
+  }
+  function placeholder(title, extra) {
+    return '<header class="vk-header"><div class="vk-header__title">' + title + '</div></header>' +
+      '<div style="padding:24px 16px;"><div class="vk-card" style="padding:16px;">' + extra + '</div></div>';
+  }
+  function render(route) {
+    document.getElementById('ul-route').textContent = route.path;
+    panel();
+    if (vkUnlock.handlesRoute(route.name)) { vkUnlock.render(route, screen, ctx); return; }
+    if (route.name === 'dashboard') {
+      screen.innerHTML = placeholder('VaultKey', 'Dashboard placeholder. Sesión abierta: DEK en window.__unlockedDek (no extraíble). <button class="vk-btn vk-btn--secondary" onclick="location.hash=\'#/unlock\'">Volver a bloquear</button>');
+      return;
+    }
+    if (route.name === 'welcome') {
+      screen.innerHTML = placeholder('Bienvenida', 'Placeholder de Bienvenida (post-wipe u origen limpio). Usa «Sembrar bóveda de prueba» para repetir.');
+      return;
+    }
+    screen.innerHTML = placeholder(route.name, 'Placeholder genérico.');
+  }
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-ul]');
+    if (el && !el.disabled) { vkUnlock.handleAction(el.getAttribute('data-ul'), ctx); setTimeout(panel, 150); }
+  });
+
+  /* Siembra: alta programática equivalente a la del onboarding */
+  window.__seed = function () {
+    var payload = JSON.stringify({ app: 'VaultKey', schemaVersion: 2, entries: [] });
+    var kit = vkCrypto.generateKitCode();
+    return vkCrypto.createVaultBlob({ master: MASTER, kitCode: kit, payloadStr: payload })
+      .then(function (alta) {
+        vkStore.saveBlob(alta.blob);
+        return vkCrypto.getOrCreatePepper().then(function (pepper) {
+          function uns(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
+          return vkCrypto.deriveKEK(MASTER, uns(alta.blob.kdf.saltMaster), alta.blob.kdf.iterMaster)
+            .then(function (kek) { return vkCrypto.unwrapDEKRaw(alta.blob.wraps.master, kek); })
+            .then(function (raw) {
+              return vkCrypto.createPinWrap(raw, PIN, pepper).then(function (pw) {
+                raw.fill(0);
+                vkStore.savePinWrap(pw);
+                vkStore.setMeta({ onboardingDone: true });
+                vkStore.resetAttempts();
+                return true;
+              });
+            });
+        });
+      });
+  };
+
+  document.getElementById('ul-seed').addEventListener('click', function () {
+    this.textContent = 'Sembrando…';
+    var btn = this;
+    window.__seed().then(function () {
+      btn.textContent = 'Sembrar bóveda de prueba';
+      vkRouter.replace('/unlock'); panel();
+    });
+  });
+  document.getElementById('ul-wipebtn').addEventListener('click', function () {
+    vkStore.wipeLocal().then(function () { vkRouter.replace('/welcome'); panel(); });
+  });
+
+  vkRouter.init({ onRender: render });
+  vkRouter.replace('/' + vkInitialRoute({ hasVault: vkStore.hasVault() }));
+})();
+</script>
+</body>
+</html>
