@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>VaultKey · Session Test (herramienta interna)</title>
+<!-- HERRAMIENTA INTERNA — NO DESPLEGAR. Sin datos reales; usa una
+     CryptoKey de prueba generada en memoria. -->
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  body { margin: 0; padding: 16px; }
+  .ok  { color: #22C55E; }
+  .bad { color: #EF4444; }
+  pre { background: #1e293b; padding: 12px; border-radius: 8px; white-space: pre-wrap; font-size: 13px; }
+  .vk-btn { margin: 4px; }
+</style>
+</head>
+<body class="vk-screen">
+<h2 style="margin-bottom:4px;">VaultKey · Session Test</h2>
+<p class="vk-field__hint">Ejecuta los tests automáticos y los manuales del timer acelerado.</p>
+
+<button class="vk-btn vk-btn--primary" id="run-auto">Ejecutar tests automáticos</button>
+<button class="vk-btn vk-btn--secondary" id="run-timer">Test timer acelerado (500 ms)</button>
+<pre id="out">Pulsa un botón para empezar.</pre>
+
+<script src="../router.js"></script>
+<script src="../session.js"></script>
+<script>
+(function () {
+  'use strict';
+  var out = document.getElementById('out');
+  var pass = 0, fail = 0, lines = [];
+
+  function t(name, cond) {
+    if (cond) { pass++; lines.push('<span class="ok">✔</span> ' + name); }
+    else       { fail++; lines.push('<span class="bad">✘ FALLO:</span> ' + name); }
+    out.innerHTML = lines.join('\n');
+  }
+
+  /* Store mínimo de prueba */
+  function makeStore(option) {
+    return {
+      getMeta: function () { return { autolockOption: option }; }
+    };
+  }
+
+  /* Router mínimo de prueba: captura la última ruta */
+  var lastRoute = null;
+  var mockRouter = { replace: function (r) { lastRoute = r; } };
+
+  /* Inicializar el router real para que los tests de URL no rompan */
+  if (typeof vkRouter !== 'undefined') {
+    vkRouter.init({ onRender: function () {} });
+  }
+
+  document.getElementById('run-auto').addEventListener('click', async function () {
+    lines = []; pass = 0; fail = 0; lastRoute = null;
+
+    /* Generar CryptoKey real no extraíble */
+    var dekKey = await crypto.subtle.generateKey(
+      { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+
+    /* 1. start activa sesión */
+    vkSession.start({ dekKey: dekKey, store: makeStore('5m'), router: mockRouter });
+    t('start: isActive() true',       vkSession.isActive() === true);
+    t('start: getDEK() devuelve key', vkSession.getDEK() === dekKey);
+    t('start: getDEK() no extraíble', vkSession.getDEK().extractable === false);
+
+    /* 2. stop sin lock: DEK sigue */
+    vkSession.stop();
+    t('stop: isActive() sigue true (DEK no borrada)', vkSession.isActive() === true);
+    t('stop: getDEK() sigue devolviendo key', vkSession.getDEK() === dekKey);
+
+    /* 3. lock limpia DEK y navega */
+    vkSession.start({ dekKey: dekKey, store: makeStore('5m'), router: mockRouter });
+    vkSession.lock();
+    t('lock: isActive() false',   vkSession.isActive() === false);
+    t('lock: getDEK() null',      vkSession.getDEK() === null);
+    t('lock: router.replace /unlock', lastRoute === '/unlock');
+
+    /* 4. start doble: la segunda sustituye a la primera */
+    var dek2 = await crypto.subtle.generateKey({ name:'AES-GCM',length:256 }, false, ['encrypt','decrypt']);
+    vkSession.start({ dekKey: dekKey, store: makeStore('5m'), router: mockRouter });
+    vkSession.start({ dekKey: dek2,  store: makeStore('5m'), router: mockRouter });
+    t('start doble: segunda sesión activa', vkSession.getDEK() === dek2);
+    vkSession.stop();
+
+    /* 5. immediate: visibilitychange hidden → lock */
+    lastRoute = null;
+    vkSession.start({ dekKey: dek2, store: makeStore('immediate'), router: mockRouter });
+    t('immediate: sesión activa', vkSession.isActive() === true);
+    /* Disparar visibilitychange con hidden */
+    Object.defineProperty(document, 'visibilityState', { value:'hidden', configurable:true, writable:true });
+    document.dispatchEvent(new Event('visibilitychange'));
+    await new Promise(function(r){setTimeout(r,50);}); /* microtask flush */
+    t('immediate: visibilitychange hidden → lock', vkSession.isActive() === false);
+    t('immediate: navegó a /unlock', lastRoute === '/unlock');
+    Object.defineProperty(document, 'visibilityState', { value:'visible', configurable:true, writable:true });
+
+    /* 6. immediate: window blur → lock */
+    lastRoute = null;
+    vkSession.start({ dekKey: dek2, store: makeStore('immediate'), router: mockRouter });
+    window.dispatchEvent(new Event('blur'));
+    await new Promise(function(r){setTimeout(r,50);});
+    t('immediate: window blur → lock', vkSession.isActive() === false && lastRoute === '/unlock');
+
+    /* 7. stop retira listeners: visibilitychange ya no bloquea */
+    lastRoute = null;
+    vkSession.start({ dekKey: dek2, store: makeStore('immediate'), router: mockRouter });
+    vkSession.stop();
+    Object.defineProperty(document, 'visibilityState', { value:'hidden', configurable:true, writable:true });
+    document.dispatchEvent(new Event('visibilitychange'));
+    await new Promise(function(r){setTimeout(r,50);});
+    t('stop retira listener: visibilitychange sin efecto', vkSession.getDEK() !== null);
+    vkSession.lock();
+    Object.defineProperty(document, 'visibilityState', { value:'visible', configurable:true, writable:true });
+
+    lines.push('');
+    lines.push('<b>Tests automáticos: ' + pass + ' correctas, ' + fail + ' fallos</b>');
+    out.innerHTML = lines.join('\n');
+  });
+
+  /* Test de timer acelerado: 500 ms de inactividad → lock */
+  document.getElementById('run-timer').addEventListener('click', async function () {
+    lines = []; pass = 0; fail = 0; lastRoute = null;
+    var dek = await crypto.subtle.generateKey({ name:'AES-GCM',length:256 }, false, ['encrypt','decrypt']);
+
+    /* Sobreescribir TIMEOUTS solo para este test */
+    var orig = vkSession.TIMEOUTS['30s'];
+
+    /* Parchear temporalmente el lookup dentro del módulo:
+       en el arnés usamos una opción de store que devuelve el valor
+       acelerado directamente manipulando getMeta */
+    var accel = 500; /* ms */
+    var accelStore = { getMeta: function() { return { autolockOption: '30s' }; } };
+
+    /* Necesitamos que start() use 500 ms: como TIMEOUTS['30s']=30000 es de solo lectura
+       en el objeto exportado, usamos un shim: sobreescribir vkSession.TIMEOUTS */
+    vkSession.TIMEOUTS['30s'] = accel;
+    vkSession.start({ dekKey: dek, store: accelStore, router: mockRouter });
+    vkSession.TIMEOUTS['30s'] = 30000; /* restaurar */
+
+    t('timer: sesión activa', vkSession.isActive() === true);
+
+    /* Simular actividad: pointerdown → timer se reinicia */
+    await new Promise(function(r){setTimeout(r, 300);}); /* esperar 300 ms de los 500 */
+    document.dispatchEvent(new PointerEvent('pointerdown', {bubbles:true}));
+    t('tras actividad: sigue activo', vkSession.isActive() === true);
+
+    /* Esperar 600 ms más (300 restantes del ciclo + margen) → debe bloquear */
+    await new Promise(function(r){setTimeout(r, 700);});
+    t('tras inactividad 500 ms: lock automático', vkSession.isActive() === false && lastRoute === '/unlock');
+
+    lines.push('');
+    lines.push('<b>Test timer: ' + pass + ' correctas, ' + fail + ' fallos</b>');
+    out.innerHTML = lines.join('\n');
+  });
+})();
+</script>
+</body>
+</html>
