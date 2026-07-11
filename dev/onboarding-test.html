@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>VaultKey · Onboarding Test (herramienta interna)</title>
+<!-- HERRAMIENTA INTERNA — NO DESPLEGAR. Bóveda de PRUEBA en claves
+     vk2_ reales de este origin de desarrollo; botón de wipe para
+     repetir. Sin app.js, sin drive.js, sin datos reales. -->
+<link rel="stylesheet" href="../theme.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  body { margin: 0; }
+  .ob-shell { max-width: 420px; margin: 0 auto; min-height: 100vh; }
+  .ob-panel { position: fixed; left: 0; right: 0; bottom: 0; max-width: 420px; margin: 0 auto;
+    background: var(--vk-header); border-top: 1px solid var(--vk-border);
+    padding: 8px 12px; font-size: 12px; color: var(--vk-text-muted);
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .ob-panel code { color: var(--vk-text); }
+  .ob-panel .vk-btn { min-width: 0; min-height: 30px; padding: 0 10px; font-size: 12px; }
+</style>
+</head>
+<body class="vk-screen">
+<div class="ob-shell"><div id="ob-screen"></div></div>
+
+<div class="ob-panel">
+  <span>Ruta: <code id="ob-route">—</code></span>
+  <span>hasVault: <code id="ob-hasvault">—</code></span>
+  <button class="vk-btn vk-btn--danger" id="ob-wipe">Reset (wipe)</button>
+  <button class="vk-btn vk-btn--secondary" id="ob-selftest">Self-test blob</button>
+  <span id="ob-selftest-out"></span>
+</div>
+
+<script src="../components.js"></script>
+<script src="../router.js"></script>
+<script src="../vault-crypto.js"></script>
+<script src="../vault-store.js"></script>
+<script src="../onboarding.js"></script>
+<script>
+(function () {
+  'use strict';
+  var screen = document.getElementById('ob-screen');
+  var ctx = { router: vkRouter, crypto: vkCrypto, store: vkStore };
+  window.__lastKit = null; /* SOLO arnés: capturar código para self-test */
+
+  function placeholder(title, extra) {
+    return '<header class="vk-header"><div class="vk-header__title">' + title + '</div></header>' +
+      '<div style="padding:24px 16px;"><div class="vk-card" style="padding:16px;">' + extra + '</div></div>';
+  }
+
+  function render(route) {
+    document.getElementById('ob-route').textContent = route.path;
+    document.getElementById('ob-hasvault').textContent = String(vkStore.hasVault());
+    if (vkOnboarding.handlesRoute(route.name)) {
+      vkOnboarding.render(route, screen, ctx);
+      if (route.name === 'onboarding-kit-save') {
+        window.__lastKit = document.getElementById('ob-kitcode').textContent;
+      }
+      return;
+    }
+    if (route.name === 'unlock') {
+      screen.innerHTML = placeholder('Desbloqueo', 'Placeholder de Desbloqueo (tarea 2.5). La regla congelada se cumple: con bóveda existente NO se vuelve a Bienvenida.');
+      return;
+    }
+    if (route.name === 'dashboard') {
+      screen.innerHTML = placeholder('VaultKey', 'Dashboard placeholder. Onboarding completado; bóveda creada de verdad en vk2_blob.');
+      return;
+    }
+    screen.innerHTML = placeholder(route.name, 'Placeholder genérico.');
+  }
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-ob]');
+    if (el) { vkOnboarding.handleAction(el.getAttribute('data-ob'), ctx); }
+  });
+
+  document.getElementById('ob-wipe').addEventListener('click', function () {
+    vkStore.wipeLocal().then(function () {
+      vkOnboarding._resetDraftForTests();
+      vkRouter.replace('/' + vkInitialRoute({ hasVault: vkStore.hasVault() }));
+      document.getElementById('ob-hasvault').textContent = String(vkStore.hasVault());
+    });
+  });
+
+  /* Self-test: el blob creado abre por master y por kit (pide ambos) */
+  document.getElementById('ob-selftest').addEventListener('click', function () {
+    var out = document.getElementById('ob-selftest-out');
+    var master = prompt('Master usada en el alta:');
+    var kit = prompt('Código del kit (o vacío para usar el capturado):') || window.__lastKit;
+    var blob = vkStore.loadBlob();
+    if (!blob) { out.textContent = 'sin bóveda'; return; }
+    out.textContent = 'probando…';
+    vkCrypto.openVaultBlob(blob, { master: master }).then(function () {
+      return vkCrypto.openVaultBlob(blob, { kitCode: kit });
+    }).then(function () { out.textContent = '✔ abre por master y por kit'; },
+      function (e) { out.textContent = '✘ ' + e.message; });
+  });
+
+  /* Regla de entrada real: con bóveda → unlock; sin bóveda → welcome */
+  vkRouter.init({ onRender: render });
+  vkRouter.replace('/' + vkInitialRoute({ hasVault: vkStore.hasVault() }));
+})();
+</script>
+</body>
+</html>
