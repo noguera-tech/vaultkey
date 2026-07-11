@@ -379,7 +379,21 @@ async function tryBioRegister(pinKey){
   localStorage.setItem('vk_bio_offer_dismissed','1');
   toast('Biometría web desactivada por seguridad. Usa el PIN de VaultKey.');
 }
-async function persist(p=lastKey){if(!p)return;localStorage.setItem(LS_DATA,JSON.stringify(await encryptData(vault,p)))}
+async function persist(p=lastKey){
+  // VK 2.0 bridge: cifrar en vk2_blob; return para no escribir LS_DATA
+  if(typeof vkSession!=='undefined'&&vkSession.isActive()&&typeof vkCrypto!=='undefined'){
+    const _dek=vkSession.getDEK();
+    if(_dek){
+      try{
+        const _ct=await vkCrypto.encryptVault(_dek,
+          JSON.stringify({app:'VaultKey',schemaVersion:2,entries:vault||[]}));
+        const _blob=vkStore.loadBlob();
+        if(_blob){_blob.vault=_ct;_blob.updatedAt=Date.now();vkStore.saveBlob(_blob);}
+      }catch(e){console.warn('VK2 persist:',e);}
+      return;
+    }
+  }
+  if(!p)return;localStorage.setItem(LS_DATA,JSON.stringify(await encryptData(vault,p)));}
 const NAV_ORDER=['home','vault','fav','settings'];
 
 function ensureFabInAppShell(){
@@ -422,11 +436,19 @@ function initFabVisibilityObserver(){
   syncFabVisibility();
 }
 // VK 2.0 — callback tras desbloqueo real con vkUnlock
-window._vk2UnlockOk=function(dekKey){
+window._vk2UnlockOk=async function(dekKey){
   if(typeof vkSession!=='undefined'){
     vkSession.start({dekKey:dekKey,store:vkStore,
       router:{replace:function(p){if(p==='/unlock')lock();}}});
   }
+  try{
+    const _blob=vkStore.loadBlob();
+    if(_blob&&_blob.vault&&typeof vkCrypto!=='undefined'){
+      const _raw=await vkCrypto.decryptVault(dekKey,_blob.vault);
+      const _pl=JSON.parse(_raw);
+      vault=Array.isArray(_pl.entries)?_pl.entries:[];
+    }
+  }catch(e){console.warn('VK2 vault decrypt:',e);vault=[];}
   unlocked=true;lastKey=null;pin='';renderDots();hidePrivacyOverlay();
   show('home');render();syncSettingsUI();resetAutoLockTimer();
   setTimeout(function(){try{checkVaultReminders();}catch(e){}},2000);
