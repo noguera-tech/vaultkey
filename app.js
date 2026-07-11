@@ -601,7 +601,8 @@ function show(id,dir){
 
 })();
 function lock(){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();vibe(30);soundLock();unlocked=false;lastKey=null;pin='';clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay()}
-async function wipe(){if(await vkConfirm('Borrar todos los datos','⚠️ Se eliminarán el PIN, todas las contraseñas y el código de recuperación. Esta acción es irreversible. ¿Continuar?')){soundError();vibe([60,30,60,30,100]);localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];lock()}}
+async function wipe(){if(await vkConfirm('Borrar todos los datos','⚠️ Se eliminarán el PIN, todas las contraseñas y el código de recuperación. Esta acción es irreversible. ¿Continuar?')){soundError();vibe([60,30,60,30,100]);// VK2 wipe: limpiar boveda 2.0 si existe
+if(typeof vkStore!=='undefined'&&vkStore.hasVault()){try{await vkStore.wipeLocal();}catch(e){console.warn('VK2 wipe:',e);}}localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];lock()}}
 function closeModals(){
   document.querySelectorAll('.modal').forEach(m=>{
     if(m.id==='recoveryModal'){
@@ -1567,7 +1568,8 @@ function useGen(){
     toast('Ahora completa servicio y usuario, luego Guardar');
   }
 }
-async function exportBackup(){let pack=localStorage.getItem(LS_DATA);if(!pack){vibe([30,30]);soundError();toast('No hay datos');return}let data={app:'VaultKey',version:1,exported:Date.now(),payload:JSON.parse(pack)};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='VaultKey-respaldo-cifrado.json';a.click();let m=meta();m.lastBackup=Date.now();localStorage.setItem(LS_META,JSON.stringify(m));render();soundSuccess();toast('Respaldo cifrado exportado. Solo se restaura con tu PIN')}
+async function exportBackup(){// VK2 export: bloquear respaldo legacy si hay boveda 2.0
+if(typeof vkStore!=='undefined'&&vkStore.hasVault()){toast('Los respaldos de VaultKey 2.0 se gestionan desde Drive. El respaldo legacy no contiene tus datos actuales.');return;}let pack=localStorage.getItem(LS_DATA);if(!pack){vibe([30,30]);soundError();toast('No hay datos');return}let data={app:'VaultKey',version:1,exported:Date.now(),payload:JSON.parse(pack)};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='VaultKey-respaldo-cifrado.json';a.click();let m=meta();m.lastBackup=Date.now();localStorage.setItem(LS_META,JSON.stringify(m));render();soundSuccess();toast('Respaldo cifrado exportado. Solo se restaura con tu PIN')}
 
 // ============================================================
 // IMPORTACIÓN CON PANTALLA PROPIA
@@ -1709,6 +1711,8 @@ async function doImportConfirm() {
 }
 
 async function importBackup(file) {
+  // VK2 import: bloquear import legacy si hay boveda 2.0
+  if(typeof vkStore!=='undefined'&&vkStore.hasVault()){toast('No puedes importar un respaldo legacy mientras tienes una bóveda VaultKey 2.0 activa.');return;}
   if(!file) return;
   openImportModal(file);
 }
