@@ -3064,21 +3064,26 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
         reg.active?.postMessage({type:'GET_VERSION'});
       }).catch(()=>{});
     }
-    if(!localStorage.getItem('vaultkey_onboarding_v130') || !localStorage.getItem('vk_meta_v1')){
-      // Nuevo usuario: sin onboarding visto O sin PIN configurado → mostrar bienvenida
-      localStorage.removeItem('vaultkey_onboarding_v130'); // limpiar flag si no hay PIN
+    // VK 2.0 — arranque: bóveda 2.0 tiene prioridad sobre rutas legacy
+    if(typeof vkStore !== 'undefined' && vkStore.hasVault()){
+      // Bóveda 2.0 detectada → desbloqueo. vkUnlock se conecta aquí en Fase 4.
+      const urlParams = new URLSearchParams(window.location.search);
+      if(urlParams.get('autofill')==='1' && window.VaultKeyBridge){
+        initPin(); show('pin'); window._autofillPickerMode=true;
+      } else {
+        initPin(); show('pin');
+      }
+    } else if(!localStorage.getItem('vaultkey_onboarding_v130') || !localStorage.getItem('vk_meta_v1')){
+      // Sin bóveda 2.0 ni meta legacy → nuevo usuario
+      localStorage.removeItem('vaultkey_onboarding_v130');
       openOnboardingHard();
     } else {
-      // Comprobar si estamos en modo autofill picker
+      // Usuario legacy con PIN configurado → desbloqueo legacy (intacto hasta Fase 4)
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('autofill') === '1' && window.VaultKeyBridge) {
-        // Modo picker: desbloquear y mostrar selector directamente
-        initPin();
-        show('pin');
-        window._autofillPickerMode = true;
+      if(urlParams.get('autofill')==='1' && window.VaultKeyBridge){
+        initPin(); show('pin'); window._autofillPickerMode=true;
       } else {
-        initPin();
-        show('pin');
+        initPin(); show('pin');
       }
     }
   }
