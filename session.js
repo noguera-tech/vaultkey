@@ -63,7 +63,7 @@
   }
 
   function start(opts) {
-    stop();  /* limpiar sesión anterior sin limpiar DEK, que aquí es nueva */
+    stop();  /* limpiar por completo cualquier sesión anterior */
     _dek = opts.dekKey;
     _store = opts.store;
     _router = opts.router;
@@ -90,7 +90,7 @@
   }
 
   function stop() {
-    /* Retira listeners y timers SIN limpiar la DEK */
+    _dek = null;
     clearTimer();
     removeListeners();
   }
