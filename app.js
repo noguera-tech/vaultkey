@@ -482,6 +482,11 @@ window.vk2ChangePIN=async function(){
     .catch(function(){toast('Contraseña maestra incorrecta.');});
 };
 function show(id,dir){
+  // VK2 security guard: bloquear navegacion si hay boveda pero sesion inactiva
+  if(typeof vkStore!=='undefined'&&vkStore.hasVault()&&
+     typeof vkSession!=='undefined'&&!vkSession.isActive()&&id!=='pin'){
+    initPin();show('pin');return;
+  }
   ensureFabInAppShell();
 
   const activeBefore=document.querySelector('.screen.active');
