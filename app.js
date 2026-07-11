@@ -351,7 +351,21 @@ function syncPreferencesUI(){
 }
 function vkConfirm(title,msg){return new Promise(res=>{confirmResolver=res;$('confirmTitle').textContent=title;$('confirmMsg').textContent=msg;$('confirmModal').classList.add('open')})}
 function resolveConfirm(ok){$('confirmModal').classList.remove('open');if(confirmResolver){confirmResolver(!!ok);confirmResolver=null}}
-function initPin(){let m=defaultSecurity(meta());mode=(m&&m.hash)?'unlock':'setup1';let left=lockRemaining();const plen=getPinLen();$('pinMsg').className='pinSub';$('pinMsg').textContent=mode==='unlock'?(left?'Bóveda bloqueada. Espera '+left+' s':'Introduce tu PIN'):'Crea un PIN de '+plen+' dígitos';if(left)$('pinMsg').classList.add('pinLocked');renderDots();renderKeys();syncSettingsUI();updateLockCountdown()}
+function initPin(){
+  // VK 2.0 — montar vkUnlock si hay boveda 2.0
+  if(typeof vkUnlock!=='undefined'&&typeof vkStore!=='undefined'&&vkStore.hasVault()){
+    const _c=$('pin');
+    if(_c){
+      const _ctx={
+        router:{navigate:function(){},replace:function(p){if(p==='/unlock')lock();},back:function(){},current:function(){return{name:'unlock'};}},
+        crypto:vkCrypto,store:vkStore,
+        onUnlocked:function(s){window._vk2UnlockOk&&window._vk2UnlockOk(s.dekKey);}
+      };
+      vkUnlock.render({name:'unlock',path:'/unlock',params:{},meta:{root:false},transitionMs:300},_c,_ctx);
+      return;
+    }
+  }
+  let m=defaultSecurity(meta());mode=(m&&m.hash)?'unlock':'setup1';let left=lockRemaining();const plen=getPinLen();$('pinMsg').className='pinSub';$('pinMsg').textContent=mode==='unlock'?(left?'Bóveda bloqueada. Espera '+left+' s':'Introduce tu PIN'):'Crea un PIN de '+plen+' dígitos';if(left)$('pinMsg').classList.add('pinLocked');renderDots();renderKeys();syncSettingsUI();updateLockCountdown()}
 function getPinLen(){const m=meta();return(m&&m.pinLen===8)?8:6;}
 function renderDots(){const len=getPinLen();let d=$('dots');d.innerHTML='';d.className='dots'+(len===8?' dots8':'');for(let i=0;i<len;i++){let x=document.createElement('div');x.className='dot'+(i<pin.length?' on':'');d.appendChild(x)}}
 function renderKeys(){let k=$('keys');k.innerHTML='';['1','2','3','4','5','6','7','8','9','bio','0','del'].forEach(n=>{let b=document.createElement('button');b.className='key';if(n==='bio'){b.innerHTML='<svg class="fingerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 11c0 5-2 7-2 10"/><path d="M16 8a4 4 0 0 0-8 0c0 1.3.5 2.7 1 4"/><path d="M6 12c.5 2.5 1.5 4 3 5"/><path d="M18 12c-.4 3.2-1.4 5.4-3.2 7"/><path d="M8 6.5A6 6 0 0 1 18 11"/><path d="M5 9a8 8 0 0 1 14.5-4"/><path d="M20 14c-.4 2.4-1.2 4.4-2.5 6"/></svg>';b.classList.add('bioKey');b.onclick=tryBio;b.title='Biometría del dispositivo';b.setAttribute('aria-label','Biometría del dispositivo')}else if(n==='del'){b.innerHTML='<svg class="delIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13z"/><path d="M18 9l-6 6M12 9l6 6"/></svg>';b.onclick=delPin;b.setAttribute('aria-label','Borrar')}else{b.textContent=n;b.setAttribute('aria-label','Dígito '+n);b.onclick=()=>pressPin(n)}k.appendChild(b)})}
@@ -407,6 +421,18 @@ function initFabVisibilityObserver(){
 
   syncFabVisibility();
 }
+// VK 2.0 — callback tras desbloqueo real con vkUnlock
+window._vk2UnlockOk=function(dekKey){
+  if(typeof vkSession!=='undefined'){
+    vkSession.start({dekKey:dekKey,store:vkStore,
+      router:{replace:function(p){if(p==='/unlock')lock();}}});
+  }
+  unlocked=true;lastKey=null;pin='';renderDots();hidePrivacyOverlay();
+  show('home');render();syncSettingsUI();resetAutoLockTimer();
+  setTimeout(function(){try{checkVaultReminders();}catch(e){}},2000);
+  setTimeout(function(){try{maybeShowAutofillPicker();}catch(e){}},300);
+  setTimeout(function(){try{checkAutofillSetupBanner();}catch(e){}},1500);
+};
 function show(id,dir){
   ensureFabInAppShell();
 
