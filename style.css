@@ -3916,3 +3916,7 @@ body:has(#settings.active) #screenDots .dot,
   color: #ffffff !important;
   box-shadow: 0 0 10px rgba(0,210,255,.35) !important;
 }
+
+/* VK 2.0 onboarding host — sobreescribe flex-column del modal legacy */
+#onboardingModal.vk2-onboarding { display:block; overflow-y:auto; }
+#onboardingModal .vk2-onboarding-host { width:100%; min-height:100dvh; display:flex; flex-direction:column; }

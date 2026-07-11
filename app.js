@@ -1204,17 +1204,24 @@ function openOnboardingHard(){
       _obRoute={name:n,path,params:{},meta:{root:n==='welcome'||n==='splash',placeholder:false},transitionMs:300};
       if(n==='dashboard'){
         // Boveda creada — cerrar modal y pedir desbloqueo (Fase 4 conecta vkUnlock)
-        modal.classList.remove('open'); modal.style.display='none';
+        modal.classList.remove('open','vk2-onboarding'); modal.style.display='none';
+        if(typeof _host!=='undefined'&&_host){_host.innerHTML='';_host.remove();}
         unlocked=false; pin='';
         initPin(); show('pin');
         return;
       }
-      if(vkOnboarding.handlesRoute(n)) vkOnboarding.render(_obRoute,modal,_obCtx);
+      if(vkOnboarding.handlesRoute(n)) vkOnboarding.render(_obRoute,_host,_obCtx);
     }
     _obCtx={router:{navigate:_obNav,replace:_obNav,back:function(){_obNav('/welcome');},current:function(){return _obRoute;}},crypto:vkCrypto,store:vkStore};
     if(modal._obClick) modal.removeEventListener('click',modal._obClick);
     modal._obClick=function(e){const el=e.target.closest('[data-ob]');if(el)vkOnboarding.handleAction(el.getAttribute('data-ob'),_obCtx);};
     modal.addEventListener('click',modal._obClick);
+    // VK2 layout host: aísla vkOnboarding del flex-column legacy
+    modal.innerHTML='';
+    let _host=document.createElement('div');
+    _host.className='vk2-onboarding-host';
+    modal.appendChild(_host);
+    modal.classList.add('vk2-onboarding');
     _obNav('/welcome');
     return;
   }
