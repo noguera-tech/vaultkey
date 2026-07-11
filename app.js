@@ -1121,13 +1121,33 @@ function openOnboardingHard(){
   if(window.hideSplashHard) window.hideSplashHard();
   hidePrivacyOverlay&&hidePrivacyOverlay();
   resetScreensForBoot();
-  onboardStep=0;
-  renderOnboarding();
   const modal=$('onboardingModal');
-  if(modal){
-    modal.classList.add('open');
-    modal.style.display='flex';
+  if(modal){ modal.classList.add('open'); modal.style.display='flex'; }
+  // VK 2.0 — onboarding real
+  if(typeof vkOnboarding !== 'undefined' && modal){
+    let _obRoute={name:'welcome',path:'/welcome',params:{},meta:{root:true,placeholder:false},transitionMs:300};
+    let _obCtx=null;
+    function _obNav(path){
+      const n=(path||'').split('/').filter(Boolean).join('-')||'welcome';
+      _obRoute={name:n,path,params:{},meta:{root:n==='welcome'||n==='splash',placeholder:false},transitionMs:300};
+      if(n==='dashboard'){
+        // Boveda creada — cerrar modal y pedir desbloqueo (Fase 4 conecta vkUnlock)
+        modal.classList.remove('open'); modal.style.display='none';
+        unlocked=false; pin='';
+        initPin(); show('pin');
+        return;
+      }
+      if(vkOnboarding.handlesRoute(n)) vkOnboarding.render(_obRoute,modal,_obCtx);
+    }
+    _obCtx={router:{navigate:_obNav,replace:_obNav,back:function(){_obNav('/welcome');},current:function(){return _obRoute;}},crypto:vkCrypto,store:vkStore};
+    if(modal._obClick) modal.removeEventListener('click',modal._obClick);
+    modal._obClick=function(e){const el=e.target.closest('[data-ob]');if(el)vkOnboarding.handleAction(el.getAttribute('data-ob'),_obCtx);};
+    modal.addEventListener('click',modal._obClick);
+    _obNav('/welcome');
+    return;
   }
+  // Fallback legacy (vkOnboarding no disponible)
+  onboardStep=0; renderOnboarding();
 }
 function finishOnboarding(){
   localStorage.setItem('vaultkey_onboarding_v130','1');
