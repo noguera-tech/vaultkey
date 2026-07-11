@@ -362,6 +362,9 @@ function initPin(){
         onUnlocked:function(s){window._vk2UnlockOk&&window._vk2UnlockOk(s.dekKey);}
       };
       vkUnlock.render({name:'unlock',path:'/unlock',params:{},meta:{root:false},transitionMs:300},_c,_ctx);
+      if(_c._ulClick) _c.removeEventListener('click',_c._ulClick);
+      _c._ulClick=function(e){const el=e.target.closest('[data-ul]');if(el)vkUnlock.handleAction(el.getAttribute('data-ul'),_ctx);};
+      _c.addEventListener('click',_c._ulClick);
       return;
     }
   }
