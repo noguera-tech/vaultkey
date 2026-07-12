@@ -449,7 +449,9 @@ window._vk2UnlockOk=async function(dekKey){
     if(_blob&&_blob.vault&&typeof vkCrypto!=='undefined'){
       const _raw=await vkCrypto.decryptVault(dekKey,_blob.vault);
       const _pl=JSON.parse(_raw);
-      vault=Array.isArray(_pl.entries)?_pl.entries:[];
+      vault=Array.isArray(_pl.entries)
+        ? _pl.entries.map(normalizeVK2Entry)
+        : [];
     }
   }catch(e){console.warn('VK2 vault decrypt:',e);vault=[];}
   unlocked=true;lastKey=null;pin='';renderDots();hidePrivacyOverlay();
@@ -481,6 +483,24 @@ window.vk2ChangePIN=async function(){
     .then(function(){toast('PIN cambiado.');})
     .catch(function(){toast('Contraseña maestra incorrecta.');});
 };
+// VK2 — adaptadores de display (Módulo 3)
+function vk2EntryTitle(e){ return e.title||e.service||e.wifiSsid||''; }
+function vk2EntryUser(e){  return e.username||e.user||e.email||''; }
+function vk2EntryPass(e){  return e.password||e.pass||''; }
+function vk2EntryNotes(e){ return e.notes||e.note||''; }
+function vk2EntryUrl(e){   return e.url||''; }
+
+function normalizeVK2Entry(e){
+  if(!e || typeof e!=='object') return e;
+
+  return Object.assign({}, e, {
+    service: e.service || e.title || e.wifiSsid || '',
+    user: e.user || e.username || e.email || '',
+    pass: e.pass || e.password || '',
+    note: e.note || e.notes || '',
+    url: e.url || ''
+  });
+}
 function show(id,dir){
   // VK2 security guard: bloquear navegacion si hay boveda pero sesion inactiva
   if(typeof vkStore!=='undefined'&&vkStore.hasVault()&&
@@ -1681,13 +1701,13 @@ async function doImportConfirm() {
   try {
     vault = _importDecrypted.filter(e=>e&&typeof e==='object').map(e=>({
       id: normalizeEntryId(e.id),
-      service: String(e.service||''),
-      entryType: String(e.entryType||'password'),
-      user: String(e.user||''),
+      service: vk2EntryTitle(e),
+      entryType: String(e.entryType||e.type||'password'),
+      user: vk2EntryUser(e),
       email: String(e.email||''),
-      pass: String(e.pass||''),
-      url: String(e.url||''),
-      note: String(e.note||''),
+      pass: vk2EntryPass(e),
+      url: vk2EntryUrl(e),
+      note: vk2EntryNotes(e),
       category: String(e.category||'general'),
       fav: !!e.fav,
       used: Number(e.used||0),
@@ -2371,6 +2391,23 @@ function openEntry(e=null){
   resetAutoLockTimer();
 }
 async function saveEntry(){
+  // VK2 saveEntry: objeto formato VK2 si hay bóveda 2.0
+  if(typeof vkStore!=='undefined'&&vkStore.hasVault()&&typeof vkModels!=='undefined'){
+    const _svc=($( 'eService')?.value||'').trim();
+    const _usr=($( 'eUser')?.value||$('eEmail')?.value||'').trim();
+    const _pwd=($( 'ePass')?.value||'');
+    const _url=($( 'eUrl')?.value||'').trim();
+    const _note=$('eSecureNote')?.value||'';
+    const entry=vkModels.create('password',{
+      title:_svc, username:_usr, password:_pwd,
+      url:_url, notes:_note, subtype:'web'
+    });
+    vault.push(entry);
+    await persist();
+    vibe([30,20,60]);soundSave();
+    closeModals();render();
+    return;
+  }
   vibe([30,20,60]);soundSave();
   // Auto-detectar icono desde busqueda si no hay seleccionado
   const _sv=(($('eIconSearch'))?.value||'').trim();
@@ -2695,6 +2732,13 @@ document.addEventListener('click',function(e){const btn=e.target.closest('[data-
 function currentPassFor(id){const e=vault.find(x=>x.id===id);return e&&e.pass?e.pass:'';}
 function currentUserFor(id){const e=vault.find(x=>x.id===id);return e&&(e.user||e.email)?e.user||e.email:'';}
 function row(e){
+  e = Object.assign({}, e, {
+    service: e.service || e.title || '',
+    user: e.user || e.username || e.email || '',
+    pass: e.pass || e.password || '',
+    entryType: e.entryType || e.type || 'password'
+  });
+
   let div=document.createElement('div');
   div.className='entry';
   div.onclick=()=>quick(e.id);
