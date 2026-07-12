@@ -3139,45 +3139,18 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
 
 (function(){
   const LS_SPLASH='vk_splash_v1';
-  const lines=[
-    'Iniciando cifrado AES-256...',
-    'Generando clave segura...',
-    'Aplicando PBKDF2 y AES-GCM...',
-    'Protegiendo tu bóveda...',
-    'Listo. Bóveda cifrada ✓'
-  ];
   function runSplash(cb){
     const splash=$('vkSplash');
-    const lineEl=$('vkSplashLine');
-    const fillEl=$('vkSplashFill');
-    if(!splash||!lineEl||!fillEl){cb();return;}
+    if(!splash){cb();return;}
     splash.classList.add('vkSplashVisible');
     splash.style.opacity='1';
-    let li=0;
-    const totalMs=2800;
-    const stepMs=totalMs/lines.length;
-    let pct=0;
-    const pctStep=100/lines.length;
-    lineEl.textContent=lines[0];
-    fillEl.style.width='0%';
-    function nextLine(){
-      if(li>=lines.length){
-        setTimeout(()=>{
-          splash.classList.add('vkSplashOut');
-          setTimeout(()=>{
-            hideSplashHard();
-            cb();
-          },520);
-        },300);
-        return;
-      }
-      lineEl.textContent=lines[li];
-      pct=Math.min(100,(li+1)*pctStep);
-      fillEl.style.width=pct+'%';
-      li++;
-      setTimeout(nextLine,stepMs);
-    }
-    setTimeout(nextLine,stepMs);
+    setTimeout(()=>{
+      splash.classList.add('vkSplashOut');
+      setTimeout(()=>{
+        hideSplashHard();
+        cb();
+      },520);
+    },1200);
   }
 
   function hideSplashHard(){

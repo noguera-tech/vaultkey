@@ -7,6 +7,7 @@
    TOKENS â€” valores exactos del mockup
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 :root {
+  --vk-splash-stroke: #A7B6C9;
   /* Fondos */
   --bg-top:    #001B38;
   --bg-mid:    #000F24;
@@ -234,15 +235,35 @@ select option { background:#001830; color:#e8f6ff; }
 #vkSplash.vkSplashOut { opacity:0; pointer-events:none; transition:opacity .4s; }
 
 .vkSplashShield {
-  width:min(76vw,292px); margin-bottom:20px;
-  animation:splashDrop .7s cubic-bezier(.22,1,.36,1) both;
+    position:relative;
+    width:151px;
+    margin-bottom:20px;
+    animation:splashDrop .7s cubic-bezier(.22,1,.36,1) both;
 }
-.vkSplashImg { width:100%; filter:none; }
-.vkSplashBrand { font-size:36px; font-weight:950; letter-spacing:-1px; color:var(--t1); animation:splashFadeUp .6s .3s both; }
-.vkSplashBrand span { color:var(--cyan); }
-.vkSplashLine  { font-size:13px; color:var(--t3); margin-top:8px; min-height:18px; animation:splashFadeUp .5s .5s both; }
-.vkSplashBar   { width:min(55vw,180px); height:3px; background:rgba(0,160,255,.15); border-radius:999px; margin-top:28px; overflow:hidden; animation:splashFadeUp .5s .6s both; }
-.vkSplashFill  { height:100%; width:0; background:linear-gradient(90deg,var(--blue),var(--cyan)); border-radius:999px; transition:width .1s linear; }
+.vkSplashImg {
+    width:100%;
+    filter:none;
+}
+.vkSplashBrand {
+    font-size:36px;
+    font-weight:950;
+    letter-spacing:-1px;
+    color:var(--t1);
+    animation:splashFadeUp .6s .3s both;
+}
+.vkSplashBrand span {
+    color:var(--cyan);
+}
+.vkSplashShieldSvg {
+    display:block;
+}
+.vkSplashLockSvg {
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+} 
+
 
 @keyframes splashDrop   { from{transform:translateY(-30px) scale(.85);opacity:0} to{transform:translateY(0) scale(1);opacity:1} }
 @keyframes splashFadeUp { from{transform:translateY(14px);opacity:0} to{transform:translateY(0);opacity:1} }
