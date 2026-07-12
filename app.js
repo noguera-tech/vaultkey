@@ -628,7 +628,7 @@ function show(id,dir){
   });
 
 })();
-function lock(){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();vibe(30);soundLock();unlocked=false;lastKey=null;pin='';clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay()}
+function lock(){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();vibe(30);soundLock();unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay()}
 async function wipe(){if(await vkConfirm('Borrar todos los datos','⚠️ Se eliminarán el PIN, todas las contraseñas y el código de recuperación. Esta acción es irreversible. ¿Continuar?')){soundError();vibe([60,30,60,30,100]);const isVk2=typeof vkStore!=='undefined'&&vkStore.hasVault();if(isVk2){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();try{await vkStore.wipeLocal();}catch(e){console.warn('VK2 wipe:',e);}localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);localStorage.removeItem('vaultkey_onboarding_v130');openOnboardingHard();return;}localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];lock()}}
 function closeModals(){
   document.querySelectorAll('.modal').forEach(m=>{
