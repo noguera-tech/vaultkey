@@ -900,3 +900,1091 @@ body.vk-lock { overflow: hidden; }
   .vk-unlock__key { width: 50px; height: 50px; font-size: 19px; }
   .vk-unlock__legal { padding-top: 6px; }
 }
+
+/* VK2 Figma onboarding welcome v1 */
+:root {
+  --vk-onb-stroke: #94a3b8;
+}
+
+#onboardingModal.vk2-onboarding {
+  background: var(--vk-bg, #0f172a);
+}
+
+#onboardingModal .vk2-onboarding-host {
+  min-height: 100dvh;
+  background: var(--vk-bg, #0f172a);
+}
+
+.vk-onb {
+  width: 100%;
+  min-height: 100dvh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding:
+    clamp(180px, 36.6dvh, 336px)
+    24px
+    max(28px, env(safe-area-inset-bottom));
+  color: var(--vk-text, #ffffff);
+  background: var(--vk-bg, #0f172a);
+  text-align: center;
+  overflow: hidden;
+}
+
+.vk-onb__shield {
+  position: relative;
+  flex: 0 0 auto;
+  width: 151px;
+  height: 181px;
+  color: var(--vk-onb-stroke, #94a3b8);
+}
+
+.vk-onb__shield > svg:first-child {
+  display: block;
+  width: 151px;
+  height: 181px;
+}
+
+.vk-onb__shield path {
+  stroke: var(--vk-onb-stroke, #94a3b8);
+}
+
+.vk-onb__shield-lock {
+  position: absolute;
+  left: 50%;
+  top: 92px;
+  width: 36px;
+  height: 40px;
+  transform: translate(-50%, -50%);
+  color: var(--vk-onb-stroke, #94a3b8);
+}
+
+.vk-onb__shield-lock path,
+.vk-onb__shield-lock rect {
+  stroke: var(--vk-onb-stroke, #94a3b8);
+}
+
+.vk-onb__brand {
+  margin: 18px 0 0;
+  color: var(--vk-text, #ffffff);
+  font-size: 36px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.vk-onb__subtitle {
+  margin: 12px 0 0;
+  color: var(--vk-text-muted, #9ca3af);
+  font-size: 18px;
+  line-height: 1.55;
+  font-weight: 600;
+}
+
+.vk-onb__actions {
+  width: min(320px, calc(100vw - 48px));
+  margin-top: 22px;
+}
+
+.vk-onb > .vk-btn,
+.vk-onb__actions .vk-btn {
+  width: 100%;
+  min-height: 56px;
+  margin: 0;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.vk-onb__legal {
+  margin-top: 72px;
+  color: var(--vk-text-muted, #9ca3af);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+@media (max-height: 760px) {
+  .vk-onb {
+    padding-top: 92px;
+    overflow-y: auto;
+  }
+
+  .vk-onb__shield {
+    width: 118px;
+    height: 142px;
+  }
+
+  .vk-onb__shield > svg:first-child {
+    width: 118px;
+    height: 142px;
+  }
+
+  .vk-onb__shield-lock {
+    top: 72px;
+    width: 28px;
+    height: 31px;
+  }
+
+  .vk-onb__brand {
+    margin-top: 14px;
+    font-size: 32px;
+  }
+
+  .vk-onb__subtitle {
+    margin-top: 8px;
+    font-size: 16px;
+  }
+
+  .vk-onb__actions {
+    margin-top: 18px;
+  }
+}
+
+/* VK2 Figma onboarding master CSS v1 */
+.vk-onb-master {
+  width: 100%;
+  min-height: 100dvh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  color: var(--vk-text, #fff);
+  background: var(--vk-bg, #0f172a);
+}
+
+.vk-onb-master__appbar {
+  flex: 0 0 auto;
+  height: 72px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  padding: max(12px, env(safe-area-inset-top)) 20px 0;
+}
+
+.vk-onb-master__content {
+  width: min(100%, 560px);
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 44px 28px 24px;
+}
+
+.vk-onb-master__title {
+  margin: 0;
+  color: var(--vk-text, #fff);
+  font-size: 32px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.vk-onb-master__subtitle {
+  margin: 12px 0 0;
+  color: var(--vk-text-muted, #9ca3af);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.vk-onb-master__form { margin-top: 36px; }
+.vk-onb-master__field { display: block; margin-top: 18px; }
+.vk-onb-master__field:first-child { margin-top: 0; }
+.vk-onb-master__control { display: block; }
+
+.vk-onb-master__input {
+  width: 100%;
+  min-height: 56px;
+  box-sizing: border-box;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.vk-onb-master__hint {
+  display: block;
+  min-height: 20px;
+  margin-top: 6px;
+}
+
+.vk-onb-master__strength {
+  margin-top: 18px;
+  color: var(--vk-text-muted, #9ca3af);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.vk-onb-master__strength-track {
+  width: 100%;
+  height: 6px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.22);
+}
+
+.vk-onb-master__strength-track > span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--vk-danger, #ef4444);
+  transition: width 160ms ease;
+}
+
+.vk-onb-master__strength-track > span.is-débil,
+.vk-onb-master__strength-track > span.is-debil { width: 33%; }
+
+.vk-onb-master__strength-track > span.is-media {
+  width: 66%;
+  background: #f59e0b;
+}
+
+.vk-onb-master__strength-track > span.is-fuerte {
+  width: 100%;
+  background: #22c55e;
+}
+
+.vk-onb-master__rules {
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--vk-text-muted, #9ca3af);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.vk-onb-master__rules li {
+  position: relative;
+  margin-top: 9px;
+  padding-left: 24px;
+}
+
+.vk-onb-master__rules li::before {
+  content: "○";
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.vk-onb-master__rules li.is-ok { color: #86efac; }
+.vk-onb-master__rules li.is-ok::before { content: "✓"; }
+
+.vk-onb-master__footer {
+  width: min(100%, 560px);
+  box-sizing: border-box;
+  margin: auto auto 0;
+  padding: 24px 28px max(28px, env(safe-area-inset-bottom));
+}
+
+.vk-onb-master__footer .vk-btn {
+  min-height: 56px;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.vk-onb-master__footer .vk-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-height: 760px) {
+  .vk-onb-master__content { padding-top: 18px; }
+  .vk-onb-master__form { margin-top: 22px; }
+  .vk-onb-master__footer { padding-top: 14px; }
+}
+
+/* VK2 Figma onboarding PIN CSS v1 */
+.vk-onb-pin {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--vk-bg, #0F172A);
+}
+
+.vk-onb-pin__appbar {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 16px 20px 0;
+}
+
+.vk-onb-pin__back {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: currentColor;
+  cursor: pointer;
+}
+
+.vk-onb-pin__back svg {
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.vk-onb-pin__content {
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding: 34px 28px 24px;
+}
+
+.vk-onb-pin__title {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 42px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.vk-onb-pin__subtitle {
+  max-width: 470px;
+  margin: 14px 0 32px;
+  color: var(--vk-text-muted, rgba(255,255,255,.68));
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.vk-onb-pin__form {
+  display: grid;
+  gap: 22px;
+}
+
+.vk-onb-pin__field {
+  display: grid;
+  gap: 9px;
+}
+
+.vk-onb-pin__label {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.vk-onb-pin__input {
+  min-height: 62px;
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: .34em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.vk-onb-pin__input::placeholder {
+  letter-spacing: .34em;
+  opacity: .34;
+}
+
+.vk-onb-pin__hint {
+  min-height: 18px;
+}
+
+.vk-onb-pin__notice {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-top: 28px;
+  padding: 16px;
+  border: 1px solid rgba(109, 173, 255, .18);
+  border-radius: 16px;
+  background: rgba(61, 129, 222, .07);
+}
+
+.vk-onb-pin__notice svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: .82;
+}
+
+.vk-onb-pin__notice p {
+  margin: 0;
+  color: var(--vk-text-muted, rgba(255,255,255,.7));
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.vk-onb-pin__footer {
+  width: min(100%, 560px);
+  margin: auto auto 0;
+  padding: 22px 28px max(28px, env(safe-area-inset-bottom));
+}
+
+.vk-onb-pin__submit {
+  width: 100%;
+  min-height: 56px;
+}
+
+@media (max-height: 760px) {
+  .vk-onb-pin__content {
+    padding-top: 18px;
+  }
+
+  .vk-onb-pin__subtitle {
+    margin-bottom: 22px;
+  }
+
+  .vk-onb-pin__form {
+    gap: 16px;
+  }
+
+  .vk-onb-pin__notice {
+    margin-top: 20px;
+  }
+}
+
+/* VK2 Figma onboarding Emergency Kit save CSS v1 */
+.vk-onb-kit-save {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--vk-bg, #0F172A);
+}
+
+.vk-onb-kit-save__appbar {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 16px 20px 0;
+}
+
+.vk-onb-kit-save__back {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: currentColor;
+  cursor: pointer;
+}
+
+.vk-onb-kit-save__back svg {
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.vk-onb-kit-save__content {
+  width: min(100%, 600px);
+  margin: 0 auto;
+  padding: 26px 28px 24px;
+}
+
+.vk-onb-kit-save__title {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 42px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.vk-onb-kit-save__subtitle {
+  max-width: 500px;
+  margin: 14px 0 28px;
+  color: var(--vk-text-muted, rgba(255,255,255,.68));
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.vk-onb-kit-save__card {
+  padding: 22px;
+  border: 1px solid var(--vk-border, #374151);
+  border-radius: 20px;
+  background: #34465F;
+  box-shadow: 0 18px 45px rgba(0,0,0,.18);
+}
+
+.vk-onb-kit-save__card-label {
+  margin-bottom: 14px;
+  color: var(--vk-text-muted, rgba(255,255,255,.68));
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.vk-onb-kit-save__code {
+  min-height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  border: 1px dashed rgba(255,255,255,.2);
+  border-radius: 16px;
+  background: rgba(15,23,42,.48);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(18px, 4vw, 24px);
+  line-height: 1.45;
+  letter-spacing: .08em;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.vk-onb-kit-save__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.vk-onb-kit-save__action {
+  min-height: 50px;
+  background: #415875;
+  border-color: #5C7596;
+  color: #FFFFFF;
+}
+
+.vk-onb-kit-save__hint {
+  display: block;
+  min-height: 20px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.vk-onb-kit-save__notice {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-top: 22px;
+  padding: 16px;
+  border: 1px solid rgba(244, 184, 76, .22);
+  border-radius: 16px;
+  background: rgba(244, 184, 76, .07);
+}
+
+.vk-onb-kit-save__notice svg {
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: .88;
+}
+
+.vk-onb-kit-save__notice p {
+  margin: 0;
+  color: var(--vk-text-muted, rgba(255,255,255,.72));
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.vk-onb-kit-save__footer {
+  width: min(100%, 600px);
+  margin: auto auto 0;
+  padding: 22px 28px max(28px, env(safe-area-inset-bottom));
+}
+
+.vk-onb-kit-save__submit {
+  width: 100%;
+  min-height: 56px;
+}
+
+@media (max-width: 520px) {
+  .vk-onb-kit-save__actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-height: 760px) {
+  .vk-onb-kit-save__content {
+    padding-top: 14px;
+  }
+
+  .vk-onb-kit-save__subtitle {
+    margin-bottom: 20px;
+  }
+
+  .vk-onb-kit-save__card {
+    padding: 18px;
+  }
+
+  .vk-onb-kit-save__code {
+    min-height: 76px;
+  }
+
+  .vk-onb-kit-save__notice {
+    margin-top: 16px;
+  }
+}
+
+/* VK2 Figma onboarding Emergency Kit verify CSS v1 */
+.vk-onb-kit-verify {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--vk-bg, #0F172A);
+}
+
+.vk-onb-kit-verify__appbar {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 16px 20px 0;
+}
+
+.vk-onb-kit-verify__back {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: currentColor;
+  cursor: pointer;
+}
+
+.vk-onb-kit-verify__back svg {
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.vk-onb-kit-verify__content {
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding: 36px 28px 24px;
+}
+
+.vk-onb-kit-verify__title {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 42px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.vk-onb-kit-verify__subtitle {
+  max-width: 500px;
+  margin: 14px 0 34px;
+  color: var(--vk-text-muted, rgba(255,255,255,.68));
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.vk-onb-kit-verify__form {
+  display: block;
+}
+
+.vk-onb-kit-verify__field {
+  display: grid;
+  gap: 10px;
+}
+
+.vk-onb-kit-verify__label {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.vk-onb-kit-verify__input {
+  min-height: 72px;
+  padding-inline: 22px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: .42em;
+  text-align: center;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.vk-onb-kit-verify__input::placeholder {
+  letter-spacing: .42em;
+  opacity: .34;
+}
+
+.vk-onb-kit-verify__hint {
+  min-height: 22px;
+}
+
+.vk-onb-kit-verify__notice {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-top: 26px;
+  padding: 16px;
+  border: 1px solid rgba(109, 173, 255, .18);
+  border-radius: 16px;
+  background: rgba(61, 129, 222, .07);
+}
+
+.vk-onb-kit-verify__notice svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: .82;
+}
+
+.vk-onb-kit-verify__notice p {
+  margin: 0;
+  color: var(--vk-text-muted, rgba(255,255,255,.7));
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.vk-onb-kit-verify__footer {
+  width: min(100%, 560px);
+  margin: auto auto 0;
+  padding: 22px 28px max(28px, env(safe-area-inset-bottom));
+}
+
+.vk-onb-kit-verify__submit {
+  width: 100%;
+  min-height: 56px;
+}
+
+@media (max-height: 760px) {
+  .vk-onb-kit-verify__content {
+    padding-top: 18px;
+  }
+
+  .vk-onb-kit-verify__subtitle {
+    margin-bottom: 24px;
+  }
+
+  .vk-onb-kit-verify__notice {
+    margin-top: 18px;
+  }
+}
+
+/* VK2 Figma onboarding creating CSS v1 */
+.vk-onb-creating {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 32px 28px;
+  background: var(--vk-bg, #0F172A);
+}
+
+.vk-onb-creating__content {
+  width: min(100%, 520px);
+  text-align: center;
+}
+
+.vk-onb-creating__visual {
+  position: relative;
+  width: 150px;
+  height: 170px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 28px;
+}
+
+.vk-onb-creating__pulse {
+  position: absolute;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, .16);
+  box-shadow: 0 0 0 0 rgba(59, 130, 246, .28);
+  animation: vkCreatingPulse 1.8s ease-out infinite;
+}
+
+.vk-onb-creating__shield {
+  position: relative;
+  z-index: 1;
+  width: 96px;
+  height: 112px;
+  fill: rgba(37, 99, 235, .2);
+  stroke: #7DB6FF;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 14px 28px rgba(37, 99, 235, .28));
+  animation: vkCreatingFloat 2.6s ease-in-out infinite;
+}
+
+.vk-onb-creating__title {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 42px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.vk-onb-creating__subtitle {
+  max-width: 440px;
+  margin: 14px auto 26px;
+  color: var(--vk-text-muted, rgba(255,255,255,.68));
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.vk-onb-creating__progress {
+  width: min(100%, 340px);
+  height: 8px;
+  margin: 0 auto 16px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,.1);
+}
+
+.vk-onb-creating__progress span {
+  display: block;
+  width: 42%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(96,165,250,.35), #60A5FA, rgba(96,165,250,.35));
+  animation: vkCreatingProgress 1.35s ease-in-out infinite;
+}
+
+.vk-onb-creating__status {
+  min-height: 22px;
+  color: var(--vk-text-muted, rgba(255,255,255,.68));
+  font-size: 14px;
+}
+
+@keyframes vkCreatingPulse {
+  0% {
+    transform: scale(.78);
+    opacity: .7;
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, .28);
+  }
+  70% {
+    transform: scale(1);
+    opacity: .18;
+    box-shadow: 0 0 0 28px rgba(59, 130, 246, 0);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+    box-shadow: 0 0 0 28px rgba(59, 130, 246, 0);
+  }
+}
+
+@keyframes vkCreatingFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes vkCreatingProgress {
+  0% { transform: translateX(-120%); }
+  50% { transform: translateX(95%); }
+  100% { transform: translateX(240%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vk-onb-creating__pulse,
+  .vk-onb-creating__shield,
+  .vk-onb-creating__progress span {
+    animation: none;
+  }
+
+  .vk-onb-creating__progress span {
+    width: 100%;
+  }
+}
+
+/* VK2 PIN unlock visual refinement v1 */
+.vk-unlock__panel {
+  padding-top: calc(34px + env(safe-area-inset-top, 0px));
+}
+
+.vk-unlock__shield {
+  width: 118px;
+  height: 142px;
+  margin-bottom: 14px;
+}
+
+.vk-unlock__shield-outline {
+  width: 118px;
+  height: 142px;
+}
+
+.vk-unlock__shield-lock {
+  width: 27px;
+  height: 30px;
+}
+
+.vk-unlock__brand {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.vk-unlock__subtitle {
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.vk-unlock__dots {
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.vk-unlock__dot {
+  width: 11px;
+  height: 11px;
+}
+
+.vk-unlock__status {
+  margin-bottom: 8px;
+}
+
+.vk-unlock__keypad {
+  grid-template-columns: repeat(3, 52px);
+  gap: 9px 16px;
+  margin-bottom: 14px;
+}
+
+.vk-unlock__key {
+  width: 52px;
+  height: 52px;
+  font-size: 20px;
+}
+
+.vk-unlock__actions {
+  width: min(100%, 300px);
+}
+
+.vk-unlock__submit {
+  min-height: 48px;
+}
+
+.vk-unlock__master-link {
+  margin-top: 2px;
+}
+
+@media (max-height: 720px) {
+  .vk-unlock__panel {
+    padding-top: calc(18px + env(safe-area-inset-top, 0px));
+  }
+
+  .vk-unlock__shield {
+    width: 92px;
+    height: 111px;
+    margin-bottom: 8px;
+  }
+
+  .vk-unlock__shield-outline {
+    width: 92px;
+    height: 111px;
+  }
+
+  .vk-unlock__shield-lock {
+    width: 22px;
+    height: 25px;
+  }
+
+  .vk-unlock__brand {
+    font-size: 27px;
+    margin-bottom: 4px;
+  }
+
+  .vk-unlock__subtitle {
+    margin-bottom: 7px;
+  }
+
+  .vk-unlock__status {
+    margin-bottom: 4px;
+  }
+
+  .vk-unlock__keypad {
+    grid-template-columns: repeat(3, 48px);
+    gap: 6px 14px;
+    margin-bottom: 9px;
+  }
+
+  .vk-unlock__key {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+  }
+
+  .vk-unlock__submit {
+    min-height: 44px;
+  }
+
+  .vk-unlock__legal {
+    padding-top: 4px;
+  }
+}
+/* VK2 PIN unlock balance refinement v2 */
+.vk-unlock__panel {
+  padding-top: calc(56px + env(safe-area-inset-top, 0px));
+}
+
+.vk-unlock__shield {
+  width: 138px;
+  height: 166px;
+  margin-bottom: 16px;
+}
+
+.vk-unlock__shield-outline {
+  width: 138px;
+  height: 166px;
+}
+
+.vk-unlock__shield-lock {
+  width: 31px;
+  height: 35px;
+}
+
+.vk-unlock__brand {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.vk-unlock__subtitle {
+  margin-bottom: 16px;
+}
+
+.vk-unlock__dots {
+  margin-bottom: 24px;
+}
+
+@media (max-height: 720px) {
+  .vk-unlock__panel {
+    padding-top: calc(28px + env(safe-area-inset-top, 0px));
+  }
+
+  .vk-unlock__shield {
+    width: 108px;
+    height: 130px;
+  }
+
+  .vk-unlock__shield-outline {
+    width: 108px;
+    height: 130px;
+  }
+
+  .vk-unlock__shield-lock {
+    width: 25px;
+    height: 28px;
+  }
+
+  .vk-unlock__brand {
+    font-size: 30px;
+  }
+
+  .vk-unlock__dots {
+    margin-bottom: 16px;
+  }
+}

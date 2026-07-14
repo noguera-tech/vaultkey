@@ -100,7 +100,7 @@
 
   function pinScreen() {
     var ready = ui.pinBuffer.length === PIN_LEN && !ui.busy;
-    var buttonText = ui.pinState === 'checking' ? 'Comprobando…' : 'Desbloquear';
+    var buttonText = ui.pinState === 'checking' ? 'Comprobando…' : 'Comprobar PIN';
     return '<div class="vk-unlock vk-unlock--' + ui.pinState + '">' +
       '<main class="vk-unlock__panel">' +
         shieldHtml() +

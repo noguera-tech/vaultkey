@@ -71,44 +71,178 @@
         '<button class="vk-btn vk-btn--primary" data-ob="go-welcome" style="margin-top:16px">Continuar</button></div></div>';
     },
     'welcome': function () {
-      return '<div style="padding:24px 16px;">' +
-        '<h2 style="margin:0 0 8px;">Bienvenido a VaultKey</h2>' +
-        '<p class="vk-field__hint" style="font-size:14px;">Tu bóveda cifrada local. Crea tu contraseña maestra para empezar.</p>' +
-        '<button class="vk-btn vk-btn--primary vk-btn--block" data-ob="go-master" style="margin-top:24px">Crear bóveda</button></div>';
+      return '<div class="vk-onb">' +
+        '<div class="vk-onb__shield">' +
+          '<svg width="84" height="101" viewBox="0 0 151 181" fill="none">' +
+          '<path d="M150.5 99.4875C150.5 144.48 117.688 166.976 78.6875 180.024C76.6453 180.688 74.4269 180.656 72.4062 179.934C33.3125 166.976 0.5 144.48 0.5 99.4875V36.498C0.5 34.1115 1.48772 31.8227 3.24588 30.1351C5.00403 28.4476 7.3886 27.4995 9.875 27.4995C28.625 27.4995 52.0625 16.7013 68.375 3.02362C70.3611 1.39488 72.8877 0.5 75.5 0.5C78.1123 0.5 80.6389 1.39488 82.625 3.02362C99.0312 16.7913 122.375 27.4995 141.125 27.4995C143.611 27.4995 145.996 28.4476 147.754 30.1351C149.512 31.8227 150.5 34.1115 150.5 36.498V99.4875Z" stroke="var(--vk-onb-stroke)" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '</svg>' +
+          '<svg class="vk-onb__shield-lock" width="20" height="22" viewBox="0 0 36 40" fill="none">' +
+          '<path d="M31.125 18.1479H4.875C2.80393 18.1479 1.125 19.8062 1.125 21.8517V34.8146C1.125 36.8601 2.80393 38.5183 4.875 38.5183H31.125C33.1961 38.5183 34.875 36.8601 34.875 34.8146V21.8517C34.875 19.8062 33.1961 18.1479 31.125 18.1479Z" stroke="var(--vk-onb-stroke)" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '<path d="M8.625 18.1481V10.7407C8.625 8.285 9.61272 5.92987 11.3709 4.19342C13.129 2.45697 15.5136 1.48145 18 1.48145C20.4864 1.48145 22.871 2.45697 24.6291 4.19342C26.3873 5.92987 27.375 8.285 27.375 10.7407V18.1481" stroke="var(--vk-onb-stroke)" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '</svg>' +
+        '</div>' +
+        '<h1 class="vk-onb__brand">VaultKey</h1>' +
+        '<p class="vk-onb__subtitle">Todo lo importante.<br>En un solo lugar seguro.</p>' +
+        '<button class="vk-btn vk-btn--primary vk-btn--block" data-ob="go-master" style="margin-top:24px">Comenzar</button>' +
+      '</div>';
     },
     'onboarding-master': function () {
-      return appbar('Crear contraseña maestra') + '<form class="vk-form" style="padding:16px;" onsubmit="return false">' +
-        field('ob-master', 'Contraseña maestra', 'password', 'Introduce la contraseña') +
-        field('ob-master2', 'Confirmar contraseña', 'password', 'Repítela') +
-        '</form>' + actions('Continuar', 'submit-master');
+      /* VK2 Figma onboarding master v1 */
+      return '<section class="vk-onb-master">' +
+        '<header class="vk-onb-master__appbar">' +
+          '<button class="vk-iconbtn vk-onb-master__back" data-ob="back" aria-label="Atrás">' +
+            '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+              '<path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>' +
+            '</svg>' +
+          '</button>' +
+        '</header>' +
+        '<div class="vk-onb-master__content">' +
+          '<h1 class="vk-onb-master__title">Crea tu contraseña maestra</h1>' +
+          '<p class="vk-onb-master__subtitle">Será la clave principal para proteger tu bóveda.</p>' +
+          '<form class="vk-onb-master__form" onsubmit="return false">' +
+            '<label class="vk-onb-master__field">' +
+              '<span class="vk-onb-master__control">' +
+                '<input class="vk-input vk-onb-master__input" id="ob-master" type="password" placeholder="Contraseña maestra" autocomplete="new-password">' +
+              '</span>' +
+              '<span class="vk-field__hint vk-onb-master__hint" id="ob-master-hint"></span>' +
+            '</label>' +
+            '<label class="vk-onb-master__field">' +
+              '<span class="vk-onb-master__control">' +
+                '<input class="vk-input vk-onb-master__input" id="ob-master2" type="password" placeholder="Confirmar contraseña" autocomplete="new-password">' +
+              '</span>' +
+              '<span class="vk-field__hint vk-onb-master__hint" id="ob-master2-hint"></span>' +
+            '</label>' +
+            '<div class="vk-onb-master__strength" aria-live="polite">' +
+              '<div class="vk-onb-master__strength-track"><span id="ob-master-strength-bar"></span></div>' +
+              '<span id="ob-master-strength-text">Seguridad: pendiente</span>' +
+            '</div>' +
+            '<ul class="vk-onb-master__rules">' +
+              '<li id="ob-master-rule-length">Al menos 12 caracteres</li>' +
+              '<li id="ob-master-rule-case">Mayúsculas y minúsculas</li>' +
+              '<li id="ob-master-rule-extra">Números o símbolos</li>' +
+            '</ul>' +
+          '</form>' +
+        '</div>' +
+        '<div class="vk-onb-master__footer">' +
+          '<button class="vk-btn vk-btn--primary vk-btn--block" id="ob-master-submit" data-ob="submit-master" disabled>Continuar</button>' +
+        '</div>' +
+      '</section>';
     },
     'onboarding-pin': function () {
-      return appbar('Crear PIN local') + '<form class="vk-form" style="padding:16px;" onsubmit="return false">' +
-        field('ob-pin', 'PIN (6 dígitos)', 'password', '••••••') +
-        field('ob-pin2', 'Confirmar PIN', 'password', '••••••') +
-        '<p class="vk-field__hint">El PIN solo desbloquea este dispositivo. Tu contraseña maestra sigue siendo la llave real.</p>' +
-        '</form>' + actions('Continuar', 'submit-pin');
+      return '<section class="vk-onb-pin">' +
+        '<header class="vk-onb-pin__appbar">' +
+          '<button class="vk-onb-pin__back" type="button" data-ob="back" aria-label="Volver">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+              '<path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>' +
+            '</svg>' +
+          '</button>' +
+        '</header>' +
+        '<div class="vk-onb-pin__content">' +
+          '<h1 class="vk-onb-pin__title">Crea tu PIN local</h1>' +
+          '<p class="vk-onb-pin__subtitle">Úsalo para desbloquear VaultKey rápidamente en este dispositivo.</p>' +
+          '<form class="vk-onb-pin__form" onsubmit="return false">' +
+            '<label class="vk-onb-pin__field">' +
+              '<span class="vk-onb-pin__label">PIN de 6 dígitos</span>' +
+              '<input class="vk-input vk-onb-pin__input" id="ob-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="off">' +
+              '<span class="vk-field__hint vk-onb-pin__hint" id="ob-pin-hint"></span>' +
+            '</label>' +
+            '<label class="vk-onb-pin__field">' +
+              '<span class="vk-onb-pin__label">Confirma tu PIN</span>' +
+              '<input class="vk-input vk-onb-pin__input" id="ob-pin2" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="off">' +
+              '<span class="vk-field__hint vk-onb-pin__hint" id="ob-pin2-hint"></span>' +
+            '</label>' +
+          '</form>' +
+          '<div class="vk-onb-pin__notice">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10v6"/><path d="M12 7h.01"/></svg>' +
+            '<p>El PIN solo desbloquea este dispositivo. Tu contraseña maestra sigue siendo la llave real de tu bóveda.</p>' +
+          '</div>' +
+        '</div>' +
+        '<div class="vk-onb-pin__footer">' +
+          '<button class="vk-btn vk-btn--primary vk-onb-pin__submit" id="ob-pin-submit" type="button" data-ob="submit-pin" disabled>Continuar</button>' +
+        '</div>' +
+      '</section>';
     },
     'onboarding-kit-save': function () {
-      return appbar('Guarda tu kit de emergencia') + '<div style="padding:16px;">' +
-        '<p class="vk-field__hint" style="font-size:14px;">Si olvidas tu contraseña maestra, este código es la ÚNICA forma de recuperar tu bóveda. Guárdalo fuera del teléfono.</p>' +
-        '<div class="vk-card" style="padding:16px; text-align:center; font-family:monospace; font-size:16px; letter-spacing:1px;" id="ob-kitcode"></div>' +
-        '<div style="display:flex; gap:12px; margin-top:12px;">' +
-        '<button class="vk-btn vk-btn--secondary" data-ob="kit-copy" style="flex:1">Copiar</button>' +
-        '<button class="vk-btn vk-btn--secondary" data-ob="kit-pdf" style="flex:1">Descargar PDF</button></div>' +
-        '<span class="vk-field__hint" id="ob-kit-hint"></span></div>' +
-        actions('Ya lo he guardado', 'go-kit-verify');
+      return '<section class="vk-onb-kit-save">' +
+        '<header class="vk-onb-kit-save__appbar">' +
+          '<button class="vk-onb-kit-save__back" type="button" data-ob="back" aria-label="Volver">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+              '<path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>' +
+            '</svg>' +
+          '</button>' +
+        '</header>' +
+        '<div class="vk-onb-kit-save__content">' +
+          '<h1 class="vk-onb-kit-save__title">Guarda tu Emergency Kit</h1>' +
+          '<p class="vk-onb-kit-save__subtitle">Es la única forma de recuperar tu bóveda si olvidas la contraseña maestra.</p>' +
+          '<div class="vk-onb-kit-save__card">' +
+            '<div class="vk-onb-kit-save__card-label">Código de recuperación</div>' +
+            '<div class="vk-onb-kit-save__code" id="ob-kitcode"></div>' +
+            '<div class="vk-onb-kit-save__actions">' +
+              '<button class="vk-btn vk-btn--secondary vk-onb-kit-save__action" type="button" data-ob="kit-copy">Copiar</button>' +
+              '<button class="vk-btn vk-btn--secondary vk-onb-kit-save__action" type="button" data-ob="kit-pdf">Descargar PDF</button>' +
+            '</div>' +
+            '<span class="vk-field__hint vk-onb-kit-save__hint" id="ob-kit-hint"></span>' +
+          '</div>' +
+          '<div class="vk-onb-kit-save__notice">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+              '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 7.8 7.5 9.5 4.3-1.7 7.5-4.9 7.5-9.5V6L12 3Z"/>' +
+              '<path d="M9.5 12.2 11 13.7l3.6-3.8"/>' +
+            '</svg>' +
+            '<p>Guárdalo fuera del teléfono, preferiblemente impreso o en un lugar seguro. No lo compartas con nadie.</p>' +
+          '</div>' +
+        '</div>' +
+        '<div class="vk-onb-kit-save__footer">' +
+          '<button class="vk-btn vk-btn--primary vk-onb-kit-save__submit" type="button" data-ob="go-kit-verify">Ya lo he guardado</button>' +
+        '</div>' +
+      '</section>';
     },
     'onboarding-kit-verify': function () {
-      return appbar('Verifica tu kit') + '<form class="vk-form" style="padding:16px;" onsubmit="return false">' +
-        '<p class="vk-field__hint" style="font-size:14px;">Introduce los 4 últimos caracteres de tu código para confirmar que lo has guardado.</p>' +
-        field('ob-kit4', 'Últimos 4 caracteres', 'text', 'XXXX') +
-        '</form>' + actions('Verificar y crear bóveda', 'submit-kit-verify');
+      return '<section class="vk-onb-kit-verify">' +
+        '<header class="vk-onb-kit-verify__appbar">' +
+          '<button class="vk-onb-kit-verify__back" type="button" data-ob="back" aria-label="Volver">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+              '<path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>' +
+            '</svg>' +
+          '</button>' +
+        '</header>' +
+        '<div class="vk-onb-kit-verify__content">' +
+          '<h1 class="vk-onb-kit-verify__title">Verifica tu Emergency Kit</h1>' +
+          '<p class="vk-onb-kit-verify__subtitle">Introduce los 4 últimos caracteres del código para confirmar que lo has guardado correctamente.</p>' +
+          '<form class="vk-onb-kit-verify__form" onsubmit="return false">' +
+            '<label class="vk-onb-kit-verify__field">' +
+              '<span class="vk-onb-kit-verify__label">Últimos 4 caracteres</span>' +
+              '<input class="vk-input vk-onb-kit-verify__input" id="ob-kit4" type="password" inputmode="text" maxlength="4" placeholder="XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false">' +
+              '<span class="vk-field__hint vk-onb-kit-verify__hint" id="ob-kit4-hint"></span>' +
+            '</label>' +
+          '</form>' +
+          '<div class="vk-onb-kit-verify__notice">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10v6"/><path d="M12 7h.01"/></svg>' +
+            '<p>Esta comprobación evita continuar sin haber guardado el código de recuperación.</p>' +
+          '</div>' +
+        '</div>' +
+        '<div class="vk-onb-kit-verify__footer">' +
+          '<button class="vk-btn vk-btn--primary vk-onb-kit-verify__submit" id="ob-kit-verify-submit" type="button" data-ob="submit-kit-verify" disabled>Verificar y crear bóveda</button>' +
+        '</div>' +
+      '</section>';
     },
     'onboarding-creating': function () {
-      return '<div class="vk-screen" style="min-height:60vh; display:flex; align-items:center; justify-content:center;">' +
-        '<div style="text-align:center"><div style="font-size:20px; font-weight:600;">Creando tu bóveda…</div>' +
-        '<div class="vk-field__hint" id="ob-creating-status">Derivando claves (unos segundos)</div></div></div>';
+      return '<section class="vk-onb-creating" aria-live="polite">' +
+        '<div class="vk-onb-creating__content">' +
+          '<div class="vk-onb-creating__visual" aria-hidden="true">' +
+            '<div class="vk-onb-creating__pulse"></div>' +
+            '<svg class="vk-onb-creating__shield" viewBox="0 0 96 112">' +
+              '<path d="M48 6 84 20v30c0 25-15 43-36 56C27 93 12 75 12 50V20L48 6Z"/>' +
+              '<path d="M34 55 44 65 64 43"/>' +
+            '</svg>' +
+          '</div>' +
+          '<h1 class="vk-onb-creating__title">Creando tu bóveda</h1>' +
+          '<p class="vk-onb-creating__subtitle">Estamos protegiendo tus datos y preparando el acceso seguro.</p>' +
+          '<div class="vk-onb-creating__progress" aria-hidden="true">' +
+            '<span></span>' +
+          '</div>' +
+          '<div class="vk-field__hint vk-onb-creating__status" id="ob-creating-status">Derivando claves seguras…</div>' +
+        '</div>' +
+      '</section>';
     }
   };
 
@@ -246,17 +380,112 @@
     render: function (route, container, ctx) {
       var fn = SCREENS[route.name];
       if (!fn) { return false; }
-      container.innerHTML = fn();
+            container.innerHTML = fn();
+      if (route.name === 'onboarding-master') {
+        var masterInput = root.document.getElementById('ob-master');
+        var masterConfirm = root.document.getElementById('ob-master2');
+        var masterSubmit = root.document.getElementById('ob-master-submit');
+        var strengthBar = root.document.getElementById('ob-master-strength-bar');
+        var strengthText = root.document.getElementById('ob-master-strength-text');
+        var ruleLength = root.document.getElementById('ob-master-rule-length');
+        var ruleCase = root.document.getElementById('ob-master-rule-case');
+        var ruleExtra = root.document.getElementById('ob-master-rule-extra');
+
+        var updateMasterUi = function () {
+          var m1 = masterInput ? masterInput.value : '';
+          var m2 = masterConfirm ? masterConfirm.value : '';
+          var strength = masterStrength(m1);
+          var hasLength = m1.length >= 12;
+          var hasCase = /[a-z]/.test(m1) && /[A-Z]/.test(m1);
+          var hasExtra = /[0-9]/.test(m1) || /[^A-Za-z0-9]/.test(m1);
+          var valid = strength === 'fuerte' && m1 === m2 && m2.length > 0;
+
+          if (masterSubmit) { masterSubmit.disabled = !valid; }
+          if (strengthBar) {
+  var progress = 0;
+
+  if (m1) {
+    progress =
+      Math.round((Math.min(m1.length, 12) / 12) * 60) +
+      (hasCase ? 20 : 0) +
+      (hasExtra ? 20 : 0);
+  }
+
+  strengthBar.className = m1 ? 'is-' + strength : '';
+  strengthBar.style.width = Math.min(progress, 100) + '%';
+}
+          if (strengthText) {
+            strengthText.textContent = 'Seguridad: ' + (m1 ? strength : 'pendiente');
+          }
+          if (ruleLength) { ruleLength.className = hasLength ? 'is-ok' : ''; }
+          if (ruleCase) { ruleCase.className = hasCase ? 'is-ok' : ''; }
+          if (ruleExtra) { ruleExtra.className = hasExtra ? 'is-ok' : ''; }
+        };
+
+        if (masterInput) { masterInput.addEventListener('input', updateMasterUi); }
+        if (masterConfirm) { masterConfirm.addEventListener('input', updateMasterUi); }
+        updateMasterUi();
+      }
+      if (route.name === 'onboarding-pin') {
+        var pinInput = root.document.getElementById('ob-pin');
+        var pinConfirm = root.document.getElementById('ob-pin2');
+        var pinSubmit = root.document.getElementById('ob-pin-submit');
+
+        var updatePinUi = function () {
+          var p1 = pinInput ? pinInput.value.replace(/\D/g, '').slice(0, 6) : '';
+          var p2 = pinConfirm ? pinConfirm.value.replace(/\D/g, '').slice(0, 6) : '';
+
+          if (pinInput && pinInput.value !== p1) { pinInput.value = p1; }
+          if (pinConfirm && pinConfirm.value !== p2) { pinConfirm.value = p2; }
+
+          var valid = pinValid(p1) && p1 === p2;
+          if (pinSubmit) { pinSubmit.disabled = !valid; }
+        };
+
+        if (pinInput) { pinInput.addEventListener('input', updatePinUi); }
+        if (pinConfirm) { pinConfirm.addEventListener('input', updatePinUi); }
+        updatePinUi();
+      }
       if (route.name === 'onboarding-kit-save') {
         root.document.getElementById('ob-kitcode').textContent = draft.kitCode || '(sin código: reinicia el flujo)';
       }
-      if (route.name === 'onboarding-creating') {
-        performCreation(ctx).then(function (dekKey) {
-          if (ctx && typeof ctx.onCreated === 'function') {
-            ctx.onCreated({ dekKey: dekKey });
-            return;
+      if (route.name === 'onboarding-kit-verify') {
+        var kitVerifyInput = root.document.getElementById('ob-kit4');
+        var kitVerifySubmit = root.document.getElementById('ob-kit-verify-submit');
+
+        var updateKitVerifyUi = function () {
+          var value = kitVerifyInput ? kitVerifyInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4) : '';
+
+          if (kitVerifyInput && kitVerifyInput.value !== value) {
+            kitVerifyInput.value = value;
           }
-          setTimeout(function () { ctx.router.replace('/dashboard'); }, 300);
+
+          var expected = ctx.crypto.normalizeKitCode(draft.kitCode).slice(-4);
+var matches = value.length === 4 && value === expected;
+
+if (kitVerifySubmit) {
+  kitVerifySubmit.disabled = !matches;
+}
+        };
+
+        if (kitVerifyInput) {
+          kitVerifyInput.addEventListener('input', updateKitVerifyUi);
+        }
+        updateKitVerifyUi();
+      }
+      if (route.name === 'onboarding-creating') {
+        var creatingStartedAt = Date.now();
+
+        performCreation(ctx).then(function (dekKey) {
+          var wait = Math.max(0, 2000 - (Date.now() - creatingStartedAt));
+
+          setTimeout(function () {
+            if (ctx && typeof ctx.onCreated === 'function') {
+              ctx.onCreated({ dekKey: dekKey });
+              return;
+            }
+            setTimeout(function () { ctx.router.replace('/dashboard'); }, 300);
+          }, wait);
         }, function (e) {
           setHint('ob-creating-status', 'Error en el alta: ' + e.message, 'error');
         });
