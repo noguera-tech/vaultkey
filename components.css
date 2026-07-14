@@ -584,3 +584,319 @@
 
 /* Bloqueo de scroll del fondo con capa abierta */
 body.vk-lock { overflow: hidden; }
+
+/* ============================================================
+   vk-unlock — desbloqueo diario VK2.1
+   Bloque aislado: PIN y contraseña maestra, todos sus estados.
+   ============================================================ */
+#pin.pinScreen:has(.vk-unlock) {
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
+  text-align: initial;
+  background: var(--vk-bg);
+}
+
+#pin.pinScreen:has(.vk-unlock)::before,
+#pin.pinScreen:has(.vk-unlock)::after {
+  display: none;
+}
+
+.vk-unlock {
+  --vk-unlock-stroke: var(--vk-text-muted);
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--vk-bg);
+  color: var(--vk-text);
+  font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.vk-unlock__panel,
+.vk-unlock__master-panel {
+  width: min(100%, 430px);
+  min-height: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(24px + env(safe-area-inset-top, 0px)) 24px calc(18px + env(safe-area-inset-bottom, 0px));
+  text-align: center;
+}
+
+.vk-unlock__shield {
+  position: relative;
+  width: 84px;
+  height: 101px;
+  flex: none;
+  margin: 0 0 10px;
+}
+
+.vk-unlock__shield-outline {
+  width: 84px;
+  height: 101px;
+}
+
+.vk-unlock__shield-outline path,
+.vk-unlock__shield-lock path {
+  stroke: var(--vk-unlock-stroke);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.vk-unlock__shield-lock {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 20px;
+  height: 22px;
+  transform: translate(-50%, -44%);
+}
+
+.vk-unlock__brand {
+  margin: 0 0 8px;
+  color: var(--vk-text);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.3px;
+}
+
+.vk-unlock__subtitle {
+  margin: 0 0 14px;
+  color: var(--vk-text-muted);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.vk-unlock__dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  min-height: 14px;
+  margin-bottom: 10px;
+}
+
+.vk-unlock__dot {
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--vk-text-muted);
+  border-radius: 50%;
+  background: transparent;
+}
+
+.vk-unlock__dot--filled {
+  border-color: var(--vk-text);
+  background: var(--vk-text);
+}
+
+.vk-unlock__status {
+  width: 100%;
+  min-height: 18px;
+  margin: 0 0 10px;
+  color: var(--vk-text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.vk-unlock--error .vk-unlock__status,
+.vk-unlock--wiping .vk-unlock__status,
+.vk-unlock--master.vk-unlock--error .vk-unlock__status {
+  color: var(--vk-text-muted);
+}
+
+.vk-unlock__keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 56px);
+  gap: 10px 18px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.vk-unlock__key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--vk-border);
+  border-radius: 50%;
+  background: var(--vk-text);
+  color: var(--vk-primary);
+  font: inherit;
+  font-size: 21px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 100ms ease, opacity 120ms ease;
+}
+
+.vk-unlock__key:active:not(:disabled) { transform: scale(.93); }
+.vk-unlock__key:disabled { cursor: default; }
+.vk-unlock__key--empty { border-color: transparent; background: transparent; }
+
+.vk-unlock__key--delete svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.vk-unlock--checking .vk-unlock__keypad,
+.vk-unlock--wiping .vk-unlock__keypad {
+  opacity: .22;
+}
+
+.vk-unlock__actions {
+  width: min(100%, 320px);
+}
+
+.vk-unlock__submit,
+.vk-unlock__master-submit {
+  min-height: 44px;
+  border-radius: 9px;
+}
+
+.vk-unlock__master-link { margin-top: 4px; }
+.vk-unlock__master-link:disabled { opacity: .45; }
+
+.vk-unlock__legal {
+  margin: auto 0 0;
+  padding-top: 12px;
+  color: var(--vk-text-muted);
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.vk-unlock__legal a {
+  color: var(--vk-text-muted);
+  text-decoration: none;
+}
+
+.vk-unlock__legal a:focus-visible,
+.vk-unlock__legal a:hover { text-decoration: underline; }
+
+.vk-unlock__appbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  padding: env(safe-area-inset-top, 0px) 12px 0 4px;
+  box-sizing: content-box;
+  background: var(--vk-header);
+  color: var(--vk-text);
+}
+
+.vk-unlock__appbar .vk-iconbtn:disabled { opacity: .45; }
+.vk-unlock__appbar .vk-iconbtn svg,
+.vk-unlock__eye svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.vk-unlock__appbar-title {
+  flex: 1;
+  padding-right: 48px;
+  color: var(--vk-text);
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.vk-unlock__master-panel {
+  min-height: calc(100% - 56px);
+  padding-top: 34px;
+}
+
+.vk-unlock__master-field {
+  display: block;
+  width: min(100%, 340px);
+  margin-top: 18px;
+}
+
+.vk-unlock__master-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.vk-unlock__master-control .vk-input {
+  min-height: 46px;
+  padding-right: 48px;
+  border-radius: 10px;
+}
+
+.vk-unlock__eye {
+  position: absolute;
+  right: 2px;
+  width: 44px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--vk-primary);
+  cursor: pointer;
+}
+
+.vk-unlock__eye svg { width: 20px; height: 20px; }
+
+.vk-unlock__master-info {
+  width: min(100%, 340px);
+  margin: 18px 0 10px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  background: var(--vk-card);
+  color: var(--vk-text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.vk-unlock__master-submit { width: min(100%, 300px); }
+
+.vk-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-height: 720px) {
+  .vk-unlock__panel { padding-top: calc(12px + env(safe-area-inset-top, 0px)); }
+  .vk-unlock__shield { width: 66px; height: 80px; margin-bottom: 5px; }
+  .vk-unlock__shield-outline { width: 66px; height: 80px; }
+  .vk-unlock__shield-lock { width: 17px; height: 19px; }
+  .vk-unlock__brand { font-size: 24px; margin-bottom: 4px; }
+  .vk-unlock__subtitle { margin-bottom: 8px; }
+  .vk-unlock__status { margin-bottom: 6px; }
+  .vk-unlock__keypad { grid-template-columns: repeat(3, 50px); gap: 7px 16px; margin-bottom: 10px; }
+  .vk-unlock__key { width: 50px; height: 50px; font-size: 19px; }
+  .vk-unlock__legal { padding-top: 6px; }
+}

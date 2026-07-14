@@ -357,7 +357,7 @@ function initPin(){
     const _c=$('pin');
     if(_c){
       const _ctx={
-        router:{navigate:function(){},replace:function(p){if(p==='/unlock')lock();},back:function(){},current:function(){return{name:'unlock'};}},
+        router:{navigate:function(){},replace:function(p){if(p==='/unlock')lock();else if(p==='/welcome')window.location.reload();},back:function(){},current:function(){return{name:'unlock'};}},
         crypto:vkCrypto,store:vkStore,
         onUnlocked:function(s){window._vk2UnlockOk&&window._vk2UnlockOk(s.dekKey);}
       };
@@ -1239,7 +1239,24 @@ function openOnboardingHard(){
       }
       if(vkOnboarding.handlesRoute(n)) vkOnboarding.render(_obRoute,_host,_obCtx);
     }
-    _obCtx={router:{navigate:_obNav,replace:_obNav,back:function(){_obNav('/welcome');},current:function(){return _obRoute;}},crypto:vkCrypto,store:vkStore};
+    _obCtx={
+      router:{navigate:_obNav,replace:_obNav,back:function(){_obNav('/welcome');},current:function(){return _obRoute;}},
+      crypto:vkCrypto,
+      store:vkStore,
+      onCreated:function(s){
+        modal.classList.remove('open','vk2-onboarding');
+        modal.style.display='none';
+        if(typeof _host!=='undefined'&&_host){_host.innerHTML='';_host.remove();}
+        unlocked=false;
+        pin='';
+        if(s&&s.dekKey&&typeof window._vk2UnlockOk==='function'){
+          window._vk2UnlockOk(s.dekKey);
+          return;
+        }
+        initPin();
+        show('pin');
+      }
+    };
     if(modal._obClick) modal.removeEventListener('click',modal._obClick);
     modal._obClick=function(e){const el=e.target.closest('[data-ob]');if(el)vkOnboarding.handleAction(el.getAttribute('data-ob'),_obCtx);};
     modal.addEventListener('click',modal._obClick);

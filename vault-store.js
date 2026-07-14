@@ -106,10 +106,28 @@
       } catch (e) { /* seguir borrando el resto */ }
     }
     var vc = cryptoApi();
+    var PEPPER_TIMEOUT_MS = 3000;
+    function withTimeout(p) {
+      return Promise.race([
+        p,
+        new Promise(function (resolve) {
+          setTimeout(function () { resolve({ __timeout: true }); }, PEPPER_TIMEOUT_MS);
+        })
+      ]);
+    }
     var pepperPromise = (vc && typeof vc.deletePepper === 'function')
-      ? vc.deletePepper().then(function () { deleted.push('device-pepper'); return deleted; })
-      : Promise.resolve(deleted);
-    return pepperPromise.then(function () { return { deleted: deleted }; });
+      ? withTimeout(vc.deletePepper()).then(
+          function (r) {
+            if (r && r.__timeout) { return { pepperDeleted: false, pepperError: 'timeout' }; }
+            deleted.push('device-pepper');
+            return { pepperDeleted: true };
+          },
+          function (err) { return { pepperDeleted: false, pepperError: err }; }
+        )
+      : Promise.resolve({ pepperDeleted: false, pepperError: 'deletePepper unavailable' });
+    return pepperPromise.then(function (pr) {
+      return { deleted: deleted, pepperDeleted: pr.pepperDeleted, pepperError: pr.pepperError || null };
+    });
   }
 
   return {

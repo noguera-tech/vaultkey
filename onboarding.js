@@ -224,7 +224,8 @@
                 ctx.store.resetAttempts();
                 /* D-4: las credenciales mueren aquí */
                 draft.master = null; draft.pin = null; draft.kitCode = null;
-                return true;
+                /* La CryptoKey no extraíble pasa directamente a la sesión. */
+                return alta.dekKey;
               });
             });
         });
@@ -250,8 +251,12 @@
         root.document.getElementById('ob-kitcode').textContent = draft.kitCode || '(sin código: reinicia el flujo)';
       }
       if (route.name === 'onboarding-creating') {
-        performCreation(ctx).then(function () {
-          setTimeout(function () { ctx.router.replace('/dashboard'); }, 300); /* 1500 ms reales en integración */
+        performCreation(ctx).then(function (dekKey) {
+          if (ctx && typeof ctx.onCreated === 'function') {
+            ctx.onCreated({ dekKey: dekKey });
+            return;
+          }
+          setTimeout(function () { ctx.router.replace('/dashboard'); }, 300);
         }, function (e) {
           setHint('ob-creating-status', 'Error en el alta: ' + e.message, 'error');
         });
