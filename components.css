@@ -1988,3 +1988,66 @@ body.vk-lock { overflow: hidden; }
     margin-bottom: 16px;
   }
 }
+/* VK2 Figma master unlock refinement */
+.vk-unlock--master .vk-unlock__master-panel {
+  min-height: calc(100% - 56px);
+  padding-top: 24px;
+}
+
+.vk-unlock--master .vk-unlock__master-field {
+  width: min(100%, 400px);
+  margin-top: 20px;
+}
+
+.vk-unlock--master .vk-unlock__master-control .vk-input {
+  min-height: 54px;
+  padding-left: 16px;
+  padding-right: 52px;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.vk-unlock--master .vk-unlock__master-info {
+  width: min(100%, 400px);
+  margin: 14px 0 0;
+  padding: 12px 16px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 12px;
+  background: rgba(51, 65, 85, 0.72);
+  font-size: 13px;
+}
+
+.vk-unlock--master .vk-unlock__status {
+  width: min(100%, 400px);
+  min-height: 20px;
+  margin: 8px 0 6px;
+}
+
+.vk-unlock--master .vk-unlock__master-submit {
+  width: min(100%, 376px);
+  min-height: 54px;
+  margin-top: 4px;
+  border-radius: 12px;
+}
+
+@media (max-height: 720px) {
+  .vk-unlock--master .vk-unlock__master-panel {
+    padding-top: 14px;
+  }
+
+  .vk-unlock--master .vk-unlock__master-field {
+    margin-top: 12px;
+  }
+
+  .vk-unlock--master .vk-unlock__master-info {
+    margin-top: 10px;
+    padding: 10px 14px;
+  }
+}
+@'
+
+/* Ajuste vertical final — master unlock */
+.vk-unlock--master .vk-unlock__master-panel {
+  padding-top: 48px;
+}
+'@ | Add-Content .\components.css

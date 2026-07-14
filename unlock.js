@@ -149,7 +149,7 @@
         '</label>' +
         '<p class="vk-unlock__master-info">La contraseña maestra no consume los intentos del PIN.</p>' +
         '<p class="vk-unlock__status" aria-live="assertive">' + esc(message) + '</p>' +
-        '<button type="button" class="vk-btn vk-btn--primary vk-btn--block vk-unlock__master-submit" data-ul="submit-master"' + (checking ? ' disabled' : '') + '>' + (checking ? 'Comprobando…' : 'Desbloquear') + '</button>' +
+        '<button type="button" class="vk-btn vk-btn--primary vk-btn--block vk-unlock__master-submit" data-ul="submit-master"' + ((checking || !ui.masterValue.trim()) ? ' disabled' : '') + '>' + (checking ? 'Comprobando…' : 'Desbloquear') + '</button>' +
         legalHtml() +
       '</main>' +
     '</div>';

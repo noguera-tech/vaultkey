@@ -365,6 +365,14 @@ function initPin(){
       if(_c._ulClick) _c.removeEventListener('click',_c._ulClick);
       _c._ulClick=function(e){const el=e.target.closest('[data-ul]');if(el)vkUnlock.handleAction(el.getAttribute('data-ul'),_ctx);};
       _c.addEventListener('click',_c._ulClick);
+      if(_c._ulInput) _c.removeEventListener('input',_c._ulInput);
+      _c._ulInput=function(e){
+        if(e.target&&e.target.id==='ul-master'){
+          const btn=_c.querySelector('[data-ul="submit-master"]');
+          if(btn) btn.disabled=!e.target.value.trim();
+        }
+      };
+      _c.addEventListener('input',_c._ulInput);
       return;
     }
   }
