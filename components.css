@@ -2051,3 +2051,32 @@ body.vk-lock { overflow: hidden; }
   padding-top: 48px;
 }
 '@ | Add-Content .\components.css
+/* Ajuste visual final — teclado PIN menos brillante */
+.vk-unlock__key {
+  background: #E2E8F0;
+  border-color: rgba(148, 163, 184, 0.55);
+}
+
+.vk-unlock__key:hover,
+.vk-unlock__key:focus-visible {
+  background: #CBD5E1;
+}
+
+.vk-unlock__key:active {
+  background: #BFC9D6;
+}
+
+/* Ajuste definitivo — teclado PIN con menos brillo */
+.vk-unlock__key {
+  background: #CBD5E1;
+  border-color: rgba(100, 116, 139, 0.7);
+}
+
+.vk-unlock__key:hover,
+.vk-unlock__key:focus-visible {
+  background: #B8C4D1;
+}
+
+.vk-unlock__key:active {
+  background: #AAB7C5;
+}
