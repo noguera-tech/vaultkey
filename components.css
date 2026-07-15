@@ -2080,3 +2080,9 @@ body.vk-lock { overflow: hidden; }
 .vk-unlock__key:active {
   background: #AAB7C5;
 }
+
+/* Estado de error — contraseña maestra */
+.vk-unlock--master.vk-unlock--error .vk-unlock__status {
+  color: #FCA5A5;
+  font-weight: 500;
+}
