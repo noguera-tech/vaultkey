@@ -65,10 +65,15 @@
     '</div>';
   }
 
+  function currentPinLen() {
+    return lastCtx && lastCtx.pinLength === 8 ? 8 : PIN_LEN;
+  }
+
   function dotsHtml() {
     var out = '';
-    var filled = (ui.pinState === 'checking') ? PIN_LEN : ui.pinBuffer.length;
-    for (var i = 0; i < PIN_LEN; i++) {
+    var pinLen = currentPinLen();
+    var filled = (ui.pinState === 'checking') ? pinLen : ui.pinBuffer.length;
+    for (var i = 0; i < pinLen; i++) {
       out += '<span class="vk-unlock__dot' + (i < filled ? ' vk-unlock__dot--filled' : '') + '" aria-hidden="true"></span>';
     }
     return out;
@@ -99,19 +104,20 @@
   }
 
   function pinScreen() {
-    var ready = ui.pinBuffer.length === PIN_LEN && !ui.busy;
+    var pinLen = currentPinLen();
+    var ready = ui.pinBuffer.length === pinLen && !ui.busy;
     var buttonText = ui.pinState === 'checking' ? 'Comprobando…' : 'Comprobar PIN';
     return '<div class="vk-unlock vk-unlock--' + ui.pinState + '">' +
       '<main class="vk-unlock__panel">' +
         shieldHtml() +
         '<h1 class="vk-unlock__brand">VaultKey</h1>' +
         '<p class="vk-unlock__subtitle">Introduce tu PIN</p>' +
-        '<div class="vk-unlock__dots" aria-label="' + ui.pinBuffer.length + ' de 6 dígitos introducidos">' + dotsHtml() + '</div>' +
+        '<div class="vk-unlock__dots" aria-label="' + ui.pinBuffer.length + ' de ' + pinLen + ' dígitos introducidos">' + dotsHtml() + '</div>' +
         pinStatusHtml() +
         '<div class="vk-unlock__keypad" aria-label="Teclado numérico">' + keypadHtml() + '</div>' +
         '<div class="vk-unlock__actions">' +
           '<button type="button" class="vk-btn vk-btn--primary vk-btn--block vk-unlock__submit" data-ul="submit-pin"' + (ready ? '' : ' disabled') + '>' + buttonText + '</button>' +
-          '<button type="button" class="vk-btn vk-btn--text vk-btn--block vk-unlock__master-link" data-ul="go-master"' + (ui.busy ? ' disabled' : '') + '>Usar contraseña maestra</button>' +
+          (lastCtx && lastCtx.allowMaster === false ? '' : '<button type="button" class="vk-btn vk-btn--text vk-btn--block vk-unlock__master-link" data-ul="go-master"' + (ui.busy ? ' disabled' : '') + '>Usar contrase\u00f1a maestra</button>') +
         '</div>' +
         legalHtml() +
       '</main>' +
@@ -192,7 +198,7 @@
     }
     if (action === 'go-pin') {
   ui.mode = 'pin';
-  ui.pinState = ui.pinBuffer.length === PIN_LEN ? 'ready' : 'initial';
+  ui.pinState = ui.pinBuffer.length === currentPinLen() ? 'ready' : 'initial';
   ui.message = '';
   ui.masterValue = '';
   ui.masterVisible = false;
@@ -208,10 +214,10 @@
 
     if (action.indexOf('digit-') === 0) {
       var n = action.slice(6);
-      if (/^[0-9]$/.test(n) && ui.pinBuffer.length < PIN_LEN) {
+      if (/^[0-9]$/.test(n) && ui.pinBuffer.length < currentPinLen()) {
         if (ui.pinState === 'error') { ui.message = ''; }
         ui.pinBuffer += n;
-        ui.pinState = ui.pinBuffer.length === PIN_LEN ? 'ready' : 'initial';
+        ui.pinState = ui.pinBuffer.length === currentPinLen() ? 'ready' : 'initial';
         rerender(ctx);
       }
       return;
@@ -220,14 +226,38 @@
     if (action === 'del') {
       ui.pinBuffer = ui.pinBuffer.slice(0, -1);
       ui.message = '';
-      ui.pinState = ui.pinBuffer.length === PIN_LEN ? 'ready' : 'initial';
+      ui.pinState = ui.pinBuffer.length === currentPinLen() ? 'ready' : 'initial';
       rerender(ctx);
       return;
     }
 
     if (action === 'submit-pin') {
-      if (ui.pinBuffer.length !== PIN_LEN) { return; }
+      if (ui.pinBuffer.length !== currentPinLen()) { return; }
       var pin = ui.pinBuffer;
+
+      /* Adaptador opcional: permite reutilizar esta UI con una bóveda legacy
+         sin alterar su cifrado, almacenamiento ni contador de intentos. */
+      if (typeof ctx.unlockWithPin === 'function') {
+        ui.busy = true;
+        ui.pinState = 'checking';
+        ui.message = '';
+        rerender(ctx);
+
+        Promise.resolve()
+          .then(function () { return ctx.unlockWithPin(pin); })
+          .then(function () {
+            resetUi();
+            ctx.router.replace('/dashboard');
+          }, function (err) {
+            ui.busy = false;
+            ui.pinBuffer = '';
+            ui.pinState = 'error';
+            ui.message = (err && err.message) ? err.message : 'PIN incorrecto.';
+            rerender(ctx);
+          });
+        return;
+      }
+
       var pinWrap = ctx.store.loadPinWrap();
       if (!pinWrap) {
         ui.pinState = 'error';

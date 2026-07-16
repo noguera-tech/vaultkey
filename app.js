@@ -376,6 +376,54 @@ function initPin(){
       return;
     }
   }
+
+  // Legacy 1.x: usar UI VK2 sin migrar ni alterar datos antiguos
+  if(typeof vkUnlock!=='undefined' && typeof vkStore!=='undefined' && !vkStore.hasVault()){
+    const _legacyMeta=defaultSecurity(meta());
+    if(_legacyMeta && _legacyMeta.hash){
+      const _c=$('pin');
+      if(_c){
+        const _ctx={
+          router:{navigate:function(){},replace:function(){},back:function(){},current:function(){return{name:'unlock'};}},
+          allowMaster:false,
+          pinLength:getPinLen(),
+          unlockWithPin:async function(p){
+            let m=defaultSecurity(meta());
+            if(!m || !m.hash) throw Error('PIN no configurado');
+
+            let pinOk=false;
+            if(m.pinSalt){
+              pinOk=(await hashPin(p,m.pinSalt))===m.hash;
+            }else{
+              pinOk=(await digest(p))===m.hash;
+            }
+
+            if(!pinOk){
+  registerFailedPin();
+  let left=lockRemaining();
+  throw Error(left ? 'BÃ³veda bloqueada. Espera '+left+' s' : 'PIN incorrecto');
+}
+
+            let pack=JSON.parse(localStorage.getItem(LS_DATA)||'null');
+            vault=pack?await decryptData(pack,p):[];
+            await unlockOk(p);
+          }
+        };
+
+        vkUnlock.render({name:'unlock',path:'/unlock',params:{},meta:{root:false},transitionMs:300},_c,_ctx);
+
+        if(_c._ulClick) _c.removeEventListener('click',_c._ulClick);
+        _c._ulClick=function(e){
+          const el=e.target.closest('[data-ul]');
+          if(el)vkUnlock.handleAction(el.getAttribute('data-ul'),_ctx);
+        };
+        _c.addEventListener('click',_c._ulClick);
+
+        return;
+      }
+    }
+  }
+
   let m=defaultSecurity(meta());mode=(m&&m.hash)?'unlock':'setup1';let left=lockRemaining();const plen=getPinLen();$('pinMsg').className='pinSub';$('pinMsg').textContent=mode==='unlock'?(left?'Bóveda bloqueada. Espera '+left+' s':'Introduce tu PIN'):'Crea un PIN de '+plen+' dígitos';if(left)$('pinMsg').classList.add('pinLocked');renderDots();renderKeys();syncSettingsUI();updateLockCountdown()}
 function getPinLen(){const m=meta();return(m&&m.pinLen===8)?8:6;}
 function renderDots(){const len=getPinLen();let d=$('dots');if(!d)return;d.innerHTML='';d.className='dots'+(len===8?' dots8':'');for(let i=0;i<len;i++){let x=document.createElement('div');x.className='dot'+(i<pin.length?' on':'');d.appendChild(x)}}
