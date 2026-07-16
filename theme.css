@@ -35,3 +35,61 @@
   --vk-input-bg: #243246;
   --vk-input-border: rgba(58, 74, 96, 0.6);
 }
+
+/* ============================================================
+   VaultKey 2.0 — theme.css — BLOQUE R1 (paralelo, temporal)
+   Fuente: Auditoría visual Figma R1 (aprobada como fuente
+   visual oficial). Prefijo --vk-r1-* para introducir el
+   sistema Figma sin tocar los tokens --vk-* ya consumidos
+   por Unlock y Onboarding (Módulo 2, ya integrados y en QA).
+
+   REGLA: ningún componente actual debe leer estos tokens
+   todavía. Se activan pantalla a pantalla, solo cuando se
+   autorice explícitamente, editando components.css/style.css
+   para que un selector concreto empiece a usar --vk-r1-*.
+
+   No incluye: --vk-r1-header (valor no confirmado en Figma),
+   ni carga de la tipografía Inter (solo se declara el nombre
+   de familia; falta decidir cómo se sirve el recurso).
+   ============================================================ */
+
+:root {
+  /* Fondo */
+  --vk-r1-bg-gradient:
+    linear-gradient(180deg, #111827 17%, #182F4E 67%);
+
+  /* Marca */
+  --vk-r1-primary: #2F6FEA;
+  --vk-r1-accent: #3B82F6;
+
+  /* Superficies */
+  --vk-r1-surface: #243246;
+  --vk-r1-surface-alt: #334155;
+
+  /* Texto */
+  --vk-r1-text: #FFFFFF;
+  --vk-r1-text-secondary: #9CA3AF;
+  --vk-r1-text-tertiary: #A7B6C9;
+
+  /* Bordes y divisores */
+  --vk-r1-border: #3A4A60;
+  --vk-r1-border-soft: rgba(58, 74, 96, 0.60);
+  --vk-r1-divider: #475569;
+
+  /* Semántico */
+  --vk-r1-success: #22C55E;
+  --vk-r1-warning: #F59E0B;
+  --vk-r1-danger: #DC2626;
+  --vk-r1-danger-emphasis: #EF4444;
+
+  /* Overlay */
+  --vk-r1-overlay: rgba(0, 0, 0, 0.35);
+
+  /* Geometría */
+  --vk-r1-radius-sm: 12px;
+  --vk-r1-radius-md: 16px;
+  --vk-r1-radius-full: 999px;
+
+  /* Tipografía — solo declaración del token, sin cargar el recurso */
+  --vk-r1-font-family: Inter, system-ui, -apple-system, sans-serif;
+}
