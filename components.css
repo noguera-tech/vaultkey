@@ -2309,3 +2309,226 @@ body.vk-lock { overflow: hidden; }
   color: #FCA5A5;
   font-weight: 500;
 }
+
+/* VAULTKEY DASHBOARD 05 - FIGMA APROBADO V6 */
+/* Preview aislada 05 Dashboard v5. No forma parte de producción. */
+.vk-dash-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--vk-r1-bg-gradient);
+}
+
+.vk-dash-root .vk-header {
+  flex: 0 0 56px;
+  padding-left: 12px;
+  border-bottom: 1px solid var(--vk-border);
+}
+
+.vk-dash-root .vk-header__title { min-width: 0; }
+
+.vk-dash-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 18px 22px 112px;
+}
+
+.vk-dash-brand {
+  margin: 0;
+  color: var(--vk-text);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  letter-spacing: -0.2px;
+}
+
+.vk-dash-greeting {
+  margin: 8px 0 0;
+  color: var(--vk-text);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.vk-dash-status {
+  margin-top: 16px;
+  padding: 16px 18px;
+  border-radius: 18px;
+}
+
+.vk-dash-status__row1,
+.vk-dash-status__row2 {
+  display: flex;
+  align-items: center;
+}
+
+.vk-dash-status__row1 { gap: 10px; }
+.vk-dash-status__row2 { gap: 8px; margin-top: 14px; }
+
+.vk-dash-status__shield {
+  width: 24px;
+  height: 29px;
+  flex: none;
+  color: var(--vk-primary);
+}
+
+.vk-dash-status__title {
+  color: var(--vk-text);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.vk-dash-status__dot {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--vk-success);
+}
+
+.vk-dash-status__label {
+  color: var(--vk-text-muted);
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.vk-dash-status__desc {
+  margin-top: 16px;
+  color: var(--vk-text-muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.vk-dash-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  width: 100%;
+  margin-top: 60px;
+  box-sizing: border-box;
+}
+
+.vk-dash-tile {
+  width: 100%;
+  min-width: 0;
+  min-height: 112px;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  row-gap: 13px;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 18px 14px;
+  border: 1px solid var(--vk-border);
+  border-radius: 16px;
+  background: var(--vk-card);
+  color: var(--vk-text);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.vk-dash-tile:active { background: var(--vk-border); }
+
+.vk-dash-tile__icon {
+  grid-column: 1;
+  grid-row: 1;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vk-primary);
+}
+
+.vk-dash-tile__icon svg { width: 100%; height: 100%; }
+
+
+/* Icono Contraseñas: composición exacta de dos capas exportadas de Figma. */
+.vk-dash-key-icon {
+  position: relative;
+  width: 32px;
+  height: 32px;
+}
+
+.vk-dash-key-icon__body {
+  position: absolute;
+  inset: 3px;
+  width: 26px !important;
+  height: 26px !important;
+}
+
+.vk-dash-key-icon__hole {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  width: 3px !important;
+  height: 2px !important;
+}
+
+.vk-dash-tile__label {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  color: var(--vk-text);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.vk-dash-tile__count {
+  grid-column: 2;
+  grid-row: 2;
+  color: var(--vk-text-muted);
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.vk-dash-fab {
+  position: fixed;
+  right: max(22px, env(safe-area-inset-right, 0px));
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  width: 56px;
+  height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 50%;
+  background: var(--vk-primary);
+  color: var(--vk-text);
+  cursor: pointer;
+}
+
+.vk-dash-fab:active { filter: brightness(.88); }
+.vk-dash-fab svg { width: 28px; height: 28px; }
+
+@media (max-height: 760px) {
+  .vk-dash-content { padding-top: 12px; padding-bottom: 90px; }
+  .vk-dash-grid { margin-top: 28px; }
+  .vk-dash-status { margin-top: 12px; }
+}
+/* FIN VAULTKEY DASHBOARD 05 - FIGMA APROBADO V6 */
+
+/* DASHBOARD 05 - CORRECCION FINAL FAB */
+#home.vk-dash-root > .vk-dash-fab {
+  position: fixed !important;
+  left: auto !important;
+  right: max(22px, env(safe-area-inset-right, 0px)) !important;
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px)) !important;
+  margin: 0 !important;
+  transform: none !important;
+  z-index: 1000 !important;
+}

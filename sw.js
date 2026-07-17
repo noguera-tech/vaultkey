@@ -3,7 +3,7 @@
 //  Versión auto-generada: no editar CACHE_VERSION manualmente.
 //  Para forzar actualización en usuarios: incrementar el número.
 // ─────────────────────────────────────────────────────────────
-const CACHE_VERSION = 20;
+const CACHE_VERSION = 21;
 const CACHE = `vaultkey-v${CACHE_VERSION}`;
 
 const FILES = [
