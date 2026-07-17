@@ -2044,13 +2044,11 @@ body.vk-lock { overflow: hidden; }
     padding: 10px 14px;
   }
 }
-@'
 
 /* Ajuste vertical final â€” master unlock */
 .vk-unlock--master .vk-unlock__master-panel {
   padding-top: 48px;
 }
-'@ | Add-Content .\components.css
 /* Ajuste visual final — teclado PIN menos brillante */
 .vk-unlock__key {
   background: #E2E8F0;
