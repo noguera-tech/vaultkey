@@ -764,7 +764,6 @@ body.vk-lock { overflow: hidden; }
   width: min(100%, 320px);
 }
 
-.vk-unlock__submit,
 .vk-unlock__master-submit {
   min-height: 44px;
   border-radius: 9px;
@@ -789,6 +788,232 @@ body.vk-lock { overflow: hidden; }
 
 .vk-unlock__legal a:focus-visible,
 .vk-unlock__legal a:hover { text-decoration: underline; }
+
+/* ============================================================
+   Bloque R1 — integración CSS de PRUEBA de UNLOCK-01 PIN
+   Fuente: preview aprobada unlock-r1-preview-v3.5.html
+   Aplicado sobre components-post-repair.css (real, post commit
+   f0b16c4 "Remove accidental PowerShell text from CSS").
+   Escopado exclusivamente a la pantalla de PIN mediante
+   ":not(.vk-unlock--master)" — no debe afectar en ningún caso
+   a la pantalla de contraseña maestra, que usa su propio
+   contenedor .vk-unlock__master-panel (no .vk-unlock__panel).
+   No modifica unlock.js, app.js, router, crypto, storage,
+   sesión, wipe ni contraseña maestra — únicamente presentación
+   (CSS). Sin JavaScript de escala: la adaptación a alturas
+   menores de 917px es puramente CSS (variables + media queries).
+
+   Layout mediante variables CSS escopadas al panel de PIN.
+   Composición 412x917 exacta cuando la altura disponible es
+   >= 917px (valores por defecto, sin media query). Para
+   alturas menores, dos niveles de compactación redefinen
+   SOLO las variables, reutilizando el mismo esqueleto de
+   posicionamiento absoluto. El breakpoint max-height:720px
+   reutiliza el mismo umbral que ya usa el resto de .vk-unlock*
+   en este archivo (layout de flujo original), para no
+   introducir un tercer valor de corte distinto.
+   ============================================================ */
+
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__panel {
+  --ul-panel-height: 917px;
+  --ul-shield-top: 70px;
+  --ul-shield-width: 150px;
+  --ul-shield-height: 180px;
+  --ul-brand-top: 268px;
+  --ul-brand-size: 32px;
+  --ul-subtitle-top: 322px;
+  --ul-dots-top: 367px;
+  --ul-status-top: 400px;
+  --ul-status-min-height: 36px;
+  --ul-keypad-top: 452px;
+  --ul-key-size: 50px;
+  --ul-key-gap: 10px 18px;
+  --ul-key-font: 32px;
+  --ul-actions-top: 740px;
+  --ul-footer-bottom: 20px;
+
+  position: relative;
+  width: min(100%, 412px);
+  height: var(--ul-panel-height);
+  min-height: var(--ul-panel-height);
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Compactación nivel 1 — alturas entre 721px y 916px.
+   Peor caso verificado: 721px (justo por encima del límite del
+   nivel 2). Reduce el "aire" entre bloques; escudo y teclas
+   conservan tamaño de tap-target razonable. */
+@media (max-height: 916px) {
+  .vk-unlock:not(.vk-unlock--master) .vk-unlock__panel {
+    --ul-panel-height: 100dvh;
+    --ul-shield-top: 24px;
+    --ul-shield-width: 110px;
+    --ul-shield-height: 132px;
+    --ul-brand-top: 164px;
+    --ul-brand-size: 28px;
+    --ul-subtitle-top: 204px;
+    --ul-dots-top: 228px;
+    --ul-status-top: 252px;
+    --ul-status-min-height: 32px;
+    --ul-keypad-top: 296px;
+    --ul-key-size: 50px;
+    --ul-key-gap: 8px 16px;
+    --ul-key-font: 28px;
+    --ul-actions-top: 556px;
+    --ul-footer-bottom: 12px;
+
+    height: 100dvh;
+    min-height: 0;
+  }
+}
+
+/* Compactación nivel 2 — alturas <= 720px (dispositivos Android
+   bajos/con chrome de sistema). Reutiliza el mismo umbral
+   max-height:720px que ya usa el resto de .vk-unlock* en este
+   archivo. Peor caso verificado: 720px exacto (y 640px como
+   margen de seguridad adicional). */
+@media (max-height: 720px) {
+  .vk-unlock:not(.vk-unlock--master) .vk-unlock__panel {
+    --ul-shield-top: 16px;
+    --ul-shield-width: 90px;
+    --ul-shield-height: 108px;
+    --ul-brand-top: 132px;
+    --ul-brand-size: 24px;
+    --ul-subtitle-top: 168px;
+    --ul-dots-top: 196px;
+    --ul-status-top: 218px;
+    --ul-status-min-height: 28px;
+    --ul-keypad-top: 254px;
+    --ul-key-size: 46px;
+    --ul-key-gap: 8px 14px;
+    --ul-key-font: 24px;
+    --ul-actions-top: 474px;
+    --ul-footer-bottom: 8px;
+  }
+}
+
+.vk-unlock__panel > .vk-unlock__shield {
+  position: absolute;
+  top: var(--ul-shield-top);
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--ul-shield-width);
+  height: var(--ul-shield-height);
+  margin: 0;
+}
+
+.vk-unlock__panel > .vk-unlock__shield .vk-unlock__shield-outline {
+  width: var(--ul-shield-width);
+  height: var(--ul-shield-height);
+}
+
+.vk-unlock__panel > .vk-unlock__shield .vk-unlock__shield-lock {
+  width: 36px;
+  height: 40px;
+  transform: translate(-50%, -46%);
+}
+
+.vk-unlock__panel > .vk-unlock__brand {
+  position: absolute;
+  top: var(--ul-brand-top);
+  left: 0;
+  width: 100%;
+  margin: 0;
+  font-size: var(--ul-brand-size);
+  line-height: 1.1;
+}
+
+.vk-unlock__panel .vk-unlock__subtitle {
+  position: absolute;
+  top: var(--ul-subtitle-top);
+  left: 0;
+  width: 100%;
+  margin: 0;
+}
+
+.vk-unlock__panel .vk-unlock__dots {
+  position: absolute;
+  top: var(--ul-dots-top);
+  left: 0;
+  width: 100%;
+  margin: 0;
+}
+
+/* Estado (initial/ready/checking/error/wiping): SIEMPRE visible,
+   con una zona reservada mínima (variable por breakpoint). Sin
+   display:none en ningún caso. */
+.vk-unlock__panel .vk-unlock__status {
+  position: absolute;
+  top: var(--ul-status-top);
+  left: 0;
+  width: 100%;
+  min-height: var(--ul-status-min-height);
+  margin: 0;
+}
+
+.vk-unlock__panel .vk-unlock__keypad {
+  position: absolute;
+  top: var(--ul-keypad-top);
+  left: 50%;
+  transform: translateX(-50%);
+  grid-template-columns: repeat(3, var(--ul-key-size));
+  gap: var(--ul-key-gap);
+  margin: 0;
+}
+
+.vk-unlock__panel .vk-unlock__key {
+  width: var(--ul-key-size);
+  height: var(--ul-key-size);
+  border: none;
+  background: var(--vk-r1-neutral-light);
+  color: var(--vk-r1-primary);
+  font-size: var(--ul-key-font);
+  font-weight: 600;
+}
+
+.vk-unlock__panel .vk-unlock__key--empty {
+  background: transparent;
+}
+
+.vk-unlock__panel .vk-unlock__actions {
+  position: absolute;
+  top: var(--ul-actions-top);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  margin: 0;
+}
+
+.vk-unlock__panel .vk-unlock__submit {
+  width: 100%;
+  height: 56px;
+  min-height: 56px;
+  border-radius: 16px;
+}
+
+.vk-unlock__panel .vk-unlock__submit:not(:disabled) {
+  background: var(--vk-r1-primary);
+  color: var(--vk-r1-text);
+}
+
+.vk-unlock__panel .vk-unlock__submit:disabled {
+  background: var(--vk-r1-surface);
+  color: var(--vk-r1-text-secondary);
+  border-color: var(--vk-r1-border);
+}
+
+.vk-unlock__panel .vk-unlock__legal {
+  position: absolute;
+  left: 0;
+  bottom: var(--ul-footer-bottom);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+/* ============================================================
+   Fin bloque R1 — integración de prueba UNLOCK-01 PIN
+   ============================================================ */
 
 .vk-unlock__appbar {
   position: sticky;
