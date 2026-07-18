@@ -3930,3 +3930,13 @@ body:has(#settings.active) #screenDots .dot,
 #home.screen.vk-dash-root::after {
   display: none !important;
 }
+
+
+/* CONTRASENAS 06 - FONDO FIGMA AISLADO */
+#passwords.screen.vk-passwords-root {
+  background: #0F172A !important;
+}
+#passwords.screen.vk-passwords-root::before,
+#passwords.screen.vk-passwords-root::after {
+  display: none !important;
+}
