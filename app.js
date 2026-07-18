@@ -2682,7 +2682,7 @@ function renderPasswordFamilyList(){
       button.type='button';
       button.className='vk-passwords-row';
       button.setAttribute('aria-label','Abrir '+(e.service||e.title||'contraseña'));
-      button.onclick=()=>quick(e.id);
+      button.onclick=()=>openPasswordDetail(e.id);
       const title=safeEsc(e.service||e.title||'Sin título');
       const identity=safeEsc(passwordFamilyIdentity(e)||'Sin usuario');
       button.innerHTML='<span class="vk-passwords-row__icon">'+passwordFamilyKeySvg()+'</span><span class="vk-passwords-row__copy"><strong>'+title+'</strong><span>'+identity+'</span></span><svg class="vk-passwords-row__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
@@ -2696,6 +2696,90 @@ function renderPasswordFamilyList(){
   section.innerHTML='<div class="vk-passwords-empty__icon" aria-hidden="true">'+passwordFamilyKeySvg()+'</div><h2>'+(noResults?'No se encontraron contraseñas':'Aún no tienes contraseñas')+'</h2><p>'+(noResults?'Prueba con otra palabra o revisa la búsqueda.':'Guarda aquí tus accesos para tenerlos protegidos y siempre a mano.')+'</p><button type="button">'+(noResults?'Limpiar búsqueda':'Añadir contraseña')+'</button>';
   section.querySelector('button').onclick=()=>{if(noResults){if(search)search.value='';render();}else openEntry();};
   host.appendChild(section);
+}
+
+
+function passwordDetailIcon(name){
+  const icons={
+    globe:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    eye:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2.1 12a10 10 0 0 1 19.8 0 10 10 0 0 1-19.8 0" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>',
+    copy:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" stroke="currentColor" stroke-width="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    external:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 4h6v6M10 14 20 4M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    edit:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    trash:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  return icons[name]||'';
+}
+
+function openPasswordDetail(id){
+  const e=vault.find(x=>x.id===id);
+  if(!e)return;
+  e.used=Date.now();
+  persist();
+  current=e;
+  renderPasswordDetail();
+  show('passwordDetail','right');
+}
+
+function renderPasswordDetail(){
+  const host=$('passwordDetailBody');
+  const titleHost=$('passwordDetailHeaderTitle');
+  if(!host||!current||!isPasswordFamilyEntry(current))return;
+
+  const e=current;
+  const title=safeEsc(e.service||e.title||e.wifiSsid||'Contraseña');
+  const user=safeEsc(passwordFamilyIdentity(e)||'Sin usuario');
+  const url=safeEsc(e.url||'');
+  const note=safeEsc(e.note||e.notes||'Sin notas');
+
+  if(titleHost)titleHost.textContent=e.service||e.title||e.wifiSsid||'Detalle';
+
+  host.innerHTML=
+    '<section class="vk-password-detail-card">'+
+      '<div class="vk-password-detail-card__title">'+passwordDetailIcon('globe')+'<strong>'+title+'</strong></div>'+
+      '<div class="vk-password-detail-row"><div><small>Usuario</small><span>'+user+'</span></div></div>'+
+      '<div class="vk-password-detail-row vk-password-detail-row--actions"><div><small>Contraseña</small><span id="passwordDetailSecret" data-visible="false">••••••••••••</span></div><div class="vk-password-detail-icons"><button type="button" aria-label="Mostrar u ocultar contraseña" onclick="togglePasswordDetailSecret()">'+passwordDetailIcon('eye')+'</button><button type="button" aria-label="Copiar contraseña" onclick="copyPasswordDetailSecret()">'+passwordDetailIcon('copy')+'</button></div></div>'+
+      (url?'<div class="vk-password-detail-row vk-password-detail-row--actions"><div><small>Sitio web</small><span>'+url+'</span></div><button type="button" aria-label="Copiar sitio web" onclick="copyPasswordDetailUrl()">'+passwordDetailIcon('copy')+'</button></div>':'')+
+      '<div class="vk-password-detail-row vk-password-detail-row--actions"><div><small>Notas</small><span>'+note+'</span></div>'+(url?'<button type="button" aria-label="Abrir sitio web" onclick="openUrl(current.url)">'+passwordDetailIcon('external')+'</button>':'')+'</div>'+
+    '</section>'+
+    '<div class="vk-password-detail-actions">'+
+      '<button type="button" class="vk-password-detail-edit" onclick="openEntry(current)">'+passwordDetailIcon('edit')+'<span>Editar</span></button>'+
+      '<button type="button" class="vk-password-detail-delete" onclick="deletePasswordFromDetail()">'+passwordDetailIcon('trash')+'<span>Eliminar</span></button>'+
+    '</div>';
+}
+
+function togglePasswordDetailSecret(){
+  const el=$('passwordDetailSecret');
+  if(!el||!current)return;
+  const visible=el.dataset.visible==='true';
+  el.dataset.visible=visible?'false':'true';
+  el.textContent=visible?'••••••••••••':(current.pass||current.password||'');
+}
+
+function copyPasswordDetailSecret(){
+  if(!current)return;
+  copyText(current.pass||current.password||'');
+  toast('Contraseña copiada');
+}
+
+function copyPasswordDetailUrl(){
+  if(!current)return;
+  copyText(current.url||'');
+  toast('Sitio web copiado');
+}
+
+async function deletePasswordFromDetail(){
+  if(!current)return;
+  const id=current.id;
+  if(await vkConfirm('Eliminar contraseña','¿Eliminar esta contraseña de la bóveda?')){
+    vault=vault.filter(e=>e.id!==id);
+    await persist();
+    current=null;
+    render();
+    show('passwords','left');
+    toast('Contraseña eliminada');
+    try{driveAutoSync();}catch(e){}
+  }
 }
 
 function render(){

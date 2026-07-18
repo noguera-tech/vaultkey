@@ -3940,3 +3940,14 @@ body:has(#settings.active) #screenDots .dot,
 #passwords.screen.vk-passwords-root::after {
   display: none !important;
 }
+
+
+/* 07 DETALLE CONTRASEÑA - FONDO FIGMA AISLADO */
+#passwordDetail.screen.vk-password-detail-root{
+  background:linear-gradient(180deg,#111827 17%,#182f4e 67%) !important;
+}
+
+#passwordDetail.screen.vk-password-detail-root::before,
+#passwordDetail.screen.vk-password-detail-root::after{
+  display:none !important;
+}
