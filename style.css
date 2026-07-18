@@ -3934,7 +3934,7 @@ body:has(#settings.active) #screenDots .dot,
 
 /* CONTRASENAS 06 - FONDO FIGMA AISLADO */
 #passwords.screen.vk-passwords-root {
-  background: #0F172A !important;
+  background: linear-gradient(180deg,#111827 17%,#182f4e 67%) !important;
 }
 #passwords.screen.vk-passwords-root::before,
 #passwords.screen.vk-passwords-root::after {

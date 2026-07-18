@@ -453,7 +453,7 @@ async function persist(p=lastKey){
     }
   }
   if(!p)return;localStorage.setItem(LS_DATA,JSON.stringify(await encryptData(vault,p)));}
-const NAV_ORDER=['home','vault','fav','settings'];
+const NAV_ORDER=['home','passwords','fav','settings'];
 
 function ensureFabInAppShell(){
   const fab=document.getElementById('fabAdd');
@@ -614,12 +614,12 @@ function show(id,dir){
   });
   // Dots visibles solo en pantallas principales
   const dotsEl=document.getElementById('screenDots');
-  if(dotsEl) dotsEl.style.display=['home','vault','fav','settings'].includes(id)?'flex':'none';
+  if(dotsEl) dotsEl.style.display=['home','passwords','fav','settings'].includes(id)?'flex':'none';
 }
 /* Swipe lateral entre pantallas principales */
 (function(){
   let sx=0,sy=0,stime=0;
-  const SWIPEABLE=['home','vault','fav','settings'];
+  const SWIPEABLE=['home','passwords','fav','settings'];
   document.addEventListener('touchstart',e=>{
     sx=e.touches[0].clientX;
     sy=e.touches[0].clientY;
@@ -2925,8 +2925,8 @@ function setPasswordCreateType(type){
   const config={
     web:{
       title:'Añadir contraseña - Web',
-      nameLabel:'Nombre',
-      namePlaceholder:'Nombre del servicio',
+      nameLabel:'Sitio web',
+      namePlaceholder:'Google, Gmail, Amazon...',
       userVisible:true,
       nameIcon:'',
       secretLabel:'Contraseña',
