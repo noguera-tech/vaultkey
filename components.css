@@ -2746,3 +2746,169 @@ body.vk-lock { overflow: hidden; }
 .vk-password-detail-delete{
   background:#ef2b2f;
 }
+
+
+
+/* VaultKey 2.0 - 08 Editar password aprobado */
+.vk-password-edit-root{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(180deg,#111827 17%,#182f4e 67%);
+  color:#fff;
+}
+
+.vk-password-edit-header{
+  height:62px;
+  flex:0 0 62px;
+  display:flex;
+  align-items:center;
+  padding:0 10px;
+  background:#24354b;
+  border-bottom:1px solid #111827;
+}
+
+.vk-password-edit-back{
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border:0;
+  border-radius:12px;
+  background:transparent;
+  color:#f8fafc;
+}
+
+.vk-password-edit-back svg{
+  width:22px;
+  height:22px;
+}
+
+.vk-password-edit-content{
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  padding:15px 24px 28px;
+}
+
+.vk-password-edit-title{
+  margin:4px 0 25px;
+  text-align:center;
+  color:#fff;
+  font-size:20px;
+  font-weight:700;
+  line-height:1.2;
+  letter-spacing:-.2px;
+}
+
+.vk-password-edit-form{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.vk-password-edit-field{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.vk-password-edit-field > span{
+  color:#f1f5f9;
+  font-size:14px;
+  font-weight:600;
+  line-height:1.2;
+}
+
+.vk-password-edit-field input,
+.vk-password-edit-field textarea{
+  width:100%;
+  margin:0;
+  border:1px solid rgba(58,74,96,.6);
+  border-radius:6px;
+  outline:none;
+  background:#243246;
+  color:#f8fafc;
+  box-shadow:none;
+  font:inherit;
+  line-height:1.35;
+}
+
+.vk-password-edit-field input{
+  height:46px;
+  padding:12px 13px;
+}
+
+.vk-password-edit-field textarea{
+  min-height:104px;
+  padding:12px 13px;
+  resize:none;
+}
+
+.vk-password-edit-field input:focus,
+.vk-password-edit-field textarea:focus{
+  border-color:#4f7fb9;
+  box-shadow:0 0 0 2px rgba(79,127,185,.18);
+}
+
+.vk-password-edit-secret{
+  position:relative;
+}
+
+.vk-password-edit-secret input{
+  padding-right:49px;
+}
+
+.vk-password-edit-eye{
+  position:absolute;
+  top:3px;
+  right:3px;
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border:0;
+  border-radius:6px;
+  background:transparent;
+  color:#3b82f6;
+}
+
+.vk-password-edit-eye svg{
+  width:22px;
+  height:22px;
+}
+
+.vk-password-edit-hidden{
+  display:none !important;
+}
+
+.vk-password-edit-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:8px;
+  padding-bottom:4px;
+}
+
+.vk-password-edit-actions button{
+  height:48px;
+  padding:0 16px;
+  border:0;
+  border-radius:8px;
+  color:#fff;
+  font-size:14px;
+  font-weight:700;
+}
+
+.vk-password-edit-cancel{
+  background:#475569;
+}
+
+.vk-password-edit-save{
+  background:#3b82f6;
+}
+
+.vk-password-edit-actions button:active{
+  transform:translateY(1px);
+}

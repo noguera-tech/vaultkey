@@ -3951,3 +3951,15 @@ body:has(#settings.active) #screenDots .dot,
 #passwordDetail.screen.vk-password-detail-root::after{
   display:none !important;
 }
+
+
+
+/* 08 EDITAR PASSWORD - FONDO FIGMA AISLADO */
+#passwordEdit.screen.vk-password-edit-root{
+  background:linear-gradient(180deg,#111827 17%,#182f4e 67%) !important;
+}
+
+#passwordEdit.screen.vk-password-edit-root::before,
+#passwordEdit.screen.vk-password-edit-root::after{
+  display:none !important;
+}

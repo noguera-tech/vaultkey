@@ -2711,6 +2711,162 @@ function passwordDetailIcon(name){
   return icons[name]||'';
 }
 
+
+function openPasswordEdit(){
+  if(!current||!isPasswordFamilyEntry(current))return;
+
+  $('passwordEditName').value=
+    current.service||current.title||current.wifiSsid||'';
+
+  $('passwordEditUser').value=
+    current.user||current.username||current.email||'';
+
+  const secret=$('passwordEditSecret');
+  secret.type='password';
+  secret.value=current.pass||current.password||current.wifiPass||'';
+
+  $('passwordEditUrl').value=current.url||'';
+  $('passwordEditNotes').value=current.note||current.notes||'';
+
+  $('passwordEditEyeOpen')?.classList.remove('vk-password-edit-hidden');
+  $('passwordEditEyeOff')?.classList.add('vk-password-edit-hidden');
+
+  show('passwordEdit','right');
+}
+
+function cancelPasswordEdit(){
+  if(!current)return;
+  renderPasswordDetail();
+  show('passwordDetail','left');
+}
+
+function togglePasswordEditSecret(){
+  const input=$('passwordEditSecret');
+  if(!input)return;
+
+  const reveal=input.type==='password';
+  input.type=reveal?'text':'password';
+
+  $('passwordEditEyeOpen')
+    ?.classList.toggle('vk-password-edit-hidden',reveal);
+
+  $('passwordEditEyeOff')
+    ?.classList.toggle('vk-password-edit-hidden',!reveal);
+}
+
+async function savePasswordEdit(){
+  if(!current||!isPasswordFamilyEntry(current))return;
+
+  const service=($('passwordEditName')?.value||'').trim();
+  const identity=($('passwordEditUser')?.value||'').trim();
+  const secret=$('passwordEditSecret')?.value||'';
+  const rawUrl=($('passwordEditUrl')?.value||'').trim();
+  const notes=($('passwordEditNotes')?.value||'').trim();
+
+  if(!service){
+    toast('El nombre es obligatorio.');
+    $('passwordEditName')?.focus();
+    return;
+  }
+
+  if(!identity){
+    toast('El usuario es obligatorio.');
+    $('passwordEditUser')?.focus();
+    return;
+  }
+
+  if(secret.length<6){
+    toast('La contraseña debe tener mínimo 6 caracteres.');
+    $('passwordEditSecret')?.focus();
+    return;
+  }
+
+  if(rawUrl&&typeof isLikelyUrl==='function'&&!isLikelyUrl(rawUrl)){
+    toast('La URL no es válida. Ej: https://google.com');
+    $('passwordEditUrl')?.focus();
+    return;
+  }
+
+  const urlValue=
+    rawUrl&&typeof normalizeUrl==='function'
+      ? normalizeUrl(rawUrl)
+      : rawUrl;
+
+  const index=vault.findIndex(entry=>entry.id===current.id);
+  if(index<0)return;
+
+  const previous=vault[index];
+  const next={...previous};
+
+  const oldSecret=
+    previous.pass||previous.password||previous.wifiPass||'';
+
+  if(Object.prototype.hasOwnProperty.call(next,'title')){
+    next.title=service;
+  }
+
+  if(Object.prototype.hasOwnProperty.call(next,'service')||
+     !Object.prototype.hasOwnProperty.call(next,'title')){
+    next.service=service;
+  }
+
+  if(Object.prototype.hasOwnProperty.call(next,'username')){
+    next.username=identity;
+  }
+
+  if(Object.prototype.hasOwnProperty.call(next,'user')||
+     !Object.prototype.hasOwnProperty.call(next,'username')){
+    next.user=identity;
+  }
+
+  if(Object.prototype.hasOwnProperty.call(next,'password')){
+    next.password=secret;
+  }
+
+  if(Object.prototype.hasOwnProperty.call(next,'pass')||
+     !Object.prototype.hasOwnProperty.call(next,'password')){
+    next.pass=secret;
+  }
+
+  if(Object.prototype.hasOwnProperty.call(next,'notes')){
+    next.notes=notes;
+  }
+
+  if(Object.prototype.hasOwnProperty.call(next,'note')||
+     !Object.prototype.hasOwnProperty.call(next,'notes')){
+    next.note=notes;
+  }
+
+  next.url=urlValue;
+  next.updated=Date.now();
+
+  if(oldSecret&&oldSecret!==secret){
+    const history=Array.isArray(previous.passHistory)
+      ? previous.passHistory
+      : [];
+
+    next.passHistory=[
+      {
+        pass:oldSecret,
+        date:previous.updated||Date.now()
+      },
+      ...history
+    ].slice(0,3);
+  }
+
+  vault[index]=next;
+  current=next;
+
+  await persist();
+
+  render();
+  renderPasswordDetail();
+  show('passwordDetail','left');
+  toast('Cambios guardados');
+
+  try{driveAutoSync();}catch(error){}
+}
+
 function openPasswordDetail(id){
   const e=vault.find(x=>x.id===id);
   if(!e)return;
@@ -2743,7 +2899,7 @@ function renderPasswordDetail(){
       '<div class="vk-password-detail-row vk-password-detail-row--actions"><div><small>Notas</small><span>'+note+'</span></div>'+(url?'<button type="button" aria-label="Abrir sitio web" onclick="openUrl(current.url)">'+passwordDetailIcon('external')+'</button>':'')+'</div>'+
     '</section>'+
     '<div class="vk-password-detail-actions">'+
-      '<button type="button" class="vk-password-detail-edit" onclick="openEntry(current)">'+passwordDetailIcon('edit')+'<span>Editar</span></button>'+
+      '<button type="button" class="vk-password-detail-edit" onclick="openPasswordEdit()">'+passwordDetailIcon('edit')+'<span>Editar</span></button>'+
       '<button type="button" class="vk-password-detail-delete" onclick="deletePasswordFromDetail()">'+passwordDetailIcon('trash')+'<span>Eliminar</span></button>'+
     '</div>';
 }
