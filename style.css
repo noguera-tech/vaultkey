@@ -3920,3 +3920,13 @@ body:has(#settings.active) #screenDots .dot,
 /* VK 2.0 onboarding host — sobreescribe flex-column del modal legacy */
 #onboardingModal.vk2-onboarding { display:block; overflow-y:auto; }
 #onboardingModal .vk2-onboarding-host { width:100%; min-height:100dvh; display:flex; flex-direction:column; }
+
+
+/* DASHBOARD 05 - FONDO FIGMA AISLADO */
+#home.screen.vk-dash-root {
+  background: #0F172A !important;
+}
+#home.screen.vk-dash-root::before,
+#home.screen.vk-dash-root::after {
+  display: none !important;
+}
