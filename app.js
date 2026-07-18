@@ -2658,6 +2658,46 @@ function setSortOrder(v){
   if(btn)btn.textContent=labels[v]||'⇅';
   render();
 }
+function isPasswordFamilyEntry(e){
+  const type=(e?.entryType||e?.type||'password').toLowerCase();
+  return type==='password'||type==='wifi'||type==='pin'||type==='recovery';
+}
+function passwordFamilyIdentity(e){
+  return e?.user||e?.username||e?.email||e?.url||e?.ssid||'';
+}
+function passwordFamilyKeySvg(){
+  return '<svg viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="M1.70186 19.5073C1.2526 19.9564 1.00014 20.5656 1 21.2009V23.8023C1 24.1199 1.12619 24.4246 1.3508 24.6492C1.57542 24.8738 1.88006 25 2.19771 25H5.79084C6.10849 25 6.41313 24.8738 6.63775 24.6492C6.86236 24.4246 6.98855 24.1199 6.98855 23.8023V22.6046C6.98855 22.2869 7.11474 21.9823 7.33935 21.7577C7.56396 21.5331 7.86861 21.4069 8.18626 21.4069H9.38397C9.70162 21.4069 10.0063 21.2807 10.2309 21.0561C10.4555 20.8315 10.5817 20.5268 10.5817 20.2092V19.0115C10.5817 18.6938 10.7079 18.3892 10.9325 18.1645C11.1571 17.9399 11.4617 17.8137 11.7794 17.8137H11.9854C12.6206 17.8136 13.2298 17.5611 13.679 17.1119L14.6539 16.137C16.3185 16.7168 18.1306 16.7146 19.7938 16.1307C21.457 15.5467 22.8728 14.4156 23.8096 12.9224C24.7464 11.4293 25.1487 9.66234 24.9507 7.91077C24.7528 6.15919 23.9662 4.52666 22.7198 3.28022C21.4733 2.03379 19.8408 1.24724 18.0892 1.04927C16.3377 0.851295 14.5708 1.25361 13.0776 2.19039C11.5844 3.12717 10.4533 4.54297 9.86934 6.20617C9.2854 7.86936 9.28319 9.68149 9.86305 11.3461L1.70186 19.5073Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.2 7.8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+}
+function renderPasswordFamilyList(){
+  const host=$('passwordFamilyList');
+  if(!host)return;
+  const search=$('passwordSearch');
+  const query=(search?.value||'').trim().toLowerCase();
+  const passwords=vault.filter(isPasswordFamilyEntry);
+  const visible=passwords.filter(e=>!query||entrySearchText(e).includes(query));
+  host.innerHTML='';
+  if(visible.length){
+    visible.forEach(e=>{
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='vk-passwords-row';
+      button.setAttribute('aria-label','Abrir '+(e.service||e.title||'contraseña'));
+      button.onclick=()=>quick(e.id);
+      const title=safeEsc(e.service||e.title||'Sin título');
+      const identity=safeEsc(passwordFamilyIdentity(e)||'Sin usuario');
+      button.innerHTML='<span class="vk-passwords-row__icon">'+passwordFamilyKeySvg()+'</span><span class="vk-passwords-row__copy"><strong>'+title+'</strong><span>'+identity+'</span></span><svg class="vk-passwords-row__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
+      host.appendChild(button);
+    });
+    return;
+  }
+  const noResults=Boolean(query&&passwords.length);
+  const section=document.createElement('section');
+  section.className='vk-passwords-empty';
+  section.innerHTML='<div class="vk-passwords-empty__icon" aria-hidden="true">'+passwordFamilyKeySvg()+'</div><h2>'+(noResults?'No se encontraron contraseñas':'Aún no tienes contraseñas')+'</h2><p>'+(noResults?'Prueba con otra palabra o revisa la búsqueda.':'Guarda aquí tus accesos para tenerlos protegidos y siempre a mano.')+'</p><button type="button">'+(noResults?'Limpiar búsqueda':'Añadir contraseña')+'</button>';
+  section.querySelector('button').onclick=()=>{if(noResults){if(search)search.value='';render();}else openEntry();};
+  host.appendChild(section);
+}
+
 function render(){
   // Saludo según hora
   try{
@@ -2665,6 +2705,7 @@ function render(){
     const _g=_h<6?'Buenas noches \u{1F44B}':_h<13?'Buenos d\u00edas \u{1F44B}':_h<20?'Buenas tardes \u{1F44B}':'Buenas noches \u{1F44B}';
     const _gel=$('homeGreeting');if(_gel)_gel.textContent=_g;
   }catch(e){}
+  renderPasswordFamilyList();
   let q=($('search')?.value||'').toLowerCase();
   let _visibleEntryCount=null;
   const rvault=$('recentListVault');
