@@ -1665,9 +1665,15 @@ function useGen(){
     const el=$(fieldId);
     if(el){el.value=v;if(fieldId==='ePass')updateStrength();}
     $('genModal').classList.remove('open');
-    $('entryModal').classList.add('open');
-  syncFabVisibility();
-    toast('Contraseña añadida a la entrada');
+    if(fieldId==='vkPasswordCreateSecret'){
+      _passwordCreateGenerated=true;
+      show('passwordCreate');
+      toast('Contraseña añadida');
+    }else{
+      $('entryModal').classList.add('open');
+      syncFabVisibility();
+      toast('Contraseña añadida a la entrada');
+    }
   }else{
     closeModals();
     openEntry();
@@ -2694,7 +2700,7 @@ function renderPasswordFamilyList(){
   const section=document.createElement('section');
   section.className='vk-passwords-empty';
   section.innerHTML='<div class="vk-passwords-empty__icon" aria-hidden="true">'+passwordFamilyKeySvg()+'</div><h2>'+(noResults?'No se encontraron contraseñas':'Aún no tienes contraseñas')+'</h2><p>'+(noResults?'Prueba con otra palabra o revisa la búsqueda.':'Guarda aquí tus accesos para tenerlos protegidos y siempre a mano.')+'</p><button type="button">'+(noResults?'Limpiar búsqueda':'Añadir contraseña')+'</button>';
-  section.querySelector('button').onclick=()=>{if(noResults){if(search)search.value='';render();}else openEntry();};
+  section.querySelector('button').onclick=()=>{if(noResults){if(search)search.value='';render();}else openPasswordCreate();};
   host.appendChild(section);
 }
 
@@ -2867,6 +2873,234 @@ async function savePasswordEdit(){
   try{driveAutoSync();}catch(error){}
 }
 
+let _passwordCreateType='web';
+let _passwordCreateGenerated=false;
+
+function passwordCreateNameIcon(name){
+  const icons={
+    wifi:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 9.5a11 11 0 0 1 14 0M8 13a6.5 6.5 0 0 1 8 0M11 16.5a2 2 0 0 1 2 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    device:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2" stroke="currentColor" stroke-width="2"/><path d="M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    key:'<svg viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="M1.70186 19.5073C1.2526 19.9564 1.00014 20.5656 1 21.2009V23.8023C1 24.1199 1.12619 24.4246 1.3508 24.6492C1.57542 24.8738 1.88006 25 2.19771 25H5.79084C6.10849 25 6.41313 24.8738 6.63775 24.6492C6.86236 24.4246 6.98855 24.1199 6.98855 23.8023V22.6046C6.98855 22.2869 7.11474 21.9823 7.33935 21.7577C7.56396 21.5331 7.86861 21.4069 8.18626 21.4069H9.38397C9.70162 21.4069 10.0063 21.2807 10.2309 21.0561C10.4555 20.8315 10.5817 20.5268 10.5817 20.2092V19.0115C10.5817 18.6938 10.7079 18.3892 10.9325 18.1645C11.1571 17.9399 11.4617 17.8137 11.7794 17.8137H11.9854C12.6206 17.8136 13.2298 17.5611 13.679 17.1119L14.6539 16.137C16.3185 16.7168 18.1306 16.7146 19.7938 16.1307C21.457 15.5467 22.8728 14.4156 23.8096 12.9224C24.7464 11.4293 25.1487 9.66234 24.9507 7.91077C24.7528 6.15919 23.9662 4.52666 22.7198 3.28022C21.4733 2.03379 19.8408 1.24724 18.0892 1.04927C16.3377 .851295 14.5708 1.25361 13.0776 2.19039C11.5844 3.12717 10.4533 4.54297 9.86934 6.20617C9.2854 7.86936 9.28319 9.68149 9.86305 11.3461L1.70186 19.5073Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  return icons[name]||'';
+}
+
+function openPasswordCreate(type='web'){
+  _passwordCreateType=['web','wifi','pin','recovery'].includes(type)?type:'web';
+
+  const name=$('vkPasswordCreateName');
+  const user=$('vkPasswordCreateUser');
+  const secret=$('vkPasswordCreateSecret');
+  const note=$('vkPasswordCreateNote');
+  const noteButton=$('vkPasswordCreateAddNote');
+
+  if(name)name.value='';
+  if(user)user.value='';
+  if(secret){
+    secret.value='';
+    secret.type='password';
+  }
+  if(note)note.value='';
+  if(noteButton)noteButton.textContent='+ Añadir nota';
+
+  _passwordCreateGenerated=false;
+
+  $('vkPasswordCreateEyeOpen')?.classList.remove('vk-password-create-hidden');
+  $('vkPasswordCreateEyeOff')?.classList.add('vk-password-create-hidden');
+  $('vkPasswordCreateNoteField')?.classList.remove('is-visible');
+
+  setPasswordCreateType(_passwordCreateType);
+
+  if(secret&&!secret.dataset.passwordCreateManualBound){
+    secret.addEventListener('input',()=>{
+      _passwordCreateGenerated=false;
+    });
+    secret.dataset.passwordCreateManualBound='true';
+  }
+
+  show('passwordCreate','right');
+  setTimeout(()=>name?.focus(),120);
+}
+function setPasswordCreateType(type){
+  const config={
+    web:{
+      title:'Añadir contraseña - Web',
+      nameLabel:'Nombre',
+      namePlaceholder:'Nombre del servicio',
+      userVisible:true,
+      nameIcon:'',
+      secretLabel:'Contraseña',
+      secretPlaceholder:'Introduce la contraseña',
+      generatorVisible:true
+    },
+    wifi:{
+      title:'Añadir contraseña - WiFi',
+      nameLabel:'Nombre de la red',
+      namePlaceholder:'Nombre de la red',
+      userVisible:false,
+      nameIcon:'wifi',
+      secretLabel:'Contraseña',
+      secretPlaceholder:'Introduce la contraseña',
+      generatorVisible:true
+    },
+    pin:{
+      title:'Añadir contraseña - PIN',
+      nameLabel:'Nombre del dispositivo',
+      namePlaceholder:'Nombre del dispositivo',
+      userVisible:false,
+      nameIcon:'device',
+      secretLabel:'PIN',
+      secretPlaceholder:'Introduce el PIN',
+      generatorVisible:false
+    },
+    recovery:{
+      title:'Añadir contraseña - Recuperación',
+      nameLabel:'Servicio',
+      namePlaceholder:'Servicio',
+      userVisible:false,
+      nameIcon:'key',
+      secretLabel:'Código',
+      secretPlaceholder:'Introduce el código',
+      generatorVisible:false
+    }
+  };
+
+  const next=config[type];
+  if(!next)return;
+  _passwordCreateType=type;
+
+  document.querySelectorAll('[data-password-create-type]').forEach(button=>{
+    button.setAttribute('aria-selected',String(button.dataset.passwordCreateType===type));
+  });
+
+  const title=$('vkPasswordCreateTitle');
+  const nameLabel=$('vkPasswordCreateNameLabel');
+  const name=$('vkPasswordCreateName');
+  const userField=$('vkPasswordCreateUserField');
+  const nameIcon=$('vkPasswordCreateNameIcon');
+  const secretLabel=$('vkPasswordCreateSecretLabel');
+  const secret=$('vkPasswordCreateSecret');
+  const generator=$('vkPasswordCreateGenerator');
+
+  if(title)title.textContent=next.title;
+  if(nameLabel)nameLabel.textContent=next.nameLabel;
+  if(name){
+    name.placeholder=next.namePlaceholder;
+    name.classList.toggle('vk-password-create-input--plain',!next.nameIcon);
+  }
+  if(userField)userField.style.display=next.userVisible?'block':'none';
+  if(nameIcon){
+    nameIcon.hidden=!next.nameIcon;
+    nameIcon.innerHTML=next.nameIcon?passwordCreateNameIcon(next.nameIcon):'';
+  }
+  if(secretLabel)secretLabel.textContent=next.secretLabel;
+  if(secret){
+    secret.placeholder=next.secretPlaceholder;
+    secret.type='password';
+    secret.value='';
+  }
+  _passwordCreateGenerated=false;
+  if(generator)generator.style.display=next.generatorVisible?'grid':'none';
+
+  $('vkPasswordCreateEyeOpen')?.classList.remove('vk-password-create-hidden');
+  $('vkPasswordCreateEyeOff')?.classList.add('vk-password-create-hidden');
+}
+
+function togglePasswordCreateSecret(){
+  const input=$('vkPasswordCreateSecret');
+  if(!input)return;
+
+  const reveal=input.type==='password';
+  input.type=reveal?'text':'password';
+
+  $('vkPasswordCreateEyeOpen')?.classList.toggle('vk-password-create-hidden',reveal);
+  $('vkPasswordCreateEyeOff')?.classList.toggle('vk-password-create-hidden',!reveal);
+}
+
+function togglePasswordCreateNote(){
+  const field=$('vkPasswordCreateNoteField');
+  const button=$('vkPasswordCreateAddNote');
+  if(!field||!button)return;
+
+  const open=field.classList.toggle('is-visible');
+  button.textContent=open?'− Ocultar nota':'+ Añadir nota';
+}
+
+function cancelPasswordCreate(){
+  show('passwords','left');
+}
+
+async function savePasswordCreate(){
+  if(typeof vkModels==='undefined'||typeof vkModels.create!=='function'){
+    toast('No se pudo crear la contraseña.');
+    return;
+  }
+
+  const title=($('vkPasswordCreateName')?.value||'').trim();
+  const username=($('vkPasswordCreateUser')?.value||'').trim();
+  const secret=$('vkPasswordCreateSecret')?.value||'';
+  const notes=($('vkPasswordCreateNote')?.value||'').trim();
+
+  if(!title){
+    toast(_passwordCreateType==='wifi'?'El nombre de la red es obligatorio.':'El nombre es obligatorio.');
+    $('vkPasswordCreateName')?.focus();
+    return;
+  }
+
+  if(_passwordCreateType==='web'&&!username){
+    toast('El usuario es obligatorio.');
+    $('vkPasswordCreateUser')?.focus();
+    return;
+  }
+
+  if(!secret.trim()){
+    const message=_passwordCreateType==='pin'
+      ?'El PIN es obligatorio.'
+      :_passwordCreateType==='recovery'
+        ?'El código es obligatorio.'
+        :'La contraseña es obligatoria.';
+    toast(message);
+    $('vkPasswordCreateSecret')?.focus();
+    return;
+  }
+  if((_passwordCreateType==='web'||_passwordCreateType==='wifi')&&!_passwordCreateGenerated){
+    const confirmed=await vkConfirm(
+      'Confirmar contraseña',
+      'Has escrito la contraseña manualmente. Revísala antes de guardar. ¿Quieres continuar?'
+    );
+
+    if(!confirmed){
+      $('vkPasswordCreateSecret')?.focus();
+      return;
+    }
+  }
+
+  try{
+    const data={
+      title,
+      subtype:_passwordCreateType,
+      username:_passwordCreateType==='web'?username:'',
+      password:_passwordCreateType==='recovery'?'':secret,
+      url:'',
+      notes,
+      codes:_passwordCreateType==='recovery'?[secret]:[],
+      passHistory:[]
+    };
+
+    const entry=vkModels.create('password',data);
+    vault.push(entry);
+    await persist();
+
+    render();
+    show('passwords','left');
+    toast('Contraseña creada');
+
+    try{driveAutoSync();}catch(error){}
+  }catch(error){
+    console.error('savePasswordCreate',error);
+    toast('No se pudo crear la contraseña.');
+  }
+}
 function openPasswordDetail(id){
   const e=vault.find(x=>x.id===id);
   if(!e)return;

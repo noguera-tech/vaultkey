@@ -114,7 +114,7 @@
     </label>
     <div id="passwordFamilyList" class="vk-passwords-list" aria-live="polite"></div>
   </div>
-  <button type="button" class="vk-passwords-fab" aria-label="Añadir contraseña" onclick="openEntry()">
+  <button type="button" class="vk-passwords-fab" aria-label="Añadir contraseña" onclick="openPasswordCreate()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
   </button>
 </section>
@@ -234,6 +234,71 @@
         </button>
       </div>
     </form>
+  </div>
+</section>
+
+<section id="passwordCreate" class="screen vk-password-create-root">
+  <header class="vk-password-create-topbar">
+    <button type="button" class="vk-password-create-back" aria-label="Volver a Contraseñas" onclick="cancelPasswordCreate()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+  </header>
+
+  <h1 id="vkPasswordCreateTitle" class="vk-password-create-title">Añadir contraseña - Web</h1>
+
+  <nav class="vk-password-create-tabs" aria-label="Tipo de contraseña">
+    <button type="button" class="vk-password-create-tab" data-password-create-type="web" aria-selected="true" onclick="setPasswordCreateType('web')">Web</button>
+    <button type="button" class="vk-password-create-tab" data-password-create-type="wifi" aria-selected="false" onclick="setPasswordCreateType('wifi')">Wi-Fi</button>
+    <button type="button" class="vk-password-create-tab" data-password-create-type="pin" aria-selected="false" onclick="setPasswordCreateType('pin')">PIN</button>
+    <button type="button" class="vk-password-create-tab" data-password-create-type="recovery" aria-selected="false" onclick="setPasswordCreateType('recovery')">Recuperación</button>
+  </nav>
+
+  <form class="vk-password-create-form" onsubmit="event.preventDefault();savePasswordCreate()">
+    <div class="vk-password-create-field">
+      <label id="vkPasswordCreateNameLabel" class="vk-password-create-label" for="vkPasswordCreateName">Nombre</label>
+      <div class="vk-password-create-control">
+        <input id="vkPasswordCreateName" class="vk-password-create-input vk-password-create-input--plain" type="text" placeholder="Nombre del servicio" autocomplete="off">
+        <span id="vkPasswordCreateNameIcon" class="vk-password-create-inline-icon" aria-hidden="true" hidden></span>
+      </div>
+    </div>
+
+    <div id="vkPasswordCreateUserField" class="vk-password-create-field">
+      <label class="vk-password-create-label" for="vkPasswordCreateUser">Usuario</label>
+      <div class="vk-password-create-control">
+        <input id="vkPasswordCreateUser" class="vk-password-create-input" type="text" placeholder="Correo o usuario" autocomplete="username">
+        <span class="vk-password-create-inline-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        </span>
+      </div>
+    </div>
+
+    <div class="vk-password-create-field">
+      <label id="vkPasswordCreateSecretLabel" class="vk-password-create-label" for="vkPasswordCreateSecret">Contraseña</label>
+      <div class="vk-password-create-control">
+        <input id="vkPasswordCreateSecret" class="vk-password-create-input vk-password-create-input--secret" type="password" placeholder="Introduce la contraseña" autocomplete="new-password">
+        <div class="vk-password-create-secret-actions">
+          <button type="button" class="vk-password-create-action" aria-label="Mostrar u ocultar contraseña" onclick="togglePasswordCreateSecret()">
+            <svg id="vkPasswordCreateEyeOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6"/><circle cx="12" cy="12" r="2.5"/></svg>
+            <svg id="vkPasswordCreateEyeOff" class="vk-password-create-hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 3 18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 4.2A10.8 10.8 0 0 1 12 4c6.3 0 9.9 8 9.9 8a17.8 17.8 0 0 1-2.1 3.1"/><path d="M6.2 6.2C3.6 8 2.1 12 2.1 12s3.6 8 9.9 8a9.8 9.8 0 0 0 4.1-.9"/></svg>
+          </button>
+          <button id="vkPasswordCreateGenerator" type="button" class="vk-password-create-action" aria-label="Abrir generador de contraseñas" onclick="openGen(true,'vkPasswordCreateSecret')">
+            <img class="vk-password-create-generator-image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAbCAYAAABm409WAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAAh1JREFUeAHVVV1O20AQnhmXBBpXSm/gI6RvYFQp3ICeoOkN6AXwmqrPcIO2J0h7ggSVv7eEExBOED8EgojYZcZhwTFOwMYS4pMsbzyz3+zMzjdBKICmGnoTqvT0jQmPQ3dvkS9BAVzBsgeAdXRg8ynfQgHy4FkBuCT1VS7LUz7yFAowwWrHoeqZr0YN+X2iVroa9HfQsJX0mVB1aH1yBUAw/+I3Ycdmcrzt7h0pty/rdXW5y04NY2CgwYlyBzgIagqM/hNfLC3NXGxcFpJMTKQNbnB2AyiKzz8uNpvKPKqz//O6sarGXtYehDmQk3E7xmTLcBV11ccobU9/EyQDSTY0h9yTC3PInMlzjdVelt0PRzMi83dGLbtHHrG/g2zwycwpv6flQDzPshPXPfnR0RhpetiXtr8upOZr6iJzNKwFoy3u/1aW7blKlpr3iLCdFlJM4tAuEv1aD8dfcweQk7NK27z0REgVqA3SPmhMeLf4nVvJPJYfVMpC6iqMJCN/57ItpREfEeI0CIstpWRcRB6PAFapJbcq5V5vcht2DOj9o223uYhjbgZ+OA7sCOAx8aXoCKB55IhGxQ4avtmhVkoA6QRLDjyS/6va37QPj46+AdhnYS38uxTM3IGvhg2k6VhAcxMeBB8UvBD3GUhnIFU6ZZLHXJachSTknsz9w8BtQUnAWXLoHwbvP0GJoKRKl8zKBpQM4iLVkyqFt4ZbVDkMr/F9OZoAAAAASUVORK5CYII=" alt="">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <button id="vkPasswordCreateAddNote" class="vk-password-create-add-note" type="button" onclick="togglePasswordCreateNote()">+ Añadir nota</button>
+
+    <div id="vkPasswordCreateNoteField" class="vk-password-create-note">
+      <label class="vk-password-create-label" for="vkPasswordCreateNote">Nota</label>
+      <textarea id="vkPasswordCreateNote" class="vk-password-create-textarea" rows="4" placeholder="Añade una nota opcional"></textarea>
+    </div>
+  </form>
+
+  <div class="vk-password-create-footer">
+    <button type="button" class="vk-password-create-button vk-password-create-cancel" onclick="cancelPasswordCreate()">Cancelar</button>
+    <button type="button" class="vk-password-create-button vk-password-create-submit" onclick="savePasswordCreate()">Crear</button>
   </div>
 </section>
 
