@@ -1021,22 +1021,63 @@ body.vk-lock { overflow: hidden; }
 }
 
 
-.vk-unlock__appbar {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  min-height: 56px;
-  padding: env(safe-area-inset-top, 0px) 12px 0 4px;
-  box-sizing: content-box;
-  background: var(--vk-header);
-  color: var(--vk-text);
+
+/* UNLOCK-02 · Master Password — integración Figma consolidada */
+#pin.pinScreen:has(.vk-unlock--master) {
+  align-items: stretch;
+  justify-content: stretch;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #111827 17%, #182f4e 67%);
 }
 
-.vk-unlock__appbar .vk-iconbtn:disabled { opacity: .45; }
-.vk-unlock__appbar .vk-iconbtn svg,
-.vk-unlock__eye svg {
+#pin.pinScreen:has(.vk-unlock--master)::before,
+#pin.pinScreen:has(.vk-unlock--master)::after {
+  display: none;
+}
+
+.vk-unlock--master {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #111827 17%, #182f4e 67%);
+  color: #ffffff;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.vk-unlock--master .vk-unlock__appbar {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 2;
+  width: 100%;
+  height: 64px;
+  min-height: 64px;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  background: #243246;
+  color: #ffffff;
+}
+
+.vk-unlock--master .vk-unlock__appbar .vk-iconbtn {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  color: #a7b6c9;
+}
+
+.vk-unlock--master .vk-unlock__appbar .vk-iconbtn:disabled { opacity: .45; }
+.vk-unlock--master .vk-unlock__appbar .vk-iconbtn svg,
+.vk-unlock--master .vk-unlock__eye svg {
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
@@ -1044,68 +1085,210 @@ body.vk-lock { overflow: hidden; }
   stroke-linejoin: round;
 }
 
-.vk-unlock__appbar-title {
-  flex: 1;
-  padding-right: 48px;
-  color: var(--vk-text);
-  font-size: 18px;
-  font-weight: 600;
+.vk-unlock--master .vk-unlock__appbar-title {
+  width: 100%;
+  padding: 0 52px;
+  box-sizing: border-box;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 24px;
   text-align: center;
 }
 
-.vk-unlock__master-panel {
-  min-height: calc(100% - 56px);
-  padding-top: 34px;
-}
-
-.vk-unlock__master-field {
-  display: block;
-  width: min(100%, 340px);
-  margin-top: 18px;
-}
-
-.vk-unlock__master-control {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
-.vk-unlock__master-control .vk-input {
-  min-height: 46px;
-  padding-right: 48px;
-  border-radius: 10px;
-}
-
-.vk-unlock__eye {
+.vk-unlock--master .vk-unlock__master-panel {
   position: absolute;
-  right: 2px;
-  width: 44px;
-  height: 42px;
+  top: 0;
+  left: 50%;
+  width: 412px;
+  height: 917px;
+  min-height: 917px;
+  margin: 0;
+  padding: 0;
+  display: block;
+  overflow: hidden;
+  text-align: center;
+  transform: translateX(-50%) scale(var(--vk-master-scale, 1));
+  transform-origin: top center;
+}
+
+.vk-unlock--master .vk-unlock__shield {
+  position: absolute;
+  left: 126px;
+  top: 150px;
+  width: 150px;
+  height: 180px;
+  margin: 0;
+}
+
+.vk-unlock--master .vk-unlock__shield-outline {
+  width: 150px;
+  height: 180px;
+}
+
+.vk-unlock--master .vk-unlock__shield-outline path,
+.vk-unlock--master .vk-unlock__shield-lock path {
+  stroke: #a7b6c9;
+  stroke-width: 1;
+}
+
+.vk-unlock--master .vk-unlock__shield-lock {
+  width: 20px;
+  height: 22px;
+}
+
+.vk-unlock--master .vk-unlock__brand {
+  position: absolute;
+  left: 129px;
+  top: 343px;
+  width: 155px;
+  height: 44px;
+  margin: 0;
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 44px;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+.vk-unlock--master .vk-unlock__master-field {
+  position: absolute;
+  left: 27px;
+  top: 434px;
+  width: 363px;
+  height: 53px;
+  margin: 0;
+}
+
+.vk-unlock--master .vk-unlock__master-control {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.vk-unlock--master .vk-unlock__master-control .vk-input {
+  width: 100%;
+  height: 53px;
+  min-height: 53px;
+  padding: 0 52px 0 20px;
+  box-sizing: border-box;
+  border: 1px solid rgba(58, 74, 96, .6);
+  border-radius: 16px;
+  background: #243246;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+  outline: none;
+}
+
+.vk-unlock--master .vk-unlock__master-control .vk-input::placeholder {
+  color: #a7b6c9;
+  opacity: 1;
+}
+
+.vk-unlock--master .vk-unlock__master-control .vk-input:focus {
+  border-color: rgba(58, 74, 96, .6);
+}
+
+.vk-unlock--master .vk-unlock__eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: 0;
   background: transparent;
-  color: var(--vk-primary);
+  color: #3b82f6;
   cursor: pointer;
 }
 
-.vk-unlock__eye svg { width: 20px; height: 20px; }
+.vk-unlock--master .vk-unlock__eye svg { width: 20px; height: 20px; }
 
-.vk-unlock__master-info {
-  width: min(100%, 340px);
-  margin: 18px 0 10px;
-  padding: 14px 16px;
+.vk-unlock--master .vk-unlock__master-info {
+  position: absolute;
+  left: 27px;
+  top: 522px;
+  width: 363px;
+  height: 80px;
+  margin: 0;
+  padding: 0 16px;
   box-sizing: border-box;
-  border-radius: 10px;
-  background: var(--vk-card);
-  color: var(--vk-text-muted);
-  font-size: 12px;
-  line-height: 1.45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(58, 74, 96, .6);
+  border-radius: 16px;
+  background: rgba(58, 74, 96, .6);
+  color: #a7b6c9;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 17px;
+  text-align: center;
 }
 
-.vk-unlock__master-submit { width: min(100%, 300px); }
+.vk-unlock--master .vk-unlock__status {
+  position: absolute;
+  left: 52px;
+  top: 607px;
+  width: 320px;
+  min-height: 20px;
+  margin: 0;
+  color: #a7b6c9;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.vk-unlock--master.vk-unlock--error .vk-unlock__status {
+  color: #a7b6c9;
+}
+
+.vk-unlock--master .vk-unlock__master-submit {
+  position: absolute;
+  left: 52px;
+  top: 638px;
+  width: 320px;
+  height: 56px;
+  min-height: 56px;
+  margin: 0;
+  border-radius: 16px;
+}
+
+.vk-unlock--master .vk-unlock__master-submit:not(:disabled) {
+  background: #2f6fea;
+  color: #ffffff;
+}
+
+.vk-unlock--master .vk-unlock__legal {
+  position: absolute;
+  left: 0;
+  top: auto;
+  bottom: 18px;
+  z-index: 3;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  color: #a7b6c9;
+  font-size: 14px;
+  line-height: 17px;
+  text-align: center;
+}
+
+.vk-unlock--master .vk-unlock__legal a {
+  color: #a7b6c9;
+  text-decoration: none;
+}
+
+.vk-unlock--master .vk-unlock__legal a:focus-visible,
+.vk-unlock--master .vk-unlock__legal a:hover { text-decoration: underline; }
 
 .vk-sr-only {
   position: absolute;
@@ -2193,67 +2376,6 @@ body.vk-lock { overflow: hidden; }
   .vk-onb-creating__dots span { animation-delay: 0s; }
 }
 
-/* VK2 Figma master unlock refinement */
-.vk-unlock--master .vk-unlock__master-panel {
-  min-height: calc(100% - 56px);
-  padding-top: 24px;
-}
-
-.vk-unlock--master .vk-unlock__master-field {
-  width: min(100%, 400px);
-  margin-top: 20px;
-}
-
-.vk-unlock--master .vk-unlock__master-control .vk-input {
-  min-height: 54px;
-  padding-left: 16px;
-  padding-right: 52px;
-  border-radius: 12px;
-  font-size: 16px;
-}
-
-.vk-unlock--master .vk-unlock__master-info {
-  width: min(100%, 400px);
-  margin: 14px 0 0;
-  padding: 12px 16px;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: 12px;
-  background: rgba(51, 65, 85, 0.72);
-  font-size: 13px;
-}
-
-.vk-unlock--master .vk-unlock__status {
-  width: min(100%, 400px);
-  min-height: 20px;
-  margin: 8px 0 6px;
-}
-
-.vk-unlock--master .vk-unlock__master-submit {
-  width: min(100%, 376px);
-  min-height: 54px;
-  margin-top: 4px;
-  border-radius: 12px;
-}
-
-@media (max-height: 720px) {
-  .vk-unlock--master .vk-unlock__master-panel {
-    padding-top: 14px;
-  }
-
-  .vk-unlock--master .vk-unlock__master-field {
-    margin-top: 12px;
-  }
-
-  .vk-unlock--master .vk-unlock__master-info {
-    margin-top: 10px;
-    padding: 10px 14px;
-  }
-}
-
-/* Ajuste vertical final â€” master unlock */
-.vk-unlock--master .vk-unlock__master-panel {
-  padding-top: 48px;
-}
 /* Estado de error — contraseña maestra */
 .vk-unlock--master.vk-unlock--error .vk-unlock__status {
   color: #FCA5A5;

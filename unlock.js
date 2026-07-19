@@ -106,7 +106,7 @@
   function pinScreen() {
     var pinLen = currentPinLen();
     var ready = ui.pinBuffer.length === pinLen && !ui.busy;
-    var buttonText = ui.pinState === 'checking' ? 'Comprobando…' : 'Comprobar PIN';
+    var buttonText = ui.pinState === 'checking' ? 'Comprobando…' : 'Desbloquear';
     return '<div class="vk-unlock vk-unlock--' + ui.pinState + '">' +
       '<main class="vk-unlock__panel">' +
         shieldHtml() +
@@ -136,7 +136,8 @@
     var inputType = ui.masterVisible ? 'text' : 'password';
     var masterValue = esc(ui.masterValue);
     var message = ui.message || '';
-    return '<div class="vk-unlock vk-unlock--master vk-unlock--' + ui.masterState + '">' +
+    var masterScale = Math.min(1, window.innerWidth / 412, window.innerHeight / 917);
+    return '<div class="vk-unlock vk-unlock--master vk-unlock--' + ui.masterState + '" style="--vk-master-scale:' + masterScale.toFixed(5) + '">' +
       '<header class="vk-unlock__appbar">' +
         '<button type="button" class="vk-iconbtn" data-ul="go-pin" aria-label="Volver al PIN"' + (checking ? ' disabled' : '') + '>' +
           '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>' +
