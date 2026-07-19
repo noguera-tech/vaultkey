@@ -2835,180 +2835,219 @@ body.vk-lock { overflow: hidden; }
   max-height: 29px !important;
 }
 
-/* VaultKey 2.0 - 07 Detalle de contraseña aprobado */.vk-password-detail-root{
-  position:relative;
-  overflow:hidden;
-  background:linear-gradient(180deg,#111827 17%,#182f4e 67%);
-  color:#fff;
+/* VaultKey 2.0 - 07 Detalle de contraseña aprobado */.vk-password-detail-root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--vk-r1-bg-gradient);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
 }
 
-.vk-password-detail-header{
-  height:62px;
-  display:flex;
-  align-items:center;
-  padding:0 14px;
-  background:#24354b;
-  border-bottom:1px solid #111827;
+.vk-password-detail-header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0 var(--vk-r1-screen-padding-inline);
+  background: var(--vk-r1-surface);
+  border-bottom:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
 }
 
-.vk-password-detail-back{
-  width:38px;
-  height:38px;
-  display:grid;
-  place-items:center;
-  padding:0;
-  border:0;
-  background:transparent;
-  color:#aeb8c7;
-  cursor:pointer;
+.vk-password-detail-back {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vk-r1-text);
+  cursor: pointer;
 }
 
-.vk-password-detail-back svg{
-  width:22px;
-  height:22px;
+.vk-password-detail-back svg {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
 }
 
-.vk-password-detail-content{
-  height:calc(100% - 62px);
-  padding:0;
-  overflow:auto;
-  scrollbar-width:none;
+.vk-password-detail-content {
+  height: calc(100% - 56px);
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+  scrollbar-width: none;
 }
 
-.vk-password-detail-content::-webkit-scrollbar{
-  display:none;
+.vk-password-detail-content::-webkit-scrollbar {
+  display: none;
 }
 
-.vk-password-detail-title{
-  margin:17px 0 0;
-  text-align:center;
-  font-size:20px;
-  font-weight:700;
-  line-height:1.2;
+.vk-password-detail-title {
+  margin: 24px var(--vk-r1-screen-padding-inline) 0;
+  color: var(--vk-r1-text);
+  font-size: var(--vk-r1-font-size-screen-title);
+  font-weight: var(--vk-r1-font-weight-bold);
+  line-height: normal;
+  letter-spacing: 0;
+  text-align: center;
 }
 
-#passwordDetailBody{
-  padding-bottom:34px;
+#passwordDetailBody {
+  padding-bottom: 32px;
 }
 
-.vk-password-detail-card{
-  margin:55px 23px 0;
-  padding:14px 15px 12px;
-  border:1px solid rgba(71,85,105,.45);
-  border-radius:18px;
-  background:#24354b;
+.vk-password-detail-card {
+  margin: 24px var(--vk-r1-screen-padding-inline) 0;
+  padding: 16px;
+  border:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
+  border-radius: var(--vk-r1-radius-md);
+  background: var(--vk-r1-surface);
+  box-shadow: none;
 }
 
-.vk-password-detail-card__title{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  margin-bottom:7px;
+.vk-password-detail-card__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
-.vk-password-detail-card__title > svg{
-  width:18px;
-  height:18px;
-  color:#3b82f6;
+.vk-password-detail-card__title > svg {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
+  color: var(--vk-r1-accent);
 }
 
-.vk-password-detail-card__title strong{
-  font-size:18px;
+.vk-password-detail-card__title strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--vk-r1-text);
+  font-size: var(--vk-r1-font-size-row-title);
+  font-weight: var(--vk-r1-font-weight-semibold);
+  line-height: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.vk-password-detail-row{
-  min-height:50px;
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-  padding:4px 0;
+.vk-password-detail-row {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-sizing: border-box;
+  padding: 8px 0;
 }
 
-.vk-password-detail-row > div:first-child{
-  min-width:0;
+.vk-password-detail-row > div:first-child {
+  min-width: 0;
 }
 
-.vk-password-detail-row small{
-  display:block;
-  margin-bottom:4px;
-  color:#9ca3af;
-  font-size:12px;
+.vk-password-detail-row small {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--vk-r1-text-tertiary);
+  font-size: var(--vk-r1-font-size-row-subtitle);
+  font-weight: var(--vk-r1-font-weight-regular);
+  line-height: normal;
 }
 
-.vk-password-detail-row span{
-  display:block;
-  overflow-wrap:anywhere;
-  color:#e5e7eb;
-  font-size:13px;
+.vk-password-detail-row span {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--vk-r1-text);
+  font-size: var(--vk-r1-font-size-input);
+  font-weight: var(--vk-r1-font-weight-regular);
+  line-height: 1.35;
 }
 
-.vk-password-detail-row--actions{
-  align-items:center;
+.vk-password-detail-row--actions {
+  align-items: center;
 }
 
-.vk-password-detail-icons{
-  display:flex;
-  gap:16px;
+.vk-password-detail-icons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.vk-password-detail-row button{
-  width:28px;
-  height:28px;
-  display:grid;
-  place-items:center;
-  flex:0 0 auto;
-  padding:0;
-  border:0;
-  background:transparent;
-  color:#3b82f6;
-  cursor:pointer;
+.vk-password-detail-row button {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vk-r1-accent);
+  cursor: pointer;
 }
 
-.vk-password-detail-row button svg{
-  width:20px;
-  height:20px;
+.vk-password-detail-row button svg {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
 }
 
-.vk-password-detail-actions{
-  display:flex;
-  justify-content:center;
-  gap:50px;
-  margin-top:35px;
+.vk-password-detail-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin:
+    32px
+    var(--vk-r1-screen-padding-inline)
+    0;
 }
 
-.vk-password-detail-actions button{
-  min-width:108px;
-  height:42px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:9px;
-  padding:0 15px;
-  border:0;
-  border-radius:12px;
-  color:#fff;
-  font-size:13px;
-  font-weight:600;
-  cursor:pointer;
+.vk-password-detail-actions button {
+  width: 174px;
+  max-width: calc(50% - 8px);
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+  padding: 0 16px;
+  border-radius: var(--vk-r1-radius-md);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
+  font-size: var(--vk-r1-font-size-button);
+  font-weight: var(--vk-r1-font-weight-regular);
+  cursor: pointer;
 }
 
-.vk-password-detail-actions svg{
-  width:20px;
-  height:20px;
+.vk-password-detail-actions svg {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
 }
 
-.vk-password-detail-edit{
-  background:#475569;
+.vk-password-detail-edit {
+  border:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
+  background: transparent;
 }
 
-.vk-password-detail-delete{
-  background:#ef2b2f;
+.vk-password-detail-delete {
+  border: var(--vk-r1-border-width) solid var(--vk-r1-danger);
+  background: var(--vk-r1-danger);
 }
 
 
-
-/* VaultKey 2.0 - 08 Editar password aprobado */
-.vk-password-edit-root{
+/* VaultKey 2.0 - 08 Editar password aprobado */.vk-password-edit-root{
   position:relative;
   overflow:hidden;
   background:linear-gradient(180deg,#111827 17%,#182f4e 67%);
