@@ -1501,161 +1501,209 @@ body.vk-lock { overflow: hidden; }
 }
 
 .vk-onb-master__footer .vk-btn:disabled {
-  opacity: 0.45;
+  background: var(--vk-r1-surface);
+  color: var(--vk-r1-text);
+  opacity: 1;
   cursor: not-allowed;
 }
 
 
 /* VK2 Figma onboarding PIN CSS v1 */
 .vk-onb-pin {
-  min-height: 100%;
+  width: 100%;
+  min-height: 100dvh;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: var(--vk-bg, #0F172A);
+  overflow: hidden;
+  background: var(--vk-r1-bg-gradient);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
 }
 
 .vk-onb-pin__appbar {
-  min-height: 72px;
+  flex: 0 0 56px;
+  height: 56px;
   display: flex;
   align-items: center;
-  padding: 16px 20px 0;
+  box-sizing: border-box;
+  padding: 0 var(--vk-r1-screen-padding-inline);
+  background: var(--vk-r1-surface);
+  border-bottom: var(--vk-r1-border-width) solid var(--vk-r1-border-soft);
 }
 
 .vk-onb-pin__back {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -12px;
   padding: 0;
   border: 0;
-  border-radius: 14px;
   background: transparent;
-  color: currentColor;
+  color: var(--vk-r1-text-secondary);
   cursor: pointer;
 }
 
 .vk-onb-pin__back svg {
-  width: 25px;
-  height: 25px;
+  width: 24px;
+  height: 24px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.9;
+  stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .vk-onb-pin__content {
-  width: min(100%, 560px);
-  margin: 0 auto;
-  padding: 34px 28px 24px;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 16px var(--vk-r1-screen-padding-inline) 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.vk-onb-pin__content::-webkit-scrollbar {
+  display: none;
 }
 
 .vk-onb-pin__title {
   margin: 0;
-  font-size: clamp(32px, 5vw, 42px);
-  line-height: 1.08;
-  letter-spacing: -0.035em;
+  color: var(--vk-r1-text);
+  font-size: 18px;
+  font-weight: var(--vk-r1-font-weight-semibold);
+  line-height: 1.3;
+  letter-spacing: 0;
+  text-align: center;
 }
 
 .vk-onb-pin__subtitle {
-  max-width: 470px;
-  margin: 14px 0 32px;
-  color: var(--vk-text-muted, rgba(255,255,255,.68));
-  font-size: 16px;
-  line-height: 1.55;
+  max-width: 330px;
+  margin: 10px auto 0;
+  color: var(--vk-r1-text-secondary);
+  font-size: 12px;
+  font-weight: var(--vk-r1-font-weight-regular);
+  line-height: 1.4;
+  text-align: center;
 }
 
 .vk-onb-pin__form {
+  width: 100%;
+  max-width: 320px;
+  margin: 44px auto 0;
   display: grid;
   gap: 22px;
 }
 
 .vk-onb-pin__field {
   display: grid;
-  gap: 9px;
+  gap: 6px;
 }
 
-.vk-onb-pin__label {
-  font-size: 14px;
-  font-weight: 650;
+.vk-onb-pin__sr-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .vk-onb-pin__input {
-  min-height: 62px;
-  font-size: 22px;
+  width: 100%;
+  height: 48px;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border: var(--vk-r1-border-width) solid var(--vk-r1-border-soft);
+  border-radius: var(--vk-r1-radius-md);
+  outline: none;
+  background: var(--vk-r1-surface);
+  color: var(--vk-r1-text);
+  box-shadow: none;
+  font-family: var(--vk-r1-font-family);
+  font-size: var(--vk-r1-font-size-input);
+  font-weight: var(--vk-r1-font-weight-regular);
   line-height: 1;
-  letter-spacing: .34em;
-  text-align: center;
+  letter-spacing: 0;
+  text-align: left;
   font-variant-numeric: tabular-nums;
 }
 
 .vk-onb-pin__input::placeholder {
-  letter-spacing: .34em;
-  opacity: .34;
+  color: var(--vk-r1-text-secondary);
+  letter-spacing: 0;
+  opacity: 1;
+}
+
+.vk-onb-pin__input:focus {
+  border-color: var(--vk-r1-accent);
 }
 
 .vk-onb-pin__hint {
+  display: block;
   min-height: 18px;
+  color: #FCA5A5;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
-.vk-onb-pin__notice {
-  display: grid;
-  grid-template-columns: 22px 1fr;
-  gap: 12px;
-  align-items: start;
-  margin-top: 28px;
-  padding: 16px;
-  border: 1px solid rgba(109, 173, 255, .18);
-  border-radius: 16px;
-  background: rgba(61, 129, 222, .07);
+.vk-onb-pin__explanation {
+  width: 100%;
+  max-width: 320px;
+  margin: 10px auto 0;
+  color: var(--vk-r1-text-secondary);
+  font-size: 11px;
+  line-height: 1.45;
 }
 
-.vk-onb-pin__notice svg {
-  width: 21px;
-  height: 21px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.7;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: .82;
-}
-
-.vk-onb-pin__notice p {
+.vk-onb-pin__explanation p {
   margin: 0;
-  color: var(--vk-text-muted, rgba(255,255,255,.7));
-  font-size: 13px;
-  line-height: 1.5;
 }
 
 .vk-onb-pin__footer {
-  width: min(100%, 560px);
-  margin: auto auto 0;
-  padding: 22px 28px max(28px, env(safe-area-inset-bottom));
+  flex: 0 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding:
+    16px
+    var(--vk-r1-screen-padding-inline)
+    calc(160px + env(safe-area-inset-bottom, 0px));
 }
 
 .vk-onb-pin__submit {
   width: 100%;
+  max-width: 320px;
   min-height: 56px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--vk-r1-radius-md);
+  background: var(--vk-r1-primary);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
+  font-size: var(--vk-r1-font-size-button);
+  font-weight: var(--vk-r1-font-weight-semibold);
+  box-shadow: none;
 }
 
-@media (max-height: 760px) {
-  .vk-onb-pin__content {
-    padding-top: 18px;
-  }
-
-  .vk-onb-pin__subtitle {
-    margin-bottom: 22px;
-  }
-
-  .vk-onb-pin__form {
-    gap: 16px;
-  }
-
-  .vk-onb-pin__notice {
-    margin-top: 20px;
-  }
+.vk-onb-pin__submit:disabled {
+  background: var(--vk-r1-surface);
+  color: var(--vk-r1-text-secondary);
+  opacity: 1;
+  cursor: not-allowed;
 }
+
 
 /* VK2 Figma onboarding Emergency Kit save CSS v1 */
 .vk-onb-kit-save {

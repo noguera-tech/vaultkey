@@ -139,22 +139,22 @@
         '</header>' +
         '<div class="vk-onb-pin__content">' +
           '<h1 class="vk-onb-pin__title">Crea tu PIN local</h1>' +
-          '<p class="vk-onb-pin__subtitle">Úsalo para desbloquear VaultKey rápidamente en este dispositivo.</p>' +
+          '<p class="vk-onb-pin__subtitle">Servirá para desbloquear VaultKey rápidamente en este dispositivo.</p>' +
           '<form class="vk-onb-pin__form" onsubmit="return false">' +
             '<label class="vk-onb-pin__field">' +
-              '<span class="vk-onb-pin__label">PIN de 6 dígitos</span>' +
-              '<input class="vk-input vk-onb-pin__input" id="ob-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="off">' +
+              '<span class="vk-onb-pin__sr-label">Introduce tu PIN</span>' +
+              '<input class="vk-input vk-onb-pin__input" id="ob-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Introduce tu PIN" autocomplete="off">' +
               '<span class="vk-field__hint vk-onb-pin__hint" id="ob-pin-hint"></span>' +
             '</label>' +
             '<label class="vk-onb-pin__field">' +
-              '<span class="vk-onb-pin__label">Confirma tu PIN</span>' +
-              '<input class="vk-input vk-onb-pin__input" id="ob-pin2" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="off">' +
+              '<span class="vk-onb-pin__sr-label">Vuelve a introducir el PIN</span>' +
+              '<input class="vk-input vk-onb-pin__input" id="ob-pin2" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Vuelve a introducir el PIN" autocomplete="off">' +
               '<span class="vk-field__hint vk-onb-pin__hint" id="ob-pin2-hint"></span>' +
             '</label>' +
           '</form>' +
-          '<div class="vk-onb-pin__notice">' +
-            '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10v6"/><path d="M12 7h.01"/></svg>' +
-            '<p>El PIN solo desbloquea este dispositivo. Tu contraseña maestra sigue siendo la llave real de tu bóveda.</p>' +
+          '<div class="vk-onb-pin__explanation">' +
+            '<p>El PIN no cifra tu bóveda.</p>' +
+            '<p>Solo permite el desbloqueo rápido en este dispositivo.</p>' +
           '</div>' +
         '</div>' +
         '<div class="vk-onb-pin__footer">' +
