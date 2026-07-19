@@ -3047,170 +3047,201 @@ body.vk-lock { overflow: hidden; }
 }
 
 
-/* VaultKey 2.0 - 08 Editar password aprobado */.vk-password-edit-root{
-  position:relative;
-  overflow:hidden;
-  background:linear-gradient(180deg,#111827 17%,#182f4e 67%);
-  color:#fff;
+/* VaultKey 2.0 - 08 Editar password aprobado */.vk-password-edit-root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--vk-r1-bg-gradient);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
 }
 
-.vk-password-edit-header{
-  height:62px;
-  flex:0 0 62px;
-  display:flex;
-  align-items:center;
-  padding:0 10px;
-  background:#24354b;
-  border-bottom:1px solid #111827;
+.vk-password-edit-header {
+  height: 56px;
+  flex: 0 0 56px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0 var(--vk-r1-screen-padding-inline);
+  background: var(--vk-r1-surface);
+  border-bottom:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
 }
 
-.vk-password-edit-back{
-  width:40px;
-  height:40px;
-  display:grid;
-  place-items:center;
-  padding:0;
-  border:0;
-  border-radius:12px;
-  background:transparent;
-  color:#f8fafc;
+.vk-password-edit-back {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vk-r1-text);
+  cursor: pointer;
 }
 
-.vk-password-edit-back svg{
-  width:22px;
-  height:22px;
+.vk-password-edit-back svg {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
 }
 
-.vk-password-edit-content{
-  flex:1;
-  min-height:0;
-  overflow-y:auto;
-  padding:15px 24px 28px;
+.vk-password-edit-content {
+  flex: 1;
+  min-height: 0;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding:
+    24px
+    var(--vk-r1-screen-padding-inline)
+    calc(32px + env(safe-area-inset-bottom, 0px));
+  scrollbar-width: none;
 }
 
-.vk-password-edit-title{
-  margin:4px 0 25px;
-  text-align:center;
-  color:#fff;
-  font-size:20px;
-  font-weight:700;
-  line-height:1.2;
-  letter-spacing:-.2px;
+.vk-password-edit-content::-webkit-scrollbar {
+  display: none;
 }
 
-.vk-password-edit-form{
-  display:flex;
-  flex-direction:column;
-  gap:20px;
+.vk-password-edit-title {
+  margin: 0 0 24px;
+  color: var(--vk-r1-text);
+  font-size: var(--vk-r1-font-size-screen-title);
+  font-weight: var(--vk-r1-font-weight-bold);
+  line-height: normal;
+  letter-spacing: 0;
+  text-align: center;
 }
 
-.vk-password-edit-field{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
+.vk-password-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.vk-password-edit-field > span{
-  color:#f1f5f9;
-  font-size:14px;
-  font-weight:600;
-  line-height:1.2;
+.vk-password-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vk-password-edit-field > span {
+  color: var(--vk-r1-text-tertiary);
+  font-size: var(--vk-r1-font-size-label);
+  font-weight: var(--vk-r1-font-weight-regular);
+  line-height: normal;
 }
 
 .vk-password-edit-field input,
-.vk-password-edit-field textarea{
-  width:100%;
-  margin:0;
-  border:1px solid rgba(58,74,96,.6);
-  border-radius:6px;
-  outline:none;
-  background:#243246;
-  color:#f8fafc;
-  box-shadow:none;
-  font:inherit;
-  line-height:1.35;
+.vk-password-edit-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  border:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
+  border-radius: var(--vk-r1-radius-md);
+  outline: none;
+  background: var(--vk-r1-surface);
+  color: var(--vk-r1-text);
+  box-shadow: none;
+  font-family: var(--vk-r1-font-family);
+  font-size: var(--vk-r1-font-size-input);
+  font-weight: var(--vk-r1-font-weight-regular);
+  line-height: 1.35;
 }
 
-.vk-password-edit-field input{
-  height:46px;
-  padding:12px 13px;
+.vk-password-edit-field input {
+  height: 48px;
+  padding: 0 16px;
 }
 
-.vk-password-edit-field textarea{
-  min-height:104px;
-  padding:12px 13px;
-  resize:none;
+.vk-password-edit-field textarea {
+  min-height: 104px;
+  padding: 14px 16px;
+  resize: none;
 }
 
 .vk-password-edit-field input:focus,
-.vk-password-edit-field textarea:focus{
-  border-color:#4f7fb9;
-  box-shadow:0 0 0 2px rgba(79,127,185,.18);
+.vk-password-edit-field textarea:focus {
+  border-color: var(--vk-r1-accent);
 }
 
-.vk-password-edit-secret{
-  position:relative;
+.vk-password-edit-secret {
+  position: relative;
 }
 
-.vk-password-edit-secret input{
-  padding-right:49px;
+.vk-password-edit-secret input {
+  padding-right: 56px;
 }
 
-.vk-password-edit-eye{
-  position:absolute;
-  top:3px;
-  right:3px;
-  width:40px;
-  height:40px;
-  display:grid;
-  place-items:center;
-  padding:0;
-  border:0;
-  border-radius:6px;
-  background:transparent;
-  color:#3b82f6;
+.vk-password-edit-eye {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vk-r1-accent);
+  cursor: pointer;
 }
 
-.vk-password-edit-eye svg{
-  width:22px;
-  height:22px;
+.vk-password-edit-eye svg {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
 }
 
-.vk-password-edit-hidden{
-  display:none !important;
+.vk-password-edit-hidden {
+  display: none !important;
 }
 
-.vk-password-edit-actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:8px;
-  padding-bottom:4px;
+.vk-password-edit-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+  padding-bottom: 4px;
 }
 
-.vk-password-edit-actions button{
-  height:48px;
-  padding:0 16px;
-  border:0;
-  border-radius:8px;
-  color:#fff;
-  font-size:14px;
-  font-weight:700;
+.vk-password-edit-actions button {
+  height: 48px;
+  box-sizing: border-box;
+  padding: 0 16px;
+  border-radius: var(--vk-r1-radius-md);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
+  font-size: var(--vk-r1-font-size-button);
+  font-weight: var(--vk-r1-font-weight-regular);
+  cursor: pointer;
 }
 
-.vk-password-edit-cancel{
-  background:#475569;
+.vk-password-edit-cancel {
+  border:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
+  background: transparent;
 }
 
-.vk-password-edit-save{
-  background:#3b82f6;
+.vk-password-edit-save {
+  border:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-primary);
+  background: var(--vk-r1-primary);
 }
 
-.vk-password-edit-actions button:active{
-  transform:translateY(1px);
-}
-/* VaultKey 2.0 - 09 Añadir password aprobado */
-.vk-password-create-root{
+
+/* VaultKey 2.0 - 09 Añadir password aprobado */.vk-password-create-root{
   position:relative;
   overflow:hidden;
   background:linear-gradient(180deg,#111827 17%,#182f4e 67%);
