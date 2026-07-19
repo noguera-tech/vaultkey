@@ -73,7 +73,7 @@
     'welcome': function () {
       return '<div class="vk-onb">' +
         '<div class="vk-onb__shield">' +
-          '<svg width="84" height="101" viewBox="0 0 151 181" fill="none">' +
+          '<svg width="150" height="180" viewBox="0 0 151 181" fill="none">' +
           '<path d="M150.5 99.4875C150.5 144.48 117.688 166.976 78.6875 180.024C76.6453 180.688 74.4269 180.656 72.4062 179.934C33.3125 166.976 0.5 144.48 0.5 99.4875V36.498C0.5 34.1115 1.48772 31.8227 3.24588 30.1351C5.00403 28.4476 7.3886 27.4995 9.875 27.4995C28.625 27.4995 52.0625 16.7013 68.375 3.02362C70.3611 1.39488 72.8877 0.5 75.5 0.5C78.1123 0.5 80.6389 1.39488 82.625 3.02362C99.0312 16.7913 122.375 27.4995 141.125 27.4995C143.611 27.4995 145.996 28.4476 147.754 30.1351C149.512 31.8227 150.5 34.1115 150.5 36.498V99.4875Z" stroke="var(--vk-onb-stroke)" stroke-linecap="round" stroke-linejoin="round"/>' +
           '</svg>' +
           '<svg class="vk-onb__shield-lock" width="20" height="22" viewBox="0 0 36 40" fill="none">' +
@@ -83,7 +83,7 @@
         '</div>' +
         '<h1 class="vk-onb__brand">VaultKey</h1>' +
         '<p class="vk-onb__subtitle">Todo lo importante.<br>En un solo lugar seguro.</p>' +
-        '<button class="vk-btn vk-btn--primary vk-btn--block" data-ob="go-master" style="margin-top:24px">Comenzar</button>' +
+        '<button class="vk-btn vk-btn--primary vk-btn--block vk-onb__start" data-ob="go-master">Comenzar</button>' +
       '</div>';
     },
     'onboarding-master': function () {

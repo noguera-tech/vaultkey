@@ -3921,6 +3921,18 @@ body:has(#settings.active) #screenDots .dot,
 #onboardingModal.vk2-onboarding { display:block; overflow-y:auto; }
 #onboardingModal .vk2-onboarding-host { width:100%; min-height:100dvh; display:flex; flex-direction:column; }
 
+/* Bienvenida R1: el frame es una pantalla fija y no genera scroll. */
+#onboardingModal.vk2-onboarding:has(.vk-onb) { overflow: hidden; }
+#onboardingModal .vk2-onboarding-host:has(> .vk-onb) {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+#onboardingModal .vk2-onboarding-host > .vk-onb {
+  height: 100dvh;
+  min-height: 0;
+}
+
 
 /* DASHBOARD 05 - FONDO FIGMA AISLADO */
 #home.screen.vk-dash-root {

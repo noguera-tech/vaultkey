@@ -1126,145 +1126,107 @@ body.vk-lock { overflow: hidden; }
   .vk-unlock__legal { padding-top: 6px; }
 }
 
-/* VK2 Figma onboarding welcome v1 */
+/* VK2 Figma onboarding welcome v2 — Figma 02 · Bienvenida */
 :root {
-  --vk-onb-stroke: #94a3b8;
+  --vk-onb-stroke: #a7b6c9;
 }
 
-#onboardingModal.vk2-onboarding {
-  background: var(--vk-bg, #0f172a);
-}
-
+#onboardingModal.vk2-onboarding,
 #onboardingModal .vk2-onboarding-host {
   min-height: 100dvh;
-  background: var(--vk-bg, #0f172a);
+  background: linear-gradient(180deg, #111827 17%, #182f4e 67%);
 }
 
 .vk-onb {
+  position: relative;
   width: 100%;
-  min-height: 100dvh;
+  min-height: 917px;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding:
-    clamp(180px, 36.6dvh, 336px)
-    24px
-    max(28px, env(safe-area-inset-bottom));
-  color: var(--vk-text, #ffffff);
-  background: var(--vk-bg, #0f172a);
+  color: #ffffff;
+  background: linear-gradient(180deg, #111827 17%, #182f4e 67%);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
   text-align: center;
   overflow: hidden;
 }
 
 .vk-onb__shield {
-  position: relative;
-  flex: 0 0 auto;
-  width: 151px;
-  height: 181px;
-  color: var(--vk-onb-stroke, #94a3b8);
+  position: absolute;
+  top: 337px;
+  left: 50%;
+  width: 150px;
+  height: 180px;
+  transform: translateX(-50%);
+  color: var(--vk-onb-stroke);
 }
 
 .vk-onb__shield > svg:first-child {
   display: block;
-  width: 151px;
-  height: 181px;
+  width: 150px;
+  height: 180px;
 }
 
 .vk-onb__shield path {
-  stroke: var(--vk-onb-stroke, #94a3b8);
+  stroke: var(--vk-onb-stroke);
 }
 
 .vk-onb__shield-lock {
   position: absolute;
   left: 50%;
-  top: 92px;
+  top: 91.5px;
   width: 36px;
   height: 40px;
   transform: translate(-50%, -50%);
-  color: var(--vk-onb-stroke, #94a3b8);
+  color: var(--vk-onb-stroke);
 }
 
 .vk-onb__shield-lock path,
 .vk-onb__shield-lock rect {
-  stroke: var(--vk-onb-stroke, #94a3b8);
+  stroke: var(--vk-onb-stroke);
 }
 
 .vk-onb__brand {
-  margin: 18px 0 0;
-  color: var(--vk-text, #ffffff);
+  position: absolute;
+  top: 527px;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  color: #ffffff;
   font-size: 36px;
-  line-height: 1.15;
+  line-height: normal;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: 0;
 }
 
 .vk-onb__subtitle {
-  margin: 12px 0 0;
-  color: var(--vk-text-muted, #9ca3af);
-  font-size: 18px;
-  line-height: 1.55;
-  font-weight: 600;
-}
-
-.vk-onb__actions {
-  width: min(320px, calc(100vw - 48px));
-  margin-top: 22px;
-}
-
-.vk-onb > .vk-btn,
-.vk-onb__actions .vk-btn {
+  position: absolute;
+  top: 580px;
+  left: 0;
   width: 100%;
-  min-height: 56px;
   margin: 0;
+  color: #a7b6c9;
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.vk-onb > .vk-onb__start {
+  position: absolute;
+  top: 644px;
+  left: 50%;
+  width: 320px;
+  min-height: 56px;
+  height: 56px;
+  margin: 0;
+  padding: 0;
+  transform: translateX(-50%);
+  border: 0;
   border-radius: 16px;
-  font-size: 18px;
+  background: #2f6fea;
+  color: #ffffff;
+  font-size: 20px;
   font-weight: 700;
-}
-
-.vk-onb__legal {
-  margin-top: 72px;
-  color: var(--vk-text-muted, #9ca3af);
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-@media (max-height: 760px) {
-  .vk-onb {
-    padding-top: 92px;
-    overflow-y: auto;
-  }
-
-  .vk-onb__shield {
-    width: 118px;
-    height: 142px;
-  }
-
-  .vk-onb__shield > svg:first-child {
-    width: 118px;
-    height: 142px;
-  }
-
-  .vk-onb__shield-lock {
-    top: 72px;
-    width: 28px;
-    height: 31px;
-  }
-
-  .vk-onb__brand {
-    margin-top: 14px;
-    font-size: 32px;
-  }
-
-  .vk-onb__subtitle {
-    margin-top: 8px;
-    font-size: 16px;
-  }
-
-  .vk-onb__actions {
-    margin-top: 18px;
-  }
+  letter-spacing: 0;
 }
 
 /* VK2 Figma onboarding master CSS v1 */
