@@ -2534,51 +2534,308 @@ body.vk-lock { overflow: hidden; }
   z-index: 1000 !important;
 }
 
-/* VaultKey 2.0 - Familia Contrasenas - Lista aprobada */
-.vk-passwords-root{position:relative;overflow:hidden;background:linear-gradient(180deg,#111827 17%,#182f4e 67%);color:#fff}
-.vk-passwords-header{height:62px;display:grid;grid-template-columns:1fr auto;align-items:center;padding:0 18px;background:#24354b;border-bottom:1px solid rgba(8,16,29,.9)}
-.vk-passwords-header__actions{display:flex;align-items:center;gap:13px}
-.vk-passwords-header .vk-iconbtn{width:34px;height:42px}
-.vk-passwords-header .vk-iconbtn svg{width:27px;height:27px}
-.vk-passwords-content{height:calc(100% - 62px);padding:21px 18px 94px;overflow:auto;scrollbar-width:none}
-.vk-passwords-content::-webkit-scrollbar{display:none}
-.vk-passwords-title{margin:0 0 19px;text-align:center;font-size:27px;line-height:1.2;letter-spacing:-.02em}
-.vk-passwords-search{height:46px;display:flex;align-items:center;gap:13px;padding:0 20px 0 26px;margin-bottom:18px;border:1px solid rgba(58,74,96,.72);border-radius:17px;background:#243246;color:#a7b6c9}
-.vk-passwords-search:focus-within{border-color:rgba(59,130,246,.9);box-shadow:0 0 0 2px rgba(59,130,246,.13)}
-.vk-passwords-search svg{width:23px;height:23px;flex:0 0 auto}
-.vk-passwords-search input{min-width:0;width:100%;border:0;outline:0;background:transparent;color:#fff;font-size:18px}
-.vk-passwords-search input::placeholder{color:#a7b6c9;opacity:1}
-.vk-passwords-list{display:grid;gap:18px}
-.vk-passwords-row{min-height:73px;width:100%;display:grid;grid-template-columns:38px minmax(0,1fr) 22px;gap:13px;align-items:center;padding:15px 17px 14px;border:1px solid rgba(58,74,96,.72);border-radius:17px;background:#243246;color:#fff;text-align:left;cursor:pointer}
-.vk-passwords-row:active{transform:scale(.992);filter:brightness(.96)}
-.vk-passwords-row__icon{width:32px;height:32px;display:grid;place-items:center;color:#3b82f6}
-.vk-passwords-row__icon svg{width:29px;height:29px}
-.vk-passwords-row__copy{min-width:0}
-.vk-passwords-row__copy strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:21px;line-height:1.12;letter-spacing:-.02em}
-.vk-passwords-row__copy span{display:block;margin-top:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#a7b6c9;font-size:15px}
-.vk-passwords-row__chevron{width:20px;height:20px;color:#aebdd0}
-.vk-passwords-empty{min-height:505px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 28px 72px;text-align:center}
-.vk-passwords-empty__icon{width:82px;height:82px;display:grid;place-items:center;margin-bottom:23px;border-radius:24px;background:rgba(59,130,246,.12);color:#3b82f6}
-.vk-passwords-empty__icon svg{width:48px;height:48px}
-.vk-passwords-empty h2{margin:0;font-size:23px;letter-spacing:-.02em}
-.vk-passwords-empty p{max-width:290px;margin:12px 0 24px;color:#a7b6c9;font-size:15px;line-height:1.5}
-.vk-passwords-empty button{min-height:46px;padding:0 21px;border:0;border-radius:13px;background:#3b82f6;color:#fff;font-weight:750;cursor:pointer}
-.vk-passwords-fab{position:absolute;right:20px;bottom:24px;width:58px;height:58px;display:grid;place-items:center;border:0;border-radius:50%;background:#3b82f6;color:#fff;box-shadow:0 12px 25px rgba(0,0,0,.25);cursor:pointer}
-.vk-passwords-fab svg{width:29px;height:29px}
-.vk-passwords-fab:active{transform:scale(.96)}
+/* ============================================================
+   VaultKey R1 — pantalla Contraseñas
+   Integración visual aislada. Sin cambios de lógica o datos.
+   ============================================================ */
 
-/* Correcciones visuales aprobadas: FAB e iconos protegidos de reglas legacy. */
-#home.vk-dash-root > button.vk-dash-fab,
-#passwords.vk-passwords-root > button.vk-passwords-fab{position:absolute!important;left:auto!important;right:max(20px,env(safe-area-inset-right,0px))!important;bottom:calc(24px + env(safe-area-inset-bottom,0px))!important;width:58px!important;height:58px!important;margin:0!important;padding:0!important;transform:none!important;z-index:1000!important}
-#home.vk-dash-root > button.vk-dash-fab svg,
-#passwords.vk-passwords-root > button.vk-passwords-fab svg{width:29px!important;height:29px!important;max-width:29px!important;max-height:29px!important}
-#passwords.vk-passwords-root .vk-passwords-search > svg{width:23px!important;height:23px!important;max-width:23px!important;max-height:23px!important}
-#passwords.vk-passwords-root .vk-passwords-empty__icon > svg{width:48px!important;height:48px!important;max-width:48px!important;max-height:48px!important}
-#passwords.vk-passwords-root .vk-passwords-row__icon > svg{width:29px!important;height:29px!important;max-width:29px!important;max-height:29px!important}
+#passwords.vk-passwords-root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--vk-r1-bg-gradient);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
+}
 
+#passwords .vk-passwords-header {
+  height: 56px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: 0 var(--vk-r1-screen-padding-inline);
+  background: var(--vk-r1-surface);
+  border-bottom:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
+}
 
-/* VaultKey 2.0 - 07 Detalle de contraseÃ±a aprobado */
-.vk-password-detail-root{
+#passwords .vk-passwords-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#passwords .vk-passwords-header .vk-iconbtn {
+  width: 48px;
+  height: 48px;
+}
+
+#passwords .vk-passwords-header .vk-iconbtn svg {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
+}
+
+#passwords .vk-passwords-content {
+  height: calc(100% - 56px);
+  box-sizing: border-box;
+  padding:
+    20px
+    var(--vk-r1-screen-padding-inline)
+    calc(96px + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+#passwords .vk-passwords-content::-webkit-scrollbar {
+  display: none;
+}
+
+#passwords .vk-passwords-title {
+  margin: 0 0 24px;
+  color: var(--vk-r1-text);
+  font-size: var(--vk-r1-font-size-screen-title);
+  font-weight: var(--vk-r1-font-weight-bold);
+  line-height: normal;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+#passwords .vk-passwords-search {
+  box-sizing: border-box;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 0 16px;
+  border:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
+  border-radius: var(--vk-r1-radius-md);
+  background: var(--vk-r1-surface);
+  color: var(--vk-r1-text-tertiary);
+}
+
+#passwords .vk-passwords-search:focus-within {
+  border-color: var(--vk-r1-accent);
+}
+
+#passwords .vk-passwords-search > svg {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
+  flex: none;
+}
+
+#passwords .vk-passwords-search input {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
+  font-size: var(--vk-r1-font-size-input);
+  font-weight: var(--vk-r1-font-weight-regular);
+}
+
+#passwords .vk-passwords-search input::placeholder {
+  color: var(--vk-r1-text-tertiary);
+  opacity: 1;
+}
+
+#passwords .vk-passwords-list {
+  display: grid;
+  gap: var(--vk-r1-row-gap);
+}
+
+#passwords .vk-passwords-row {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--vk-r1-row-height);
+  display: grid;
+  grid-template-columns:
+    var(--vk-r1-icon-size)
+    minmax(0, 1fr)
+    20px;
+  align-items: center;
+  gap: 15px;
+  padding: 0 16px;
+  border:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
+  border-radius: var(--vk-r1-radius-md);
+  background: var(--vk-r1-surface);
+  color: var(--vk-r1-text);
+  text-align: left;
+  font-family: var(--vk-r1-font-family);
+  cursor: pointer;
+}
+
+#passwords .vk-passwords-row__icon {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vk-r1-accent);
+}
+
+#passwords .vk-passwords-row__icon svg {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
+}
+
+#passwords .vk-passwords-row__copy {
+  min-width: 0;
+}
+
+#passwords .vk-passwords-row__copy strong {
+  display: block;
+  overflow: hidden;
+  color: var(--vk-r1-text);
+  font-size: var(--vk-r1-font-size-row-title);
+  font-weight: var(--vk-r1-font-weight-semibold);
+  line-height: normal;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#passwords .vk-passwords-row__copy span {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--vk-r1-text-tertiary);
+  font-size: var(--vk-r1-font-size-row-subtitle);
+  font-weight: var(--vk-r1-font-weight-regular);
+  line-height: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#passwords .vk-passwords-row__chevron {
+  width: 20px;
+  height: 20px;
+  color: var(--vk-r1-text-tertiary);
+}
+
+#passwords .vk-passwords-empty {
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 24px 24px 72px;
+  text-align: center;
+}
+
+#passwords .vk-passwords-empty__icon {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--vk-r1-accent);
+}
+
+#passwords .vk-passwords-empty__icon svg {
+  width: 48px;
+  height: 48px;
+}
+
+#passwords .vk-passwords-empty h2 {
+  margin: 0;
+  color: var(--vk-r1-text);
+  font-size: var(--vk-r1-font-size-screen-title);
+  font-weight: var(--vk-r1-font-weight-bold);
+  letter-spacing: 0;
+}
+
+#passwords .vk-passwords-empty p {
+  max-width: 290px;
+  margin: 12px 0 24px;
+  color: var(--vk-r1-text-tertiary);
+  font-size: var(--vk-r1-font-size-row-subtitle);
+  line-height: 1.5;
+}
+
+#passwords .vk-passwords-empty button {
+  width: 174px;
+  height: 48px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--vk-r1-radius-md);
+  background: var(--vk-r1-primary);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
+  font-size: var(--vk-r1-font-size-button);
+  font-weight: var(--vk-r1-font-weight-regular);
+  cursor: pointer;
+}
+
+#passwords.vk-passwords-root > .vk-passwords-fab {
+  position: absolute;
+  right: max(
+    var(--vk-r1-screen-padding-inline),
+    env(safe-area-inset-right, 0px)
+  );
+  bottom: calc(
+    24px + env(safe-area-inset-bottom, 0px)
+  );
+  width: 56px;
+  height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--vk-r1-radius-fab);
+  background: var(--vk-r1-primary);
+  color: var(--vk-r1-text);
+  box-shadow: none;
+  transform: none;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+#passwords.vk-passwords-root > .vk-passwords-fab svg {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
+  max-width: var(--vk-r1-icon-size);
+  max-height: var(--vk-r1-icon-size);
+}
+
+/* Protección de geometría del FAB de Home frente a reglas legacy. */
+#home.vk-dash-root > button.vk-dash-fab {
+  position: absolute !important;
+  left: auto !important;
+  right: max(20px, env(safe-area-inset-right, 0px)) !important;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+  width: 58px !important;
+  height: 58px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  z-index: 1000 !important;
+}
+
+#home.vk-dash-root > button.vk-dash-fab svg {
+  width: 29px !important;
+  height: 29px !important;
+  max-width: 29px !important;
+  max-height: 29px !important;
+}
+
+/* VaultKey 2.0 - 07 Detalle de contraseña aprobado */.vk-password-detail-root{
   position:relative;
   overflow:hidden;
   background:linear-gradient(180deg,#111827 17%,#182f4e 67%);
