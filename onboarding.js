@@ -197,23 +197,21 @@
             '</svg>' +
           '</button>' +
         '</header>' +
-        '<div class="vk-onb-kit-verify__content">' +
-          '<h1 class="vk-onb-kit-verify__title">Verifica tu Emergency Kit</h1>' +
-          '<p class="vk-onb-kit-verify__subtitle">Introduce los 4 últimos caracteres del código para confirmar que lo has guardado correctamente.</p>' +
-          '<form class="vk-onb-kit-verify__form" onsubmit="return false">' +
-            '<label class="vk-onb-kit-verify__field">' +
-              '<span class="vk-onb-kit-verify__label">Últimos 4 caracteres</span>' +
-              '<input class="vk-input vk-onb-kit-verify__input" id="ob-kit4" type="password" inputmode="text" maxlength="4" placeholder="XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false">' +
-              '<span class="vk-field__hint vk-onb-kit-verify__hint" id="ob-kit4-hint"></span>' +
-            '</label>' +
-          '</form>' +
-          '<div class="vk-onb-kit-verify__notice">' +
-            '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10v6"/><path d="M12 7h.01"/></svg>' +
-            '<p>Esta comprobación evita continuar sin haber guardado el código de recuperación.</p>' +
-          '</div>' +
+        '<div class="vk-onb-kit-verify__heading">' +
+          '<h1 class="vk-onb-kit-verify__title">Verifica tu kit de emergencia</h1>' +
+          '<p class="vk-onb-kit-verify__subtitle">Introduce el código indicado en tu kit para confirmar<br>que lo has guardado.</p>' +
         '</div>' +
-        '<div class="vk-onb-kit-verify__footer">' +
-          '<button class="vk-btn vk-btn--primary vk-onb-kit-verify__submit" id="ob-kit-verify-submit" type="button" data-ob="submit-kit-verify" disabled>Verificar y crear bóveda</button>' +
+        '<div class="vk-onb-kit-verify__block">' +
+          '<label class="vk-onb-kit-verify__label" for="ob-kit4">Introduce los 4 últimos caracteres del código</label>' +
+          '<div class="vk-onb-kit-verify__input-wrap">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 19 6v5c0 4.8-2.7 8.1-7 10-4.3-1.9-7-5.2-7-10V6l7-3Z"/></svg>' +
+            '<input class="vk-onb-kit-verify__input" id="ob-kit4" type="text" inputmode="text" maxlength="4" placeholder="Código de verificación" autocomplete="off" autocapitalize="characters" spellcheck="false">' +
+          '</div>' +
+          '<span class="vk-field__hint vk-onb-kit-verify__hint" id="ob-kit4-hint"></span>' +
+          '<p class="vk-onb-kit-verify__help">Descarga o imprime una copia y guárdala en un lugar<br>seguro.</p>' +
+          '<button class="vk-onb-kit-verify__submit" id="ob-kit-verify-submit" type="button" data-ob="submit-kit-verify" disabled>Verificar y continuar</button>' +
+          '<p class="vk-onb-kit-verify__confirmation">Este paso confirma que has guardado<br>correctamente tu kit.</p>' +
+          '<button class="vk-onb-kit-verify__download" type="button" data-ob="kit-pdf">Volver a descargar</button>' +
         '</div>' +
       '</section>';
     },
@@ -452,12 +450,9 @@
             kitVerifyInput.value = value;
           }
 
-          var expected = ctx.crypto.normalizeKitCode(draft.kitCode).slice(-4);
-var matches = value.length === 4 && value === expected;
-
-if (kitVerifySubmit) {
-  kitVerifySubmit.disabled = !matches;
-}
+          if (kitVerifySubmit) {
+            kitVerifySubmit.disabled = value.length !== 4;
+          }
         };
 
         if (kitVerifyInput) {
