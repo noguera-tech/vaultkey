@@ -1274,66 +1274,138 @@ body.vk-lock { overflow: hidden; }
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  color: var(--vk-text, #fff);
-  background: var(--vk-bg, #0f172a);
+  overflow: hidden;
+  background: var(--vk-r1-bg-gradient);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
 }
 
 .vk-onb-master__appbar {
-  flex: 0 0 auto;
-  height: 72px;
-  box-sizing: border-box;
+  flex: 0 0 56px;
+  height: 56px;
   display: flex;
   align-items: center;
-  padding: max(12px, env(safe-area-inset-top)) 20px 0;
+  box-sizing: border-box;
+  padding: 0 var(--vk-r1-screen-padding-inline);
+  background: var(--vk-r1-surface);
+  border-bottom:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
+}
+
+.vk-onb-master__back {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vk-r1-text);
 }
 
 .vk-onb-master__content {
-  width: min(100%, 560px);
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
   box-sizing: border-box;
-  margin: 0 auto;
-  padding: 44px 28px 24px;
+  margin: 0;
+  padding:
+    32px
+    var(--vk-r1-screen-padding-inline)
+    24px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.vk-onb-master__content::-webkit-scrollbar {
+  display: none;
 }
 
 .vk-onb-master__title {
   margin: 0;
-  color: var(--vk-text, #fff);
-  font-size: 32px;
-  line-height: 1.15;
-  font-weight: 700;
-  letter-spacing: -0.5px;
+  color: var(--vk-r1-text);
+  font-size: var(--vk-r1-font-size-screen-title);
+  font-weight: var(--vk-r1-font-weight-bold);
+  line-height: normal;
+  letter-spacing: 0;
+  text-align: center;
 }
 
 .vk-onb-master__subtitle {
-  margin: 12px 0 0;
-  color: var(--vk-text-muted, #9ca3af);
-  font-size: 16px;
-  line-height: 1.5;
+  max-width: 330px;
+  margin: 12px auto 0;
+  color: var(--vk-r1-text-secondary);
+  font-size: 14px;
+  font-weight: var(--vk-r1-font-weight-regular);
+  line-height: 1.45;
+  text-align: center;
 }
 
-.vk-onb-master__form { margin-top: 36px; }
-.vk-onb-master__field { display: block; margin-top: 18px; }
-.vk-onb-master__field:first-child { margin-top: 0; }
-.vk-onb-master__control { display: block; }
+.vk-onb-master__form {
+  margin-top: 32px;
+}
+
+.vk-onb-master__field {
+  display: block;
+  margin-top: 16px;
+}
+
+.vk-onb-master__field:first-child {
+  margin-top: 0;
+}
+
+.vk-onb-master__control {
+  display: block;
+}
 
 .vk-onb-master__input {
   width: 100%;
-  min-height: 56px;
+  height: 48px;
+  min-height: 48px;
   box-sizing: border-box;
   padding: 0 16px;
-  border-radius: 12px;
-  font-size: 16px;
+  border:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
+  border-radius: var(--vk-r1-radius-md);
+  outline: none;
+  background: var(--vk-r1-surface);
+  color: var(--vk-r1-text);
+  box-shadow: none;
+  font-family: var(--vk-r1-font-family);
+  font-size: var(--vk-r1-font-size-input);
+  font-weight: var(--vk-r1-font-weight-regular);
+}
+
+.vk-onb-master__input::placeholder {
+  color: var(--vk-r1-text-secondary);
+  opacity: 1;
+}
+
+.vk-onb-master__input:focus {
+  border-color: var(--vk-r1-accent);
 }
 
 .vk-onb-master__hint {
   display: block;
-  min-height: 20px;
+  min-height: 18px;
   margin-top: 6px;
+  color: #FCA5A5;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .vk-onb-master__strength {
   margin-top: 18px;
-  color: var(--vk-text-muted, #9ca3af);
-  font-size: 14px;
+  color: var(--vk-r1-text-secondary);
+  font-size: 13px;
+  font-weight: var(--vk-r1-font-weight-regular);
   line-height: 1.4;
 }
 
@@ -1343,7 +1415,7 @@ body.vk-lock { overflow: hidden; }
   margin-bottom: 8px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.22);
+  background: rgba(167, 182, 201, 0.22);
 }
 
 .vk-onb-master__strength-track > span {
@@ -1351,60 +1423,81 @@ body.vk-lock { overflow: hidden; }
   width: 0;
   height: 100%;
   border-radius: inherit;
-  background: var(--vk-danger, #ef4444);
+  background: var(--vk-r1-danger);
   transition: width 160ms ease;
 }
 
-.vk-onb-master__strength-track > span.is-dÃ©bil,
-.vk-onb-master__strength-track > span.is-debil { width: 33%; }
+.vk-onb-master__strength-track > span.is-débil,
+.vk-onb-master__strength-track > span.is-debil {
+  width: 33%;
+}
 
 .vk-onb-master__strength-track > span.is-media {
   width: 66%;
-  background: #f59e0b;
+  background: var(--vk-r1-warning);
 }
 
 .vk-onb-master__strength-track > span.is-fuerte {
   width: 100%;
-  background: #22c55e;
+  background: #22C55E;
 }
 
 .vk-onb-master__rules {
   margin: 18px 0 0;
   padding: 0;
   list-style: none;
-  color: var(--vk-text-muted, #9ca3af);
-  font-size: 14px;
-  line-height: 1.5;
+  color: var(--vk-r1-text-secondary);
+  font-size: 13px;
+  font-weight: var(--vk-r1-font-weight-regular);
+  line-height: 1.45;
 }
 
 .vk-onb-master__rules li {
   position: relative;
-  margin-top: 9px;
+  margin-top: 10px;
   padding-left: 24px;
 }
 
 .vk-onb-master__rules li::before {
-  content: "â—‹";
+  content: "\25CB";
   position: absolute;
   left: 0;
   top: 0;
+  color: var(--vk-r1-text-secondary);
 }
 
-.vk-onb-master__rules li.is-ok { color: #86efac; }
-.vk-onb-master__rules li.is-ok::before { content: "âœ“"; }
+.vk-onb-master__rules li.is-ok {
+  color: #86EFAC;
+}
+
+.vk-onb-master__rules li.is-ok::before {
+  content: "\2713";
+  color: #22C55E;
+}
 
 .vk-onb-master__footer {
-  width: min(100%, 560px);
+  flex: 0 0 auto;
+  width: 100%;
   box-sizing: border-box;
-  margin: auto auto 0;
-  padding: 24px 28px max(28px, env(safe-area-inset-bottom));
+  margin: 0;
+  padding:
+    16px
+    var(--vk-r1-screen-padding-inline)
+    calc(24px + env(safe-area-inset-bottom, 0px));
 }
 
 .vk-onb-master__footer .vk-btn {
+  width: 100%;
   min-height: 56px;
-  border-radius: 16px;
-  font-size: 18px;
-  font-weight: 700;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--vk-r1-radius-md);
+  background: var(--vk-r1-primary);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
+  font-size: var(--vk-r1-font-size-button);
+  font-weight: var(--vk-r1-font-weight-regular);
+  box-shadow: none;
 }
 
 .vk-onb-master__footer .vk-btn:disabled {
@@ -1412,11 +1505,6 @@ body.vk-lock { overflow: hidden; }
   cursor: not-allowed;
 }
 
-@media (max-height: 760px) {
-  .vk-onb-master__content { padding-top: 18px; }
-  .vk-onb-master__form { margin-top: 22px; }
-  .vk-onb-master__footer { padding-top: 14px; }
-}
 
 /* VK2 Figma onboarding PIN CSS v1 */
 .vk-onb-pin {
