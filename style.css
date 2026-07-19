@@ -3924,7 +3924,7 @@ body:has(#settings.active) #screenDots .dot,
 
 /* DASHBOARD 05 - FONDO FIGMA AISLADO */
 #home.screen.vk-dash-root {
-  background: #0F172A !important;
+  background: var(--vk-r1-bg-gradient) !important;
 }
 #home.screen.vk-dash-root::before,
 #home.screen.vk-dash-root::after {
