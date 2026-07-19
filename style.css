@@ -1,4 +1,4 @@
-﻿/*
+/*
  * VaultKey â€” Design System V2.1 ESCUDO ESCENA
  * Base limpia: un solo asset maestro del escudo, sin parches, sin halos CSS, sin capturas montadas.
  */
@@ -3998,4 +3998,70 @@ body:has(#settings.active) #screenDots .dot,
 #passwordCreate.vk-password-create-root > .vk-password-create-footer{
   top:620px;
   left:25px;
+}
+/* ============================================================
+   VaultKey R1 — layout aislado de Ajustes
+   La apariencia de componentes vive en components.css.
+   ============================================================ */
+
+#settings.vk-settings-root {
+  background: var(--vk-r1-bg-gradient) !important;
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
+}
+
+#settings.vk-settings-root::before,
+#settings.vk-settings-root::after {
+  display: none !important;
+  content: none !important;
+}
+
+#settings .vk-settings-header {
+  position: relative;
+  z-index: 2;
+  padding-inline: var(--vk-r1-screen-padding-inline);
+  background: var(--vk-r1-surface);
+  border: 0;
+  border-bottom: var(--vk-r1-border-width) solid var(--vk-r1-border-soft);
+  box-shadow: none;
+}
+
+#settings .vk-settings-header .vk-header__actions {
+  margin-left: auto;
+}
+
+#settings .vk-settings-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding:
+    4px
+    var(--vk-r1-screen-padding-inline)
+    calc(var(--nav-h) + 20px + env(safe-area-inset-bottom, 0px));
+  scrollbar-width: none;
+}
+
+#settings .vk-settings-content::-webkit-scrollbar {
+  display: none;
+}
+
+#settings .vk-settings-title {
+  margin: 0 0 24px;
+}
+
+#settings .vk-settings-version {
+  margin-top: auto;
+  padding-top: 24px;
+  transform: translateY(54px);
+  color: var(--vk-r1-text-tertiary);
+  font-size: var(--vk-r1-font-size-row-subtitle);
+  font-weight: var(--vk-r1-font-weight-regular);
+  text-align: center;
 }

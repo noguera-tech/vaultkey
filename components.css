@@ -1,19 +1,19 @@
 /* ============================================================
-   VaultKey 2.0 — components.css
-   Capa visual de los componentes base R1 (Plan Módulo 1 · 1.6)
-   Fuente de reglas: Especificación Final v1.0 §4/§14 + decisiones
-   congeladas de Figma (inputs 07-07, anatomía de filas, chevron).
+   VaultKey 2.0 â€” components.css
+   Capa visual de los componentes base R1 (Plan MÃ³dulo 1 Â· 1.6)
+   Fuente de reglas: EspecificaciÃ³n Final v1.0 Â§4/Â§14 + decisiones
+   congeladas de Figma (inputs 07-07, anatomÃ­a de filas, chevron).
 
    REGLA: este fichero consume EXCLUSIVAMENTE tokens --vk-*
    definidos en theme.css. Cero valores hex.
 
-   Commit 1: Header principal · AppBar secundaria · Botones ·
-   Cards/filas · Campos de texto.
-   (Bottom Sheet, Diálogo y Chips llegan en el Commit 2 junto a
+   Commit 1: Header principal Â· AppBar secundaria Â· Botones Â·
+   Cards/filas Â· Campos de texto.
+   (Bottom Sheet, DiÃ¡logo y Chips llegan en el Commit 2 junto a
    components.js.)
    ============================================================ */
 
-/* ---------- Base común ---------- */
+/* ---------- Base comÃºn ---------- */
 
 /* Modelo de caja coherente: los contenedores de componente con
    width + padding usan border-box (los <button> ya lo traen del
@@ -35,9 +35,9 @@
 }
 
 /* ============================================================
-   1 · HEADER PRINCIPAL
-   Solo pantallas raíz. Logo/título + Favoritos + Ajustes,
-   en ese orden. Sin flecha atrás. (Especificación §4)
+   1 Â· HEADER PRINCIPAL
+   Solo pantallas raÃ­z. Logo/tÃ­tulo + Favoritos + Ajustes,
+   en ese orden. Sin flecha atrÃ¡s. (EspecificaciÃ³n Â§4)
    ============================================================ */
 
 .vk-header {
@@ -65,7 +65,7 @@
   gap: 4px;
 }
 
-/* Botón de icono compartido (Header y AppBar) */
+/* BotÃ³n de icono compartido (Header y AppBar) */
 .vk-iconbtn {
   display: inline-flex;
   align-items: center;
@@ -84,9 +84,9 @@
 .vk-iconbtn svg { width: 24px; height: 24px; }
 
 /* ============================================================
-   2 · APPBAR SECUNDARIA
-   Flecha atrás + título. Sin estrella, sin ajustes, sin logo,
-   sin handle. Pantallas de detalle/creación/edición/config.
+   2 Â· APPBAR SECUNDARIA
+   Flecha atrÃ¡s + tÃ­tulo. Sin estrella, sin ajustes, sin logo,
+   sin handle. Pantallas de detalle/creaciÃ³n/ediciÃ³n/config.
    ============================================================ */
 
 .vk-appbar {
@@ -109,9 +109,9 @@
 }
 
 /* ============================================================
-   5 · BOTONES
-   Primario azul · secundario gris oscuro · destructivo rojo
-   (siempre con confirmación — el diálogo llega en Commit 2).
+   5 Â· BOTONES
+   Primario azul Â· secundario gris oscuro Â· destructivo rojo
+   (siempre con confirmaciÃ³n â€” el diÃ¡logo llega en Commit 2).
    ============================================================ */
 
 .vk-btn {
@@ -166,7 +166,7 @@
 }
 
 /* ============================================================
-   6 · CARDS Y FILAS
+   6 Â· CARDS Y FILAS
    Regla congelada: fila con chevron SOLO si navega; fila con
    toggle NO lleva chevron y no navega.
    ============================================================ */
@@ -178,7 +178,7 @@
   overflow: hidden;
 }
 
-/* Fila de lista genérica */
+/* Fila de lista genÃ©rica */
 .vk-row {
   display: flex;
   align-items: center;
@@ -242,7 +242,7 @@
 }
 .vk-row__chevron svg { width: 20px; height: 20px; }
 
-/* Toggle (switch) — CSS puro con input[type=checkbox] */
+/* Toggle (switch) â€” CSS puro con input[type=checkbox] */
 .vk-toggle {
   position: relative;
   display: inline-block;
@@ -252,17 +252,17 @@
   flex-shrink: 0;
 }
 
-/* Acción derecha de fila (toggle o chevron): anclada al extremo,
-   sin padding interno (deformaría el toggle: sus hijos absolutos
-   con inset:0 cubrirían también el padding). La separación con el
-   cuerpo la da el gap de .vk-row; la respiración con el borde,
+/* AcciÃ³n derecha de fila (toggle o chevron): anclada al extremo,
+   sin padding interno (deformarÃ­a el toggle: sus hijos absolutos
+   con inset:0 cubrirÃ­an tambiÃ©n el padding). La separaciÃ³n con el
+   cuerpo la da el gap de .vk-row; la respiraciÃ³n con el borde,
    el padding derecho de la fila. */
 .vk-row .vk-toggle,
 .vk-row .vk-row__chevron {
   margin-left: auto;
 }
 
-/* Respiración de la acción derecha respecto al borde de la card */
+/* RespiraciÃ³n de la acciÃ³n derecha respecto al borde de la card */
 .vk-row:has(.vk-toggle),
 .vk-row:has(.vk-row__chevron) {
   padding-right: 20px;
@@ -308,11 +308,11 @@
 }
 
 /* ============================================================
-   7 · CAMPOS DE TEXTO
+   7 Â· CAMPOS DE TEXTO
    Estilo congelado de Figma (07-07): fondo --vk-input-bg,
-   borde --vk-input-border, radio 6 px, padding 8–12 px,
-   relleno horizontal. Variantes: normal · enmascarado con ojo ·
-   confirmación integrada (onboarding sin pantallas separadas).
+   borde --vk-input-border, radio 6 px, padding 8â€“12 px,
+   relleno horizontal. Variantes: normal Â· enmascarado con ojo Â·
+   confirmaciÃ³n integrada (onboarding sin pantallas separadas).
    ============================================================ */
 
 .vk-field { display: block; width: 100%; }
@@ -355,7 +355,7 @@
   cursor: not-allowed;
 }
 
-/* Enmascarado con ojo: el input reserva sitio para el botón */
+/* Enmascarado con ojo: el input reserva sitio para el botÃ³n */
 .vk-field--masked .vk-input { padding-right: 48px; }
 
 .vk-field__eye {
@@ -386,17 +386,17 @@
 .vk-field__hint--ok { color: var(--vk-success); }
 .vk-field__hint--error { color: var(--vk-danger); }
 
-/* Confirmación integrada: estados de coincidencia */
+/* ConfirmaciÃ³n integrada: estados de coincidencia */
 .vk-input--ok { border-color: var(--vk-success); }
 .vk-input--error { border-color: var(--vk-danger); }
 
-/* Espaciado vertical estándar entre campos de un formulario */
+/* Espaciado vertical estÃ¡ndar entre campos de un formulario */
 .vk-form > .vk-field + .vk-field { margin-top: 16px; }
 
 /* ============================================================
-   3 · BOTTOM SHEET  (Commit 2)
-   Handle superior + título + contenido. Superposición inferior;
-   cierra al tocar fuera (scrim). Transición 300 ms (Espec. §13).
+   3 Â· BOTTOM SHEET  (Commit 2)
+   Handle superior + tÃ­tulo + contenido. SuperposiciÃ³n inferior;
+   cierra al tocar fuera (scrim). TransiciÃ³n 300 ms (Espec. Â§13).
    ============================================================ */
 
 .vk-sheet {
@@ -452,7 +452,7 @@
   margin-bottom: 16px;
 }
 
-/* Pie de acciones estándar de sheet/diálogo */
+/* Pie de acciones estÃ¡ndar de sheet/diÃ¡logo */
 .vk-actions {
   display: flex;
   gap: 12px;
@@ -461,9 +461,9 @@
 .vk-actions > .vk-btn { flex: 1; }
 
 /* ============================================================
-   4 · DIÁLOGO DE CONFIRMACIÓN  (Commit 2)
-   Superposición centrada; cierra al tocar fuera; Cancelar cierra;
-   acción destructiva en rojo. Componente único reutilizable.
+   4 Â· DIÃLOGO DE CONFIRMACIÃ“N  (Commit 2)
+   SuperposiciÃ³n centrada; cierra al tocar fuera; Cancelar cierra;
+   acciÃ³n destructiva en rojo. Componente Ãºnico reutilizable.
    ============================================================ */
 
 .vk-dialog {
@@ -521,9 +521,9 @@
 }
 
 /* ============================================================
-   8 · CHIPS DE TIPO  (Commit 2)
-   Selector exclusivo Web / Wi-Fi / PIN / Recuperación.
-   Web por defecto (decisión congelada 05-07).
+   8 Â· CHIPS DE TIPO  (Commit 2)
+   Selector exclusivo Web / Wi-Fi / PIN / RecuperaciÃ³n.
+   Web por defecto (decisiÃ³n congelada 05-07).
    ============================================================ */
 
 .vk-chips {
@@ -559,7 +559,7 @@
    Auxiliares de componentes con comportamiento
    ============================================================ */
 
-/* Slider (maqueta del generador) — nativo con acento por token */
+/* Slider (maqueta del generador) â€” nativo con acento por token */
 .vk-slider {
   width: 100%;
   accent-color: var(--vk-primary);
@@ -586,8 +586,8 @@
 body.vk-lock { overflow: hidden; }
 
 /* ============================================================
-   vk-unlock — desbloqueo diario VK2.1
-   Bloque aislado: PIN y contraseña maestra, todos sus estados.
+   vk-unlock â€” desbloqueo diario VK2.1
+   Bloque aislado: PIN y contraseÃ±a maestra, todos sus estados.
    ============================================================ */
 #pin.pinScreen:has(.vk-unlock) {
   align-items: stretch;
@@ -790,23 +790,23 @@ body.vk-lock { overflow: hidden; }
 .vk-unlock__legal a:hover { text-decoration: underline; }
 
 /* ============================================================
-   Bloque R1 — integración CSS de PRUEBA de UNLOCK-01 PIN
+   Bloque R1 â€” integraciÃ³n CSS de PRUEBA de UNLOCK-01 PIN
    Fuente: preview aprobada unlock-r1-preview-v3.5.html
    Aplicado sobre components-post-repair.css (real, post commit
    f0b16c4 "Remove accidental PowerShell text from CSS").
    Escopado exclusivamente a la pantalla de PIN mediante
-   ":not(.vk-unlock--master)" — no debe afectar en ningún caso
-   a la pantalla de contraseña maestra, que usa su propio
+   ":not(.vk-unlock--master)" â€” no debe afectar en ningÃºn caso
+   a la pantalla de contraseÃ±a maestra, que usa su propio
    contenedor .vk-unlock__master-panel (no .vk-unlock__panel).
    No modifica unlock.js, app.js, router, crypto, storage,
-   sesión, wipe ni contraseña maestra — únicamente presentación
-   (CSS). Sin JavaScript de escala: la adaptación a alturas
+   sesiÃ³n, wipe ni contraseÃ±a maestra â€” Ãºnicamente presentaciÃ³n
+   (CSS). Sin JavaScript de escala: la adaptaciÃ³n a alturas
    menores de 917px es puramente CSS (variables + media queries).
 
    Layout mediante variables CSS escopadas al panel de PIN.
-   Composición 412x917 exacta cuando la altura disponible es
+   ComposiciÃ³n 412x917 exacta cuando la altura disponible es
    >= 917px (valores por defecto, sin media query). Para
-   alturas menores, dos niveles de compactación redefinen
+   alturas menores, dos niveles de compactaciÃ³n redefinen
    SOLO las variables, reutilizando el mismo esqueleto de
    posicionamiento absoluto. El breakpoint max-height:720px
    reutiliza el mismo umbral que ya usa el resto de .vk-unlock*
@@ -840,10 +840,10 @@ body.vk-lock { overflow: hidden; }
   padding: 0;
 }
 
-/* Compactación nivel 1 — alturas entre 721px y 916px.
-   Peor caso verificado: 721px (justo por encima del límite del
+/* CompactaciÃ³n nivel 1 â€” alturas entre 721px y 916px.
+   Peor caso verificado: 721px (justo por encima del lÃ­mite del
    nivel 2). Reduce el "aire" entre bloques; escudo y teclas
-   conservan tamaño de tap-target razonable. */
+   conservan tamaÃ±o de tap-target razonable. */
 @media (max-height: 916px) {
   .vk-unlock:not(.vk-unlock--master) .vk-unlock__panel {
     --ul-panel-height: 100dvh;
@@ -868,7 +868,7 @@ body.vk-lock { overflow: hidden; }
   }
 }
 
-/* Compactación nivel 2 — alturas <= 720px (dispositivos Android
+/* CompactaciÃ³n nivel 2 â€” alturas <= 720px (dispositivos Android
    bajos/con chrome de sistema). Reutiliza el mismo umbral
    max-height:720px que ya usa el resto de .vk-unlock* en este
    archivo. Peor caso verificado: 720px exacto (y 640px como
@@ -941,8 +941,8 @@ body.vk-lock { overflow: hidden; }
 }
 
 /* Estado (initial/ready/checking/error/wiping): SIEMPRE visible,
-   con una zona reservada mínima (variable por breakpoint). Sin
-   display:none en ningún caso. */
+   con una zona reservada mÃ­nima (variable por breakpoint). Sin
+   display:none en ningÃºn caso. */
 .vk-unlock__panel .vk-unlock__status {
   position: absolute;
   top: var(--ul-status-top);
@@ -1012,7 +1012,7 @@ body.vk-lock { overflow: hidden; }
   padding: 0;
 }
 /* ============================================================
-   Fin bloque R1 — integración de prueba UNLOCK-01 PIN
+   Fin bloque R1 â€” integraciÃ³n de prueba UNLOCK-01 PIN
    ============================================================ */
 
 .vk-unlock__appbar {
@@ -1355,7 +1355,7 @@ body.vk-lock { overflow: hidden; }
   transition: width 160ms ease;
 }
 
-.vk-onb-master__strength-track > span.is-débil,
+.vk-onb-master__strength-track > span.is-dÃ©bil,
 .vk-onb-master__strength-track > span.is-debil { width: 33%; }
 
 .vk-onb-master__strength-track > span.is-media {
@@ -1384,14 +1384,14 @@ body.vk-lock { overflow: hidden; }
 }
 
 .vk-onb-master__rules li::before {
-  content: "○";
+  content: "â—‹";
   position: absolute;
   left: 0;
   top: 0;
 }
 
 .vk-onb-master__rules li.is-ok { color: #86efac; }
-.vk-onb-master__rules li.is-ok::before { content: "✓"; }
+.vk-onb-master__rules li.is-ok::before { content: "âœ“"; }
 
 .vk-onb-master__footer {
   width: min(100%, 560px);
@@ -2270,11 +2270,11 @@ body.vk-lock { overflow: hidden; }
   }
 }
 
-/* Ajuste vertical final — master unlock */
+/* Ajuste vertical final â€” master unlock */
 .vk-unlock--master .vk-unlock__master-panel {
   padding-top: 48px;
 }
-/* Ajuste visual final � teclado PIN menos brillante */
+/* Ajuste visual final — teclado PIN menos brillante */
 .vk-unlock__key {
   background: #E2E8F0;
   border-color: rgba(148, 163, 184, 0.55);
@@ -2289,7 +2289,7 @@ body.vk-lock { overflow: hidden; }
   background: #BFC9D6;
 }
 
-/* Ajuste definitivo � teclado PIN con menos brillo */
+/* Ajuste definitivo — teclado PIN con menos brillo */
 .vk-unlock__key {
   background: #CBD5E1;
   border-color: rgba(100, 116, 139, 0.7);
@@ -2304,14 +2304,14 @@ body.vk-lock { overflow: hidden; }
   background: #AAB7C5;
 }
 
-/* Estado de error � contrase�a maestra */
+/* Estado de error — contraseña maestra */
 .vk-unlock--master.vk-unlock--error .vk-unlock__status {
   color: #FCA5A5;
   font-weight: 500;
 }
 
 /* VAULTKEY DASHBOARD 05 - FIGMA APROBADO V6 */
-/* Preview aislada 05 Dashboard v5. No forma parte de producción. */
+/* Preview aislada 05 Dashboard v5. No forma parte de producciÃ³n. */
 .vk-dash-root {
   position: relative;
   width: 100%;
@@ -2453,7 +2453,7 @@ body.vk-lock { overflow: hidden; }
 .vk-dash-tile__icon svg { width: 100%; height: 100%; }
 
 
-/* Icono Contraseñas: composición exacta de dos capas exportadas de Figma. */
+/* Icono ContraseÃ±as: composiciÃ³n exacta de dos capas exportadas de Figma. */
 .vk-dash-key-icon {
   position: relative;
   width: 32px;
@@ -2576,7 +2576,7 @@ body.vk-lock { overflow: hidden; }
 #passwords.vk-passwords-root .vk-passwords-row__icon > svg{width:29px!important;height:29px!important;max-width:29px!important;max-height:29px!important}
 
 
-/* VaultKey 2.0 - 07 Detalle de contraseña aprobado */
+/* VaultKey 2.0 - 07 Detalle de contraseÃ±a aprobado */
 .vk-password-detail-root{
   position:relative;
   overflow:hidden;
@@ -2912,7 +2912,7 @@ body.vk-lock { overflow: hidden; }
 .vk-password-edit-actions button:active{
   transform:translateY(1px);
 }
-/* VaultKey 2.0 - 09 A�adir password aprobado */
+/* VaultKey 2.0 - 09 Añadir password aprobado */
 .vk-password-create-root{
   position:relative;
   overflow:hidden;
@@ -3172,4 +3172,111 @@ body.vk-lock { overflow: hidden; }
   .vk-password-create-form{width:calc(100% - 49px)}
   .vk-password-create-control{width:100%}
   .vk-password-create-footer{width:calc(100% - 48px)}
+}
+
+/* ============================================================
+   VaultKey R1 â€” componentes visuales aislados
+   Fuente: docs/design-system/
+   No sustituye todavÃ­a los componentes legacy .vk-*.
+   ============================================================ */
+
+.vk-r1-screen {
+  min-height: 100%;
+  background: var(--vk-r1-bg-gradient);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+.vk-r1-header {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--vk-r1-screen-padding-inline);
+  background: transparent;
+  color: var(--vk-r1-text);
+}
+
+.vk-r1-title {
+  margin: 0;
+  color: var(--vk-r1-text);
+  font-size: var(--vk-r1-font-size-screen-title);
+  font-weight: var(--vk-r1-font-weight-bold);
+  line-height: var(--vk-r1-line-height-auto);
+  letter-spacing: var(--vk-r1-letter-spacing);
+  text-align: center;
+}
+
+.vk-r1-list {
+  display: grid;
+  gap: var(--vk-r1-row-gap);
+}
+
+.vk-r1-row {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--vk-r1-row-height);
+  display: grid;
+  grid-template-columns: var(--vk-r1-icon-size) minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: 15px;
+  padding: 0 16px;
+  border: var(--vk-r1-border-width) solid var(--vk-r1-border-soft);
+  border-radius: var(--vk-r1-radius-md);
+  background: var(--vk-r1-surface);
+  color: var(--vk-r1-text);
+  text-align: left;
+  font: inherit;
+}
+
+.vk-r1-row__icon {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vk-r1-accent);
+}
+
+.vk-r1-row__icon--warning {
+  color: var(--vk-r1-warning);
+}
+
+.vk-r1-row__icon svg {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--vk-r1-icon-stroke-width);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.vk-r1-row__body {
+  min-width: 0;
+}
+
+.vk-r1-row__title {
+  display: block;
+  color: var(--vk-r1-text);
+  font-size: var(--vk-r1-font-size-row-title);
+  font-weight: var(--vk-r1-font-weight-semibold);
+  line-height: var(--vk-r1-line-height-auto);
+  letter-spacing: var(--vk-r1-letter-spacing);
+}
+
+.vk-r1-row__subtitle {
+  display: block;
+  margin-top: 3px;
+  color: var(--vk-r1-text-tertiary);
+  font-size: var(--vk-r1-font-size-row-subtitle);
+  font-weight: var(--vk-r1-font-weight-regular);
+  line-height: var(--vk-r1-line-height-auto);
+  letter-spacing: var(--vk-r1-letter-spacing);
+}
+
+.vk-r1-row__chevron {
+  justify-self: end;
+  color: var(--vk-r1-text-tertiary);
+  font-size: 24px;
+  line-height: 1;
 }

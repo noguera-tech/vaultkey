@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -398,62 +398,104 @@
       </div>
     </div>
   </div></div></section>
-<section id="settings" class="screen"><div class="top"><div><div class="title">Ajustes</div><div class="sub">Seguridad, respaldos y apariencia</div></div></div><div class="content">
-  <div class="settingBlock"><div class="label">Seguridad</div><div class="settingsGrid">
-    <div class="settingsRow" onclick="lock()"><div class="sico">🔒</div><div class="stxt"><b>Bloquear ahora</b><span>Pide el PIN al volver a entrar</span></div><div>›</div></div>
-    <div class="settingsRow" id="bioSettingsRow" onclick="bioSettingsAction()"><div class="sico">👆</div><div class="stxt"><b>Biometría del dispositivo</b><span id="bioSettingsSpan">Introduce el PIN de VaultKey una vez para activarla</span></div><div id="bioSettingsPill" class="pill">Inactiva</div></div>
-    <div class="settingsRow" onclick="showRecoveryCode()"><div class="sico">🧩</div><div class="stxt"><b>Código de recuperación</b><span>Ver o copiar el código creado con la bóveda</span></div><div>›</div></div>
-    <div class="settingsRow" data-vk-kind="recovery" onclick="regenerateRecoveryCode()"><div class="sico">🔄</div><div class="stxt"><b>Regenerar código de recuperación</b><span>Crea uno nuevo e invalida el anterior</span></div><div>›</div></div>
-    <div class="settingsRow" id="vk2ChangeMasterRow" onclick="vk2ChangeMaster()"><div class="sico">🔑</div><div class="stxt"><b>Cambiar contraseña maestra</b><span>Actualiza la clave principal de la bóveda</span></div><div>›</div></div>
-    <div class="settingsRow" id="vk2ChangePINRow" onclick="vk2ChangePIN()"><div class="sico">🔢</div><div class="stxt"><b>Cambiar PIN local</b><span>Actualiza el PIN de desbloqueo rápido</span></div><div>›</div></div>
-    <div class="settingsRow"><div class="sico">🔢</div><div class="stxt"><b>Longitud del PIN</b><span id="pinLenSpan">PIN de 6 dígitos (actual)</span></div><div style="display:flex;gap:6px"><button id="pinLen6Btn" class="pill" onclick="setPinLen(6)" style="cursor:pointer">6</button><button id="pinLen8Btn" class="pill" onclick="setPinLen(8)" style="cursor:pointer">8</button></div></div>
-    <div class="settingsRow" onclick="toast('Auto bloqueo inmediato al cerrar o bloquear manualmente')"><div class="sico">⏱️</div><div class="stxt"><b>Auto bloqueo</b><span>Recomendado: inmediato</span></div><div class="pill">Seguro</div></div>
-    <div class="settingsRow" style="flex-direction:column;align-items:flex-start;gap:8px"><div style="display:flex;align-items:center;gap:10px;width:100%"><div class="sico" style="background:rgba(255,77,85,.12);font-size:20px">🗑️</div><div class="stxt"><b>Borrado automático</b><span>Borra toda la bóveda tras 10 intentos fallidos de PIN</span></div><label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0"><input type="checkbox" id="autoWipeToggle" style="width:18px;height:18px;accent-color:#ff4d55;cursor:pointer" onchange="confirmAutoWipe(this.checked)"></label></div><p style="font-size:11px;color:rgba(255,77,85,.8);margin:0;line-height:1.4">⚠️ Acción irreversible. Asegúrate de tener un respaldo cifrado antes de activar esta opción.</p></div>
-  </div></div>
-  <div class="settingBlock"><div class="label">Respaldos</div><div class="settingsGrid">
-    <div class="settingsRow" onclick="exportBackup()"><div class="sico">📤</div><div class="stxt"><b>Exportar respaldo cifrado</b><span id="exportBackupSpan">Guarda una copia protegida de la bóveda</span></div><div>›</div></div>
-    <div class="settingsRow" onclick="document.getElementById('importFile').click()"><div class="sico">📥</div><div class="stxt"><b>Importar respaldo</b><span id="importBackupSpan">Restaurar desde archivo cifrado (.json)</span></div><div>›</div></div>
-    <input id="importFile" type="file" accept="application/json" class="hidden" onchange="importBackup(this.files[0])">
-    <div class="settingsRow" onclick="document.getElementById('importCsvFile').click()"><div class="sico">📋</div><div class="stxt"><b>Importar desde otro gestor</b><span>LastPass, Bitwarden, 1Password, Chrome (.csv)</span></div><div>›</div></div>
-    <input id="importCsvFile" type="file" accept=".csv,text/csv" class="hidden" onchange="importFromCSV(this.files[0]);this.value=''">
-  </div></div>
+<section id="settings" class="screen vk-settings-root vk-r1-screen">
+  <header class="vk-header vk-settings-header vk-r1-header">
+    <div class="vk-header__title" aria-hidden="true"></div>
 
-  <div class="settingBlock"><div class="label">Google Drive</div><div class="settingsGrid">
-    <div class="settingsRow" id="driveConnectRow" onclick="driveConnect()"><div class="sico">☁️</div><div class="stxt"><b>Conectar Google Drive</b><span>Respaldo cifrado opcional con Google Drive</span></div><div>›</div></div>
-    <div class="settingsRow" id="driveStatusRow" style="display:none"><div class="sico" id="driveStatusIco">✅</div><div class="stxt"><b id="driveStatusTxt">Drive conectado</b><span id="driveStatusSub">Última sync: nunca</span></div><div id="driveStatusArrow">›</div></div>
-    <div class="settingsRow" id="driveSyncRow" onclick="driveSyncNow()" style="display:none"><div class="sico">🔄</div><div class="stxt"><b>Sincronizar ahora</b><span>Subir respaldo cifrado a Drive</span></div><div>›</div></div>
-    <div class="settingsRow" id="driveRestoreRow" onclick="driveRestore()" style="display:none"><div class="sico">⬇️</div><div class="stxt"><b>Restaurar desde Drive</b><span>Descargar y restaurar último respaldo</span></div><div>›</div></div>
-    <div class="settingsRow" id="driveAutoRow" style="display:none"><div class="sico">⚙️</div><div class="stxt"><b>Sync automática</b><span id="driveAutoSub">Al guardar cada entrada</span></div><div><label class="toggle"><input type="checkbox" id="driveAutoToggle" onchange="driveToggleAuto(this.checked)" checked><span class="slider"></span></label></div></div>
-    <div class="settingsRow" id="driveDisconnectRow" onclick="driveDisconnect()" style="display:none"><div class="sico">🔌</div><div class="stxt"><b>Desconectar Drive</b><span>Dejar de sincronizar</span></div><div>›</div></div>
-  </div></div>
+    <div class="vk-header__actions">
+      <button type="button" class="vk-iconbtn" aria-label="Favoritos" onclick="show('fav')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      </button>
 
-  <div class="settingBlock"><div class="label">Configuración</div><div class="card">
-    <b>Autobloqueo inteligente</b>
-    <div class="sub">No debe pedir PIN mientras estás escribiendo, tocando o navegando. Solo bloquea al salir o tras inactividad real.</div>
-    <select id="autoLockSelect" class="settingSelect" onchange="setAutoLock(this.value)">
-      <option value="0">Inmediato al salir</option>
-      <option value="30000" selected>30 segundos sin actividad</option>
-      <option value="60000">1 minuto sin actividad</option>
-      <option value="300000">5 minutos</option>
-      <option value="900000">15 minutos</option>
-    </select>
-    <div class="securityNote">En aplicaciones recientes se mostrará una pantalla privada: 🔐 VaultKey " Bóveda protegida.</div>
-  </div></div>
-  
-  <div class="settingBlock"><div class="label">Preferencias</div><div class="settingsGrid">
-    <div class="settingsRow" onclick="toggleVibration()"><div class="sico">📳</div><div class="stxt"><b>Vibración</b><span id="vibeSettingHint">Feedback háptico en botones y acciones</span></div><div id="vibeToggle">●</div></div>
-    <div class="settingsRow" onclick="toggleSound()"><div class="sico">🔔</div><div class="stxt"><b>Sonidos</b><span id="soundSettingHint">Sonidos de confirmación y error</span></div><div id="soundToggle">○</div></div>
-    <div class="settingsRow" id="soundStyleRow" style="display:none"><div class="sico">🎵</div><div class="stxt"><b>Estilo de sonido</b><span id="soundStyleHint">Suave</span></div><div onclick="event.stopPropagation()"><select id="soundStyleSelect" onchange="setSoundStyle(this.value)" style="background:transparent;border:none;color:var(--cyan);font-weight:800;font-size:14px;text-align:right"><option value="suave">Suave</option><option value="cristal">Cristal</option><option value="retro">Retro</option><option value="minimo">Mínimo</option></select></div></div>
-  </div></div>
-  <div class="settingBlock"><div class="label">General</div><div class="settingsGrid">
-    <div class="settingsRow" onclick="shareApp()"><div class="sico">📲</div><div class="stxt"><b>Compartir aplicación</b><span>Enviar enlace de VaultKey</span></div><div>›</div></div>
-    <div class="settingsRow" onclick="showSecurityInfo()"><div class="sico">📋</div><div class="stxt"><b>Privacidad y seguridad</b><span>Cómo protege VaultKey tus datos</span></div><div>›</div></div>
-    <div class="settingsRow" id="versionRow" style="cursor:pointer"><div class="sico">ℹ️</div><div class="stxt"><b>VaultKey V2.3.4</b><span id="versionRowHint">Pulsa para ver información de la bóveda</span></div><div>›</div></div>
-  </div></div>
-    <div class="settingsRow" onclick="window.open('https://nogueratech.app/privacy.html','_blank')"><div class="sico">📄</div><div class="stxt"><b>Política de privacidad</b><span>Ver política de privacidad</span></div><div>›</div></div>
-    <div class="settingsRow" id="vk2ContactRow" onclick="window.open('mailto:apps.nogueratech@gmail.com')"><div class="sico">✉️</div><div class="stxt"><b>Contacto</b><span>apps.nogueratech@gmail.com</span></div><div>›</div></div>
-  <div class="settingBlock"><div class="label">Zona de peligro</div><div class="settingsRow" style="flex-direction:column;align-items:flex-start;gap:8px;border-color:rgba(255,77,85,.3);background:rgba(255,77,85,.06)"><div style="display:flex;align-items:center;gap:10px;width:100%"><div class="sico" style="background:rgba(255,77,85,.15);font-size:20px">⚠️</div><div class="stxt"><b style="color:#ff6b75">Borrar todos los datos</b><span>Elimina el PIN, todas las contraseñas y el código de recuperación. Irreversible.</span></div></div><button class="ghost danger" onclick="wipe()" style="width:100%;margin-top:4px">Borrar y restablecer app</button></div></div>
-</div></section>
+      <button type="button" class="vk-iconbtn" aria-label="Ajustes" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.63.24 1.17.7 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="vk-settings-content">
+    <h1 class="vk-settings-title vk-r1-title">Ajustes</h1>
+
+    <nav class="vk-settings-menu vk-r1-list" aria-label="Secciones de Ajustes">
+      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="security">
+        <span class="vk-settings-card__icon vk-r1-row__icon" aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
+  </svg>
+</span>
+        <span class="vk-settings-card__text vk-r1-row__body">
+          <strong class="vk-r1-row__title">Seguridad</strong>
+          <small class="vk-r1-row__subtitle">PIN, biometría y protección</small>
+        </span>
+        <span class="vk-settings-card__arrow vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+
+      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="drive">
+        <span class="vk-settings-card__icon vk-r1-row__icon" aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 0 1 0 9Z"/>
+  </svg>
+</span>
+        <span class="vk-settings-card__text vk-r1-row__body">
+          <strong class="vk-r1-row__title">Google Drive</strong>
+          <small class="vk-r1-row__subtitle">Sincronización y copias</small>
+        </span>
+        <span class="vk-settings-card__arrow vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+
+      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="notifications">
+        <span class="vk-settings-card__icon vk-r1-row__icon" aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10.3 21a2 2 0 0 0 3.4 0"/>
+    <path d="M4 17h16c-1.3-1.4-2-3.2-2-6a6 6 0 0 0-12 0c0 2.8-.7 4.6-2 6Z"/>
+  </svg>
+</span>
+        <span class="vk-settings-card__text vk-r1-row__body">
+          <strong class="vk-r1-row__title">Notificaciones</strong>
+          <small class="vk-r1-row__subtitle">Recordatorios y avisos</small>
+        </span>
+        <span class="vk-settings-card__arrow vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+
+      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="information">
+        <span class="vk-settings-card__icon vk-r1-row__icon" aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/>
+    <path d="M12 11v5"/>
+    <path d="M12 8h.01"/>
+  </svg>
+</span>
+        <span class="vk-settings-card__text vk-r1-row__body">
+          <strong class="vk-r1-row__title">Información</strong>
+          <small class="vk-r1-row__subtitle">Versión, ayuda y privacidad</small>
+        </span>
+        <span class="vk-settings-card__arrow vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+
+      <button type="button" class="vk-settings-card vk-settings-card--danger vk-r1-row" data-settings-target="danger">
+        <span class="vk-settings-card__icon vk-r1-row__icon vk-r1-row__icon--warning" aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10.3 3.7 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z"/>
+    <path d="M12 9v4"/>
+    <path d="M12 17h.01"/>
+  </svg>
+</span>
+        <span class="vk-settings-card__text vk-r1-row__body">
+          <strong class="vk-r1-row__title">Zona de peligro</strong>
+          <small class="vk-r1-row__subtitle">Eliminar todos los datos</small>
+        </span>
+        <span class="vk-settings-card__arrow vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+    </nav>
+
+    <div class="vk-settings-version">VaultKey 2.0</div>
+  </main>
+</section>
 <div class="modal" id="entryModal"><div class="sheet">
 <div class="sheetHead entryTargetHead">
   <button class="linkBtn" onclick="closeModals()">Cancelar</button>

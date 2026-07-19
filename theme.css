@@ -94,3 +94,40 @@
   /* Tipografía — solo declaración del token, sin cargar el recurso */
   --vk-r1-font-family: Inter, system-ui, -apple-system, sans-serif;
 }
+
+/* ============================================================
+   VaultKey R1 — tokens visuales confirmados
+   Fuente: docs/design-system/VAULTKEY_VISUAL_MASTER_v1.0.md
+   No sustituye todavía los tokens legacy --vk-*.
+   ============================================================ */
+
+:root {
+  /* Tipografía */
+  --vk-r1-font-weight-regular: 400;
+  --vk-r1-font-weight-semibold: 600;
+  --vk-r1-font-weight-bold: 700;
+
+  --vk-r1-font-size-screen-title: 20px;
+  --vk-r1-font-size-row-title: 16px;
+  --vk-r1-font-size-row-subtitle: 13px;
+  --vk-r1-font-size-label: 14px;
+  --vk-r1-font-size-input: 16px;
+  --vk-r1-font-size-button: 14px;
+
+  --vk-r1-line-height-auto: normal;
+  --vk-r1-letter-spacing: 0;
+
+  /* Geometría confirmada */
+  --vk-r1-radius-xs: 6px;
+  --vk-r1-radius-fab: 28px;
+  --vk-r1-border-width: 1px;
+
+  /* Layout */
+  --vk-r1-screen-padding-inline: 24px;
+  --vk-r1-row-gap: 15px;
+  --vk-r1-row-height: 72px;
+
+  /* Iconografía */
+  --vk-r1-icon-size: 24px;
+  --vk-r1-icon-stroke-width: 2;
+}
