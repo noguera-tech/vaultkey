@@ -3241,268 +3241,311 @@ body.vk-lock { overflow: hidden; }
 }
 
 
-/* VaultKey 2.0 - 09 Añadir password aprobado */.vk-password-create-root{
-  position:relative;
-  overflow:hidden;
-  background:linear-gradient(180deg,#111827 17%,#182f4e 67%);
-  color:#fff;
+/* VaultKey 2.0 - 09 Añadir password aprobado */.vk-password-create-root {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--vk-r1-bg-gradient);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
 }
 
-.vk-password-create-topbar{
-  position:absolute;
-  inset:0 0 auto;
-  height:64px;
-  background:#243246;
+.vk-password-create-topbar {
+  position: relative;
+  flex: 0 0 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0 var(--vk-r1-screen-padding-inline);
+  background: var(--vk-r1-surface);
+  border-bottom:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
 }
 
-.vk-password-create-back{
-  position:absolute;
-  left:23px;
-  top:12px;
-  width:40px;
-  height:40px;
-  display:grid;
-  place-items:center;
-  padding:0;
-  border:0;
-  background:transparent;
-  color:#a7b6c9;
+.vk-password-create-back {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vk-r1-text);
+  cursor: pointer;
 }
 
-.vk-password-create-back svg{
-  width:26px;
-  height:26px;
+.vk-password-create-back svg {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
 }
 
-.vk-password-create-title{
-  position:absolute;
-  top:82px;
-  left:50%;
-  width:310px;
-  margin:0;
-  transform:translateX(-50%);
-  color:#fff;
-  font-size:20px;
-  font-weight:700;
-  line-height:28.25px;
-  text-align:center;
-  white-space:nowrap;
+.vk-password-create-title {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 24px var(--vk-r1-screen-padding-inline) 0;
+  color: var(--vk-r1-text);
+  font-size: var(--vk-r1-font-size-screen-title);
+  font-weight: var(--vk-r1-font-weight-bold);
+  line-height: normal;
+  letter-spacing: 0;
+  text-align: center;
 }
 
-.vk-password-create-tabs{
-  position:absolute;
-  top:145px;
-  left:26px;
-  width:363px;
-  height:27px;
-  display:grid;
-  grid-template-columns:72px 72px 54px 165px;
-  align-items:center;
-  overflow:hidden;
-  border:1px solid rgba(143,163,191,.2);
-  border-radius:6px;
-  background:rgba(58,74,96,.6);
+.vk-password-create-tabs {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 36px;
+  height: 36px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  box-sizing: border-box;
+  margin: 24px var(--vk-r1-screen-padding-inline) 0;
+  overflow: hidden;
+  border:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
+  border-radius: var(--vk-r1-radius-sm);
+  background: var(--vk-r1-surface);
 }
 
-.vk-password-create-tab{
-  height:27px;
-  padding:0;
-  border:0;
-  background:transparent;
-  color:#a7b6c9;
-  font-size:12px;
-  line-height:27px;
-  text-align:center;
+.vk-password-create-tab {
+  min-width: 0;
+  height: 100%;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--vk-r1-text-secondary);
+  font-family: var(--vk-r1-font-family);
+  font-size: 12px;
+  font-weight: var(--vk-r1-font-weight-regular);
+  line-height: normal;
+  text-align: center;
+  cursor: pointer;
 }
 
-.vk-password-create-tab[aria-selected="true"]{
-  color:#3b82f6;
+.vk-password-create-tab[aria-selected="true"] {
+  color: var(--vk-r1-accent);
 }
 
-.vk-password-create-form{
-  position:absolute;
-  top:212px;
-  left:23px;
-  width:363px;
+.vk-password-create-form {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding:
+    48px
+    var(--vk-r1-screen-padding-inline)
+    24px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
 }
 
-.vk-password-create-field{
-  margin:0 0 18px;
+.vk-password-create-form::-webkit-scrollbar {
+  display: none;
 }
 
-.vk-password-create-label{
-  display:block;
-  margin:0 0 8px;
-  color:#a7b6c9;
-  font-size:12px;
-  font-weight:400;
-  line-height:16px;
+.vk-password-create-field {
+  margin: 0 0 20px;
 }
 
-.vk-password-create-control{
-  position:relative;
-  width:363px;
-  height:40px;
+.vk-password-create-label {
+  display: block;
+  margin: 0 0 8px;
+  color: var(--vk-r1-text-tertiary);
+  font-size: var(--vk-r1-font-size-label);
+  font-weight: var(--vk-r1-font-weight-regular);
+  line-height: normal;
+}
+
+.vk-password-create-control {
+  position: relative;
+  width: 100%;
+  height: 48px;
 }
 
 .vk-password-create-input,
-.vk-password-create-textarea{
-  width:100%;
-  margin:0;
-  border:0;
-  outline:0;
-  background:rgba(58,74,96,.6);
-  color:#fff;
-  box-shadow:inset 0 0 0 1px rgba(143,163,191,.08);
-  font:inherit;
+.vk-password-create-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  border:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
+  border-radius: var(--vk-r1-radius-md);
+  outline: none;
+  background: var(--vk-r1-surface);
+  color: var(--vk-r1-text);
+  box-shadow: none;
+  font-family: var(--vk-r1-font-family);
+  font-size: var(--vk-r1-font-size-input);
+  font-weight: var(--vk-r1-font-weight-regular);
+  line-height: 1.35;
 }
 
-.vk-password-create-input{
-  height:40px;
-  padding:0 46px 0 14px;
-  border-radius:8px;
-  font-size:12px;
+.vk-password-create-input {
+  height: 48px;
+  padding: 0 52px 0 16px;
 }
 
-.vk-password-create-input--plain{
-  padding-right:14px;
+.vk-password-create-input--plain {
+  padding-right: 16px;
 }
 
-.vk-password-create-input--secret{
-  padding-right:72px;
+.vk-password-create-input--secret {
+  padding-right: 88px;
 }
 
 .vk-password-create-input::placeholder,
-.vk-password-create-textarea::placeholder{
-  color:#fff;
-  opacity:.96;
+.vk-password-create-textarea::placeholder {
+  color: var(--vk-r1-text-secondary);
+  opacity: 1;
 }
 
-.vk-password-create-inline-icon{
-  position:absolute;
-  top:50%;
-  right:12px;
-  width:22px;
-  height:22px;
-  display:grid;
-  place-items:center;
-  transform:translateY(-50%);
-  color:#3b82f6;
-  pointer-events:none;
+.vk-password-create-input:focus,
+.vk-password-create-textarea:focus {
+  border-color: var(--vk-r1-accent);
+}
+
+.vk-password-create-inline-icon {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%);
+  color: var(--vk-r1-accent);
+  pointer-events: none;
 }
 
 .vk-password-create-inline-icon svg,
-.vk-password-create-action svg{
-  width:18px;
-  height:18px;
+.vk-password-create-action svg {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
 }
 
-.vk-password-create-secret-actions{
-  position:absolute;
-  top:50%;
-  right:9px;
-  display:flex;
-  align-items:center;
-  gap:7px;
-  transform:translateY(-50%);
+.vk-password-create-secret-actions {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transform: translateY(-50%);
 }
 
-.vk-password-create-action{
-  width:22px;
-  height:22px;
-  display:grid;
-  place-items:center;
-  padding:0;
-  border:0;
-  background:transparent;
-  color:#3b82f6;
+.vk-password-create-action {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vk-r1-accent);
+  cursor: pointer;
 }
 
-.vk-password-create-generator-image{
-  display:block;
-  width:22px;
-  height:22px;
-  object-fit:contain;
+.vk-password-create-generator-image {
+  display: block;
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
+  object-fit: contain;
 }
 
-.vk-password-create-hidden{
-  display:none !important;
+.vk-password-create-hidden {
+  display: none !important;
 }
 
-.vk-password-create-add-note{
-  display:inline-block;
-  margin-top:-2px;
-  padding:0;
-  border:0;
-  background:transparent;
-  color:#a7b6c9;
-  font-size:12px;
-  line-height:16px;
+.vk-password-create-add-note {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vk-r1-text-tertiary);
+  font-family: var(--vk-r1-font-family);
+  font-size: var(--vk-r1-font-size-label);
+  font-weight: var(--vk-r1-font-weight-regular);
+  line-height: normal;
+  cursor: pointer;
 }
 
-.vk-password-create-note{
-  display:none;
-  margin-top:14px;
+.vk-password-create-note {
+  display: none;
+  margin-top: 20px;
 }
 
-.vk-password-create-note.is-visible{
-  display:block;
+.vk-password-create-note.is-visible {
+  display: block;
 }
 
-.vk-password-create-textarea{
-  min-height:84px;
-  padding:12px 14px;
-  border-radius:8px;
-  resize:none;
-  font-size:12px;
+.vk-password-create-textarea {
+  min-height: 104px;
+  padding: 14px 16px;
+  resize: none;
 }
 
-.vk-password-create-footer{
-  position:absolute;
-  top:620px;
-  left:25px;
-  width:364px;
-  height:48px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
+.vk-password-create-footer {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  box-sizing: border-box;
+  margin-bottom: 168px;
+  padding:
+    16px
+    var(--vk-r1-screen-padding-inline)
+    0;
 }
 
-.vk-password-create-button{
-  height:48px;
-  padding:0;
-  border-radius:10px;
-  color:#fff;
-  font-size:12px;
-  font-weight:400;
+.vk-password-create-button {
+  height: 48px;
+  box-sizing: border-box;
+  padding: 0 16px;
+  border-radius: var(--vk-r1-radius-md);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
+  font-size: var(--vk-r1-font-size-button);
+  font-weight: var(--vk-r1-font-weight-regular);
+  cursor: pointer;
 }
 
-.vk-password-create-cancel{
-  border:1px solid rgba(143,163,191,.2);
-  background:transparent;
+.vk-password-create-cancel {
+  border:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
+  background: transparent;
 }
 
-.vk-password-create-submit{
-  border:1px solid #3b82f6;
-  background:#3b82f6;
+.vk-password-create-submit {
+  border:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-primary);
+  background: var(--vk-r1-primary);
 }
 
-.vk-password-create-button:active,
-.vk-password-create-action:active,
-.vk-password-create-back:active,
-.vk-password-create-tab:active{
-  transform:translateY(1px);
-}
 
-@media (max-width:411px){
-  .vk-password-create-title{width:calc(100% - 52px)}
-  .vk-password-create-tabs,
-  .vk-password-create-form{width:calc(100% - 49px)}
-  .vk-password-create-control{width:100%}
-  .vk-password-create-footer{width:calc(100% - 48px)}
-}
-
-/* ============================================================
+/* =============================================================
    VaultKey R1 â€” componentes visuales aislados
    Fuente: docs/design-system/
    No sustituye todavÃ­a los componentes legacy .vk-*.

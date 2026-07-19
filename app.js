@@ -2919,7 +2919,12 @@ function openPasswordCreate(type='web'){
   }
 
   show('passwordCreate','right');
-  setTimeout(()=>name?.focus(),120);
+  setTimeout(()=>{
+    name?.focus({preventScroll:true});
+
+    const createForm=document.querySelector('.vk-password-create-form');
+    if(createForm)createForm.scrollTop=0;
+  },120);
 }
 function setPasswordCreateType(type){
   const config={
@@ -2968,6 +2973,14 @@ function setPasswordCreateType(type){
   const next=config[type];
   if(!next)return;
   _passwordCreateType=type;
+
+  const noteField=$('vkPasswordCreateNoteField');
+  const noteButton=$('vkPasswordCreateAddNote');
+  const createForm=document.querySelector('.vk-password-create-form');
+
+  noteField?.classList.remove('is-visible');
+  if(noteButton)noteButton.textContent='+ Añadir nota';
+  if(createForm)createForm.scrollTop=0;
 
   document.querySelectorAll('[data-password-create-type]').forEach(button=>{
     button.setAttribute('aria-selected',String(button.dataset.passwordCreateType===type));

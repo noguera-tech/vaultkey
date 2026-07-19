@@ -3963,42 +3963,17 @@ body:has(#settings.active) #screenDots .dot,
 #passwordEdit.screen.vk-password-edit-root::after{
   display:none !important;
 }
-/* VaultKey 2.0 - 09 passwordCreate blindaje legacy */
-#passwordCreate.vk-password-create-root{
-  background:linear-gradient(180deg,#111827 17%,#182f4e 67%) !important;
+/* 09 AÑADIR CONTRASEÑA - FONDO FIGMA AISLADO */
+#passwordCreate.screen.vk-password-create-root {
+  background: linear-gradient(180deg, #111827 17%, #182F4E 67%) !important;
 }
 
-#passwordCreate.vk-password-create-root > .vk-password-create-topbar,
-#passwordCreate.vk-password-create-root > .vk-password-create-title,
-#passwordCreate.vk-password-create-root > .vk-password-create-tabs,
-#passwordCreate.vk-password-create-root > .vk-password-create-form,
-#passwordCreate.vk-password-create-root > .vk-password-create-footer{
-  position:absolute;
+#passwordCreate.screen.vk-password-create-root::before,
+#passwordCreate.screen.vk-password-create-root::after {
+  display: none !important;
+  content: none !important;
 }
 
-#passwordCreate.vk-password-create-root > .vk-password-create-topbar{
-  inset:0 0 auto;
-}
-
-#passwordCreate.vk-password-create-root > .vk-password-create-title{
-  top:82px;
-  left:50%;
-}
-
-#passwordCreate.vk-password-create-root > .vk-password-create-tabs{
-  top:145px;
-  left:26px;
-}
-
-#passwordCreate.vk-password-create-root > .vk-password-create-form{
-  top:212px;
-  left:23px;
-}
-
-#passwordCreate.vk-password-create-root > .vk-password-create-footer{
-  top:620px;
-  left:25px;
-}
 /* ============================================================
    VaultKey R1 — layout aislado de Ajustes
    La apariencia de componentes vive en components.css.
