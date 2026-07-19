@@ -217,20 +217,19 @@
     },
     'onboarding-creating': function () {
       return '<section class="vk-onb-creating" aria-live="polite">' +
-        '<div class="vk-onb-creating__content">' +
-          '<div class="vk-onb-creating__visual" aria-hidden="true">' +
-            '<div class="vk-onb-creating__pulse"></div>' +
-            '<svg class="vk-onb-creating__shield" viewBox="0 0 96 112">' +
-              '<path d="M48 6 84 20v30c0 25-15 43-36 56C27 93 12 75 12 50V20L48 6Z"/>' +
-              '<path d="M34 55 44 65 64 43"/>' +
-            '</svg>' +
-          '</div>' +
-          '<h1 class="vk-onb-creating__title">Creando tu bóveda</h1>' +
-          '<p class="vk-onb-creating__subtitle">Estamos protegiendo tus datos y preparando el acceso seguro.</p>' +
-          '<div class="vk-onb-creating__progress" aria-hidden="true">' +
-            '<span></span>' +
-          '</div>' +
-          '<div class="vk-field__hint vk-onb-creating__status" id="ob-creating-status">Derivando claves seguras…</div>' +
+        '<div class="vk-onb-creating__shield" aria-hidden="true">' +
+          '<svg width="150" height="180" viewBox="0 0 151 181" fill="none">' +
+            '<path d="M150.5 99.4875C150.5 144.48 117.688 166.976 78.6875 180.024C76.6453 180.688 74.4269 180.656 72.4062 179.934C33.3125 166.976 0.5 144.48 0.5 99.4875V36.498C0.5 34.1115 1.48772 31.8227 3.24588 30.1351C5.00403 28.4476 7.3886 27.4995 9.875 27.4995C28.625 27.4995 52.0625 16.7013 68.375 3.02362C70.3611 1.39488 72.8877 0.5 75.5 0.5C78.1123 0.5 80.6389 1.39488 82.625 3.02362C99.0312 16.7913 122.375 27.4995 141.125 27.4995C143.611 27.4995 145.996 28.4476 147.754 30.1351C149.512 31.8227 150.5 34.1115 150.5 36.498V99.4875Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '</svg>' +
+          '<svg class="vk-onb-creating__lock" width="36" height="40" viewBox="0 0 36 40" fill="none">' +
+            '<path d="M31.125 18.1479H4.875C2.80393 18.1479 1.125 19.8062 1.125 21.8517V34.8146C1.125 36.8601 2.80393 38.5183 4.875 38.5183H31.125C33.1961 38.5183 34.875 36.8601 34.875 34.8146V21.8517C34.875 19.8062 33.1961 18.1479 31.125 18.1479Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '<path d="M8.625 18.1481V10.7407C8.625 8.285 9.61272 5.92987 11.3709 4.19342C13.129 2.45697 15.5136 1.48145 18 1.48145C20.4864 1.48145 22.871 2.45697 24.6291 4.19342C26.3873 5.92987 27.375 8.285 27.375 10.7407V18.1481" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '</svg>' +
+        '</div>' +
+        '<h1 class="vk-onb-creating__title">Creando tu bóveda</h1>' +
+        '<p class="vk-onb-creating__subtitle" id="ob-creating-status">Protegiendo tu información…</p>' +
+        '<div class="vk-onb-creating__dots" aria-label="Creando bóveda">' +
+          '<span></span><span></span><span></span>' +
         '</div>' +
       '</section>';
     }

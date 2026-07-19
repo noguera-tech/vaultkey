@@ -2083,131 +2083,108 @@ body.vk-lock { overflow: hidden; }
   background: #3a4a60;
 }
 
-/* VK2 Figma onboarding creating CSS v1 */
+/* VK2 Figma onboarding creating CSS v2 — Figma 04 · Creando bóveda */
 .vk-onb-creating {
-  min-height: 100%;
-  display: grid;
-  place-items: center;
-  padding: 32px 28px;
-  background: var(--vk-bg, #0F172A);
-}
-
-.vk-onb-creating__content {
-  width: min(100%, 520px);
+  position: relative;
+  width: 100%;
+  min-height: 917px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: linear-gradient(180deg, #111827 17%, #182f4e 67%);
+  color: #ffffff;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
   text-align: center;
 }
 
-.vk-onb-creating__visual {
-  position: relative;
-  width: 150px;
-  height: 170px;
-  display: grid;
-  place-items: center;
-  margin: 0 auto 28px;
-}
-
-.vk-onb-creating__pulse {
-  position: absolute;
-  width: 132px;
-  height: 132px;
-  border-radius: 50%;
-  background: rgba(59, 130, 246, .16);
-  box-shadow: 0 0 0 0 rgba(59, 130, 246, .28);
-  animation: vkCreatingPulse 1.8s ease-out infinite;
-}
-
 .vk-onb-creating__shield {
-  position: relative;
-  z-index: 1;
-  width: 96px;
-  height: 112px;
-  fill: rgba(37, 99, 235, .2);
-  stroke: #7DB6FF;
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 14px 28px rgba(37, 99, 235, .28));
-  animation: vkCreatingFloat 2.6s ease-in-out infinite;
+  position: absolute;
+  top: 206px;
+  left: 134px;
+  width: 150px;
+  height: 180px;
+  color: #a7b6c9;
+}
+
+.vk-onb-creating__shield > svg:first-child {
+  display: block;
+  width: 150px;
+  height: 180px;
+}
+
+.vk-onb-creating__shield path {
+  stroke-width: 1;
+}
+
+.vk-onb-creating__lock {
+  position: absolute;
+  top: 91.5px;
+  left: 50%;
+  width: 36px;
+  height: 40px;
+  transform: translate(-50%, -50%);
 }
 
 .vk-onb-creating__title {
+  position: absolute;
+  top: 430px;
+  left: 95px;
+  width: 221px;
+  height: 29px;
   margin: 0;
-  font-size: clamp(32px, 5vw, 42px);
-  line-height: 1.08;
-  letter-spacing: -0.035em;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 0;
+  text-align: center;
 }
 
 .vk-onb-creating__subtitle {
-  max-width: 440px;
-  margin: 14px auto 26px;
-  color: var(--vk-text-muted, rgba(255,255,255,.68));
+  position: absolute;
+  top: 514px;
+  left: 99px;
+  width: 219px;
+  height: 19px;
+  margin: 0;
+  color: #a7b6c9;
   font-size: 16px;
-  line-height: 1.55;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 0;
+  text-align: center;
 }
 
-.vk-onb-creating__progress {
-  width: min(100%, 340px);
-  height: 8px;
-  margin: 0 auto 16px;
-  overflow: hidden;
+.vk-onb-creating__dots {
+  position: absolute;
+  top: 565px;
+  left: 181px;
+  width: 53px;
+  height: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vk-onb-creating__dots span {
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
   border-radius: 999px;
-  background: rgba(255,255,255,.1);
+  background: transparent;
+  animation: vkCreatingDotFill .01s linear forwards;
 }
 
-.vk-onb-creating__progress span {
-  display: block;
-  width: 42%;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, rgba(96,165,250,.35), #60A5FA, rgba(96,165,250,.35));
-  animation: vkCreatingProgress 1.35s ease-in-out infinite;
-}
+.vk-onb-creating__dots span:nth-child(1) { animation-delay: .35s; }
+.vk-onb-creating__dots span:nth-child(2) { animation-delay: .95s; }
+.vk-onb-creating__dots span:nth-child(3) { animation-delay: 1.55s; }
 
-.vk-onb-creating__status {
-  min-height: 22px;
-  color: var(--vk-text-muted, rgba(255,255,255,.68));
-  font-size: 14px;
-}
-
-@keyframes vkCreatingPulse {
-  0% {
-    transform: scale(.78);
-    opacity: .7;
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, .28);
-  }
-  70% {
-    transform: scale(1);
-    opacity: .18;
-    box-shadow: 0 0 0 28px rgba(59, 130, 246, 0);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0;
-    box-shadow: 0 0 0 28px rgba(59, 130, 246, 0);
-  }
-}
-
-@keyframes vkCreatingFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-@keyframes vkCreatingProgress {
-  0% { transform: translateX(-120%); }
-  50% { transform: translateX(95%); }
-  100% { transform: translateX(240%); }
+@keyframes vkCreatingDotFill {
+  to { background: #d9d9d9; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .vk-onb-creating__pulse,
-  .vk-onb-creating__shield,
-  .vk-onb-creating__progress span {
-    animation: none;
-  }
-
-  .vk-onb-creating__progress span {
-    width: 100%;
-  }
+  .vk-onb-creating__dots span { animation-delay: 0s; }
 }
 
 /* VK2 PIN unlock visual refinement v1 */
