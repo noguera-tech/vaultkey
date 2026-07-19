@@ -790,230 +790,236 @@ body.vk-lock { overflow: hidden; }
 .vk-unlock__legal a:hover { text-decoration: underline; }
 
 /* ============================================================
-   Bloque R1 â€” integraciÃ³n CSS de PRUEBA de UNLOCK-01 PIN
-   Fuente: preview aprobada unlock-r1-preview-v3.5.html
-   Aplicado sobre components-post-repair.css (real, post commit
-   f0b16c4 "Remove accidental PowerShell text from CSS").
-   Escopado exclusivamente a la pantalla de PIN mediante
-   ":not(.vk-unlock--master)" â€” no debe afectar en ningÃºn caso
-   a la pantalla de contraseÃ±a maestra, que usa su propio
-   contenedor .vk-unlock__master-panel (no .vk-unlock__panel).
-   No modifica unlock.js, app.js, router, crypto, storage,
-   sesiÃ³n, wipe ni contraseÃ±a maestra â€” Ãºnicamente presentaciÃ³n
-   (CSS). Sin JavaScript de escala: la adaptaciÃ³n a alturas
-   menores de 917px es puramente CSS (variables + media queries).
-
-   Layout mediante variables CSS escopadas al panel de PIN.
-   ComposiciÃ³n 412x917 exacta cuando la altura disponible es
-   >= 917px (valores por defecto, sin media query). Para
-   alturas menores, dos niveles de compactaciÃ³n redefinen
-   SOLO las variables, reutilizando el mismo esqueleto de
-   posicionamiento absoluto. El breakpoint max-height:720px
-   reutiliza el mismo umbral que ya usa el resto de .vk-unlock*
-   en este archivo (layout de flujo original), para no
-   introducir un tercer valor de corte distinto.
+   UNLOCK-01 · PIN — Figma aprobado
+   Bloque visual aislado. No afecta a UNLOCK-02 ni a la lógica.
    ============================================================ */
+#pin.pinScreen:has(.vk-unlock:not(.vk-unlock--master)) {
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
+  text-align: initial;
+  background: var(--vk-r1-bg-gradient);
+}
+
+#pin.pinScreen:has(.vk-unlock:not(.vk-unlock--master))::before,
+#pin.pinScreen:has(.vk-unlock:not(.vk-unlock--master))::after {
+  display: none;
+}
+
+.vk-unlock:not(.vk-unlock--master) {
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--vk-r1-bg-gradient);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
+}
 
 .vk-unlock:not(.vk-unlock--master) .vk-unlock__panel {
-  --ul-panel-height: 917px;
-  --ul-shield-top: 70px;
-  --ul-shield-width: 150px;
-  --ul-shield-height: 180px;
-  --ul-brand-top: 268px;
-  --ul-brand-size: 32px;
-  --ul-subtitle-top: 322px;
-  --ul-dots-top: 367px;
-  --ul-status-top: 400px;
-  --ul-status-min-height: 36px;
-  --ul-keypad-top: 452px;
-  --ul-key-size: 50px;
-  --ul-key-gap: 10px 18px;
-  --ul-key-font: 32px;
-  --ul-actions-top: 740px;
-  --ul-footer-bottom: 20px;
-
   position: relative;
   width: min(100%, 412px);
-  height: var(--ul-panel-height);
-  min-height: var(--ul-panel-height);
+  height: 917px;
+  min-height: 917px;
   margin: 0 auto;
   padding: 0;
+  overflow: hidden;
+  text-align: center;
 }
 
-/* CompactaciÃ³n nivel 1 â€” alturas entre 721px y 916px.
-   Peor caso verificado: 721px (justo por encima del lÃ­mite del
-   nivel 2). Reduce el "aire" entre bloques; escudo y teclas
-   conservan tamaÃ±o de tap-target razonable. */
-@media (max-height: 916px) {
-  .vk-unlock:not(.vk-unlock--master) .vk-unlock__panel {
-    --ul-panel-height: 100dvh;
-    --ul-shield-top: 24px;
-    --ul-shield-width: 110px;
-    --ul-shield-height: 132px;
-    --ul-brand-top: 164px;
-    --ul-brand-size: 28px;
-    --ul-subtitle-top: 204px;
-    --ul-dots-top: 228px;
-    --ul-status-top: 252px;
-    --ul-status-min-height: 32px;
-    --ul-keypad-top: 296px;
-    --ul-key-size: 50px;
-    --ul-key-gap: 8px 16px;
-    --ul-key-font: 28px;
-    --ul-actions-top: 556px;
-    --ul-footer-bottom: 12px;
-
-    height: 100dvh;
-    min-height: 0;
-  }
-}
-
-/* CompactaciÃ³n nivel 2 â€” alturas <= 720px (dispositivos Android
-   bajos/con chrome de sistema). Reutiliza el mismo umbral
-   max-height:720px que ya usa el resto de .vk-unlock* en este
-   archivo. Peor caso verificado: 720px exacto (y 640px como
-   margen de seguridad adicional). */
-@media (max-height: 720px) {
-  .vk-unlock:not(.vk-unlock--master) .vk-unlock__panel {
-    --ul-shield-top: 16px;
-    --ul-shield-width: 90px;
-    --ul-shield-height: 108px;
-    --ul-brand-top: 132px;
-    --ul-brand-size: 24px;
-    --ul-subtitle-top: 168px;
-    --ul-dots-top: 196px;
-    --ul-status-top: 218px;
-    --ul-status-min-height: 28px;
-    --ul-keypad-top: 254px;
-    --ul-key-size: 46px;
-    --ul-key-gap: 8px 14px;
-    --ul-key-font: 24px;
-    --ul-actions-top: 474px;
-    --ul-footer-bottom: 8px;
-  }
-}
-
-.vk-unlock__panel > .vk-unlock__shield {
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__shield {
   position: absolute;
-  top: var(--ul-shield-top);
+  top: 70px;
   left: 50%;
-  transform: translateX(-50%);
-  width: var(--ul-shield-width);
-  height: var(--ul-shield-height);
+  width: 150px;
+  height: 180px;
   margin: 0;
+  transform: translateX(-50%);
 }
 
-.vk-unlock__panel > .vk-unlock__shield .vk-unlock__shield-outline {
-  width: var(--ul-shield-width);
-  height: var(--ul-shield-height);
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__shield-outline {
+  width: 150px;
+  height: 180px;
 }
 
-.vk-unlock__panel > .vk-unlock__shield .vk-unlock__shield-lock {
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__shield-outline path,
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__shield-lock path {
+  stroke: var(--vk-r1-text-tertiary);
+  stroke-width: 1;
+}
+
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__shield-lock {
   width: 36px;
   height: 40px;
   transform: translate(-50%, -46%);
 }
 
-.vk-unlock__panel > .vk-unlock__brand {
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__brand {
   position: absolute;
-  top: var(--ul-brand-top);
+  top: 263px;
   left: 0;
   width: 100%;
   margin: 0;
-  font-size: var(--ul-brand-size);
-  line-height: 1.1;
-}
-
-.vk-unlock__panel .vk-unlock__subtitle {
-  position: absolute;
-  top: var(--ul-subtitle-top);
-  left: 0;
-  width: 100%;
-  margin: 0;
-}
-
-.vk-unlock__panel .vk-unlock__dots {
-  position: absolute;
-  top: var(--ul-dots-top);
-  left: 0;
-  width: 100%;
-  margin: 0;
-}
-
-/* Estado (initial/ready/checking/error/wiping): SIEMPRE visible,
-   con una zona reservada mÃ­nima (variable por breakpoint). Sin
-   display:none en ningÃºn caso. */
-.vk-unlock__panel .vk-unlock__status {
-  position: absolute;
-  top: var(--ul-status-top);
-  left: 0;
-  width: 100%;
-  min-height: var(--ul-status-min-height);
-  margin: 0;
-}
-
-.vk-unlock__panel .vk-unlock__keypad {
-  position: absolute;
-  top: var(--ul-keypad-top);
-  left: 50%;
-  transform: translateX(-50%);
-  grid-template-columns: repeat(3, var(--ul-key-size));
-  gap: var(--ul-key-gap);
-  margin: 0;
-}
-
-.vk-unlock__panel .vk-unlock__key {
-  width: var(--ul-key-size);
-  height: var(--ul-key-size);
-  border: none;
-  background: var(--vk-r1-neutral-light);
-  color: var(--vk-r1-primary);
-  font-size: var(--ul-key-font);
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
+  font-size: 36px;
   font-weight: 600;
+  line-height: normal;
+  letter-spacing: 0;
 }
 
-.vk-unlock__panel .vk-unlock__key--empty {
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__subtitle {
+  position: absolute;
+  top: 328px;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  color: var(--vk-r1-text-tertiary);
+  font-size: 16px;
+  line-height: normal;
+}
+
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__dots {
+  position: absolute;
+  top: 366px;
+  left: 50%;
+  width: max-content;
+  min-height: 15px;
+  margin: 0;
+  gap: 11px;
+  transform: translateX(-50%);
+}
+
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__dot {
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--vk-r1-text);
   background: transparent;
 }
 
-.vk-unlock__panel .vk-unlock__actions {
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__dot--filled {
+  border-color: var(--vk-r1-text);
+  background: var(--vk-r1-text);
+}
+
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__status {
   position: absolute;
-  top: var(--ul-actions-top);
+  top: 390px;
+  left: 26px;
+  width: 360px;
+  min-height: 20px;
+  margin: 0;
+  color: var(--vk-r1-text-tertiary);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__keypad {
+  position: absolute;
+  top: 420px;
   left: 50%;
+  display: grid;
+  grid-template-columns: repeat(3, 50px);
+  gap: 20.6667px 25.5px;
+  width: 201px;
+  height: 262px;
+  margin: 0;
   transform: translateX(-50%);
+}
+
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__key {
+  width: 50px;
+  height: 50px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--vk-r1-neutral-light);
+  color: var(--vk-r1-accent);
+  font-family: var(--vk-r1-font-family);
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__key:hover,
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__key:focus-visible {
+  background: var(--vk-r1-neutral-light);
+}
+
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__key--empty {
+  background: transparent;
+}
+
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__key--delete svg {
+  width: 27px;
+  height: 27px;
+  stroke-width: 2;
+}
+
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__actions {
+  position: absolute;
+  top: 694px;
+  left: 50%;
   width: 320px;
   margin: 0;
+  transform: translateX(-50%);
 }
 
-.vk-unlock__panel .vk-unlock__submit {
-  width: 100%;
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__submit {
+  width: 320px;
   height: 56px;
   min-height: 56px;
+  border: 1px solid var(--vk-r1-border-soft);
   border-radius: 16px;
+  background: var(--vk-r1-surface);
+  color: var(--vk-r1-text-secondary);
+  font-size: 20px;
+  font-weight: 600;
 }
 
-.vk-unlock__panel .vk-unlock__submit:not(:disabled) {
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__submit:not(:disabled) {
+  border-color: transparent;
   background: var(--vk-r1-primary);
   color: var(--vk-r1-text);
 }
 
-.vk-unlock__panel .vk-unlock__submit:disabled {
-  background: var(--vk-r1-surface);
-  color: var(--vk-r1-text-secondary);
-  border-color: var(--vk-r1-border);
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__master-link {
+  width: auto;
+  min-height: 24px;
+  margin: 16px auto 0;
+  padding: 0;
+  color: var(--vk-r1-accent);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
 }
 
-.vk-unlock__panel .vk-unlock__legal {
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__legal {
   position: absolute;
   left: 0;
-  bottom: var(--ul-footer-bottom);
+  right: 0;
+  bottom: 18px;
   width: 100%;
   margin: 0;
   padding: 0;
+  color: var(--vk-r1-text-tertiary);
+  font-size: 14px;
+  line-height: 17px;
+  text-align: center;
+  z-index: 2;
 }
-/* ============================================================
-   Fin bloque R1 â€” integraciÃ³n de prueba UNLOCK-01 PIN
-   ============================================================ */
+
+.vk-unlock:not(.vk-unlock--master) .vk-unlock__legal a {
+  color: var(--vk-r1-text-tertiary);
+}
+
+/* Adaptación proporcional para alturas inferiores al frame 412×917. */
+@media (max-height: 916px) {
+  .vk-unlock:not(.vk-unlock--master) .vk-unlock__panel {
+    transform: scale(calc(100dvh / 917));
+    transform-origin: top center;
+  }
+}
+
 
 .vk-unlock__appbar {
   position: sticky;
@@ -2187,191 +2193,6 @@ body.vk-lock { overflow: hidden; }
   .vk-onb-creating__dots span { animation-delay: 0s; }
 }
 
-/* VK2 PIN unlock visual refinement v1 */
-.vk-unlock__panel {
-  padding-top: calc(34px + env(safe-area-inset-top, 0px));
-}
-
-.vk-unlock__shield {
-  width: 118px;
-  height: 142px;
-  margin-bottom: 14px;
-}
-
-.vk-unlock__shield-outline {
-  width: 118px;
-  height: 142px;
-}
-
-.vk-unlock__shield-lock {
-  width: 27px;
-  height: 30px;
-}
-
-.vk-unlock__brand {
-  font-size: 32px;
-  margin-bottom: 8px;
-}
-
-.vk-unlock__subtitle {
-  margin-bottom: 12px;
-  font-size: 15px;
-}
-
-.vk-unlock__dots {
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
-.vk-unlock__dot {
-  width: 11px;
-  height: 11px;
-}
-
-.vk-unlock__status {
-  margin-bottom: 8px;
-}
-
-.vk-unlock__keypad {
-  grid-template-columns: repeat(3, 52px);
-  gap: 9px 16px;
-  margin-bottom: 14px;
-}
-
-.vk-unlock__key {
-  width: 52px;
-  height: 52px;
-  font-size: 20px;
-}
-
-.vk-unlock__actions {
-  width: min(100%, 300px);
-}
-
-.vk-unlock__submit {
-  min-height: 48px;
-}
-
-.vk-unlock__master-link {
-  margin-top: 2px;
-}
-
-@media (max-height: 720px) {
-  .vk-unlock__panel {
-    padding-top: calc(18px + env(safe-area-inset-top, 0px));
-  }
-
-  .vk-unlock__shield {
-    width: 92px;
-    height: 111px;
-    margin-bottom: 8px;
-  }
-
-  .vk-unlock__shield-outline {
-    width: 92px;
-    height: 111px;
-  }
-
-  .vk-unlock__shield-lock {
-    width: 22px;
-    height: 25px;
-  }
-
-  .vk-unlock__brand {
-    font-size: 27px;
-    margin-bottom: 4px;
-  }
-
-  .vk-unlock__subtitle {
-    margin-bottom: 7px;
-  }
-
-  .vk-unlock__status {
-    margin-bottom: 4px;
-  }
-
-  .vk-unlock__keypad {
-    grid-template-columns: repeat(3, 48px);
-    gap: 6px 14px;
-    margin-bottom: 9px;
-  }
-
-  .vk-unlock__key {
-    width: 48px;
-    height: 48px;
-    font-size: 18px;
-  }
-
-  .vk-unlock__submit {
-    min-height: 44px;
-  }
-
-  .vk-unlock__legal {
-    padding-top: 4px;
-  }
-}
-/* VK2 PIN unlock balance refinement v2 */
-.vk-unlock__panel {
-  padding-top: calc(56px + env(safe-area-inset-top, 0px));
-}
-
-.vk-unlock__shield {
-  width: 138px;
-  height: 166px;
-  margin-bottom: 16px;
-}
-
-.vk-unlock__shield-outline {
-  width: 138px;
-  height: 166px;
-}
-
-.vk-unlock__shield-lock {
-  width: 31px;
-  height: 35px;
-}
-
-.vk-unlock__brand {
-  font-size: 36px;
-  margin-bottom: 10px;
-}
-
-.vk-unlock__subtitle {
-  margin-bottom: 16px;
-}
-
-.vk-unlock__dots {
-  margin-bottom: 24px;
-}
-
-@media (max-height: 720px) {
-  .vk-unlock__panel {
-    padding-top: calc(28px + env(safe-area-inset-top, 0px));
-  }
-
-  .vk-unlock__shield {
-    width: 108px;
-    height: 130px;
-  }
-
-  .vk-unlock__shield-outline {
-    width: 108px;
-    height: 130px;
-  }
-
-  .vk-unlock__shield-lock {
-    width: 25px;
-    height: 28px;
-  }
-
-  .vk-unlock__brand {
-    font-size: 30px;
-  }
-
-  .vk-unlock__dots {
-    margin-bottom: 16px;
-  }
-}
 /* VK2 Figma master unlock refinement */
 .vk-unlock--master .vk-unlock__master-panel {
   min-height: calc(100% - 56px);
@@ -2433,36 +2254,6 @@ body.vk-lock { overflow: hidden; }
 .vk-unlock--master .vk-unlock__master-panel {
   padding-top: 48px;
 }
-/* Ajuste visual final — teclado PIN menos brillante */
-.vk-unlock__key {
-  background: #E2E8F0;
-  border-color: rgba(148, 163, 184, 0.55);
-}
-
-.vk-unlock__key:hover,
-.vk-unlock__key:focus-visible {
-  background: #CBD5E1;
-}
-
-.vk-unlock__key:active {
-  background: #BFC9D6;
-}
-
-/* Ajuste definitivo — teclado PIN con menos brillo */
-.vk-unlock__key {
-  background: #CBD5E1;
-  border-color: rgba(100, 116, 139, 0.7);
-}
-
-.vk-unlock__key:hover,
-.vk-unlock__key:focus-visible {
-  background: #B8C4D1;
-}
-
-.vk-unlock__key:active {
-  background: #AAB7C5;
-}
-
 /* Estado de error — contraseña maestra */
 .vk-unlock--master.vk-unlock--error .vk-unlock__status {
   color: #FCA5A5;
