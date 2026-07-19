@@ -228,13 +228,20 @@ select option { background:#001830; color:#e8f6ff; }
 #vkSplash {
   position:fixed; inset:0; z-index:9999;
   display:none; overflow:hidden;
+  background:#070B14;
+}
+#vkSplash::before {
+  content:"";
+  position:absolute; top:0; bottom:0; left:50%;
+  width:min(100%, 430px);
+  transform:translateX(-50%);
   background:linear-gradient(180deg, #111827 17%, #182F4E 67%);
 }
 #vkSplash.vkSplashVisible { display:block; }
 #vkSplash.vkSplashOut { pointer-events:none; }
 
 .vkSplashFrame {
-  position:absolute; left:50%; top:50%;
+  position:absolute; left:50%; top:50%; z-index:1;
   width:412px; height:917px;
   transform:translate(-50%, -50%) scale(var(--vk-splash-scale, 1));
   transform-origin:center center;
