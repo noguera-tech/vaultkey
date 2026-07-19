@@ -1667,187 +1667,198 @@ body.vk-lock { overflow: hidden; }
 }
 
 
-/* VK2 Figma onboarding Emergency Kit save CSS v1 */
+/* VK2 Figma onboarding Emergency Kit save CSS v2 — Figma ONBOARD-06 */
 .vk-onb-kit-save {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: var(--vk-bg, #0F172A);
+  position: relative;
+  width: 100%;
+  min-height: 917px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: linear-gradient(180deg, #111827 17%, #182f4e 67%);
+  color: #ffffff;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 .vk-onb-kit-save__appbar {
-  min-height: 72px;
-  display: flex;
-  align-items: center;
-  padding: 16px 20px 0;
+  position: absolute;
+  inset: 0 0 auto 0;
+  width: 100%;
+  height: 64px;
+  background: #243246;
 }
 
 .vk-onb-kit-save__back {
-  width: 44px;
-  height: 44px;
+  position: absolute;
+  left: 16px;
+  top: 8px;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
   padding: 0;
   border: 0;
-  border-radius: 14px;
   background: transparent;
-  color: currentColor;
+  color: #a7b6c9;
   cursor: pointer;
 }
 
 .vk-onb-kit-save__back svg {
-  width: 25px;
-  height: 25px;
+  width: 24px;
+  height: 24px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.9;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.vk-onb-kit-save__content {
-  width: min(100%, 600px);
-  margin: 0 auto;
-  padding: 26px 28px 24px;
+.vk-onb-kit-save__heading {
+  position: absolute;
+  left: 0;
+  top: 82px;
+  width: 100%;
+  text-align: center;
 }
 
 .vk-onb-kit-save__title {
   margin: 0;
-  font-size: clamp(32px, 5vw, 42px);
-  line-height: 1.08;
-  letter-spacing: -0.035em;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 0;
 }
 
 .vk-onb-kit-save__subtitle {
-  max-width: 500px;
-  margin: 14px 0 28px;
-  color: var(--vk-text-muted, rgba(255,255,255,.68));
-  font-size: 16px;
-  line-height: 1.55;
+  margin: 10px 0 0;
+  color: #a7b6c9;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 0;
 }
 
-.vk-onb-kit-save__card {
-  padding: 22px;
-  border: 1px solid var(--vk-border, #374151);
-  border-radius: 20px;
-  background: #34465F;
-  box-shadow: 0 18px 45px rgba(0,0,0,.18);
+.vk-onb-kit-save__block {
+  position: absolute;
+  left: 50%;
+  top: 332px;
+  width: 393px;
+  height: 335px;
+  transform: translateX(-50%);
 }
 
-.vk-onb-kit-save__card-label {
-  margin-bottom: 14px;
-  color: var(--vk-text-muted, rgba(255,255,255,.68));
-  font-size: 13px;
-  font-weight: 650;
-  letter-spacing: .02em;
-  text-transform: uppercase;
+.vk-onb-kit-save__code,
+.vk-onb-kit-save__download,
+.vk-onb-kit-save__submit {
+  position: absolute;
+  left: 50%;
+  width: 360px;
+  height: 56px;
+  box-sizing: border-box;
+  transform: translateX(-50%);
+  border-radius: 16px;
 }
 
 .vk-onb-kit-save__code {
-  min-height: 92px;
+  top: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 18px;
-  border: 1px dashed rgba(255,255,255,.2);
-  border-radius: 16px;
-  background: rgba(15,23,42,.48);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: clamp(18px, 4vw, 24px);
-  line-height: 1.45;
-  letter-spacing: .08em;
+  padding: 0 16px;
   text-align: center;
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  border: 1px solid rgba(58, 74, 96, .6);
+  background: #243246;
+  color: #a7b6c9;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.vk-onb-kit-save__actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.vk-onb-kit-save__action {
-  min-height: 50px;
-  background: #415875;
-  border-color: #5C7596;
-  color: #FFFFFF;
-}
-
-.vk-onb-kit-save__hint {
-  display: block;
-  min-height: 20px;
-  margin-top: 10px;
+.vk-onb-kit-save__help {
+  position: absolute;
+  top: 85px;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  color: #a7b6c9;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 0;
   text-align: center;
 }
 
-.vk-onb-kit-save__notice {
-  display: grid;
-  grid-template-columns: 24px 1fr;
-  gap: 12px;
-  align-items: start;
-  margin-top: 22px;
-  padding: 16px;
-  border: 1px solid rgba(244, 184, 76, .22);
-  border-radius: 16px;
-  background: rgba(244, 184, 76, .07);
+.vk-onb-kit-save__download,
+.vk-onb-kit-save__submit {
+  border: 0;
+  color: #ffffff;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 0;
+  cursor: pointer;
 }
 
-.vk-onb-kit-save__notice svg {
-  width: 23px;
-  height: 23px;
+.vk-onb-kit-save__download {
+  top: 131px;
+  display: grid;
+  grid-template-columns: 24px 1fr 24px;
+  align-items: center;
+  padding: 0 16px;
+  background: #3a4a60;
+}
+
+.vk-onb-kit-save__download svg {
+  width: 24px;
+  height: 24px;
   fill: none;
-  stroke: currentColor;
-  stroke-width: 1.7;
+  stroke: #a7b6c9;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  opacity: .88;
 }
 
-.vk-onb-kit-save__notice p {
-  margin: 0;
-  color: var(--vk-text-muted, rgba(255,255,255,.72));
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.vk-onb-kit-save__footer {
-  width: min(100%, 600px);
-  margin: auto auto 0;
-  padding: 22px 28px max(28px, env(safe-area-inset-bottom));
+.vk-onb-kit-save__download span {
+  grid-column: 2;
+  text-align: center;
 }
 
 .vk-onb-kit-save__submit {
-  width: 100%;
-  min-height: 56px;
+  top: 216px;
+  background: #2f6fea;
 }
 
-@media (max-width: 520px) {
-  .vk-onb-kit-save__actions {
-    grid-template-columns: 1fr;
-  }
+.vk-onb-kit-save__warning {
+  position: absolute;
+  left: 0;
+  top: 301px;
+  width: 393px;
+  min-height: 34px;
+  margin: 0;
+  color: #a7b6c9;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 0;
+  text-align: center;
 }
 
-@media (max-height: 760px) {
-  .vk-onb-kit-save__content {
-    padding-top: 14px;
-  }
-
-  .vk-onb-kit-save__subtitle {
-    margin-bottom: 20px;
-  }
-
-  .vk-onb-kit-save__card {
-    padding: 18px;
-  }
-
-  .vk-onb-kit-save__code {
-    min-height: 76px;
-  }
-
-  .vk-onb-kit-save__notice {
-    margin-top: 16px;
-  }
+.vk-onb-kit-save__hint {
+  position: absolute;
+  left: 26px;
+  top: 190px;
+  width: 341px;
+  min-height: 17px;
+  color: #a7b6c9;
+  font-size: 13px;
+  text-align: center;
+  pointer-events: none;
 }
 
 /* VK2 Figma onboarding Emergency Kit verify CSS v1 */

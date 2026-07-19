@@ -171,28 +171,20 @@
             '</svg>' +
           '</button>' +
         '</header>' +
-        '<div class="vk-onb-kit-save__content">' +
-          '<h1 class="vk-onb-kit-save__title">Guarda tu Emergency Kit</h1>' +
-          '<p class="vk-onb-kit-save__subtitle">Es la única forma de recuperar tu bóveda si olvidas la contraseña maestra.</p>' +
-          '<div class="vk-onb-kit-save__card">' +
-            '<div class="vk-onb-kit-save__card-label">Código de recuperación</div>' +
-            '<div class="vk-onb-kit-save__code" id="ob-kitcode"></div>' +
-            '<div class="vk-onb-kit-save__actions">' +
-              '<button class="vk-btn vk-btn--secondary vk-onb-kit-save__action" type="button" data-ob="kit-copy">Copiar</button>' +
-              '<button class="vk-btn vk-btn--secondary vk-onb-kit-save__action" type="button" data-ob="kit-pdf">Descargar PDF</button>' +
-            '</div>' +
-            '<span class="vk-field__hint vk-onb-kit-save__hint" id="ob-kit-hint"></span>' +
-          '</div>' +
-          '<div class="vk-onb-kit-save__notice">' +
-            '<svg viewBox="0 0 24 24" aria-hidden="true">' +
-              '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 7.8 7.5 9.5 4.3-1.7 7.5-4.9 7.5-9.5V6L12 3Z"/>' +
-              '<path d="M9.5 12.2 11 13.7l3.6-3.8"/>' +
-            '</svg>' +
-            '<p>Guárdalo fuera del teléfono, preferiblemente impreso o en un lugar seguro. No lo compartas con nadie.</p>' +
-          '</div>' +
+        '<div class="vk-onb-kit-save__heading">' +
+          '<h1 class="vk-onb-kit-save__title">Guarda tu kit de emergencia</h1>' +
+          '<p class="vk-onb-kit-save__subtitle">Te ayudará a recuperar el acceso si olvidas tu<br>contraseña maestra.</p>' +
         '</div>' +
-        '<div class="vk-onb-kit-save__footer">' +
-          '<button class="vk-btn vk-btn--primary vk-onb-kit-save__submit" type="button" data-ob="go-kit-verify">Ya lo he guardado</button>' +
+        '<div class="vk-onb-kit-save__block">' +
+          '<div class="vk-onb-kit-save__code" id="ob-kitcode"></div>' +
+          '<p class="vk-onb-kit-save__help">Descarga una copia y guárdala fuera del móvil.</p>' +
+          '<button class="vk-onb-kit-save__download" type="button" data-ob="kit-pdf">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14a2 2 0 0 0 2-2v-3"/><path d="M3 16v3a2 2 0 0 0 2 2"/></svg>' +
+            '<span>Descargar PDF</span>' +
+          '</button>' +
+          '<button class="vk-onb-kit-save__submit" type="button" data-ob="go-kit-verify">Ya lo he guardado</button>' +
+          '<p class="vk-onb-kit-save__warning">No podrás recuperar tu bóveda sin tu contraseña maestra<br>o tu kit de emergencia.</p>' +
+          '<span class="vk-field__hint vk-onb-kit-save__hint" id="ob-kit-hint"></span>' +
         '</div>' +
       '</section>';
     },

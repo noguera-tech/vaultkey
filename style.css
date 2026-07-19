@@ -3934,6 +3934,19 @@ body:has(#settings.active) #screenDots .dot,
 }
 
 
+/* Guardar kit R1: frame fijo sin scroll. */
+#onboardingModal.vk2-onboarding:has(.vk-onb-kit-save) { overflow: hidden; }
+#onboardingModal .vk2-onboarding-host:has(> .vk-onb-kit-save) {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+#onboardingModal .vk2-onboarding-host > .vk-onb-kit-save {
+  height: 100dvh;
+  min-height: 917px;
+}
+
+
 /* DASHBOARD 05 - FONDO FIGMA AISLADO */
 #home.screen.vk-dash-root {
   background: var(--vk-r1-bg-gradient) !important;
