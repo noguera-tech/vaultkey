@@ -3766,6 +3766,11 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     splash.style.setProperty('--vk-splash-scale',String(scale));
   }
   function runSplash(cb){
+    if(window.__VK_TWA__){
+      hideSplashHard();
+      cb();
+      return;
+    }
     const splash=$('vkSplash');
     if(!splash){cb();return;}
     updateSplashScale();
