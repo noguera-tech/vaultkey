@@ -219,7 +219,14 @@
   </style>
 </head>
 <body>
-<script>location.replace('app.html');</script>
+<script>
+try {
+  if (document.referrer.indexOf('android-app://com.nogueratech.vaultkey') === 0) {
+    sessionStorage.setItem('vk_twa_session', '1');
+  }
+} catch (e) {}
+location.replace('app.html');
+</script>
   <main class="page">
     <section class="hero" aria-label="VaultKey">
       <div class="hero-card">
