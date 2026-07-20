@@ -1015,7 +1015,7 @@ body.vk-lock { overflow: hidden; }
 /* Adaptación proporcional para alturas inferiores al frame 412×917. */
 @media (max-height: 916px) {
   .vk-unlock:not(.vk-unlock--master) .vk-unlock__panel {
-    transform: scale(calc((100dvh - 28px) / 917));
+    transform: scale(var(--vk-pin-scale, 1));
     transform-origin: top center;
   }
 }
