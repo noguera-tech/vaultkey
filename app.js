@@ -3037,6 +3037,15 @@ function togglePasswordCreateNote(){
 
   const open=field.classList.toggle('is-visible');
   button.textContent=open?'− Ocultar nota':'+ Añadir nota';
+
+  if(open){
+    setTimeout(()=>{
+      field.scrollIntoView({
+        behavior:'smooth',
+        block:'center'
+      });
+    },60);
+  }
 }
 
 function cancelPasswordCreate(){
