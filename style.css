@@ -227,7 +227,7 @@ select option { background:#001830; color:#e8f6ff; }
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 #vkSplash {
   position:fixed; inset:0; z-index:9999;
-  display:none; overflow:hidden;
+  display:block; overflow:hidden;
   background:#070B14;
 }
 #vkSplash::before {

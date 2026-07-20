@@ -3765,7 +3765,7 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     setTimeout(()=>{
       hideSplashHard();
       cb();
-    },2800);
+    },1300);
   }
 
   function hideSplashHard(){
@@ -3839,14 +3839,7 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
   }
 
   window.addEventListener('load',()=>{
-    const isNewUser = !localStorage.getItem('vk_meta_v1');
-    const splashSeen = localStorage.getItem(LS_SPLASH);
-    localStorage.setItem(LS_SPLASH,'1');
-    if(!splashSeen){
-      runSplash(bootApp);
-    } else {
-      bootApp();
-    }
+    runSplash(bootApp);
   });
 
   // visibilitychange gestionado por handleVisibilityChange arriba
