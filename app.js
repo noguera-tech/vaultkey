@@ -2885,7 +2885,77 @@ function passwordCreateNameIcon(name){
   return icons[name]||'';
 }
 
+
+function updatePasswordCreateViewport(){
+  const root=$('passwordCreate');
+  if(!root)return;
+
+  const viewport=window.visualViewport;
+  const visibleHeight=Math.round(viewport?viewport.height:window.innerHeight);
+  let baselineHeight=Number(root.dataset.viewportBaseline)||0;
+
+  if(!baselineHeight||visibleHeight>baselineHeight){
+    baselineHeight=visibleHeight;
+    root.dataset.viewportBaseline=String(baselineHeight);
+  }
+
+  const keyboardOpen=visibleHeight<(baselineHeight-120);
+
+  root.style.setProperty(
+    '--vk-password-create-viewport-height',
+    visibleHeight+'px'
+  );
+  root.classList.toggle(
+    'vk-password-create-keyboard-open',
+    keyboardOpen
+  );
+
+  if(!keyboardOpen)return;
+
+  const active=document.activeElement;
+  if(
+    !active||
+    !root.contains(active)||
+    !active.matches('input,textarea,select')
+  )return;
+
+  clearTimeout(root._vkKeyboardScrollTimer);
+  root._vkKeyboardScrollTimer=setTimeout(()=>{
+    try{
+      active.scrollIntoView({
+        behavior:'smooth',
+        block:'center',
+        inline:'nearest'
+      });
+    }catch(e){}
+  },80);
+}
+
+function bindPasswordCreateViewport(){
+  const root=$('passwordCreate');
+  if(!root||root.dataset.keyboardViewportBound)return;
+
+  root.dataset.keyboardViewportBound='true';
+
+  const viewport=window.visualViewport;
+  if(viewport){
+    viewport.addEventListener('resize',updatePasswordCreateViewport);
+    viewport.addEventListener('scroll',updatePasswordCreateViewport);
+  }else{
+    window.addEventListener('resize',updatePasswordCreateViewport);
+  }
+
+  root.addEventListener('focusin',()=>{
+    setTimeout(updatePasswordCreateViewport,60);
+  });
+
+  root.addEventListener('focusout',()=>{
+    setTimeout(updatePasswordCreateViewport,120);
+  });
+}
+
 function openPasswordCreate(type='web'){
+  bindPasswordCreateViewport();
   _passwordCreateType=['web','wifi','pin','recovery'].includes(type)?type:'web';
 
   const name=$('vkPasswordCreateName');
@@ -2924,6 +2994,8 @@ function openPasswordCreate(type='web'){
 
     const createForm=document.querySelector('.vk-password-create-form');
     if(createForm)createForm.scrollTop=0;
+
+    updatePasswordCreateViewport();
   },120);
 }
 function setPasswordCreateType(type){

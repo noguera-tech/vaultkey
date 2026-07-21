@@ -3723,3 +3723,35 @@ body.vk-lock { overflow: hidden; }
   font-size: 24px;
   line-height: 1;
 }
+
+
+/* VaultKey - estabilidad del formulario con teclado movil */
+#passwordCreate.vk-password-create-keyboard-open {
+  height: var(--vk-password-create-viewport-height, 100dvh);
+  min-height: 0;
+  bottom: auto;
+}
+
+#passwordCreate.vk-password-create-keyboard-open
+  .vk-password-create-title {
+  margin-top: 12px;
+}
+
+#passwordCreate.vk-password-create-keyboard-open
+  .vk-password-create-tabs {
+  margin-top: 12px;
+}
+
+#passwordCreate.vk-password-create-keyboard-open
+  .vk-password-create-form {
+  padding-top: 20px;
+  scroll-padding-block: 24px 96px;
+}
+
+#passwordCreate.vk-password-create-keyboard-open
+  .vk-password-create-footer {
+  margin-bottom: 0;
+  padding-bottom: calc(
+    12px + env(safe-area-inset-bottom, 0px)
+  );
+}
