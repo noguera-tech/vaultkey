@@ -9,7 +9,20 @@
 <title>VaultKey</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<style>html,body{margin:0;background:#070B14}</style>
+<script>
+(function () {
+  var isTwa = false;
+  try {
+    isTwa = sessionStorage.getItem('vk_twa_session') === '1';
+  } catch (e) {}
+  window.__VK_TWA__ = isTwa;
+  if (isTwa) document.documentElement.classList.add('vk-twa');
+})();
+</script>
+<style>
+html,body{margin:0;background:#070B14}
+html.vk-twa #vkSplash{display:none!important}
+</style>
 
 <link rel="stylesheet" href="theme.css">
 <link rel="stylesheet" href="components.css">
