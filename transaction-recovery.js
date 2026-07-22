@@ -27,6 +27,25 @@
          MANUAL_RECOVERY_REQUIRED, resolved:false. Esta función
          NUNCA deja una promesa rechazada sin normalizar.
 
+   Cambio P0.6 (contrato finalized/warning):
+   - cancelTransaction/finalizeCommitted/finalizeRolledBack ya no
+     solo pueden rechazar o resolver "sin más": pueden resolver con
+     { finalized:true, kind, warningCode, cleanupPending } cuando
+     candidate+active se eliminaron con éxito pero un paso POSTERIOR
+     (resumen vk_tx_last_recovery o limpieza de vk_tx_snapshot)
+     falló. El helper afterFinalize() interpreta ese resultado:
+       - si trae warningCode -> action 'FINALIZED_WITH_WARNING'
+         (o 'CLEANED_WITH_WARNING' para las rutas de cancelación),
+         resolved:true, NUNCA MANUAL_RECOVERY_REQUIRED ni
+         PROMOTION_FAILED/ROLLBACK_FAILED — no hay transacción que
+         recuperar, ya está finalizada.
+       - detectVaultState() para calcular stateAfter es BEST EFFORT
+         en la rama de warning: si rechaza o lanza, stateAfter queda
+         null, pero la acción de warning y resolved:true se
+         mantienen igualmente.
+       - si NO trae warningCode, se comporta exactamente como antes
+         (detectAfter con la acción "limpia" de siempre).
+
    Sigue sin conectarse a bootApp(), app.js, Drive ni onboarding.
    ============================================================ */
 
@@ -70,6 +89,39 @@
         return respond(action, txId, true, st.state, extra);
       };
 
+      /* P0.6: interpreta el resultado de cancelTransaction/
+         finalizeCommitted/finalizeRolledBack. Si trae warningCode,
+         la transacción YA está finalizada (candidate/active ya no
+         existen, para CUALQUIER kind incluido CANCELLED) y NO debe
+         reportarse como MANUAL_RECOVERY_REQUIRED ni como
+         PROMOTION_FAILED/ROLLBACK_FAILED.
+
+         detectVaultState() es BEST EFFORT en la rama de warning:
+         si rechaza o lanza, stateAfter queda null, pero la acción
+         sigue siendo la de warning con resolved:true. Nunca se deja
+         que ese rechazo suba al catch de nivel superior y convierta
+         una finalización real en MANUAL_RECOVERY_REQUIRED. */
+      var afterFinalize = async function (result, cleanAction, warningAction, precomputedState) {
+        if (result && result.finalized && result.warningCode) {
+          var stW = null;
+          if (precomputedState) {
+            stW = precomputedState;
+          } else {
+            try {
+              var stRes = await vaultState.detectVaultState(opts);
+              stW = stRes.state;
+            } catch (e) {
+              stW = null; /* best-effort: la transacción ya está
+                             finalizada aunque no se pueda saber el
+                             estado resultante */
+            }
+          }
+          return respond(warningAction, txId, true, stW, { warningCode: result.warningCode, cleanupPending: !!result.cleanupPending });
+        }
+        if (precomputedState) { return respond(cleanAction, txId, true, precomputedState); }
+        return await detectAfter(cleanAction);
+      };
+
       var attemptRollback = async function () {
         var snap;
         try {
@@ -100,8 +152,9 @@
           return respond('MANUAL_RECOVERY_REQUIRED', txId, false, null, { errorCode: e.code || 'ROLLBACK_FAILED' });
         }
 
+        var finAR;
         try {
-          await store.finalizeRolledBack(txId, opts.storage, opts);
+          finAR = await store.finalizeRolledBack(txId, opts.storage, opts);
         } catch (e) {
           /* #3/#4/#5: si finalizeRolledBack rechaza (p.ej.
              SNAPSHOT_NOT_FOUND o SNAPSHOT_CORRUPT), NO se ignora:
@@ -111,7 +164,7 @@
           return respond('MANUAL_RECOVERY_REQUIRED', txId, false, null, { errorCode: e.code || 'ROLLBACK_FAILED' });
         }
 
-        return await detectAfter('ROLLED_BACK_INVALID_PROMOTION');
+        return await afterFinalize(finAR, 'ROLLED_BACK_INVALID_PROMOTION', 'FINALIZED_WITH_WARNING');
       };
 
       /* Verificación estricta compartida por PROMOTION_STARTED,
@@ -171,13 +224,14 @@
           return respond('MANUAL_RECOVERY_REQUIRED', txId, false, st.state, { errorCode: e.code || 'PROMOTION_FAILED' });
         }
 
+        var finVP;
         try {
-          await store.finalizeCommitted(txId, opts.storage, opts);
+          finVP = await store.finalizeCommitted(txId, opts.storage, opts);
         } catch (e) {
           return respond('MANUAL_RECOVERY_REQUIRED', txId, false, st.state, { errorCode: e.code || 'PROMOTION_FAILED' });
         }
 
-        return respond('COMPLETED_VALID_PROMOTION', txId, true, st.state);
+        return await afterFinalize(finVP, 'COMPLETED_VALID_PROMOTION', 'FINALIZED_WITH_WARNING', st.state);
       };
 
       switch (active.phase) {
@@ -190,12 +244,13 @@
           } catch (e) {
             return respond('MANUAL_RECOVERY_REQUIRED', txId, false, null, { errorCode: e.code });
           }
+          var cancelResA;
           try {
-            await store.cancelTransaction(txId, opts.storage, opts);
+            cancelResA = await store.cancelTransaction(txId, opts.storage, opts);
           } catch (e) {
             return respond('MANUAL_RECOVERY_REQUIRED', txId, false, null, { errorCode: e.code });
           }
-          return await detectAfter('CLEANED_INCOMPLETE_PREPARATION');
+          return await afterFinalize(cancelResA, 'CLEANED_INCOMPLETE_PREPARATION', 'CLEANED_WITH_WARNING');
         }
 
         case 'SNAPSHOT_WRITTEN': {
@@ -222,12 +277,13 @@
           } catch (e) {
             return respond('MANUAL_RECOVERY_REQUIRED', txId, false, null, { errorCode: e.code });
           }
+          var cancelResB;
           try {
-            await store.cancelTransaction(txId, opts.storage, opts);
+            cancelResB = await store.cancelTransaction(txId, opts.storage, opts);
           } catch (e) {
             return respond('MANUAL_RECOVERY_REQUIRED', txId, false, null, { errorCode: e.code });
           }
-          return await detectAfter('CLEANED_INCOMPLETE_PREPARATION');
+          return await afterFinalize(cancelResB, 'CLEANED_INCOMPLETE_PREPARATION', 'CLEANED_WITH_WARNING');
         }
 
         case 'PROMOTION_STARTED':
@@ -237,12 +293,13 @@
         }
 
         case 'COMMITTED': {
+          var finComm;
           try {
-            await store.finalizeCommitted(txId, opts.storage, opts);
+            finComm = await store.finalizeCommitted(txId, opts.storage, opts);
           } catch (e) {
             return respond('MANUAL_RECOVERY_REQUIRED', txId, false, null, { errorCode: e.code || 'PROMOTION_FAILED' });
           }
-          return await detectAfter('FINALIZED_COMMITTED');
+          return await afterFinalize(finComm, 'FINALIZED_COMMITTED', 'FINALIZED_WITH_WARNING');
         }
 
         case 'ROLLBACK_STARTED': {
@@ -250,12 +307,13 @@
         }
 
         case 'ROLLED_BACK': {
+          var finRB;
           try {
-            await store.finalizeRolledBack(txId, opts.storage, opts);
+            finRB = await store.finalizeRolledBack(txId, opts.storage, opts);
           } catch (e) {
             return respond('MANUAL_RECOVERY_REQUIRED', txId, false, null, { errorCode: e.code || 'ROLLBACK_FAILED' });
           }
-          return await detectAfter('FINALIZED_ROLLED_BACK');
+          return await afterFinalize(finRB, 'FINALIZED_ROLLED_BACK', 'FINALIZED_WITH_WARNING');
         }
 
         case 'FAILED':
