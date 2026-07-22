@@ -49,6 +49,47 @@ function rejectingVaultState(errCode) {
   return { detectVaultState: function () { return Promise.reject(Object.assign(new Error('fallo forzado'), { code: errCode })); } };
 }
 
+/* P0.6 (corregido): storage "por etapas" para probar el ORDEN REAL de
+   la finalización con warning, sin cortar prematuramente en la
+   primera lectura de vk_tx_active:
+     1. Permite TODAS las lecturas mientras vk_tx_active exista.
+     2. Detecta cuándo removeItem('vk_tx_active') terminó con éxito
+        (solo entonces activa la siguiente etapa).
+     3. Solo DESPUÉS de ese punto, rompe las lecturas de las claves
+        V1/VK2 que usa detectVaultState() para clasificar el estado.
+     4. Mantiene roto, en todo momento, setItem('vk_tx_last_recovery').
+   NOTA DE CALIBRACIÓN: con este storage, detectVaultState() NO
+   rechaza — internamente ya captura cada getItem roto y degrada a
+   { state: 'STORAGE_ERROR' } de forma resuelta, nunca como rechazo.
+   Por tanto stateAfter aquí es 'STORAGE_ERROR', no null. Esto SÍ
+   demuestra el orden completo pedido (active se lee -> snapshot se
+   archiva -> active se elimina -> falla el resumen -> finishArchive
+   resuelve con warning -> detectVaultState se ve afectado después).
+   Para probar la rama defensiva stateAfter:null (detectVaultState
+   rechazando de verdad) se usa por separado rejectingVaultState. */
+function stagedFailureStorage(underlying) {
+  var activeRemoved = false;
+  var stateKeys = ['vk_meta_v1', 'vk_data_v1', 'vk_recovery_v1', 'vk_pin_change_backup', 'vk2_blob', 'vk2_pinwrap', 'vk2_meta'];
+  return {
+    getItem: function (k) {
+      if (activeRemoved && stateKeys.indexOf(k) !== -1) {
+        throw new Error('storage caído tras eliminar vk_tx_active (lectura de estado v1/vk2): ' + k);
+      }
+      return underlying.getItem(k);
+    },
+    setItem: function (k, v) {
+      if (k === 'vk_tx_last_recovery') {
+        throw new Error('fallo simulado al escribir el resumen');
+      }
+      underlying.setItem(k, v);
+    },
+    removeItem: function (k) {
+      underlying.removeItem(k);
+      if (k === 'vk_tx_active') { activeRemoved = true; }
+    }
+  };
+}
+
 (async function () {
   console.log('== sin transacción activa ==');
   reset();
@@ -236,6 +277,100 @@ function rejectingVaultState(errCode) {
   ts.markFailed(txK.transactionId, 'ALGO_FALLO');
   var rK = await tr.recoverInterruptedTransaction({ store: ts, vaultState: vs });
   t('FAILED -> MANUAL_RECOVERY_REQUIRED, no resuelto automáticamente', rK.action === 'MANUAL_RECOVERY_REQUIRED' && ts.getActiveTransaction() !== null);
+
+  console.log('== P0.6: orden real con storage por etapas — COMMITTED, resumen falla, detectVaultState degrada a STORAGE_ERROR ==');
+  reset();
+  seedValidV1();
+  var txStagedC = ts.beginTransaction({ targetFormat: 'V1', targetState: 'V1_READY' });
+  var snapStagedC = await ts.createSnapshot({ transactionId: txStagedC.transactionId, reason: 'PRE' });
+  await ts.saveSnapshot(snapStagedC);
+  await driveToPhase(txStagedC.transactionId, 'COMMITTED');
+  var stagedC = stagedFailureStorage(localStorage);
+  var rStagedC = await tr.recoverInterruptedTransaction({ store: ts, vaultState: vs, opts: { storage: stagedC } });
+  t('orden real: action = FINALIZED_WITH_WARNING (se alcanzó finalize, no un corte temprano)', rStagedC.action === 'FINALIZED_WITH_WARNING');
+  t('orden real: resolved = true', rStagedC.resolved === true);
+  t('orden real: warningCode = RECOVERY_SUMMARY_WRITE_FAILED (el fallo real fue el paso 3)', rStagedC.warningCode === 'RECOVERY_SUMMARY_WRITE_FAILED');
+  t('orden real: stateAfter = STORAGE_ERROR (detectVaultState degrada, no rechaza; ver nota de calibración)', rStagedC.stateAfter === 'STORAGE_ERROR');
+  t('orden real: NUNCA MANUAL_RECOVERY_REQUIRED', rStagedC.action !== 'MANUAL_RECOVERY_REQUIRED');
+  t('orden real: vk_tx_active quedó eliminado de verdad (no es un corte antes de leerlo)', ts.getActiveTransaction() === null);
+  t('orden real: vk_tx_last_recovery_snapshot archivado permanece válido (paso 1 se completó antes del fallo)', ts.loadLastRecoverySnapshot() !== null && ts.loadLastRecoverySnapshot().id === snapStagedC.id);
+  t('orden real: vk_tx_last_recovery NO se escribió (el fallo fue real, no se oculta)', localStorage.getItem('vk_tx_last_recovery') === null);
+
+  console.log('== P0.6: reinicio posterior (storage normal, sin active) -> NONE ==');
+  var rStagedC2 = await tr.recoverInterruptedTransaction({ store: ts, vaultState: vs });
+  t('P0.6: tras reiniciar sin active, action = NONE', rStagedC2.action === 'NONE' && rStagedC2.resolved === true);
+
+  console.log('== P0.6: mismo orden real para CANCELLED (fase CREATED, sin snapshot) ==');
+  reset();
+  seedValidV1();
+  var txStagedCancel = ts.beginTransaction({ reason: 'TEST' });
+  var stagedCancel = stagedFailureStorage(localStorage);
+  var rStagedCancel = await tr.recoverInterruptedTransaction({ store: ts, vaultState: vs, opts: { storage: stagedCancel } });
+  t('orden real (CANCELLED): action = CLEANED_WITH_WARNING', rStagedCancel.action === 'CLEANED_WITH_WARNING');
+  t('orden real (CANCELLED): resolved = true', rStagedCancel.resolved === true);
+  t('orden real (CANCELLED): warningCode correcto', rStagedCancel.warningCode === 'RECOVERY_SUMMARY_WRITE_FAILED');
+  t('orden real (CANCELLED): stateAfter = STORAGE_ERROR', rStagedCancel.stateAfter === 'STORAGE_ERROR');
+  t('orden real (CANCELLED): NUNCA MANUAL_RECOVERY_REQUIRED', rStagedCancel.action !== 'MANUAL_RECOVERY_REQUIRED');
+  t('orden real (CANCELLED): vk_tx_active quedó eliminado de verdad', ts.getActiveTransaction() === null);
+
+  console.log('== P0.6: detectVaultState() REALMENTE rechaza tras finalizar con warning -> stateAfter:null (COMMITTED) ==');
+  reset();
+  seedValidV1();
+  var txRejC = ts.beginTransaction({ targetFormat: 'V1', targetState: 'V1_READY' });
+  var snapRejC = await ts.createSnapshot({ transactionId: txRejC.transactionId, reason: 'PRE' });
+  await ts.saveSnapshot(snapRejC);
+  await driveToPhase(txRejC.transactionId, 'COMMITTED');
+  var flakySummaryOnly = {
+    getItem: localStorage.getItem.bind(localStorage),
+    setItem: function (k, v) {
+      if (k === 'vk_tx_last_recovery') { throw new Error('fallo simulado al escribir el resumen'); }
+      localStorage.setItem(k, v);
+    },
+    removeItem: localStorage.removeItem.bind(localStorage)
+  };
+  var rRejC = await tr.recoverInterruptedTransaction({ store: ts, vaultState: rejectingVaultState('STORAGE_READ_FAILED'), opts: { storage: flakySummaryOnly } });
+  t('detectVaultState rechaza de verdad (COMMITTED): action = FINALIZED_WITH_WARNING', rRejC.action === 'FINALIZED_WITH_WARNING');
+  t('detectVaultState rechaza de verdad (COMMITTED): resolved = true', rRejC.resolved === true);
+  t('detectVaultState rechaza de verdad (COMMITTED): stateAfter = null (best effort real)', rRejC.stateAfter === null);
+  t('detectVaultState rechaza de verdad (COMMITTED): warningCode se conserva', rRejC.warningCode === 'RECOVERY_SUMMARY_WRITE_FAILED');
+  t('detectVaultState rechaza de verdad (COMMITTED): NUNCA MANUAL_RECOVERY_REQUIRED', rRejC.action !== 'MANUAL_RECOVERY_REQUIRED');
+  t('detectVaultState rechaza de verdad (COMMITTED): vk_tx_active quedó eliminado', ts.getActiveTransaction() === null);
+
+  console.log('== P0.6: mismo caso con rejectingVaultState para CANCELLED -> stateAfter:null ==');
+  reset();
+  seedValidV1();
+  var txRejCancel = ts.beginTransaction({ reason: 'TEST' });
+  var flakySummaryOnlyCancel = {
+    getItem: localStorage.getItem.bind(localStorage),
+    setItem: function (k, v) {
+      if (k === 'vk_tx_last_recovery') { throw new Error('fallo simulado'); }
+      localStorage.setItem(k, v);
+    },
+    removeItem: localStorage.removeItem.bind(localStorage)
+  };
+  var rRejCancel = await tr.recoverInterruptedTransaction({ store: ts, vaultState: rejectingVaultState('STORAGE_READ_FAILED'), opts: { storage: flakySummaryOnlyCancel } });
+  t('detectVaultState rechaza de verdad (CANCELLED): action = CLEANED_WITH_WARNING', rRejCancel.action === 'CLEANED_WITH_WARNING');
+  t('detectVaultState rechaza de verdad (CANCELLED): resolved = true', rRejCancel.resolved === true);
+  t('detectVaultState rechaza de verdad (CANCELLED): stateAfter = null', rRejCancel.stateAfter === null);
+  t('detectVaultState rechaza de verdad (CANCELLED): warningCode se conserva', rRejCancel.warningCode === 'RECOVERY_SUMMARY_WRITE_FAILED');
+  t('detectVaultState rechaza de verdad (CANCELLED): NUNCA MANUAL_RECOVERY_REQUIRED', rRejCancel.action !== 'MANUAL_RECOVERY_REQUIRED');
+  t('detectVaultState rechaza de verdad (CANCELLED): vk_tx_active quedó eliminado', ts.getActiveTransaction() === null);
+
+  console.log('== P0.6: no-regresión final — fallo ANTES de active sigue MANUAL_RECOVERY_REQUIRED en TODAS las rutas ==');
+  reset();
+  seedValidV1();
+  var txCancFailActive = ts.beginTransaction({ reason: 'TEST' });
+  var flakyActiveCancel = {
+    getItem: localStorage.getItem.bind(localStorage),
+    setItem: localStorage.setItem.bind(localStorage),
+    removeItem: function (k) {
+      if (k === 'vk_tx_active') { throw new Error('fallo simulado'); }
+      localStorage.removeItem(k);
+    }
+  };
+  var rCancFail = await tr.recoverInterruptedTransaction({ store: ts, vaultState: vs, opts: { storage: flakyActiveCancel } });
+  t('P0.6 cancel no-regresión: fallo antes de active sigue MANUAL_RECOVERY_REQUIRED', rCancFail.action === 'MANUAL_RECOVERY_REQUIRED' && rCancFail.resolved === false);
+  t('P0.6 cancel no-regresión: vk_tx_active sigue presente', ts.getActiveTransaction() !== null);
 
   console.log('\n' + pass + ' OK, ' + fail + ' FALLOS');
   process.exit(fail > 0 ? 1 : 0);
