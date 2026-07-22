@@ -259,12 +259,15 @@ async function buildCandidate(txId, targetFormat, targetState) {
       localStorage.removeItem(k);
     }
   };
-  var rFailSnapCleanup = await rejectsCode(ts.finalizeCommitted(txFailSnapCleanup.transactionId, flakySnapStorage), 'STORAGE_WRITE_FAILED');
-  t('#16: el rechazo se propaga (no se oculta el fallo de limpieza del residuo)', rFailSnapCleanup.rejected && rFailSnapCleanup.matches);
-  t('#1: a pesar del fallo, vk_tx_active SÍ quedó eliminado (lo esencial se completó)', ts.getActiveTransaction() === null);
-  t('#6: el resumen vk_tx_last_recovery SÍ refleja la finalización real (se escribió tras borrar active)', JSON.parse(localStorage.getItem('vk_tx_last_recovery')).transactionId === txFailSnapCleanup.transactionId);
+  var rFailSnapCleanup = await ts.finalizeCommitted(txFailSnapCleanup.transactionId, flakySnapStorage);
+  t('P0.6: finalizeCommitted RESUELVE (no rechaza) cuando falla solo la limpieza del residuo técnico', rFailSnapCleanup.finalized === true);
+  t('P0.6: warningCode = SNAPSHOT_CLEANUP_FAILED', rFailSnapCleanup.warningCode === 'SNAPSHOT_CLEANUP_FAILED');
+  t('P0.6: kind se propaga en el resultado', rFailSnapCleanup.kind === 'COMMITTED_DESTRUCTIVE');
+  t('P0.6: cleanupPending = true', rFailSnapCleanup.cleanupPending === true);
+  t('P0.1 (a pesar del fallo): vk_tx_active SÍ quedó eliminado (lo esencial se completó)', ts.getActiveTransaction() === null);
+  t('P0.1: el resumen vk_tx_last_recovery SÍ refleja la finalización real (se escribió tras borrar active)', JSON.parse(localStorage.getItem('vk_tx_last_recovery')).transactionId === txFailSnapCleanup.transactionId);
 
-  console.log('== P0.5 #6/#16: el resumen final NUNCA afirma cierre cuando active sigue presente ==');
+  console.log('== P0.5 #6/#16: el resumen final NUNCA afirma cierre cuando active sigue presente (fallo ANTES del punto de no retorno) ==');
   reset();
   localStorage.setItem('vk_meta_v1', JSON.stringify({ hash: 'abc' }));
   var txSummaryCheck = ts.beginTransaction({});
@@ -282,6 +285,133 @@ async function buildCandidate(txId, targetFormat, targetState) {
   await rejectsCode(ts.finalizeCommitted(txSummaryCheck.transactionId, flakyActiveStorage2), 'STORAGE_WRITE_FAILED');
   t('#6: vk_tx_last_recovery NO existe (el resumen nunca se escribió sin haber borrado active antes)', localStorage.getItem('vk_tx_last_recovery') === null);
   t('#6: vk_tx_active sigue presente, consistente con la ausencia de resumen', ts.getActiveTransaction() !== null);
+
+  console.log('== P0.6: setItem(vk_tx_last_recovery) falla tras active+candidate borrados (COMMITTED) ==');
+  reset();
+  localStorage.setItem('vk_meta_v1', JSON.stringify({ hash: 'abc' }));
+  var txP6C = ts.beginTransaction({ targetFormat: 'V1', targetState: 'V1_READY' });
+  var snapP6C = await ts.createSnapshot({ transactionId: txP6C.transactionId, reason: 'PRE' });
+  await ts.saveSnapshot(snapP6C);
+  await driveToPhase(txP6C.transactionId, 'COMMITTED');
+  var flakySummaryStorage = {
+    getItem: localStorage.getItem.bind(localStorage),
+    setItem: function (k, v) {
+      if (k === 'vk_tx_last_recovery') { throw new Error('fallo simulado al escribir el resumen'); }
+      localStorage.setItem(k, v);
+    },
+    removeItem: localStorage.removeItem.bind(localStorage)
+  };
+  var rP6C = await ts.finalizeCommitted(txP6C.transactionId, flakySummaryStorage);
+  t('P0.6: finalizeCommitted RESUELVE (no rechaza) con finalized:true', rP6C.finalized === true);
+  t('P0.6: kind = COMMITTED_DESTRUCTIVE', rP6C.kind === 'COMMITTED_DESTRUCTIVE');
+  t('P0.6: warningCode = RECOVERY_SUMMARY_WRITE_FAILED', rP6C.warningCode === 'RECOVERY_SUMMARY_WRITE_FAILED');
+  t('P0.6: cleanupPending = true', rP6C.cleanupPending === true);
+  t('P0.6: vk_tx_active queda ausente', ts.getActiveTransaction() === null);
+  t('P0.6: vk_tx_last_recovery efectivamente NO se escribió (no hay falso positivo)', localStorage.getItem('vk_tx_last_recovery') === null);
+  t('P0.6: vk_tx_snapshot técnico permanece (residuo, nunca se alcanzó su borrado)', ts.loadSnapshot() !== null);
+  t('P0.6: vk_tx_last_recovery_snapshot archivado permanece válido', ts.loadLastRecoverySnapshot() !== null && ts.loadLastRecoverySnapshot().id === snapP6C.id);
+
+  console.log('== P0.6: mismo caso para ROLLED_BACK ==');
+  reset();
+  localStorage.setItem('vk_meta_v1', JSON.stringify({ hash: 'abc' }));
+  var txP6R = ts.beginTransaction({ reason: 'TEST' });
+  var snapP6R = await ts.createSnapshot({ transactionId: txP6R.transactionId, reason: 'PRE' });
+  await ts.saveSnapshot(snapP6R);
+  ts.setTransactionPhase(txP6R.transactionId, 'SNAPSHOT_WRITTEN');
+  ts.setTransactionPhase(txP6R.transactionId, 'ROLLBACK_STARTED');
+  await ts.restoreSnapshot(snapP6R);
+  ts.setTransactionPhase(txP6R.transactionId, 'ROLLED_BACK');
+  var flakySummaryStorage2 = {
+    getItem: localStorage.getItem.bind(localStorage),
+    setItem: function (k, v) {
+      if (k === 'vk_tx_last_recovery') { throw new Error('fallo simulado al escribir el resumen'); }
+      localStorage.setItem(k, v);
+    },
+    removeItem: localStorage.removeItem.bind(localStorage)
+  };
+  var rP6R = await ts.finalizeRolledBack(txP6R.transactionId, flakySummaryStorage2);
+  t('P0.6 ROLLED_BACK: finalized:true', rP6R.finalized === true);
+  t('P0.6 ROLLED_BACK: kind = ROLLED_BACK', rP6R.kind === 'ROLLED_BACK');
+  t('P0.6 ROLLED_BACK: warningCode = RECOVERY_SUMMARY_WRITE_FAILED', rP6R.warningCode === 'RECOVERY_SUMMARY_WRITE_FAILED');
+  t('P0.6 ROLLED_BACK: vk_tx_active ausente', ts.getActiveTransaction() === null);
+  t('P0.6 ROLLED_BACK: vk_tx_last_recovery no escrito', localStorage.getItem('vk_tx_last_recovery') === null);
+  t('P0.6 ROLLED_BACK: vk_tx_snapshot técnico permanece', ts.loadSnapshot() !== null);
+  t('P0.6 ROLLED_BACK: vk_tx_last_recovery_snapshot permanece válido', ts.loadLastRecoverySnapshot() !== null);
+
+  console.log('== P0.6 corregido: CANCELLED con fallo al escribir vk_tx_last_recovery (fase CREATED) ==');
+  reset();
+  localStorage.setItem('vk_meta_v1', JSON.stringify({ hash: 'abc' }));
+  var txCancC = ts.beginTransaction({ reason: 'TEST' });
+  var flakySummaryCancel = {
+    getItem: localStorage.getItem.bind(localStorage),
+    setItem: function (k, v) {
+      if (k === 'vk_tx_last_recovery') { throw new Error('fallo simulado al escribir el resumen (cancel)'); }
+      localStorage.setItem(k, v);
+    },
+    removeItem: localStorage.removeItem.bind(localStorage)
+  };
+  var rCancC = await ts.cancelTransaction(txCancC.transactionId, flakySummaryCancel);
+  t('P0.6 CANCELLED: finishArchive SÍ escribe el resumen también para CANCELLED (confirma la corrección del punto 1)', rCancC.finalized === true);
+  t('P0.6 CANCELLED: kind = CANCELLED', rCancC.kind === 'CANCELLED');
+  t('P0.6 CANCELLED: warningCode = RECOVERY_SUMMARY_WRITE_FAILED', rCancC.warningCode === 'RECOVERY_SUMMARY_WRITE_FAILED');
+  t('P0.6 CANCELLED: vk_tx_active queda ausente', ts.getActiveTransaction() === null);
+  t('P0.6 CANCELLED: vk_tx_last_recovery efectivamente no se escribió', localStorage.getItem('vk_tx_last_recovery') === null);
+  t('P0.6 CANCELLED: vk_tx_snapshot no existía (CANCELLED no lo preserva) y sigue sin existir', ts.loadSnapshot() === null);
+
+  console.log('== P0.6: mismo caso en fase SNAPSHOT_WRITTEN (con snapshot real de por medio) ==');
+  reset();
+  localStorage.setItem('vk_meta_v1', JSON.stringify({ hash: 'abc' }));
+  var txCancS = ts.beginTransaction({ reason: 'TEST' });
+  var snapCancS = await ts.createSnapshot({ transactionId: txCancS.transactionId, reason: 'PRE' });
+  await ts.saveSnapshot(snapCancS);
+  ts.setTransactionPhase(txCancS.transactionId, 'SNAPSHOT_WRITTEN');
+  var flakySummaryCancel2 = {
+    getItem: localStorage.getItem.bind(localStorage),
+    setItem: function (k, v) {
+      if (k === 'vk_tx_last_recovery') { throw new Error('fallo simulado'); }
+      localStorage.setItem(k, v);
+    },
+    removeItem: localStorage.removeItem.bind(localStorage)
+  };
+  var rCancS = await ts.cancelTransaction(txCancS.transactionId, flakySummaryCancel2);
+  t('P0.6 CANCELLED (SNAPSHOT_WRITTEN): finalized:true', rCancS.finalized === true);
+  t('P0.6 CANCELLED (SNAPSHOT_WRITTEN): kind = CANCELLED', rCancS.kind === 'CANCELLED');
+  t('P0.6 CANCELLED (SNAPSHOT_WRITTEN): warningCode correcto', rCancS.warningCode === 'RECOVERY_SUMMARY_WRITE_FAILED');
+  t('P0.6 CANCELLED (SNAPSHOT_WRITTEN): active ausente', ts.getActiveTransaction() === null);
+
+  console.log('== P0.6: no-regresión — fallos ANTES de active siguen RECHAZANDO (zona A intacta, incluida CANCELLED) ==');
+  reset();
+  localStorage.setItem('vk_meta_v1', JSON.stringify({ hash: 'abc' }));
+  var txZoneA = ts.beginTransaction({ reason: 'TEST' });
+  var flakyActiveCancelStillFails = {
+    getItem: localStorage.getItem.bind(localStorage),
+    setItem: localStorage.setItem.bind(localStorage),
+    removeItem: function (k) {
+      if (k === 'vk_tx_active') { throw new Error('fallo simulado al borrar active'); }
+      localStorage.removeItem(k);
+    }
+  };
+  var rejectedZoneA = await rejectsCode(ts.cancelTransaction(txZoneA.transactionId, flakyActiveCancelStillFails), 'STORAGE_WRITE_FAILED');
+  t('P0.6 no-regresión (CANCELLED): un fallo AL BORRAR active sigue RECHAZANDO (no se convierte en finalized:true)', rejectedZoneA.rejected && rejectedZoneA.matches);
+  t('P0.6 no-regresión (CANCELLED): vk_tx_active sigue presente', ts.getActiveTransaction() !== null);
+
+  reset();
+  localStorage.setItem('vk_meta_v1', JSON.stringify({ hash: 'abc' }));
+  var txZoneA2 = ts.beginTransaction({ targetFormat: 'V1', targetState: 'V1_READY' });
+  var snapZoneA2 = await ts.createSnapshot({ transactionId: txZoneA2.transactionId, reason: 'PRE' });
+  await ts.saveSnapshot(snapZoneA2);
+  await driveToPhase(txZoneA2.transactionId, 'COMMITTED');
+  var flakyActiveCommitStillFails = {
+    getItem: localStorage.getItem.bind(localStorage),
+    setItem: localStorage.setItem.bind(localStorage),
+    removeItem: function (k) {
+      if (k === 'vk_tx_active') { throw new Error('fallo simulado al borrar active'); }
+      localStorage.removeItem(k);
+    }
+  };
+  var rejectedZoneA2 = await rejectsCode(ts.finalizeCommitted(txZoneA2.transactionId, flakyActiveCommitStillFails), 'STORAGE_WRITE_FAILED');
+  t('P0.6 no-regresión (COMMITTED): un fallo AL BORRAR active sigue RECHAZANDO', rejectedZoneA2.rejected && rejectedZoneA2.matches);
+  t('P0.6 no-regresión (COMMITTED): vk_tx_active sigue presente', ts.getActiveTransaction() !== null);
 
 
   reset();
