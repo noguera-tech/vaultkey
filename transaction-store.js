@@ -88,6 +88,25 @@
    - #5  opts se propaga a TODAS las llamadas a verifySnapshot().
    - #6  el resumen vk_tx_last_recovery se escribe DESPUÉS de haber
          eliminado vk_tx_active, nunca antes.
+
+   Cambios P0.6 (contrato finalized/warning, aprobado tras dos
+   rondas de corrección):
+   - finishArchive() deja de LANZAR excepciones para fallos
+     ocurridos DESPUÉS de eliminar con éxito vk_tx_candidate y
+     vk_tx_active (para CUALQUIER kind, incluido 'CANCELLED': la
+     escritura del resumen es incondicional al kind). Esos dos
+     borrados son el único "punto de no retorno" real: si fallan,
+     se sigue propagando la excepción tal cual (comportamiento sin
+     cambios). Si fallan pasos POSTERIORES (escritura del resumen
+     vk_tx_last_recovery o borrado del residuo técnico
+     vk_tx_snapshot), finishArchive() ya NO rechaza: RESUELVE con
+     { finalized: true, kind, warningCode, cleanupPending: true }.
+     Esto permite a los llamadores (transaction-recovery.js)
+     distinguir "la transacción ya está finalizada, solo falta un
+     detalle de limpieza/auditoría" de un fallo real de
+     finalización — nunca debe reportarse como
+     MANUAL_RECOVERY_REQUIRED/PROMOTION_FAILED/ROLLBACK_FAILED en
+     ese caso, porque no hay ninguna transacción que recuperar.
    ============================================================ */
 
 (function (root, factory) {
@@ -366,8 +385,14 @@
      - #5 opts se propaga a TODAS las llamadas a verifySnapshot(),
        incluida la de la copia archivada releída.
      - #6 el resumen vk_tx_last_recovery se escribe DESPUÉS de haber
-       eliminado vk_tx_active con éxito, nunca antes: nunca afirma
-       una finalización que todavía no ha ocurrido. */
+       eliminado vk_tx_active, nunca antes: nunca afirma una
+       finalización que todavía no ha ocurrido.
+
+     Cambio P0.6: archiveAndClear ahora PROPAGA el valor de retorno
+     de finishArchive() (antes se ignoraba con "return;"), para que
+     el resultado { finalized, kind, warningCode, cleanupPending }
+     llegue intacto a cancelTransaction/finalizeCommitted/
+     finalizeRolledBack y de ahí a transaction-recovery.js. */
   function snapshotNotFoundError(kind) {
     return err('SNAPSHOT_NOT_FOUND',
       'No se puede finalizar (' + kind + '): falta el snapshot activo que debía preservarse ' +
@@ -399,8 +424,7 @@
         /* 'CANCELLED': nunca se llegó a escribir nada destructivo;
            el contenido del snapshot es irrelevante, solo se
            descarta. Si vk_tx_snapshot no existe, no pasa nada. */
-        finishArchive(record, storage, kind, false);
-        return;
+        return finishArchive(record, storage, kind, false);
       }
 
       var snapshot = loadSnapshot(storage); /* puede lanzar SNAPSHOT_CORRUPT/STORAGE_READ_FAILED: se propaga tal cual */
@@ -427,7 +451,7 @@
              está completo: no hace falta reescribirlo, basta con
              completar la finalización usándolo como snapshot
              conservado. */
-          finishArchive(record, storage, kind, true);
+          return finishArchive(record, storage, kind, true);
         });
       }
 
@@ -480,7 +504,7 @@
           if (!v2.ok) {
             throw err('SNAPSHOT_WRITE_FAILED', 'La copia archivada releída no verifica su digest (' + v2.reason + ').');
           }
-          finishArchive(record, storage, kind, true);
+          return finishArchive(record, storage, kind, true);
         });
       });
     });
@@ -488,20 +512,22 @@
 
   /* #1/#6 (P0.5): orden estricto:
        1) candidate (artefacto secundario, sin valor de recuperación)
-       2) vk_tx_active (la transacción deja de existir)
-       3) SOLO ENTONCES se escribe el resumen vk_tx_last_recovery,
-          que por tanto nunca puede afirmar una finalización que
-          todavía no ha ocurrido de verdad.
-       4) vk_tx_snapshot se limpia el ÚLTIMO, como residuo técnico:
-          si este paso falla, la transacción ya no existe (paso 2 ya
-          se completó) y el residuo es inofensivo y limpiable más
-          tarde; pero el fallo SÍ se propaga como rechazo para que
-          el llamador sepa que la limpieza no terminó al 100%. */
+       2) vk_tx_active (la transacción deja de existir) — ESTE es el
+          único punto de no retorno real. Un fallo en 1) o 2) sigue
+          lanzando (propagando) exactamente igual que antes de P0.6.
+       3) SOLO ENTONCES se escribe el resumen vk_tx_last_recovery.
+       4) vk_tx_snapshot se limpia el ÚLTIMO, como residuo técnico.
+
+     P0.6: los pasos 3 y 4 ya NO lanzan. Si fallan, la transacción
+     YA está finalizada (candidate+active ya no existen) y se
+     RESUELVE con { finalized:true, kind, warningCode,
+     cleanupPending:true } en vez de propagar un rechazo — no hay
+     ninguna transacción que un llamador pueda "recuperar". */
   function finishArchive(record, storage, kind, hasRecoverableSnapshot) {
     removeKeyVerified(K_TX_CANDIDATE, storage);
     removeKeyVerified(K_TX_ACTIVE, storage);
 
-    writeJSON(K_TX_LAST_RECOVERY, {
+    var summaryRecord = {
       transactionId: record.transactionId,
       finalPhase: record.phase,
       kind: kind,
@@ -509,9 +535,27 @@
       updatedAt: record.updatedAt,
       historyLength: record.history.length,
       hasRecoverableSnapshot: !!hasRecoverableSnapshot
-    }, storage);
+    };
 
-    removeKeyVerified(K_TX_SNAPSHOT, storage);
+    try {
+      writeJSON(K_TX_LAST_RECOVERY, summaryRecord, storage);
+    } catch (e) {
+      /* vk_tx_active y vk_tx_candidate ya se eliminaron con éxito,
+         para CUALQUIER kind (incluido CANCELLED). Falta el resumen
+         de auditoría, pero no hay transacción que recuperar.
+         vk_tx_snapshot NO se toca (nunca se alcanza este paso). */
+      return { finalized: true, kind: kind, warningCode: 'RECOVERY_SUMMARY_WRITE_FAILED', cleanupPending: true, detail: normalizeErr(e) };
+    }
+
+    try {
+      removeKeyVerified(K_TX_SNAPSHOT, storage);
+    } catch (e) {
+      /* active ya se borró y el resumen YA se escribió. Solo queda
+         un residuo técnico (vk_tx_snapshot) sin limpiar. */
+      return { finalized: true, kind: kind, warningCode: 'SNAPSHOT_CLEANUP_FAILED', cleanupPending: true, detail: normalizeErr(e) };
+    }
+
+    return { finalized: true, kind: kind, cleanupPending: false };
   }
 
   function requireActiveMatch(transactionId, storage) {
