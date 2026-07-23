@@ -3419,10 +3419,14 @@ body.vk-lock { overflow: hidden; }
     48px
     var(--vk-r1-screen-padding-inline)
     24px;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
   scroll-padding-block: 24px;
   scrollbar-width: none;
+}
+
+.vk-password-create-form:has(.vk-password-create-note.is-visible) {
+  overflow-y: auto;
 }
 
 .vk-password-create-form::-webkit-scrollbar {
@@ -3582,7 +3586,7 @@ body.vk-lock { overflow: hidden; }
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   box-sizing: border-box;
-  margin-bottom: 168px;
+  margin-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
   padding:
     16px
     var(--vk-r1-screen-padding-inline)
@@ -3618,19 +3622,46 @@ body.vk-lock { overflow: hidden; }
 }
 
 /* Android keyboard: interactive-widget=resizes-content reduces the visual
-   viewport. Remove the Figma bottom spacer only while height is constrained,
-   leaving enough room for the form to scroll and keep the focused field
-   visible above the keyboard. */
+   viewport. Compact the screen and enable form scrolling only while height
+   is constrained, keeping the focused field visible above the keyboard. */
 @media (max-height: 640px) {
+  .vk-password-create-topbar {
+    display: none;
+  }
+
+  .vk-password-create-title {
+    margin: 10px var(--vk-r1-screen-padding-inline) 0;
+    font-size: 18px;
+  }
+
+  .vk-password-create-tabs {
+    flex-basis: 32px;
+    height: 32px;
+    margin: 10px var(--vk-r1-screen-padding-inline) 0;
+  }
+
+  .vk-password-create-form {
+    padding: 12px var(--vk-r1-screen-padding-inline);
+    overflow-y: auto;
+    scroll-padding-block: 12px;
+  }
+
   .vk-password-create-field,
   .vk-password-create-add-note,
   .vk-password-create-note {
-    scroll-margin-block: 24px;
+    scroll-margin-block: 12px;
   }
 
   .vk-password-create-footer {
     margin-bottom: 0;
-    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    padding:
+      8px
+      var(--vk-r1-screen-padding-inline)
+      calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .vk-password-create-button {
+    height: 44px;
   }
 }
 
