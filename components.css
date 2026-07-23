@@ -3421,6 +3421,7 @@ body.vk-lock { overflow: hidden; }
     24px;
   overflow-y: auto;
   overflow-x: hidden;
+  scroll-padding-block: 24px;
   scrollbar-width: none;
 }
 
@@ -3614,6 +3615,23 @@ body.vk-lock { overflow: hidden; }
     solid
     var(--vk-r1-primary);
   background: var(--vk-r1-primary);
+}
+
+/* Android keyboard: interactive-widget=resizes-content reduces the visual
+   viewport. Remove the Figma bottom spacer only while height is constrained,
+   leaving enough room for the form to scroll and keep the focused field
+   visible above the keyboard. */
+@media (max-height: 640px) {
+  .vk-password-create-field,
+  .vk-password-create-add-note,
+  .vk-password-create-note {
+    scroll-margin-block: 24px;
+  }
+
+  .vk-password-create-footer {
+    margin-bottom: 0;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 
