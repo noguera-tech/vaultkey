@@ -436,7 +436,7 @@ html.vk-twa #vkSplash{display:none!important}
     <h1 class="vk-settings-title vk-r1-title">Ajustes</h1>
 
     <nav class="vk-settings-menu vk-r1-list" aria-label="Secciones de Ajustes">
-      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="security">
+      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="security" onclick="show('settingsSecurity')">
         <span class="vk-settings-card__icon vk-r1-row__icon" aria-hidden="true">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
@@ -508,6 +508,79 @@ html.vk-twa #vkSplash{display:none!important}
     </nav>
 
     <div class="vk-settings-version">VaultKey 2.0</div>
+  </main>
+</section>
+<section id="settingsSecurity" class="screen vk-settings-security vk-r1-screen">
+  <header class="vk-appbar vk-settings-security__appbar">
+    <button type="button" class="vk-iconbtn" aria-label="Volver a Ajustes" onclick="show('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m15 18-6-6 6-6"/>
+      </svg>
+    </button>
+    <span class="vk-appbar__title">Seguridad</span>
+  </header>
+
+  <main class="vk-settings-security__content">
+    <h1 class="vk-settings-security__title vk-r1-title">Seguridad</h1>
+
+    <div class="vk-settings-security__menu vk-r1-list" aria-label="Opciones de Seguridad">
+      <button type="button" class="vk-settings-security__card vk-r1-row" data-security-target="master-password" aria-disabled="true">
+        <span class="vk-r1-row__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 8-8"/><path d="m15 8 2 2"/><path d="m17 6 2 2"/></svg>
+        </span>
+        <span class="vk-r1-row__body">
+          <strong class="vk-r1-row__title">Contraseña maestra</strong>
+          <small class="vk-r1-row__subtitle">Cambiar la contraseña principal</small>
+        </span>
+        <span class="vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+
+      <button type="button" class="vk-settings-security__card vk-r1-row" data-security-target="pin" aria-disabled="true">
+        <span class="vk-r1-row__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        </span>
+        <span class="vk-r1-row__body">
+          <strong class="vk-r1-row__title">PIN de desbloqueo</strong>
+          <small class="vk-r1-row__subtitle">Cambiar el PIN local</small>
+        </span>
+        <span class="vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+
+      <button type="button" class="vk-settings-security__card vk-settings-security__card--unavailable vk-r1-row" data-security-target="biometrics" aria-disabled="true">
+        <span class="vk-r1-row__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 11a2 2 0 0 1 2 2c0 3-1 6-2 8"/><path d="M8 13a4 4 0 0 1 8 0c0 2-.3 4-.8 6"/><path d="M5 13a7 7 0 0 1 14 0c0 1.4-.1 2.7-.4 4"/><path d="M3 13a9 9 0 0 1 18 0"/><path d="M8.5 21c.8-2.2 1.5-5.3 1.5-8"/></svg>
+        </span>
+        <span class="vk-r1-row__body">
+          <strong class="vk-r1-row__title">Desbloqueo biométrico</strong>
+          <small class="vk-r1-row__subtitle">No disponible</small>
+        </span>
+        <span class="vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+
+      <button type="button" class="vk-settings-security__card vk-r1-row" data-security-target="auto-lock" aria-disabled="true">
+        <span class="vk-r1-row__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 14v3"/></svg>
+        </span>
+        <span class="vk-r1-row__body">
+          <strong class="vk-r1-row__title">Bloqueo automático</strong>
+          <small class="vk-r1-row__subtitle">Configurar tiempo de bloqueo</small>
+        </span>
+        <span class="vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+
+      <button type="button" class="vk-settings-security__card vk-r1-row" data-security-target="emergency-kit" aria-disabled="true">
+        <span class="vk-r1-row__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+        </span>
+        <span class="vk-r1-row__body">
+          <strong class="vk-r1-row__title">Kit de emergencia</strong>
+          <small class="vk-r1-row__subtitle">Gestionar el kit de emergencia</small>
+        </span>
+        <span class="vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+    </div>
+
+    <div class="vk-settings-security__version">VaultKey 2.0</div>
   </main>
 </section>
 <div class="modal" id="entryModal"><div class="sheet">
