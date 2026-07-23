@@ -3723,3 +3723,92 @@ body.vk-lock { overflow: hidden; }
   font-size: 24px;
   line-height: 1;
 }
+
+/* =============================================================
+   Ajustes > Seguridad
+   Integración visual aislada. Las filas no ejecutan todavía
+   cambios de credenciales, biometría, bloqueo ni Kit.
+   ============================================================ */
+
+.vk-settings-security {
+  min-height: 100%;
+  overflow-y: auto;
+}
+
+.vk-settings-security__appbar {
+  box-sizing: border-box;
+  height: var(--vk-r1-header-height);
+  padding:
+    env(safe-area-inset-top)
+    var(--vk-r1-screen-padding-inline)
+    0
+    8px;
+  background: var(--vk-r1-surface);
+}
+
+.vk-settings-security__appbar .vk-iconbtn {
+  flex: none;
+  color: var(--vk-r1-text-tertiary);
+}
+
+.vk-settings-security__appbar .vk-appbar__title {
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
+  font-size: var(--vk-r1-font-size-row-title);
+  font-weight: var(--vk-r1-font-weight-semibold);
+}
+
+.vk-settings-security__content {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--vk-r1-content-max-width);
+  min-height: calc(100% - var(--vk-r1-header-height));
+  margin: 0 auto;
+  padding:
+    16px
+    var(--vk-r1-screen-padding-inline)
+    max(24px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+}
+
+.vk-settings-security__title {
+  margin-bottom: 95px;
+}
+
+.vk-settings-security__menu {
+  width: 100%;
+}
+
+.vk-settings-security__card {
+  height: var(--vk-r1-row-height);
+  cursor: default;
+}
+
+.vk-settings-security__card:active {
+  background: var(--vk-r1-surface);
+}
+
+.vk-settings-security__card--unavailable {
+  opacity: 0.72;
+}
+
+.vk-settings-security__version {
+  margin-top: auto;
+  padding-top: 32px;
+  color: var(--vk-r1-text-tertiary);
+  font-family: var(--vk-r1-font-family);
+  font-size: var(--vk-r1-font-size-row-subtitle);
+  font-weight: var(--vk-r1-font-weight-regular);
+  text-align: center;
+}
+
+@media (max-height: 700px) {
+  .vk-settings-security__title {
+    margin-bottom: 40px;
+  }
+
+  .vk-settings-security__version {
+    margin-top: 32px;
+  }
+}

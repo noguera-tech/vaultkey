@@ -436,7 +436,7 @@ html.vk-twa #vkSplash{display:none!important}
     <h1 class="vk-settings-title vk-r1-title">Ajustes</h1>
 
     <nav class="vk-settings-menu vk-r1-list" aria-label="Secciones de Ajustes">
-      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="security">
+      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="security" onclick="show('settingsSecurity')">
         <span class="vk-settings-card__icon vk-r1-row__icon" aria-hidden="true">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
@@ -508,6 +508,79 @@ html.vk-twa #vkSplash{display:none!important}
     </nav>
 
     <div class="vk-settings-version">VaultKey 2.0</div>
+  </main>
+</section>
+<section id="settingsSecurity" class="screen vk-settings-security vk-r1-screen">
+  <header class="vk-appbar vk-settings-security__appbar">
+    <button type="button" class="vk-iconbtn" aria-label="Volver a Ajustes" onclick="show('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m15 18-6-6 6-6"/>
+      </svg>
+    </button>
+    <span class="vk-appbar__title">Seguridad</span>
+  </header>
+
+  <main class="vk-settings-security__content">
+    <h1 class="vk-settings-security__title vk-r1-title">Seguridad</h1>
+
+    <div class="vk-settings-security__menu vk-r1-list" aria-label="Opciones de Seguridad">
+      <button type="button" class="vk-settings-security__card vk-r1-row" data-security-target="master-password" aria-disabled="true">
+        <span class="vk-r1-row__icon vk-settings-security__key" aria-hidden="true">
+          <img class="vk-settings-security__key-main" alt="" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjYiIGhlaWdodD0iMjYiIHZpZXdCb3g9IjAgMCAyNiAyNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEuNzAxODYgMTkuNTA3M0MxLjI1MjYgMTkuOTU2NCAxLjAwMDE0IDIwLjU2NTYgMSAyMS4yMDA5VjIzLjgwMjNDMSAyNC4xMTk5IDEuMTI2MTkgMjQuNDI0NiAxLjM1MDggMjQuNjQ5MkMxLjU3NTQyIDI0Ljg3MzggMS44ODAwNiAyNSAyLjE5NzcxIDI1SDUuNzkwODRDNi4xMDg0OSAyNSA2LjQxMzEzIDI0Ljg3MzggNi42Mzc3NSAyNC42NDkyQzYuODYyMzYgMjQuNDI0NiA2Ljk4ODU1IDI0LjExOTkgNi45ODg1NSAyMy44MDIzVjIyLjYwNDZDNi45ODg1NSAyMi4yODY5IDcuMTE0NzQgMjEuOTgyMyA3LjMzOTM1IDIxLjc1NzdDNy41NjM5NiAyMS41MzMxIDcuODY4NjEgMjEuNDA2OSA4LjE4NjI2IDIxLjQwNjlIOS4zODM5N0M5LjcwMTYyIDIxLjQwNjkgMTAuMDA2MyAyMS4yODA3IDEwLjIzMDkgMjEuMDU2MUMxMC40NTU1IDIwLjgzMTUgMTAuNTgxNyAyMC41MjY4IDEwLjU4MTcgMjAuMjA5MlYxOS4wMTE1QzEwLjU4MTcgMTguNjkzOCAxMC43MDc5IDE4LjM4OTIgMTAuOTMyNSAxOC4xNjQ1QzExLjE1NzEgMTcuOTM5OSAxMS40NjE3IDE3LjgxMzcgMTEuNzc5NCAxNy44MTM3SDExLjk4NTRDMTIuNjIwNiAxNy44MTM2IDEzLjIyOTggMTcuNTYxMSAxMy42NzkgMTcuMTExOUwxNC42NTM5IDE2LjEzN0MxNi4zMTg1IDE2LjcxNjggMTguMTMwNiAxNi43MTQ2IDE5Ljc5MzggMTYuMTMwN0MyMS40NTcgMTUuNTQ2NyAyMi44NzI4IDE0LjQxNTYgMjMuODA5NiAxMi45MjI0QzI0Ljc0NjQgMTEuNDI5MyAyNS4xNDg3IDkuNjYyMzQgMjQuOTUwNyA3LjkxMDc3QzI0Ljc1MjggNi4xNTkxOSAyMy45NjYyIDQuNTI2NjUgMjIuNzE5OCAzLjI4MDIyQzIxLjQ3MzMgMi4wMzM3OCAxOS44NDA4IDEuMjQ3MjQgMTguMDg5MiAxLjA0OTI3QzE2LjMzNzcgMC44NTEyOTQgMTQuNTcwOCAxLjI1MzYxIDEzLjA3NzYgMi4xOTAzOUMxMS41ODQ0IDMuMTI3MTcgMTAuNDUzMyA0LjU0Mjk3IDkuODY5MzQgNi4yMDYxNkM5LjI4NTQgNy44NjkzNiA5LjI4MzE5IDkuNjgxNDkgOS44NjMwNSAxMS4zNDYxTDEuNzAxODYgMTkuNTA3M1oiIHN0cm9rZT0iIzNCODJGNiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBhdGggZD0iTTE4IDdIMTguMDEiIHN0cm9rZT0iIzNCODJGNiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cg==">
+        </span>
+        <span class="vk-r1-row__body">
+          <strong class="vk-r1-row__title">Contraseña maestra</strong>
+          <small class="vk-r1-row__subtitle">Cambiar la contraseña principal</small>
+        </span>
+        <span class="vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+
+      <button type="button" class="vk-settings-security__card vk-r1-row" data-security-target="pin" aria-disabled="true">
+        <span class="vk-r1-row__icon" aria-hidden="true">
+          <img alt="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iNDkgMzA2IDI0IDI0IiBmaWxsPSJub25lIj4KICA8cGF0aCBkPSJNNzAuMzMzMyAzMTYuOEg1MS42NjY3QzUwLjE5MzkgMzE2LjggNDkgMzE3Ljg3NCA0OSAzMTkuMlYzMjcuNkM0OSAzMjguOTI1IDUwLjE5MzkgMzMwIDUxLjY2NjcgMzMwSDcwLjMzMzNDNzEuODA2MSAzMzAgNzMgMzI4LjkyNSA3MyAzMjcuNlYzMTkuMkM3MyAzMTcuODc0IDcxLjgwNjEgMzE2LjggNzAuMzMzMyAzMTYuOFoiIHN0cm9rZT0iIzNCODJGNiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNNTQuMzMzIDMxNi44VjMxMkM1NC4zMzMgMzEwLjQwOSA1NS4wMzU0IDMwOC44ODMgNTYuMjg1NiAzMDcuNzU3QzU3LjUzNTkgMzA2LjYzMiA1OS4yMzE2IDMwNiA2MC45OTk3IDMwNkM2Mi43Njc4IDMwNiA2NC40NjM1IDMwNi42MzIgNjUuNzEzNyAzMDcuNzU3QzY2Ljk2NCAzMDguODgzIDY3LjY2NjMgMzEwLjQwOSA2Ny42NjYzIDMxMlYzMTYuOCIgc3Ryb2tlPSIjM0I4MkY2IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4K">
+        </span>
+        <span class="vk-r1-row__body">
+          <strong class="vk-r1-row__title">PIN de desbloqueo</strong>
+          <small class="vk-r1-row__subtitle">Cambiar el PIN local</small>
+        </span>
+        <span class="vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+
+      <button type="button" class="vk-settings-security__card vk-settings-security__card--unavailable vk-r1-row" data-security-target="biometrics" aria-disabled="true">
+        <span class="vk-r1-row__icon" aria-hidden="true">
+          <img alt="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iNDkgMzk1IDI0IDI0IiBmaWxsPSJub25lIiBvdmVyZmxvdz0idmlzaWJsZSI+CiAgPHBhdGggZD0iTTYxLjA0NDkgNDA0LjZDNjAuNDA2IDQwNC42IDU5Ljc5MzMgNDA0Ljg1MyA1OS4zNDE1IDQwNS4zMDNDNTguODg5NyA0MDUuNzUzIDU4LjYzNTkgNDA2LjM2MyA1OC42MzU5IDQwN0M1OC42MzU5IDQwOC4yMjQgNTguNTE1NSA0MTAuMDEyIDU4LjMyMjggNDExLjhNNjMuNDUzOSA0MDguMzQ0QzYzLjQ1MzkgNDExLjIgNjMuNDUzOSA0MTYgNjIuMjQ5NCA0MTlNNjcuNDE2NyA0MTcuODI0QzY3LjU2MTIgNDE3LjEwNCA2Ny45MzQ2IDQxNS4wNjQgNjguMDE4OSA0MTQuMk00OSA0MDdDNDkgNDA0LjQ4MSA0OS43OTU0IDQwMi4wMjcgNTEuMjczNiAzOTkuOTgzQzUyLjc1MTcgMzk3Ljk0IDU0LjgzNzcgMzk2LjQxMiA1Ny4yMzYgMzk1LjYxNkM1OS42MzQzIDM5NC44MTkgNjIuMjIzMyAzOTQuNzk1IDY0LjYzNjMgMzk1LjU0NkM2Ny4wNDkzIDM5Ni4yOTcgNjkuMTY0IDM5Ny43ODUgNzAuNjgwOCAzOTkuOE00OSA0MTEuOEg0OS4wMTJNNzIuODQ4OSA0MTEuOEM3My4wODk4IDQwOS40IDczLjAwNjcgNDA1LjM3NSA3Mi44NDg5IDQwNC42IiBzdHJva2U9IiMzQjgyRjYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTTUyLjYxMzMgNDE2QzUzLjIxNTUgNDE0LjIgNTMuODE3OCA0MTAuNiA1My44MTc4IDQwN0M1My44MTY2IDQwNi4xODMgNTMuOTU1IDQwNS4zNzEgNTQuMjI3MyA0MDQuNk01Ny4wMDk3IDQxOUM1Ny4yNjI2IDQxOC4yMDggNTcuNTUxNyA0MTcuNDE2IDU3LjY5NjIgNDE2LjZNNTcuNDMxMiA0MDAuNzZDNTguNTMwMiA0MDAuMTI4IDU5Ljc3NjkgMzk5Ljc5NSA2MS4wNDU5IDM5OS43OTVDNjIuMzE0OSAzOTkuNzk2IDYzLjU2MTQgNDAwLjEyOSA2NC42NjAyIDQwMC43NjFDNjUuNzU5IDQwMS4zOTQgNjYuNjcxMiA0MDIuMzAzIDY3LjMwNTIgNDAzLjM5OEM2Ny45MzkxIDQwNC40OTQgNjguMjcyNSA0MDUuNzM2IDY4LjI3MTcgNDA3VjQwOS40IiBzdHJva2U9IiMzQjgyRjYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=">
+        </span>
+        <span class="vk-r1-row__body">
+          <strong class="vk-r1-row__title">Desbloqueo biométrico</strong>
+          <small class="vk-r1-row__subtitle">No disponible</small>
+        </span>
+        <span class="vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+
+      <button type="button" class="vk-settings-security__card vk-r1-row" data-security-target="auto-lock" aria-disabled="true">
+        <span class="vk-r1-row__icon" aria-hidden="true">
+          <img alt="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iNDkgNDgxIDI0IDI0IiBmaWxsPSJub25lIj4KICA8cGF0aCBkPSJNNzAuMzMzMyA0OTEuOEg1MS42NjY3QzUwLjE5MzkgNDkxLjggNDkgNDkyLjg3NCA0OSA0OTQuMlY1MDIuNkM0OSA1MDMuOTI1IDUwLjE5MzkgNTA1IDUxLjY2NjcgNTA1SDcwLjMzMzNDNzEuODA2MSA1MDUgNzMgNTAzLjkyNSA3MyA1MDIuNlY0OTQuMkM3MyA0OTIuODc0IDcxLjgwNjEgNDkxLjggNzAuMzMzMyA0OTEuOFoiIHN0cm9rZT0iIzNCODJGNiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNNTQuMzMzIDQ5MS44VjQ4N0M1NC4zMzMgNDg1LjQwOSA1NS4wMzU0IDQ4My44ODMgNTYuMjg1NiA0ODIuNzU3QzU3LjUzNTkgNDgxLjYzMiA1OS4yMzE2IDQ4MSA2MC45OTk3IDQ4MUM2Mi43Njc4IDQ4MSA2NC40NjM1IDQ4MS42MzIgNjUuNzEzNyA0ODIuNzU3QzY2Ljk2NCA0ODMuODgzIDY3LjY2NjMgNDg1LjQwOSA2Ny42NjYzIDQ4N1Y0OTEuOCIgc3Ryb2tlPSIjM0I4MkY2IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4K">
+        </span>
+        <span class="vk-r1-row__body">
+          <strong class="vk-r1-row__title">Bloqueo automático</strong>
+          <small class="vk-r1-row__subtitle">Configurar tiempo de bloqueo</small>
+        </span>
+        <span class="vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+
+      <button type="button" class="vk-settings-security__card vk-r1-row" data-security-target="emergency-kit" aria-disabled="true">
+        <span class="vk-r1-row__icon" aria-hidden="true">
+          <img alt="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iNDkgNTY4IDI0IDI0IiBmaWxsPSJub25lIj4KICA8cGF0aCBkPSJNNjAuNTA5NyA1OTEuOTY2QzYwLjMzODMgNTkxLjk0MyA2MC4xNzcxIDU5MS45MDkgNjAuMDI2MyA1OTEuODY0QzU2LjY1MzcgNTkwLjg0NCA1My45NzMxIDU4OS4xMTUgNTEuOTg0NiA1ODYuNjc2QzQ5Ljk5NDkgNTg0LjIzNyA0OSA1ODEuNTk3IDQ5IDU3OC43NTZWNTcyLjkzM0M0OSA1NzIuNDY4IDQ5LjE2NzQgNTcyLjA0OCA0OS41MDIzIDU3MS42NzVDNDkuODM2IDU3MS4zMDEgNTAuMjY4NiA1NzEuMDMxIDUwLjggNTcwLjg2M0w2MC4wMzE0IDU2OC4xNDRDNjAuMzY1MSA1NjguMDQ4IDYwLjY4OCA1NjggNjEgNTY4QzYxLjMxMiA1NjggNjEuNjM1NCA1NjguMDQ4IDYxLjk3MDMgNTY4LjE0NEw3MS4yIDU3MC44NjNDNzEuNzMwMyA1NzEuMDMyIDcyLjE2MjkgNTcxLjMwMiA3Mi40OTc3IDU3MS42NzVDNzIuODMyNiA1NzIuMDQ4IDczIDU3Mi40NjggNzMgNTcyLjkzM1Y1NzguNzU2QzczIDU4MS41OTcgNzIuMDA1NyA1ODQuMjM3IDcwLjAxNzEgNTg2LjY3NkM2OC4wMjg2IDU4OS4xMTUgNjUuMzQ3NCA1OTAuODQ0IDYxLjk3MzcgNTkxLjg2NEM2MS44MjQgNTkxLjkwOSA2MS42NjM0IDU5MS45NDMgNjEuNDkyIDU5MS45NjZDNjEuMzIwNiA1OTEuOTg5IDYxLjE1NjYgNTkyIDYxIDU5MkM2MC44NDM0IDU5MiA2MC42ODExIDU5MS45ODkgNjAuNTA5NyA1OTEuOTY2Wk02MSA1OTAuNzE5QzYzLjk3MTQgNTg5Ljk3MiA2Ni40Mjg2IDU4OC40NzYgNjguMzcxNCA1ODYuMjMzQzcwLjMxNDMgNTgzLjk5IDcxLjI4NTcgNTgxLjQ5OCA3MS4yODU3IDU3OC43NTZWNTcyLjkwOEM3MS4yODU3IDU3Mi43MzQgNzEuMjI1MSA1NzIuNTc3IDcxLjEwNCA1NzIuNDM3QzcwLjk4NCA1NzIuMjk4IDcwLjgxMzcgNTcyLjE5MyA3MC41OTMxIDU3Mi4xMjVMNjEuMzYzNCA1NjkuNDA2QzYxLjI1MzcgNTY5LjM2OSA2MS4xMzI2IDU2OS4zNTEgNjEgNTY5LjM1MUM2MC44Njc0IDU2OS4zNTEgNjAuNzQ2MyA1NjkuMzY5IDYwLjYzNjYgNTY5LjQwNkw1MS40MDY5IDU3Mi4xMjVDNTEuMTg2MyA1NzIuMTkzIDUxLjAxNiA1NzIuMjk4IDUwLjg5NiA1NzIuNDM3QzUwLjc3NDkgNTcyLjU3NyA1MC43MTQzIDU3Mi43MzQgNTAuNzE0MyA1NzIuOTA4VjU3OC43NTZDNTAuNzE0MyA1ODEuNDk4IDUxLjY4NTcgNTgzLjk5IDUzLjYyODYgNTg2LjIzM0M1NS41NzE0IDU4OC40NzYgNTguMDI4NiA1ODkuOTcyIDYxIDU5MC43MTlaIiBmaWxsPSIjM0I4MkY2Ii8+Cjwvc3ZnPgo=">
+        </span>
+        <span class="vk-r1-row__body">
+          <strong class="vk-r1-row__title">Kit de emergencia</strong>
+          <small class="vk-r1-row__subtitle">Gestionar el kit de emergencia</small>
+        </span>
+        <span class="vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+    </div>
+
+    <div class="vk-settings-security__version">VaultKey 2.0</div>
   </main>
 </section>
 <div class="modal" id="entryModal"><div class="sheet">
