@@ -3402,21 +3402,43 @@ function renderFav(){
   const countEl=$('favCount');
   if(!grid)return;
   const favs=vault.filter(e=>e.fav);
+  const root=$('fav');
+  if(root){
+    root.classList.toggle('vk-favorites-root--empty',!favs.length);
+    root.classList.toggle('vk-favorites-root--content',Boolean(favs.length));
+  }
   if(countEl)countEl.textContent=favs.length?favs.length+' favorito'+(favs.length===1?'':'s'):'';
   if(!favs.length){
-    grid.innerHTML='<div class="empty" style="padding:40px 0 20px;text-align:center"><div style="margin:0 auto 14px;filter:drop-shadow(0 0 18px rgba(0,180,255,.5))"><svg viewBox="0 0 80 80" width="80" height="80" fill="none"><polygon points="40,10 48,30 70,32 54,47 58,68 40,57 22,68 26,47 10,32 32,30" stroke="#00d4ff" stroke-width="2.5" stroke-linejoin="round" fill="rgba(0,180,255,.08)"/><polygon points="40,18 46,32 62,34 51,44 54,60 40,52 26,60 29,44 18,34 34,32" fill="rgba(0,210,255,.12)"/></svg></div><b style="color:#e0f0ff;font-size:16px;display:block;margin-bottom:6px">Sin favoritos aún</b><p style="color:#3a6888;margin:0 0 16px;font-size:13px">Marca entradas como favoritas para acceder más rápido</p><button class="primary" onclick="show(\'vault\')" style="width:auto;padding:10px 24px">Ver entradas</button></div>';
+    grid.innerHTML='<section id="favEmptyState" class="vk-favorites-empty"><label class="vk-favorites-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input type="search" aria-label="Buscar favorito" placeholder="Buscar favorito..."></label><div class="vk-favorites-empty__message"><h2>Aún no tienes favoritos</h2><p>Marca elementos importantes para encontrarlos más rápido.</p><svg class="vk-favorites-empty__icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m32 6 8.03 16.27L58 24.88 45 37.55 48.07 55 32 46.55 15.93 55 19 37.55 6 24.88l17.97-2.61L32 6Z"/></svg></div></section>';
     return;
   }
   grid.innerHTML='';
   favs.forEach(e=>{
-    const ic=iconForEntry(e);
-    const weak=e?.entryType==='password'&&score(e.pass)<3;
-    const identity=entryMainIdentity(e);
-    const row=document.createElement('div');
-    row.className='favRow';
+    const type=(e?.entryType||e?.type||'password').toLowerCase();
+    const icons={
+      password:passwordFamilyKeySvg(),
+      wifi:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 9.5a11 11 0 0 1 14 0M8 13a6.5 6.5 0 0 1 8 0M11 16.5a2 2 0 0 1 2 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19" r="1" fill="currentColor"/></svg>',
+      card:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M7 15h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+      id:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="10" r="2" stroke="currentColor" stroke-width="2"/><path d="M5.5 16a3 3 0 0 1 5 0M14 9h4M14 13h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+      license:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="10" r="2" stroke="currentColor" stroke-width="2"/><path d="M5.5 16a3 3 0 0 1 5 0M14 9h4M14 13h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+      note:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 3h9l3 3v15H6Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 3v4h4M9 11h6M9 15h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+      medical:'<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4h6v5h5v6h-5v5H9v-5H4V9h5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>'
+    };
+    const subtitles={
+      password:e.user||e.username||e.email||e.url||'Contraseña',
+      wifi:e.wifiSsid||e.service||'Red Wi-Fi',
+      card:[e.cardType,e.cardNumber?'•••• '+String(e.cardNumber).slice(-4):''].filter(Boolean).join(' · ')||'Tarjeta',
+      id:[e.idType,e.idNumber?'••• '+String(e.idNumber).slice(-3):''].filter(Boolean).join(' · ')||'Documento',
+      license:e.licCategory?'Licencia · '+e.licCategory:'Licencia',
+      note:'Nota segura',
+      medical:e.medBlood?'Datos médicos · '+e.medBlood:'Datos médicos'
+    };
+    const row=document.createElement('button');
+    row.type='button';
+    row.className='vk-favorites-row';
+    row.setAttribute('aria-label','Abrir '+(e.service||e.title||'favorito'));
     row.onclick=()=>quick(e.id);
-    const userVal=e.user||e.email||'';
-    row.innerHTML=`<div class="favRowIco">${vkLogoHTML(ic,'logo',48)}</div><div class="favRowInfo"><div class="favRowName">${safeEsc(e.service)}${weak?'<span class="favRowWeak">DÉBIL</span>':''}</div>${identity?'<div class="favRowId">'+esc(identity)+'</div>':''}</div><div class="favRowBtns"><button class="favRowBtn2" onclick="event.stopPropagation();vibe(25);soundCopy();copyText(${JSON.stringify(userVal)});toast('Usuario copiado')">👤</button><button class="favRowBtn" onclick="event.stopPropagation();vibe(25);soundCopy();copyText(${JSON.stringify(e.pass||'')});toast('Contraseña copiada')">🔑</button></div>`;
+    row.innerHTML=`<span class="vk-favorites-row__icon">${icons[type]||icons.password}</span><span class="vk-favorites-row__copy"><strong>${safeEsc(e.service||e.title||'Sin título')}</strong><span>${safeEsc(subtitles[type]||'Elemento protegido')}</span></span><svg class="vk-favorites-row__star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="vk-favorites-row__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>`;
     grid.appendChild(row);
   });
 }
