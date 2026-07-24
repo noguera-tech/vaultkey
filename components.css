@@ -3723,3 +3723,118 @@ body.vk-lock { overflow: hidden; }
   font-size: 24px;
   line-height: 1;
 }
+
+/* =============================================================
+   Información
+   Integración visual aislada del frame 217:1636 (412 x 917).
+   ============================================================ */
+
+#information.vk-information-root {
+  background: var(--vk-r1-bg-gradient) !important;
+  color: var(--vk-r1-text);
+  font-family: var(--vk-r1-font-family);
+}
+
+#information.vk-information-root::before,
+#information.vk-information-root::after {
+  display: none !important;
+  content: none !important;
+}
+
+#information .vk-information-header {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 74px;
+  height: 74px;
+  padding:
+    0
+    16px
+    0
+    var(--vk-r1-screen-padding-inline);
+  background: var(--vk-r1-surface);
+  border: 0;
+  border-bottom:
+    var(--vk-r1-border-width)
+    solid
+    var(--vk-r1-border-soft);
+  box-shadow: none;
+}
+
+#information .vk-information-header .vk-header__actions {
+  margin-left: auto;
+  gap: 0;
+}
+
+#information .vk-information-header .vk-iconbtn {
+  width: 40px;
+  height: 40px;
+}
+
+#information .vk-information-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding:
+    8px
+    var(--vk-r1-screen-padding-inline)
+    16px;
+  scrollbar-width: none;
+}
+
+#information .vk-information-content::-webkit-scrollbar {
+  display: none;
+}
+
+#information .vk-information-title {
+  margin: 0 0 48px;
+}
+
+#information .vk-information-list {
+  width: 100%;
+  gap: 18px;
+}
+
+#information .vk-information-card {
+  height: 84px;
+  min-height: 84px;
+  grid-template-columns:
+    var(--vk-r1-icon-size)
+    minmax(0, 1fr)
+    24px;
+  gap: 30px;
+  padding: 0 22px;
+  text-decoration: none;
+  cursor: default;
+}
+
+#information a.vk-information-card {
+  cursor: pointer;
+}
+
+#information .vk-information-card__text {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+}
+
+#information .vk-information-card__text .vk-r1-row__subtitle {
+  margin-top: 0;
+}
+
+#information .vk-information-version {
+  margin-top: auto;
+  padding-top: 24px;
+  color: var(--vk-r1-text-tertiary);
+  font-size: var(--vk-r1-font-size-row-subtitle);
+  font-weight: var(--vk-r1-font-weight-regular);
+  text-align: center;
+}
