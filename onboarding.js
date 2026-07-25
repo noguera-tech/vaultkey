@@ -24,6 +24,79 @@
 
   /* Estado efímero del alta (D-4): muere al terminar */
   var draft = { master: null, pin: null, kitCode: null };
+  var keyboardCleanup = null;
+
+  function setupKeyboardAwareOnboarding(screenSelector, inputSelector) {
+    if (keyboardCleanup) { keyboardCleanup(); keyboardCleanup = null; }
+
+    var screen = root.document.querySelector(screenSelector);
+    if (!screen) { return; }
+
+    var viewport = root.visualViewport;
+    var inputs = Array.prototype.slice.call(screen.querySelectorAll(inputSelector));
+    var baseHeight = root.innerHeight || root.document.documentElement.clientHeight || 0;
+    var blurTimer = null;
+
+    function activeInput() {
+      var active = root.document.activeElement;
+      return active && screen.contains(active) && inputs.indexOf(active) !== -1 ? active : null;
+    }
+
+    function syncKeyboardState() {
+      var visibleHeight = viewport ? viewport.height : (root.innerHeight || baseHeight);
+      var heightLoss = Math.max(0, baseHeight - visibleHeight);
+      var focused = activeInput();
+      var keyboardOpen = Boolean(focused && heightLoss > 120);
+
+      screen.style.setProperty('--vk-onb-visible-height', Math.round(visibleHeight) + 'px');
+      screen.classList.toggle('is-keyboard-open', keyboardOpen);
+
+      if (keyboardOpen && focused) {
+        root.setTimeout(function () {
+          try { focused.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) {}
+        }, 60);
+      }
+    }
+
+    function onFocus() {
+      if (blurTimer) { root.clearTimeout(blurTimer); blurTimer = null; }
+      baseHeight = Math.max(baseHeight, root.innerHeight || 0);
+      root.setTimeout(syncKeyboardState, 80);
+      root.setTimeout(syncKeyboardState, 260);
+    }
+
+    function onBlur() {
+      blurTimer = root.setTimeout(syncKeyboardState, 180);
+    }
+
+    inputs.forEach(function (input) {
+      input.addEventListener('focus', onFocus);
+      input.addEventListener('blur', onBlur);
+    });
+
+    if (viewport) {
+      viewport.addEventListener('resize', syncKeyboardState);
+      viewport.addEventListener('scroll', syncKeyboardState);
+    } else {
+      root.addEventListener('resize', syncKeyboardState);
+    }
+
+    syncKeyboardState();
+
+    keyboardCleanup = function () {
+      if (blurTimer) { root.clearTimeout(blurTimer); }
+      inputs.forEach(function (input) {
+        input.removeEventListener('focus', onFocus);
+        input.removeEventListener('blur', onBlur);
+      });
+      if (viewport) {
+        viewport.removeEventListener('resize', syncKeyboardState);
+        viewport.removeEventListener('scroll', syncKeyboardState);
+      } else {
+        root.removeEventListener('resize', syncKeyboardState);
+      }
+    };
+  }
   var ROUTES = ['splash', 'welcome', 'onboarding-master', 'onboarding-pin',
     'onboarding-kit-save', 'onboarding-kit-verify', 'onboarding-creating'];
 
@@ -369,7 +442,8 @@
     render: function (route, container, ctx) {
       var fn = SCREENS[route.name];
       if (!fn) { return false; }
-            container.innerHTML = fn();
+      if (keyboardCleanup) { keyboardCleanup(); keyboardCleanup = null; }
+      container.innerHTML = fn();
       if (route.name === 'onboarding-master') {
         var masterInput = root.document.getElementById('ob-master');
         var masterConfirm = root.document.getElementById('ob-master2');
@@ -414,6 +488,7 @@
         if (masterInput) { masterInput.addEventListener('input', updateMasterUi); }
         if (masterConfirm) { masterConfirm.addEventListener('input', updateMasterUi); }
         updateMasterUi();
+        setupKeyboardAwareOnboarding('.vk-onb-master', '.vk-onb-master__input');
       }
       if (route.name === 'onboarding-pin') {
         var pinInput = root.document.getElementById('ob-pin');
@@ -434,6 +509,7 @@
         if (pinInput) { pinInput.addEventListener('input', updatePinUi); }
         if (pinConfirm) { pinConfirm.addEventListener('input', updatePinUi); }
         updatePinUi();
+        setupKeyboardAwareOnboarding('.vk-onb-pin', '.vk-onb-pin__input');
       }
       if (route.name === 'onboarding-kit-save') {
         root.document.getElementById('ob-kitcode').textContent = draft.kitCode || '(sin código: reinicia el flujo)';

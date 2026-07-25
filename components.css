@@ -4029,3 +4029,49 @@ body.vk-lock { overflow: hidden; }
   font-weight: var(--vk-r1-font-weight-regular);
   line-height: 1.5;
 }
+
+/* Onboarding: adaptación al teclado virtual en alta inicial */
+.vk-onb-master.is-keyboard-open,
+.vk-onb-pin.is-keyboard-open {
+  height: var(--vk-onb-visible-height, 100dvh);
+  min-height: 0;
+}
+
+.vk-onb-master.is-keyboard-open .vk-onb-master__appbar,
+.vk-onb-pin.is-keyboard-open .vk-onb-pin__appbar {
+  display: none;
+}
+
+.vk-onb-master.is-keyboard-open .vk-onb-master__content {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  scroll-padding-top: 12px;
+  scroll-padding-bottom: 84px;
+}
+
+.vk-onb-pin.is-keyboard-open .vk-onb-pin__content {
+  padding-top: 12px;
+  padding-bottom: 8px;
+  scroll-padding-top: 12px;
+  scroll-padding-bottom: 84px;
+}
+
+.vk-onb-master.is-keyboard-open .vk-onb-master__form {
+  margin-top: 18px;
+}
+
+.vk-onb-pin.is-keyboard-open .vk-onb-pin__form {
+  margin-top: 18px;
+  gap: 12px;
+}
+
+.vk-onb-master.is-keyboard-open .vk-onb-master__footer,
+.vk-onb-pin.is-keyboard-open .vk-onb-pin__footer {
+  padding: 8px var(--vk-r1-screen-padding-inline)
+    calc(8px + env(safe-area-inset-bottom, 0px));
+}
+
+.vk-onb-master.is-keyboard-open .vk-onb-master__footer .vk-btn,
+.vk-onb-pin.is-keyboard-open .vk-onb-pin__submit {
+  min-height: 48px;
+}
