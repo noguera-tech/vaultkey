@@ -2852,40 +2852,6 @@ body.vk-lock { overflow: hidden; }
   cursor: pointer;
 }
 
-#passwords.vk-passwords-root > .vk-passwords-fab {
-  position: absolute;
-  right: max(
-    var(--vk-r1-screen-padding-inline),
-    env(safe-area-inset-right, 0px)
-  );
-  bottom: calc(
-    24px + env(safe-area-inset-bottom, 0px)
-  );
-  width: 56px;
-  height: 56px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: var(--vk-r1-radius-fab);
-  background: var(--vk-r1-primary);
-  color: var(--vk-r1-text);
-  box-shadow: none;
-  transform: none;
-  cursor: pointer;
-  z-index: 1000;
-}
-
-#passwords.vk-passwords-root > .vk-passwords-fab svg {
-  width: var(--vk-r1-icon-size);
-  height: var(--vk-r1-icon-size);
-  max-width: var(--vk-r1-icon-size);
-  max-height: var(--vk-r1-icon-size);
-}
-
 /* Protección de geometría del FAB de Home frente a reglas legacy. */
 #home.vk-dash-root > button.vk-dash-fab {
   position: absolute !important;
