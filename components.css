@@ -4075,3 +4075,24 @@ body.vk-lock { overflow: hidden; }
 .vk-onb-pin.is-keyboard-open .vk-onb-pin__submit {
   min-height: 48px;
 }
+
+/* VaultKey R1 — ajuste móvil de la pantalla de bienvenida */
+@media (max-width: 600px) {
+  .vk-onb {
+    --vk-welcome-shift-y: calc(-1 * clamp(125px, 8dvh, 96px));
+  }
+
+  .vk-onb__shield {
+    transform: translate(-50%, var(--vk-welcome-shift-y));
+  }
+
+  .vk-onb__brand,
+  .vk-onb__subtitle {
+    transform: translateY(var(--vk-welcome-shift-y));
+  }
+
+  .vk-onb > .vk-onb__start {
+    width: min(320px, calc(100% - 40px));
+    transform: translate(-50%, var(--vk-welcome-shift-y));
+  }
+}
