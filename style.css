@@ -4112,3 +4112,133 @@ body:has(#settings.active) #screenDots .dot,
   font-weight: var(--vk-r1-font-weight-regular);
   text-align: center;
 }
+/* =========================================================
+   AJUSTES > SEGURIDAD — valores trasladados del SVG oficial.
+   ========================================================= */
+.vk-security-root {
+  min-height: 100dvh;
+  color: #FFFFFF;
+  background: linear-gradient(149.36deg, #111827 17%, #182F4E 67.3077%);
+  font-family: Arial, Helvetica, sans-serif;
+}
+.vk-security-header {
+  box-sizing: border-box;
+  width: 100%;
+  height: 75px;
+  min-height: 75px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 21px 0 0;
+  background: #243246;
+  border: 0;
+  border-bottom: 1px solid #000000;
+}
+.vk-security-header__actions { display: flex; align-items: center; gap: 18px; }
+.vk-security-header__button {
+  width: 24px; height: 28px; padding: 0; border: 0; background: transparent; color: #FFFFFF;
+}
+.vk-security-header__button svg { display: block; width: 100%; height: 100%; }
+.vk-security-content {
+  box-sizing: border-box;
+  position: relative;
+  width: min(100%, 412px);
+  min-height: calc(100dvh - 75px);
+  margin: 0 auto;
+  padding: 0 23px 21px 24px;
+  display: flex;
+  flex-direction: column;
+}
+.vk-security-title {
+  margin: 7px 0 0;
+  color: #FFFFFF;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 29px;
+  text-align: center;
+}
+.vk-security-menu {
+  display: grid;
+  gap: 15px;
+  margin-top: 85px;
+}
+.vk-security-card {
+  box-sizing: border-box;
+  width: 100%;
+  height: 72px;
+  min-height: 72px;
+  display: grid;
+  grid-template-columns: 28px minmax(0,1fr) auto;
+  align-items: center;
+  column-gap: 19px;
+  padding: 0 23px 0 24px;
+  border: 1px solid rgba(58,74,96,.6);
+  border-radius: 16px;
+  color: inherit;
+  background: #243246;
+  box-shadow: none;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+button.vk-security-card { cursor: pointer; }
+button.vk-security-card:active { background: #243246; }
+.vk-security-card__icon { display: block; width: 28px; height: 28px; }
+.vk-security-card__icon svg { display: block; width: 28px; height: 28px; }
+.vk-security-card__body { min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+.vk-security-card__body strong {
+  overflow: hidden;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 19px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vk-security-card__body small {
+  overflow: hidden;
+  color: #A7B6C9;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vk-security-card__chevron { display: block; width: 13px; height: 16px; padding: 0; }
+.vk-security-card__chevron svg { display: block; width: 13px; height: 16px; }
+.vk-security-switch {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: #3B82F6;
+  cursor: pointer;
+}
+.vk-security-switch span {
+  position: absolute;
+  top: 3px;
+  left: 22px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #D9D9D9;
+  box-shadow: none;
+}
+.vk-security-switch[aria-checked="false"] { background: #3A4A60; }
+.vk-security-switch[aria-checked="false"] span { left: 4px; }
+.vk-security-version {
+  margin-top: auto;
+  padding-right: 27px;
+  color: #A7B6C9;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 16px;
+  text-align: right;
+}
+@media (max-width: 370px) {
+  .vk-security-content { padding-inline: 16px; }
+  .vk-security-menu { margin-top: 72px; }
+  .vk-security-card { padding-inline: 16px; column-gap: 14px; }
+}
+

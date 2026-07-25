@@ -120,3 +120,40 @@ document.addEventListener('keydown', function (e) {
   var open = document.querySelectorAll('.vk-sheet.vk-open, .vk-dialog.vk-open');
   if (open.length) vkLayerClose(open[open.length - 1]);
 });
+
+
+/* ---------- Ajustes > Seguridad (navegación UI R1) ---------- */
+
+document.addEventListener('click', function (e) {
+  var settingsSecurity = e.target.closest('[data-settings-target="security"]');
+  if (settingsSecurity) {
+    if (typeof window.show === 'function') window.show('securitySettings');
+    return;
+  }
+
+  var action = e.target.closest('[data-security-action]');
+  if (action) {
+    var name = action.getAttribute('data-security-action');
+    if (typeof window.show === 'function') window.show(name === 'favorites' ? 'fav' : 'settings');
+    return;
+  }
+
+  var biometric = e.target.closest('.vk-security-switch');
+  if (biometric) {
+    var enabled = biometric.getAttribute('aria-checked') === 'true';
+    biometric.setAttribute('aria-checked', enabled ? 'false' : 'true');
+    biometric.dispatchEvent(new CustomEvent('vk-security-ui-change', {
+      bubbles: true,
+      detail: { target: 'biometrics', enabled: !enabled }
+    }));
+    return;
+  }
+
+  var row = e.target.closest('[data-security-target]');
+  if (row) {
+    row.dispatchEvent(new CustomEvent('vk-security-ui-open', {
+      bubbles: true,
+      detail: { target: row.getAttribute('data-security-target') }
+    }));
+  }
+});
