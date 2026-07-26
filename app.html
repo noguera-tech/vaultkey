@@ -23,6 +23,158 @@
 html,body{margin:0;background:#070B14}
 html.vk-twa #vkSplash{display:none!important}
 
+/* Ver Kit de emergencia — Figma 217:1764 */
+#emergencyKitView{
+  box-sizing:border-box;
+  height:100dvh;
+  min-height:0;
+  overflow:hidden;
+  background:linear-gradient(149.3508256958964deg,#111827 15.964%,#182F4E 63.204%);
+  border:1px solid #030508;
+  color:#FFFFFF;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+#emergencyKitView[hidden]{display:none!important}
+.vk-kit-header{
+  box-sizing:border-box;
+  height:64px;
+  background:#243246;
+  border-bottom:1px solid #000000;
+  display:flex;
+  align-items:center;
+  padding:0 24px;
+}
+.vk-kit-back{
+  width:32px;
+  height:32px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#A7B6C9;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.vk-kit-back svg{width:24px;height:24px}
+.vk-kit-content{
+  width:min(364px,calc(100% - 44px));
+  height:calc(100dvh - 64px);
+  margin:0 auto;
+  padding:17px 0 max(18px,env(safe-area-inset-bottom));
+  box-sizing:border-box;
+  overflow:hidden;
+}
+.vk-kit-title{
+  margin:0;
+  color:#FFFFFF;
+  font-size:20px;
+  line-height:normal;
+  font-weight:700;
+  text-align:center;
+}
+.vk-kit-card{
+  box-sizing:border-box;
+  width:100%;
+  height:260px;
+  margin-top:62px;
+  padding:17px 27px 12px;
+  border:1px solid rgba(58,74,96,.6);
+  border-radius:20px;
+  background:#243246;
+}
+.vk-kit-card-heading{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  margin:0;
+  color:#FFFFFF;
+  font-size:16px;
+  line-height:normal;
+  font-weight:600;
+}
+.vk-kit-card-icon{
+  width:24px;
+  height:24px;
+  color:#3B82F6;
+  flex:0 0 24px;
+}
+.vk-kit-card-icon svg{display:block;width:100%;height:100%}
+.vk-kit-description{
+  width:210px;
+  margin:27px auto 0;
+  color:#A7B6C9;
+  font-size:16px;
+  line-height:normal;
+  font-weight:400;
+  text-align:left;
+}
+.vk-kit-vault{
+  margin:31px 0 0;
+  color:#FFFFFF;
+  font-size:20px;
+  line-height:normal;
+  font-weight:400;
+  text-align:center;
+}
+.vk-kit-vault span{display:block}
+.vk-kit-meta{
+  display:grid;
+  grid-template-columns:1fr 1px 1fr;
+  align-items:center;
+  margin-top:28px;
+}
+.vk-kit-meta-divider{
+  width:1px;
+  height:26px;
+  background:rgba(58,74,96,.8);
+}
+.vk-kit-meta-item{
+  color:#FFFFFF;
+  font-size:13px;
+  line-height:normal;
+  font-weight:400;
+  text-align:center;
+}
+.vk-kit-meta-item span{display:block}
+.vk-kit-actions{
+  display:flex;
+  justify-content:center;
+  gap:48px;
+  margin-top:14px;
+}
+.vk-kit-action{
+  box-sizing:border-box;
+  width:120px;
+  height:43px;
+  padding:0;
+  border:1px solid #475569;
+  border-radius:16px;
+  background:#334155;
+  color:#CBD5E1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  font:400 14px/normal Inter,system-ui,sans-serif;
+  cursor:pointer;
+}
+.vk-kit-action:active{transform:translateY(1px)}
+.vk-kit-action-icon{
+  width:20px;
+  height:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  line-height:1;
+}
+@media(max-width:390px){
+  .vk-kit-content{width:calc(100% - 32px)}
+  .vk-kit-card{padding-left:20px;padding-right:20px}
+  .vk-kit-actions{gap:32px}
+}
+
 /* Cambiar PIN — Figma 217:329 */
 #pinChange{box-sizing:border-box;height:100dvh;min-height:0;overflow:hidden;background:linear-gradient(149.3508256958964deg,#111827 15.964%,#182F4E 63.204%);border:1px solid #030508;color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 #pinChange[hidden]{display:none!important}
@@ -623,7 +775,7 @@ html.vk-twa #vkSplash{display:none!important}
         <span class="vk-security-card__body"><strong>Bloqueo automático</strong><small>Configurar tiempo de bloqueo</small></span>
         <span class="vk-security-card__chevron" aria-hidden="true"><svg viewBox="357 480 10 16"><path d="M359 494L365 488L359 482" fill="none" stroke="#A7B6C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </button>
-      <button type="button" class="vk-security-card" data-security-target="emergency-kit" role="listitem">
+      <button type="button" class="vk-security-card" data-security-target="emergency-kit" role="listitem" onclick="openEmergencyKit()">
         <span class="vk-security-card__icon" aria-hidden="true"><svg viewBox="47 566 28 28" fill="none"><path d="M60.5097 591.966C60.3383 591.943 60.1771 591.909 60.0263 591.864C56.6537 590.844 53.9731 589.115 51.9846 586.676C49.9949 584.237 49 581.597 49 578.756V572.933C49 572.468 49.1674 572.048 49.5023 571.675C49.836 571.301 50.2686 571.031 50.8 570.863L60.0314 568.144C60.3651 568.048 60.688 568 61 568C61.312 568 61.6354 568.048 61.9703 568.144L71.2 570.863C71.7303 571.032 72.1629 571.302 72.4977 571.675C72.8326 572.048 73 572.468 73 572.933V578.756C73 581.597 72.0057 584.237 70.0171 586.676C68.0286 589.115 65.3474 590.844 61.9737 591.864C61.824 591.909 61.6634 591.943 61.492 591.966C61.3206 591.989 61.1566 592 61 592C60.8434 592 60.6811 591.989 60.5097 591.966ZM61 590.719C63.9714 589.972 66.4286 588.476 68.3714 586.233C70.3143 583.99 71.2857 581.498 71.2857 578.756V572.908C71.2857 572.734 71.2251 572.577 71.104 572.437C70.984 572.298 70.8137 572.193 70.5931 572.125L61.3634 569.406C61.2537 569.369 61.1326 569.351 61 569.351C60.8674 569.351 60.7463 569.369 60.6366 569.406L51.4069 572.125C51.1863 572.193 51.016 572.298 50.896 572.437C50.7749 572.577 50.7143 572.734 50.7143 572.908V578.756C50.7143 581.498 51.6857 583.99 53.6286 586.233C55.5714 588.476 58.0286 589.972 61 590.719Z" fill="#3B82F6"/></svg></span>
         <span class="vk-security-card__body"><strong>Kit de emergencia</strong><small>Gestionar el kit de emergencia</small></span>
         <span class="vk-security-card__chevron" aria-hidden="true"><svg viewBox="357 570 10 16"><path d="M359 584L365 578L359 572" fill="none" stroke="#A7B6C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -678,6 +830,62 @@ html.vk-twa #vkSplash{display:none!important}
       <p id="pinChangeMessage" class="vk-pin-message" role="alert" aria-live="polite"></p>
       <button id="pinChangeSave" class="vk-pin-save" type="submit" disabled>Guardar cambios</button>
     </form>
+  </main>
+</section>
+
+
+<section id="emergencyKitView" class="screen" aria-labelledby="emergencyKitTitle" hidden>
+  <header class="vk-kit-header">
+    <button type="button" class="vk-kit-back" aria-label="Volver a Seguridad" onclick="closeEmergencyKit()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+  </header>
+
+  <main class="vk-kit-content">
+    <h1 id="emergencyKitTitle" class="vk-kit-title">Kit de emergencia</h1>
+
+    <article class="vk-kit-card" aria-label="Información del kit de emergencia">
+      <h2 class="vk-kit-card-heading">
+        <span class="vk-kit-card-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H19a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6.5A2.5 2.5 0 0 1 4 17.5Z"/>
+            <path d="M4 6.5v11M8 8h8M8 12h8"/>
+            <path d="m2 9 2 1-2 1M2 14l2 1-2 1"/>
+          </svg>
+        </span>
+        Kit de emergencia
+      </h2>
+
+      <p class="vk-kit-description">Guarda esta información<br>en un lugar seguro.</p>
+
+      <p class="vk-kit-vault">
+        <span>ID de bóveda</span>
+        <span id="emergencyVaultId">VK-2026-XXXX</span>
+      </p>
+
+      <div class="vk-kit-meta">
+        <div class="vk-kit-meta-item">
+          <span>Clave de emergencia</span>
+          <span aria-label="Clave oculta">•••• •••• •••• ••••</span>
+        </div>
+        <div class="vk-kit-meta-divider" aria-hidden="true"></div>
+        <div class="vk-kit-meta-item">
+          <span>Creado el</span>
+          <span id="emergencyCreatedDate">06/07/2026</span>
+        </div>
+      </div>
+    </article>
+
+    <div class="vk-kit-actions">
+      <button type="button" class="vk-kit-action" onclick="copyEmergencyKitKey()">
+        <span class="vk-kit-action-icon" aria-hidden="true">📋</span>
+        Copiar
+      </button>
+      <button type="button" class="vk-kit-action" onclick="downloadEmergencyKit()">
+        <span class="vk-kit-action-icon" aria-hidden="true">⬇️</span>
+        Descargar
+      </button>
+    </div>
   </main>
 </section>
 
@@ -1068,6 +1276,120 @@ window.openPinChange=function(){var e=byId(P.screen);if(!e)return;byId(P.form).r
 window.cancelPinChange=function(){byId(P.form).reset();byId(P.message).textContent="";delete byId(P.message).dataset.success;updatePinChange();try{if(typeof window.show==="function")window.show("securitySettings","left");else fallback("securitySettings")}catch(_){fallback("securitySettings")}};
 window.submitPinChange=function(){var m=byId(P.message);if(!updatePinChange()){delete m.dataset.success;m.style.color="#ff4444";m.textContent="Introduce correctamente los tres PIN de 6 dígitos.";return}window.dispatchEvent(new CustomEvent("vaultkey:pin-change-form-valid"));m.dataset.success="true";m.textContent="✅ PIN actualizado";m.style.color="#22c55e";byId(P.save).disabled=true;setTimeout(function(){window.cancelPinChange()},2000)};
 document.addEventListener("DOMContentLoaded",function(){if(!byId(P.screen))return;[P.current,P.next,P.confirm].forEach(function(id){var input=byId(id);["input","change","keyup","paste"].forEach(function(ev){input.addEventListener(ev,function(){setTimeout(function(){sanitize(input);updatePinChange()},0)})})});updatePinChange()});
+})();
+</script>
+
+
+<script>
+(function(){
+"use strict";
+
+var EMERGENCY_KIT_DATA={
+  vaultId:"VK-2026-XXXX",
+  emergencyKey:"VKEM-7A9C-4Q2M-8X6P",
+  createdDate:"06/07/2026"
+};
+
+function kitById(id){return document.getElementById(id)}
+
+function showKitScreenFallback(targetId){
+  document.querySelectorAll(".screen").forEach(function(screen){
+    screen.classList.remove("active");
+    screen.hidden=true;
+    screen.style.display="none";
+  });
+  var target=kitById(targetId);
+  target.hidden=false;
+  target.style.display="";
+  target.classList.add("active");
+}
+
+function showKitToast(message){
+  var toast=kitById("toast");
+  if(!toast) return;
+  toast.textContent=message;
+  toast.style.opacity="1";
+  clearTimeout(window.__vkEmergencyToastTimer);
+  window.__vkEmergencyToastTimer=setTimeout(function(){
+    toast.style.opacity="0";
+  },1800);
+}
+
+window.openEmergencyKit=function(){
+  var screen=kitById("emergencyKitView");
+  if(!screen) return;
+
+  kitById("emergencyVaultId").textContent=EMERGENCY_KIT_DATA.vaultId;
+  kitById("emergencyCreatedDate").textContent=EMERGENCY_KIT_DATA.createdDate;
+
+  try{
+    if(typeof window.show==="function"){
+      screen.hidden=false;
+      window.show("emergencyKitView","right");
+    }else{
+      showKitScreenFallback("emergencyKitView");
+    }
+  }catch(error){
+    showKitScreenFallback("emergencyKitView");
+  }
+};
+
+window.closeEmergencyKit=function(){
+  try{
+    if(typeof window.show==="function"){
+      window.show("securitySettings","left");
+    }else{
+      showKitScreenFallback("securitySettings");
+    }
+  }catch(error){
+    showKitScreenFallback("securitySettings");
+  }
+};
+
+window.copyEmergencyKitKey=async function(){
+  var key=EMERGENCY_KIT_DATA.emergencyKey;
+
+  try{
+    if(navigator.clipboard&&window.isSecureContext){
+      await navigator.clipboard.writeText(key);
+    }else{
+      var helper=document.createElement("textarea");
+      helper.value=key;
+      helper.setAttribute("readonly","");
+      helper.style.position="fixed";
+      helper.style.opacity="0";
+      document.body.appendChild(helper);
+      helper.select();
+      if(!document.execCommand("copy")) throw new Error("copy-failed");
+      helper.remove();
+    }
+    showKitToast("✅ Copiado al portapapeles");
+  }catch(error){
+    showKitToast("No se pudo copiar");
+  }
+};
+
+window.downloadEmergencyKit=function(){
+  var content=[
+    "VaultKey 2.0 — Kit de emergencia",
+    "",
+    "ID de bóveda: "+EMERGENCY_KIT_DATA.vaultId,
+    "Clave de emergencia: "+EMERGENCY_KIT_DATA.emergencyKey,
+    "Fecha de creación: "+EMERGENCY_KIT_DATA.createdDate
+  ].join("\n");
+
+  var blob=new Blob([content],{type:"text/plain;charset=utf-8"});
+  var url=URL.createObjectURL(blob);
+  var link=document.createElement("a");
+  link.href=url;
+  link.download="vaultkey-kit-emergencia.txt";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(function(){URL.revokeObjectURL(url)},0);
+
+  showKitToast("✅ Descargado");
+};
 })();
 </script>
 
