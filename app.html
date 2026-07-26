@@ -22,6 +22,30 @@
 <style>
 html,body{margin:0;background:#070B14}
 html.vk-twa #vkSplash{display:none!important}
+
+/* Figma 217:293 — Cambiar contraseña maestra */
+#masterPasswordChange{box-sizing:border-box;height:100dvh;min-height:0;overflow:hidden;background:linear-gradient(149.3508256958964deg,#111827 15.964%,#182F4E 63.204%);border:1px solid #030508;color:#fff;font-family:Inter,system-ui,sans-serif}
+#masterPasswordChange[hidden]{display:none!important}
+.vk-master-header{height:62px;background:#243246;border-bottom:1px solid #030508;display:flex;align-items:center;padding:0 25px;box-sizing:border-box}
+.vk-master-back{width:32px;height:32px;padding:0;border:0;background:transparent;color:#a7b6c9;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.vk-master-back svg{width:24px;height:24px}
+.vk-master-content{width:min(360px,calc(100% - 50px));height:calc(100dvh - 62px);margin:0 auto;padding:14px 0 max(12px,env(safe-area-inset-bottom));box-sizing:border-box;overflow:hidden;display:flex;flex-direction:column}
+.vk-master-title{margin:0;color:#fff;font-size:20px;line-height:24px;font-weight:600;text-align:center}
+.vk-master-subtitle{width:338px;max-width:100%;margin:18px auto 24px;color:#9ca3af;font-size:16px;line-height:19px;font-weight:400;text-align:center}
+.vk-master-field{display:block;margin:0 0 16px}
+.vk-master-input{box-sizing:border-box;width:100%;height:56px;padding:0 18px;border-radius:16px;border:1px solid rgba(58,74,96,.6);background:#243246;color:#fff;font:500 14px/normal Inter,system-ui,sans-serif;text-align:center;outline:none;appearance:none;-webkit-appearance:none}
+.vk-master-input::placeholder{color:#a7b6c9;opacity:1}.vk-master-input:focus{border-color:rgba(0,217,255,.4)}.vk-master-input[aria-invalid=true]{border-color:rgba(58,74,96,.6)}
+.vk-master-strength{width:242px;height:9px;margin:16px auto 7px;border-radius:6px;overflow:hidden;background:#d9d9d9}
+.vk-master-strength-fill{width:0;height:100%;border-radius:6px;background:#009951;transition:width .18s ease,background .18s ease}
+.vk-master-strength-label{margin:0 0 8px;color:#8fa3bf;font-size:14px;line-height:17px;text-align:center}
+.vk-master-rules{margin:10px 0 16px;padding:0;list-style:none;color:#fff;font-size:14px;line-height:17px}
+.vk-master-rules li{margin:0 0 8px}.vk-master-rules li::before{content:"• "}.vk-master-rules li[data-valid=true]{color:#44aa44}
+.vk-master-note{width:366px;max-width:100%;margin:0 auto 12px;color:#8fa3bf;font-size:14px;line-height:17px;text-align:center}
+.vk-master-message{min-height:16px;margin:0 0 6px;color:#ff4444;font-size:12px;line-height:18px;text-align:center}
+.vk-master-actions{display:grid;gap:8px;margin-top:auto}.vk-master-save,.vk-master-cancel{box-sizing:border-box;width:100%;height:56px;border-radius:16px;font:600 20px/normal Inter,system-ui,sans-serif;cursor:pointer}
+.vk-master-save{border:0;background:#2f6fea;color:#fff}.vk-master-save:disabled{opacity:.55;cursor:not-allowed}
+.vk-master-cancel{border:1px solid rgba(167,182,201,.6);background:transparent;color:#fff}
+@media(max-height:780px){.vk-master-content{padding-top:10px}.vk-master-subtitle{margin:12px auto 16px}.vk-master-field{margin-bottom:10px}.vk-master-strength{margin-top:10px}.vk-master-rules{margin:6px 0 10px}.vk-master-rules li{margin-bottom:5px}.vk-master-note{margin-bottom:6px}.vk-master-actions{gap:6px}.vk-master-save,.vk-master-cancel{height:46px;font-size:18px}}
 </style>
 
 <link rel="stylesheet" href="theme.css">
@@ -559,7 +583,7 @@ html.vk-twa #vkSplash{display:none!important}
   <main class="vk-security-content">
     <h1 id="securitySettingsTitle" class="vk-security-title">Seguridad</h1>
     <div class="vk-security-menu" role="list">
-      <button type="button" class="vk-security-card" data-security-target="master-password" role="listitem">
+      <button type="button" class="vk-security-card" data-security-target="master-password" role="listitem" onclick="openMasterPasswordChange()">
         <span class="vk-security-card__icon" aria-hidden="true"><svg viewBox="47 217 28 28" fill="none"><path d="M66 225H66.01" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M49.7019 237.507C49.2526 237.956 49.0001 238.566 49 239.201V241.802C49 242.12 49.1262 242.425 49.3508 242.649C49.5754 242.874 49.8801 243 50.1977 243H53.7908C54.1085 243 54.4131 242.874 54.6377 242.649C54.8624 242.425 54.9885 242.12 54.9885 241.802V240.605C54.9885 240.287 55.1147 239.982 55.3394 239.758C55.564 239.533 55.8686 239.407 56.1863 239.407H57.384C57.7016 239.407 58.0063 239.281 58.2309 239.056C58.4555 238.831 58.5817 238.527 58.5817 238.209V237.011C58.5817 236.694 58.7079 236.389 58.9325 236.165C59.1571 235.94 59.4617 235.814 59.7794 235.814H59.9854C60.6206 235.814 61.2298 235.561 61.679 235.112L62.6539 234.137C64.3185 234.717 66.1306 234.715 67.7938 234.131C69.457 233.547 70.8728 232.416 71.8096 230.922C72.7464 229.429 73.1487 227.662 72.9507 225.911C72.7528 224.159 71.9662 222.527 70.7198 221.28C69.4733 220.034 67.8408 219.247 66.0892 219.049C64.3377 218.851 62.5708 219.254 61.0776 220.19C59.5844 221.127 58.4533 222.543 57.8693 224.206C57.2854 225.869 57.2832 227.681 57.8631 229.346L49.7019 237.507Z" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <span class="vk-security-card__body"><strong>Contraseña maestra</strong><small>Cambiar la contraseña principal</small></span>
         <span class="vk-security-card__chevron" aria-hidden="true"><svg viewBox="354 223 13 16"><path d="M359 237L365 231L359 225" fill="none" stroke="#A7B6C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -588,6 +612,32 @@ html.vk-twa #vkSplash{display:none!important}
     <div class="vk-security-version">VaultKey 2.0</div>
   </main>
 </section>
+
+<section id="masterPasswordChange" class="screen" aria-labelledby="masterPasswordChangeTitle" hidden>
+  <header class="vk-master-header">
+    <button type="button" class="vk-master-back" aria-label="Volver a Seguridad" onclick="cancelMasterPasswordChange()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+  </header>
+  <main class="vk-master-content">
+    <h1 id="masterPasswordChangeTitle" class="vk-master-title">Cambiar contraseña maestra</h1>
+    <p class="vk-master-subtitle">Actualiza la clave principal que protege tu bóveda.</p>
+    <form id="masterPasswordChangeForm" novalidate onsubmit="event.preventDefault();submitMasterPasswordChange()">
+      <label class="vk-master-field"><span hidden>Contraseña actual</span><input id="masterPasswordCurrent" class="vk-master-input" type="password" placeholder="Contraseña actual" autocomplete="current-password"></label>
+      <label class="vk-master-field"><span hidden>Nueva contraseña maestra</span><input id="masterPasswordNew" class="vk-master-input" type="password" placeholder="Nueva contraseña maestra" autocomplete="new-password"><div class="vk-master-strength" aria-hidden="true"><div id="masterPasswordStrengthFill" class="vk-master-strength-fill"></div></div><p id="masterPasswordStrength" class="vk-master-strength-label" aria-live="polite">Seguridad: sin evaluar</p></label>
+      <label class="vk-master-field"><span hidden>Confirmar nueva contraseña</span><input id="masterPasswordConfirm" class="vk-master-input" type="password" placeholder="Confirmar nueva contraseña" autocomplete="new-password"></label>
+      <ul class="vk-master-rules" aria-label="Requisitos de la contraseña">
+        <li id="masterRuleLength" data-valid="false">Mínimo 12 caracteres</li>
+        <li id="masterRuleComposition" data-valid="false">Usa letras, números y símbolos</li>
+        <li id="masterRuleReuse" data-valid="false">No reutilices contraseñas de otros servicios</li>
+      </ul>
+      <p class="vk-master-note">Después del cambio, tendrás que usar la nueva contraseña maestra para acceder a tu bóveda.</p>
+      <p id="masterPasswordMessage" class="vk-master-message" role="alert" aria-live="polite"></p>
+      <div class="vk-master-actions"><button id="masterPasswordSave" class="vk-master-save" type="submit" disabled>Guardar cambios</button><button class="vk-master-cancel" type="button" onclick="cancelMasterPasswordChange()">Cancelar</button></div>
+    </form>
+  </main>
+</section>
+
 <div class="modal" id="entryModal"><div class="sheet">
 <div class="sheetHead entryTargetHead">
   <button class="linkBtn" onclick="closeModals()">Cancelar</button>
@@ -943,6 +993,24 @@ html.vk-twa #vkSplash{display:none!important}
     <div class="vkSplashBrand">VaultKey</div>
   </div>
 </div>
+
+<script>
+(function(){
+"use strict";
+var I={s:"masterPasswordChange",f:"masterPasswordChangeForm",c:"masterPasswordCurrent",n:"masterPasswordNew",x:"masterPasswordConfirm",b:"masterPasswordStrengthFill",t:"masterPasswordStrength",m:"masterPasswordMessage",g:"masterPasswordSave"};
+var R=["masterRuleLength","masterRuleComposition","masterRuleReuse"];
+function $(id){return document.getElementById(id)}
+function checks(){var c=$(I.c).value,n=$(I.n).value,x=$(I.x).value;return[c.length>0,n.length>=12,/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(n),/[0-9]/.test(n),/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9\s]/.test(n),c.length>0&&n.length>0&&c!==n,n.length>0&&n===x]}
+function strength(n,a){if(!n)return["sin evaluar",0,"#009951"];var q=[a[1],a[2],a[3],a[4]].filter(Boolean).length;if(q<=1)return["débil",25,"#ff4444"];if(q===2)return["media",55,"#0099cc"];if(q===3)return["fuerte",82,"#009951"];return["muy fuerte",100,"#009951"]}
+function update(){var a=checks(),z=strength($(I.n).value,a),newValid=(a[1]&&a[2]&&a[3]&&a[4]&&a[5]),confirmValid=a[6],canSave=(newValid&&confirmValid);$(R[0]).dataset.valid=a[1]?"true":"false";$(R[1]).dataset.valid=(a[2]&&a[3]&&a[4])?"true":"false";$(R[2]).dataset.valid=a[5]?"true":"false";$(I.b).style.width=z[1]+"%";$(I.b).style.background=z[2];$(I.t).textContent="Seguridad: "+z[0];$(I.g).disabled=!canSave;$(I.c).setAttribute("aria-invalid",a[0]?"false":"true");$(I.n).setAttribute("aria-invalid",newValid?"false":"true");$(I.x).setAttribute("aria-invalid",confirmValid?"false":"true");if($(I.m).dataset.success!=="true")$(I.m).textContent="";return a.every(Boolean)}
+function fallback(id){document.querySelectorAll(".screen").forEach(function(e){e.classList.remove("active");e.hidden=true;e.style.display="none"});var e=$(id);e.hidden=false;e.style.display="";e.classList.add("active")}
+window.openMasterPasswordChange=function(){var e=$(I.s);if(!e)return;$(I.f).reset();$(I.m).textContent="";delete $(I.m).dataset.success;update();try{if(typeof window.show==="function"){e.hidden=false;window.show(I.s,"right")}else fallback(I.s)}catch(_){fallback(I.s)}setTimeout(function(){$(I.c).focus()},0)};
+window.cancelMasterPasswordChange=function(){$(I.f).reset();$(I.m).textContent="";delete $(I.m).dataset.success;update();try{if(typeof window.show==="function")window.show("securitySettings","left");else fallback("securitySettings")}catch(_){fallback("securitySettings")}};
+window.submitMasterPasswordChange=function(){var m=$(I.m);if(!update()){delete m.dataset.success;m.style.color="#ff4444";m.textContent="Revisa los requisitos antes de guardar.";return}window.dispatchEvent(new CustomEvent("vaultkey:master-password-form-valid"));m.dataset.success="true";m.textContent="✅ Contraseña maestra actualizada";m.style.color="#22c55e";document.getElementById("masterPasswordSave").disabled=true;setTimeout(function(){window.cancelMasterPasswordChange()},2000)};
+document.addEventListener("DOMContentLoaded",function(){if(!$(I.s))return;[I.c,I.n,I.x].forEach(function(id){["input","change","keyup","paste"].forEach(function(ev){$(id).addEventListener(ev,function(){setTimeout(update,0)})})});update()});
+})();
+</script>
+
 <!-- VaultKey 2.0 — núcleo de seguridad -->
 <script src="vault-crypto.js"></script>
 <script src="vault-store.js"></script>
