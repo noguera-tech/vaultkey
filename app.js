@@ -5161,3 +5161,223 @@ try {
   }
 })();
 
+
+/* ============================================================
+   VaultKey v1.2 — Módulo Notas (CRUD local)
+   Almacenamiento independiente: localStorage["vaultkey_notes"]
+   ============================================================ */
+(function(){
+  'use strict';
+
+  var NOTES_KEY='vaultkey_notes';
+  var notesSearchBound=false;
+
+  function notesRead(){
+    try{
+      var parsed=JSON.parse(localStorage.getItem(NOTES_KEY)||'[]');
+      return Array.isArray(parsed)?parsed.filter(function(note){
+        return note&&typeof note==='object'&&typeof note.id==='string';
+      }):[];
+    }catch(error){
+      console.warn('VaultKey Notes: JSON inválido',error);
+      return [];
+    }
+  }
+
+  function notesWrite(notes){
+    localStorage.setItem(NOTES_KEY,JSON.stringify(notes));
+  }
+
+  function noteUuid(){
+    if(window.crypto&&typeof window.crypto.randomUUID==='function'){
+      return 'uuid-'+window.crypto.randomUUID();
+    }
+    return 'uuid-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
+  }
+
+  function noteEscape(value){
+    return String(value==null?'':value)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#039;');
+  }
+
+  function noteFormatDate(timestamp){
+    var date=new Date(Number(timestamp)||Date.now());
+    return date.toLocaleDateString('es-ES',{
+      day:'2-digit',
+      month:'2-digit',
+      year:'numeric'
+    });
+  }
+
+  function notePreview(content){
+    var normalized=String(content||'').replace(/\s+/g,' ').trim();
+    return normalized.length>100?normalized.slice(0,100)+'…':normalized;
+  }
+
+  function updateNotesCount(){
+    var counter=document.getElementById('statNotes');
+    if(!counter)return;
+    var count=notesRead().length;
+    counter.textContent=count+' nota'+(count===1?'':'s');
+  }
+
+  function renderNotesList(){
+    var list=document.getElementById('notesList');
+    if(!list)return;
+
+    var search=document.getElementById('notesSearch');
+    var query=String(search&&search.value||'').trim().toLocaleLowerCase('es');
+    var notes=notesRead()
+      .filter(function(note){
+        return !query||String(note.title||'').toLocaleLowerCase('es').includes(query);
+      })
+      .sort(function(a,b){
+        return Number(b.updatedAt||b.createdAt||0)-Number(a.updatedAt||a.createdAt||0);
+      });
+
+    if(!notes.length){
+      list.innerHTML='<div class="vk-notes-empty">'+
+        '<strong>'+(query?'No se encontraron notas':'Aún no hay notas')+'</strong>'+
+        '<span>'+(query?'Prueba con otro título.':'Pulsa + para crear la primera nota.')+'</span>'+
+      '</div>';
+      return;
+    }
+
+    list.innerHTML=notes.map(function(note){
+      var preview=notePreview(note.content)||'Sin descripción.';
+      return '<button type="button" class="vk-note-row" data-note-id="'+noteEscape(note.id)+'">'+
+        '<span class="vk-note-row-main">'+
+          '<strong>'+noteEscape(note.title||'Sin título')+'</strong>'+
+          '<small>'+noteEscape(preview)+'</small>'+
+        '</span>'+
+        '<span class="vk-note-row-meta">'+
+          '<time datetime="'+new Date(Number(note.updatedAt||note.createdAt||Date.now())).toISOString()+'">'+noteFormatDate(note.updatedAt||note.createdAt)+'</time>'+
+          '<svg class="vk-note-row-note-icon" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2v20M3 6h4M3 10h4M3 14h4M3 18h4"/><rect x="7" y="3" width="14" height="18" rx="2"/><path d="m14 8 4-4 2 2-4 4-3 1 1-3Z"/></svg>'+
+          '<svg class="vk-note-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>'+
+        '</span>'+
+      '</button>';
+    }).join('');
+  }
+
+  window.showNotes=function(dir){
+    if(typeof window.show==='function')window.show('notes',dir);
+    renderNotesList();
+    updateNotesCount();
+  };
+
+  window.showNoteDetail=function(id){
+    var note=notesRead().find(function(item){return item.id===id;});
+    if(!note){
+      window.showNotes('left');
+      return;
+    }
+
+    window.__vkCurrentNoteId=note.id;
+    document.getElementById('noteDetailTitle').textContent=note.title||'Sin título';
+    document.getElementById('noteDetailCardTitle').textContent=note.title||'Sin título';
+    document.getElementById('noteDetailContent').textContent=note.content||'Sin descripción.';
+    document.getElementById('noteDetailDate').textContent='Actualizada: '+noteFormatDate(note.updatedAt||note.createdAt);
+
+    if(typeof window.show==='function')window.show('noteDetail','right');
+  };
+
+  window.openCreateNote=function(){
+    var form=document.getElementById('noteCreateForm');
+    if(form)form.reset();
+    window.__vkCurrentNoteId=null;
+    if(typeof window.show==='function')window.show('noteCreate','right');
+    setTimeout(function(){
+      var input=document.getElementById('noteCreateTitleInput');
+      if(input)input.focus();
+    },280);
+  };
+
+  window.openEditNote=function(id){
+    var note=notesRead().find(function(item){return item.id===id;});
+    if(!note)return;
+
+    window.__vkCurrentNoteId=note.id;
+    document.getElementById('noteEditTitleInput').value=note.title||'';
+    document.getElementById('noteEditContentInput').value=note.content||'';
+    if(typeof window.show==='function')window.show('noteEdit','right');
+  };
+
+  window.saveNote=function(id,title,content){
+    title=String(title||'').trim();
+    content=String(content||'').trim();
+
+    if(!title){
+      if(typeof window.toast==='function')window.toast('El título es obligatorio','err');
+      var target=id?'noteEditTitleInput':'noteCreateTitleInput';
+      var input=document.getElementById(target);
+      if(input)input.focus();
+      return false;
+    }
+
+    var notes=notesRead();
+    var now=Date.now();
+
+    if(id){
+      var index=notes.findIndex(function(note){return note.id===id;});
+      if(index===-1)return false;
+      notes[index]=Object.assign({},notes[index],{
+        title:title,
+        content:content,
+        updatedAt:now
+      });
+    }else{
+      id=noteUuid();
+      notes.push({
+        id:id,
+        title:title,
+        content:content,
+        createdAt:now,
+        updatedAt:now
+      });
+    }
+
+    notesWrite(notes);
+    updateNotesCount();
+    if(typeof window.toast==='function')window.toast(id===window.__vkCurrentNoteId?'Nota guardada':'Nota creada','ok');
+    window.showNoteDetail(id);
+    return true;
+  };
+
+  window.deleteNote=function(id){
+    var note=notesRead().find(function(item){return item.id===id;});
+    if(!note)return;
+
+    if(!window.confirm('¿Eliminar la nota "'+(note.title||'Sin título')+'"?'))return;
+
+    notesWrite(notesRead().filter(function(item){return item.id!==id;}));
+    window.__vkCurrentNoteId=null;
+    updateNotesCount();
+    if(typeof window.toast==='function')window.toast('Nota eliminada','ok');
+    window.showNotes('left');
+  };
+
+  document.addEventListener('click',function(event){
+    var row=event.target.closest&&event.target.closest('.vk-note-row[data-note-id]');
+    if(!row)return;
+    window.showNoteDetail(row.getAttribute('data-note-id'));
+  });
+
+  document.addEventListener('DOMContentLoaded',function(){
+    var search=document.getElementById('notesSearch');
+    if(search&&!notesSearchBound){
+      notesSearchBound=true;
+      search.addEventListener('input',renderNotesList);
+    }
+    updateNotesCount();
+  });
+
+  window.vkNotes={
+    read:notesRead,
+    render:renderNotesList,
+    updateCount:updateNotesCount
+  };
+})();

@@ -4242,3 +4242,426 @@ button.vk-security-card:active { background: #243246; }
   .vk-security-card { padding-inline: 16px; column-gap: 14px; }
 }
 
+
+/* ============================================================
+   VaultKey v1.2 — Módulo Notas
+   Figma nodes: 217:1179, 217:1735, 217:1788, 217:1808
+   ============================================================ */
+.vk-notes-screen,
+.vk-note-detail-screen,
+.vk-note-form-screen {
+  background:linear-gradient(149.3508256958964deg,#111827 15.964%,#182F4E 63.204%);
+  color:#FFFFFF;
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+
+.vk-notes-topbar,
+.vk-note-editor-topbar {
+  height:64px;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+  background:#243246;
+  border:1px solid #030508;
+  flex-shrink:0;
+}
+
+.vk-notes-topbar-actions {
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.vk-notes-icon-button,
+.vk-note-back {
+  width:24px;
+  height:24px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#FFFFFF;
+  display:grid;
+  place-items:center;
+}
+
+.vk-notes-icon-button svg,
+.vk-note-back svg {
+  width:24px;
+  height:24px;
+}
+
+.vk-note-back {
+  color:#A7B6C9;
+}
+
+.vk-notes-content {
+  flex:1;
+  overflow-y:auto;
+  padding:16px 23px 96px;
+  scrollbar-width:none;
+}
+
+.vk-notes-content::-webkit-scrollbar {
+  display:none;
+}
+
+.vk-notes-title,
+.vk-note-screen-title {
+  margin:0;
+  color:#FFFFFF;
+  font-size:20px;
+  line-height:24px;
+  font-weight:700;
+  text-align:center;
+}
+
+.vk-notes-search {
+  height:48px;
+  margin-top:36px;
+  padding:0 18px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background:#243246;
+  border:1px solid rgba(58,74,96,.6);
+  border-radius:16px;
+}
+
+.vk-notes-search svg {
+  width:20px;
+  height:20px;
+  flex-shrink:0;
+  color:#A7B6C9;
+}
+
+.vk-notes-search input {
+  width:100%;
+  min-width:0;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:#FFFFFF;
+  font-size:16px;
+  font-weight:400;
+  cursor:text;
+}
+
+.vk-notes-search input::placeholder {
+  color:#A7B6C9;
+  opacity:1;
+}
+
+.vk-notes-list {
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+  margin-top:46px;
+}
+
+.vk-note-row {
+  width:100%;
+  min-height:72px;
+  padding:10px 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  border-radius:16px;
+  border:1px solid rgba(58,74,96,.6);
+  background:#243246;
+  color:#FFFFFF;
+  text-align:left;
+}
+
+.vk-note-row-main {
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.vk-note-row-main strong {
+  color:#FFFFFF;
+  font-size:16px;
+  line-height:19px;
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.vk-note-row-main small {
+  color:#A7B6C9;
+  font-size:13px;
+  line-height:16px;
+  font-weight:400;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.vk-note-row-meta {
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.vk-note-row-meta time {
+  display:none;
+  color:#A7B6C9;
+  font-size:12px;
+}
+
+.vk-note-row-note-icon {
+  width:26px;
+  height:26px;
+}
+
+.vk-note-row-chevron {
+  width:20px;
+  height:20px;
+  color:#A7B6C9;
+}
+
+.vk-notes-empty {
+  min-height:220px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  color:#A7B6C9;
+  text-align:center;
+}
+
+.vk-notes-empty strong {
+  color:#FFFFFF;
+  font-size:16px;
+}
+
+.vk-notes-empty span {
+  font-size:13px;
+}
+
+.vk-notes-fab {
+  position:absolute;
+  right:21px;
+  bottom:25px;
+  width:56px;
+  height:56px;
+  border:0;
+  border-radius:50%;
+  background:#3B82F6;
+  color:#FFFFFF;
+  display:grid;
+  place-items:center;
+  z-index:5;
+}
+
+.vk-notes-fab svg {
+  width:26px;
+  height:26px;
+}
+
+.vk-note-detail-content {
+  flex:1;
+  overflow-y:auto;
+  padding:8px 24px 32px;
+}
+
+.vk-note-detail-content .vk-note-screen-title {
+  margin-top:0;
+}
+
+.vk-note-detail-card {
+  min-height:260px;
+  margin-top:72px;
+  padding:16px;
+  background:#243246;
+  border:1px solid rgba(58,74,96,.6);
+  border-radius:20px;
+}
+
+.vk-note-detail-heading {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.vk-note-detail-heading svg {
+  width:26px;
+  height:26px;
+  flex-shrink:0;
+}
+
+.vk-note-detail-heading strong {
+  color:#FFFFFF;
+  font-size:16px;
+  line-height:20px;
+  font-weight:600;
+}
+
+.vk-note-detail-label {
+  margin-top:24px;
+  color:#A7B6C9;
+  font-size:13px;
+}
+
+.vk-note-detail-text {
+  margin-top:7px;
+  color:#FFFFFF;
+  font-size:13px;
+  line-height:1.65;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+
+.vk-note-detail-date {
+  margin-top:24px;
+  color:#A7B6C9;
+  font-size:12px;
+}
+
+.vk-note-detail-actions {
+  display:flex;
+  justify-content:center;
+  gap:52px;
+  margin-top:30px;
+}
+
+.vk-note-action {
+  width:120px;
+  height:43px;
+  border-radius:16px;
+  border:1px solid #475569;
+  color:#CBD5E1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  font-size:14px;
+  font-weight:400;
+}
+
+.vk-note-action svg {
+  width:24px;
+  height:24px;
+}
+
+.vk-note-action-edit {
+  background:#334155;
+}
+
+.vk-note-action-delete {
+  background:#DC2626;
+}
+
+.vk-note-form {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  padding:8px 23px 54px;
+  overflow-y:auto;
+}
+
+.vk-note-form .vk-note-screen-title {
+  margin-bottom:17px;
+}
+
+.vk-note-field {
+  display:flex;
+  flex-direction:column;
+  gap:11px;
+  margin-bottom:11px;
+}
+
+.vk-note-field > span {
+  color:#A7B6C9;
+  font-size:14px;
+  line-height:17px;
+  font-weight:500;
+}
+
+.vk-note-field input,
+.vk-note-field textarea {
+  width:100%;
+  border:1px solid rgba(58,74,96,.6);
+  border-radius:16px;
+  background:#243246;
+  color:#FFFFFF;
+  outline:0;
+  cursor:text;
+}
+
+.vk-note-field input {
+  height:53px;
+  padding:0 17px;
+  font-size:14px;
+  font-weight:500;
+}
+
+.vk-note-field textarea {
+  height:96px;
+  padding:10px 8px;
+  resize:none;
+  font-size:13px;
+  line-height:1.65;
+  font-weight:400;
+}
+
+.vk-note-field input::placeholder,
+.vk-note-field textarea::placeholder {
+  color:#FFFFFF;
+  opacity:1;
+}
+
+.vk-note-field input:focus,
+.vk-note-field textarea:focus {
+  border-color:#3B82F6;
+}
+
+.vk-note-form-actions {
+  margin-top:auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.vk-note-form-actions button {
+  height:48px;
+  border-radius:16px;
+  color:#FFFFFF;
+  font-size:14px;
+  font-weight:400;
+}
+
+.vk-note-form-cancel {
+  border:1px solid #3A4A60;
+  background:transparent;
+}
+
+.vk-note-form-submit {
+  border:0;
+  background:#3B82F6;
+}
+
+@media (min-width:520px) {
+  .vk-note-row-meta time {
+    display:block;
+  }
+}
+
+@media (max-height:700px) {
+  .vk-note-detail-card {
+    margin-top:34px;
+  }
+
+  .vk-note-form {
+    padding-bottom:22px;
+  }
+}
+
