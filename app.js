@@ -696,6 +696,9 @@ function closeModals(){
   });
   if(typeof window.closeDocumentTypePicker==='function')window.closeDocumentTypePicker();
   if(typeof window.closeDocumentSourceSheet==='function')window.closeDocumentSourceSheet();
+  if(typeof window.closeEmergencyKitRegenerateDialog==='function'){
+    window.closeEmergencyKitRegenerateDialog(true);
+  }
   editId=null;useGenTarget=false;selectedEntryIcon='';try{resetNoteReminder();}catch(e){}try{resetEntryTags();}catch(e){}setTimeout(()=>{try{syncFabVisibility();}catch(e){}},0);
 }
 
@@ -868,9 +871,21 @@ function beginBiometricFlow(){window._vkBiometricFlow=true;hidePrivacyOverlay()}
 function endBiometricFlow(){setTimeout(()=>{window._vkBiometricFlow=false;if(unlocked&&!document.hidden)hidePrivacyOverlay()},700)}
 function showPrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.add('show');document.body.classList.add('vk-locked')}
 function hidePrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.remove('show');document.body.classList.remove('vk-locked')}
+window.isFilePickerGuardActive=function(){
+  return window._vkFilePickerOpen===true ||
+    Date.now()<Number(window._vkFilePickerGraceUntil||0);
+};
+window.finishFilePicker=function(){
+  window._vkFilePickerOpen=false;
+  window._vkFilePickerGraceUntil=Date.now()+500;
+  if(window._vkFilePickerFocusFallbackTimer){
+    clearTimeout(window._vkFilePickerFocusFallbackTimer);
+    window._vkFilePickerFocusFallbackTimer=null;
+  }
+};
 function handleVisibilityChange(){
   if(!appBooted)return;
-  if(window._vkSharing||window._vkBiometricFlow||window._vkFilePickerOpen)return;
+  if(window._vkSharing||window._vkBiometricFlow||window.isFilePickerGuardActive())return;
   if(document.hidden){
     if(unlocked){
       // Guardar borrador del formulario si está abierto
@@ -929,14 +944,22 @@ window.addEventListener('pageshow',(e)=>{
 // Mostrar privacy overlay inmediatamente en blur/pagehide
 // para evitar que Android capture contenido sensible en recientes
 window.addEventListener('blur', () => {
-  if(window._vkFilePickerOpen) return;
+  if(window.isFilePickerGuardActive()) return;
   if(!appBooted || !unlocked || window._vkSharing || window._vkBiometricFlow) return;
   showPrivacyOverlay();
 });
 // Recuperar overlay al volver el foco cuando NO hay cambio de pestaña
 // (ej. abrir/usar DevTools en la misma ventana no dispara visibilitychange)
 window.addEventListener('focus', () => {
-  if(window._vkFilePickerOpen){window._vkFilePickerOpen=false;return;}
+  if(window.isFilePickerGuardActive()){
+    if(window._vkFilePickerOpen&&window._vkFilePickerCancelSupported===false){
+      clearTimeout(window._vkFilePickerFocusFallbackTimer);
+      window._vkFilePickerFocusFallbackTimer=setTimeout(()=>{
+        if(window._vkFilePickerOpen)window.finishFilePicker();
+      },250);
+    }
+    return;
+  }
   if(!appBooted || window._vkSharing || window._vkBiometricFlow) return;
   handleVisibilityChange();
 });
@@ -5801,7 +5824,34 @@ window.openTypePicker=function(){category='';image='';editingId=null;modal('docu
 window.closeDocumentTypePicker=function(){modal('documentTypePicker',false);};
 window.selectDocumentType=function(c){if(!labels[c])return;category=c;image='';editingId=null;modal('documentTypePicker',false);modal('documentSourceSheet',true);};
 window.closeDocumentSourceSheet=function(){modal('documentSourceSheet',false);};
-window.openDocumentSource=function(m){mode=m==='scan'?'scan':'import';var i=document.getElementById(mode==='scan'?'documentScanInput':'documentImportInput');if(i){window._vkFilePickerOpen=true;i.value='';i.click();}};
+window.openDocumentSource=function(m){
+  mode=m==='scan'?'scan':'import';
+  var i=document.getElementById(mode==='scan'?'documentScanInput':'documentImportInput');
+  if(!i)return;
+
+  window._vkFilePickerOpen=true;
+  window._vkFilePickerGraceUntil=0;
+  window._vkFilePickerCancelSupported=('oncancel' in i);
+
+  var finish=function(){
+    i.removeEventListener('change',finish);
+    i.removeEventListener('cancel',finish);
+    window.finishFilePicker();
+  };
+
+  i.addEventListener('change',finish,{once:true});
+  if(window._vkFilePickerCancelSupported){
+    i.addEventListener('cancel',finish,{once:true});
+  }
+
+  i.value='';
+  try{
+    i.click();
+  }catch(error){
+    finish();
+    throw error;
+  }
+};
 window.handleDocumentFile=function(ev){var input=ev&&ev.target,file=input&&input.files&&input.files[0];if(!file)return;if(!file.type||!file.type.startsWith('image/')){toast('Selecciona un archivo de imagen válido','err');input.value='';return;}var r=new FileReader();r.onerror=function(){toast('No se pudo leer la imagen seleccionada','err');input.value='';};r.onload=function(){if(typeof r.result!=='string'||!r.result.startsWith('data:image/')){toast('La imagen seleccionada no es válida','err');input.value='';return;}image=r.result;modal('documentSourceSheet',false);if(editingId){document.getElementById('documentEditImage').src=image;show('documentEdit','right');}else{document.getElementById('documentPreviewImage').src=image;show('documentPreview','right');}input.value='';};r.readAsDataURL(file);};
 window.repeatDocumentSelection=function(){modal('documentSourceSheet',true);};
 window.openCreateDocumentForm=function(){if(!image||!category){toast('Selecciona primero una imagen','err');openTypePicker();return;}document.getElementById('documentCreateForm').reset();document.getElementById('documentCreateImage').src=image;document.getElementById('documentCreateName').value=label(category);document.getElementById('documentCreateMore').hidden=true;document.getElementById('documentCreateMoreButton').textContent='+ Más información';visual('documentCreate',category);show('documentCreate','right');};

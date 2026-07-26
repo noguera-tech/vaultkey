@@ -1202,7 +1202,7 @@ html.vk-twa #vkSplash{display:none!important}
     <h1 class="vk-settings-title vk-r1-title">Ajustes</h1>
 
     <nav class="vk-settings-menu vk-r1-list" aria-label="Secciones de Ajustes">
-      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="security" aria-controls="securitySettings" onclick="show('securitySettings')">
+      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="security" aria-controls="securitySettings">
         <span class="vk-settings-card__icon vk-r1-row__icon" aria-hidden="true">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
@@ -1809,14 +1809,63 @@ html.vk-twa #vkSplash{display:none!important}
 "use strict";
 var I={s:"masterPasswordChange",f:"masterPasswordChangeForm",c:"masterPasswordCurrent",n:"masterPasswordNew",x:"masterPasswordConfirm",b:"masterPasswordStrengthFill",t:"masterPasswordStrength",m:"masterPasswordMessage",g:"masterPasswordSave"};
 var R=["masterRuleLength","masterRuleComposition","masterRuleReuse"];
+var masterChangeBusy=false;
 function $(id){return document.getElementById(id)}
 function checks(){var c=$(I.c).value,n=$(I.n).value,x=$(I.x).value;return[c.length>0,n.length>=12,/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(n),/[0-9]/.test(n),/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9\s]/.test(n),c.length>0&&n.length>0&&c!==n,n.length>0&&n===x]}
 function strength(n,a){if(!n)return["sin evaluar",0,"#009951"];var q=[a[1],a[2],a[3],a[4]].filter(Boolean).length;if(q<=1)return["débil",25,"#ff4444"];if(q===2)return["media",55,"#0099cc"];if(q===3)return["fuerte",82,"#009951"];return["muy fuerte",100,"#009951"]}
-function update(){var a=checks(),z=strength($(I.n).value,a),newValid=(a[1]&&a[2]&&a[3]&&a[4]&&a[5]),confirmValid=a[6],canSave=(newValid&&confirmValid);$(R[0]).dataset.valid=a[1]?"true":"false";$(R[1]).dataset.valid=(a[2]&&a[3]&&a[4])?"true":"false";$(R[2]).dataset.valid=a[5]?"true":"false";$(I.b).style.width=z[1]+"%";$(I.b).style.background=z[2];$(I.t).textContent="Seguridad: "+z[0];$(I.g).disabled=!canSave;$(I.c).setAttribute("aria-invalid",a[0]?"false":"true");$(I.n).setAttribute("aria-invalid",newValid?"false":"true");$(I.x).setAttribute("aria-invalid",confirmValid?"false":"true");if($(I.m).dataset.success!=="true")$(I.m).textContent="";return a.every(Boolean)}
+function update(){var a=checks(),z=strength($(I.n).value,a),newValid=(a[1]&&a[2]&&a[3]&&a[4]&&a[5]),confirmValid=a[6],canSave=(newValid&&confirmValid);$(R[0]).dataset.valid=a[1]?"true":"false";$(R[1]).dataset.valid=(a[2]&&a[3]&&a[4])?"true":"false";$(R[2]).dataset.valid=a[5]?"true":"false";$(I.b).style.width=z[1]+"%";$(I.b).style.background=z[2];$(I.t).textContent="Seguridad: "+z[0];$(I.g).disabled=masterChangeBusy||!canSave;$(I.c).setAttribute("aria-invalid",a[0]?"false":"true");$(I.n).setAttribute("aria-invalid",newValid?"false":"true");$(I.x).setAttribute("aria-invalid",confirmValid?"false":"true");if($(I.m).dataset.success!=="true"&&!masterChangeBusy)$(I.m).textContent="";return a.every(Boolean)}
 function fallback(id){document.querySelectorAll(".screen").forEach(function(e){e.classList.remove("active");e.hidden=true;e.style.display="none"});var e=$(id);e.hidden=false;e.style.display="";e.classList.add("active")}
 window.openMasterPasswordChange=function(){var e=$(I.s);if(!e)return;$(I.f).reset();$(I.m).textContent="";delete $(I.m).dataset.success;update();try{if(typeof window.show==="function"){e.hidden=false;window.show(I.s,"right")}else fallback(I.s)}catch(_){fallback(I.s)}setTimeout(function(){$(I.c).focus()},0)};
 window.cancelMasterPasswordChange=function(){$(I.f).reset();$(I.m).textContent="";delete $(I.m).dataset.success;update();try{if(typeof window.show==="function")window.show("securitySettings","left");else fallback("securitySettings")}catch(_){fallback("securitySettings")}};
-window.submitMasterPasswordChange=function(){var m=$(I.m);if(!update()){delete m.dataset.success;m.style.color="#ff4444";m.textContent="Revisa los requisitos antes de guardar.";return}window.dispatchEvent(new CustomEvent("vaultkey:master-password-form-valid"));m.dataset.success="true";m.textContent="✅ Contraseña maestra actualizada";m.style.color="#22c55e";document.getElementById("masterPasswordSave").disabled=true;setTimeout(function(){window.cancelMasterPasswordChange()},2000)};
+window.submitMasterPasswordChange=async function(){
+  var m=$(I.m),button=$(I.g),blob,newBlob;
+  if(masterChangeBusy)return;
+  if(!update()){
+    delete m.dataset.success;
+    m.style.color="#ff4444";
+    m.textContent="Revisa los requisitos antes de guardar.";
+    return;
+  }
+  if(!window.vkStore||!window.vkCrypto||typeof window.vkCrypto.rotateMaster!=="function"){
+    delete m.dataset.success;
+    m.style.color="#ff4444";
+    m.textContent="❌ No se pudo acceder al sistema criptográfico";
+    return;
+  }
+  masterChangeBusy=true;
+  button.disabled=true;
+  button.textContent="Verificando...";
+  delete m.dataset.success;
+  m.style.color="#a7b6c9";
+  m.textContent="Verificando...";
+  try{
+    blob=window.vkStore.loadBlob();
+    if(!blob)throw new Error("vault-missing");
+    newBlob=await window.vkCrypto.rotateMaster(blob,$(I.c).value,$(I.n).value);
+    window.vkStore.saveBlob(newBlob);
+    m.dataset.success="true";
+    m.style.color="#22c55e";
+    m.textContent="✅ Contraseña maestra actualizada";
+    button.textContent="Guardado";
+    setTimeout(function(){
+      masterChangeBusy=false;
+      button.textContent="Guardar cambios";
+      window.cancelMasterPasswordChange();
+    },2000);
+  }catch(error){
+    masterChangeBusy=false;
+    delete m.dataset.success;
+    m.style.color="#ff4444";
+    m.textContent=error&&error.message==="vault-missing"
+      ?"❌ No se encontró la bóveda"
+      :"❌ La contraseña actual no es correcta";
+    button.textContent="Guardar cambios";
+    update();
+  }finally{
+    blob=null;
+    newBlob=null;
+  }
+};
 document.addEventListener("DOMContentLoaded",function(){if(!$(I.s))return;[I.c,I.n,I.x].forEach(function(id){["input","change","keyup","paste"].forEach(function(ev){$(id).addEventListener(ev,function(){setTimeout(update,0)})})});update()});
 })();
 </script>
@@ -1826,14 +1875,74 @@ document.addEventListener("DOMContentLoaded",function(){if(!$(I.s))return;[I.c,I
 (function(){
 "use strict";
 var P={screen:"pinChange",form:"pinChangeForm",current:"pinChangeCurrent",next:"pinChangeNew",confirm:"pinChangeConfirm",message:"pinChangeMessage",save:"pinChangeSave"};
+var pinChangeBusy=false;
 function byId(id){return document.getElementById(id)}
 function sanitize(input){var clean=input.value.replace(/\D/g,"").slice(0,6);if(input.value!==clean)input.value=clean}
 function state(){var c=byId(P.current).value,n=byId(P.next).value,x=byId(P.confirm).value;return{current:/^\d{6}$/.test(c),next:/^\d{6}$/.test(n),confirm:/^\d{6}$/.test(x)&&x===n,different:/^\d{6}$/.test(c)&&/^\d{6}$/.test(n)&&c!==n}}
-function updatePinChange(){var s=state(),ok=s.current&&s.next&&s.confirm&&s.different;byId(P.current).setAttribute("aria-invalid",s.current?"false":"true");byId(P.next).setAttribute("aria-invalid",(s.next&&s.different)?"false":"true");byId(P.confirm).setAttribute("aria-invalid",s.confirm?"false":"true");byId(P.save).disabled=!ok;if(byId(P.message).dataset.success!=="true")byId(P.message).textContent="";return ok}
+function updatePinChange(){var s=state(),ok=s.current&&s.next&&s.confirm&&s.different;byId(P.current).setAttribute("aria-invalid",s.current?"false":"true");byId(P.next).setAttribute("aria-invalid",(s.next&&s.different)?"false":"true");byId(P.confirm).setAttribute("aria-invalid",s.confirm?"false":"true");byId(P.save).disabled=pinChangeBusy||!ok;if(byId(P.message).dataset.success!=="true"&&!pinChangeBusy)byId(P.message).textContent="";return ok}
+function pinSaltFromBase64(value){var binary=atob(String(value||"")),out=new Uint8Array(binary.length),i;for(i=0;i<binary.length;i++)out[i]=binary.charCodeAt(i);return out}
 function fallback(id){document.querySelectorAll(".screen").forEach(function(e){e.classList.remove("active");e.hidden=true;e.style.display="none"});var t=byId(id);t.hidden=false;t.style.display="";t.classList.add("active")}
 window.openPinChange=function(){var e=byId(P.screen);if(!e)return;byId(P.form).reset();byId(P.message).textContent="";delete byId(P.message).dataset.success;updatePinChange();try{if(typeof window.show==="function"){e.hidden=false;window.show(P.screen,"right")}else fallback(P.screen)}catch(_){fallback(P.screen)}setTimeout(function(){byId(P.current).focus()},0)};
 window.cancelPinChange=function(){byId(P.form).reset();byId(P.message).textContent="";delete byId(P.message).dataset.success;updatePinChange();try{if(typeof window.show==="function")window.show("securitySettings","left");else fallback("securitySettings")}catch(_){fallback("securitySettings")}};
-window.submitPinChange=function(){var m=byId(P.message);if(!updatePinChange()){delete m.dataset.success;m.style.color="#ff4444";m.textContent="Introduce correctamente los tres PIN de 6 dígitos.";return}window.dispatchEvent(new CustomEvent("vaultkey:pin-change-form-valid"));m.dataset.success="true";m.textContent="✅ PIN actualizado";m.style.color="#22c55e";byId(P.save).disabled=true;setTimeout(function(){window.cancelPinChange()},2000)};
+window.submitPinChange=async function(){
+  var m=byId(P.message),button=byId(P.save),pinWrap,pepper,salt,kek,dekRaw,newPinWrap;
+  if(pinChangeBusy)return;
+  if(!updatePinChange()){
+    delete m.dataset.success;
+    m.style.color="#ff4444";
+    m.textContent="Introduce correctamente los tres PIN de 6 dígitos.";
+    return;
+  }
+  if(!window.vkStore||!window.vkCrypto){
+    delete m.dataset.success;
+    m.style.color="#ff4444";
+    m.textContent="❌ No se pudo acceder al sistema criptográfico";
+    return;
+  }
+  pinChangeBusy=true;
+  button.disabled=true;
+  button.textContent="Verificando...";
+  delete m.dataset.success;
+  m.style.color="#a7b6c9";
+  m.textContent="Verificando...";
+  try{
+    pinWrap=window.vkStore.loadPinWrap();
+    if(!pinWrap||!pinWrap.saltPin)throw new Error("pinwrap-missing");
+    pepper=await window.vkCrypto.getOrCreatePepper();
+    salt=pinSaltFromBase64(pinWrap.saltPin);
+    kek=await window.vkCrypto.deriveKEKPin(byId(P.current).value,salt,pepper);
+    dekRaw=await window.vkCrypto.unwrapDEKRaw({iv:pinWrap.iv,ct:pinWrap.ct},kek);
+    newPinWrap=await window.vkCrypto.createPinWrap(dekRaw,byId(P.next).value,pepper);
+    window.vkStore.savePinWrap(newPinWrap);
+    m.dataset.success="true";
+    m.style.color="#22c55e";
+    m.textContent="✅ PIN actualizado";
+    button.textContent="Guardado";
+    setTimeout(function(){
+      pinChangeBusy=false;
+      button.textContent="Guardar cambios";
+      window.cancelPinChange();
+    },2000);
+  }catch(error){
+    pinChangeBusy=false;
+    delete m.dataset.success;
+    m.style.color="#ff4444";
+    m.textContent=error&&error.message==="pinwrap-missing"
+      ?"❌ No se encontró la configuración del PIN"
+      :"❌ El PIN actual no es correcto";
+    button.textContent="Guardar cambios";
+    updatePinChange();
+  }finally{
+    if(dekRaw&&dekRaw.fill)dekRaw.fill(0);
+    if(salt&&salt.fill)salt.fill(0);
+    pinWrap=null;
+    pepper=null;
+    salt=null;
+    kek=null;
+    dekRaw=null;
+    newPinWrap=null;
+  }
+};
 document.addEventListener("DOMContentLoaded",function(){if(!byId(P.screen))return;[P.current,P.next,P.confirm].forEach(function(id){var input=byId(id);["input","change","keyup","paste"].forEach(function(ev){input.addEventListener(ev,function(){setTimeout(function(){sanitize(input);updatePinChange()},0)})})});updatePinChange()});
 })();
 </script>
@@ -1843,11 +1952,8 @@ document.addEventListener("DOMContentLoaded",function(){if(!byId(P.screen))retur
 (function(){
 "use strict";
 
-var EMERGENCY_KIT_DATA={
-  vaultId:"VK-2026-XXXX",
-  emergencyKey:"VKEM-7A9C-4Q2M-8X6P",
-  createdDate:"06/07/2026"
-};
+var currentEmergencyKitCode=null;
+var emergencyKitBusy=false;
 
 function kitById(id){return document.getElementById(id)}
 
@@ -1865,49 +1971,193 @@ function showKitScreenFallback(targetId){
 
 function showKitToast(message){
   var toast=kitById("toast");
-  if(!toast) return;
+  if(!toast)return;
   toast.textContent=message;
   toast.style.opacity="1";
   clearTimeout(window.__vkEmergencyToastTimer);
-  window.__vkEmergencyToastTimer=setTimeout(function(){
-    toast.style.opacity="0";
-  },1800);
+  window.__vkEmergencyToastTimer=setTimeout(function(){toast.style.opacity="0"},1800);
+}
+
+function formatKitDate(value){
+  if(!value)return"No disponible";
+  var date=new Date(Number(value));
+  if(isNaN(date.getTime()))return"No disponible";
+  return date.toLocaleDateString("es-ES",{day:"2-digit",month:"2-digit",year:"numeric"});
+}
+
+function getKitBlob(){
+  return window.vkStore&&typeof window.vkStore.loadBlob==="function"
+    ?window.vkStore.loadBlob()
+    :null;
+}
+
+function ensureRegenerateDialog(){
+  var modal=kitById("emergencyKitRegenerateModal");
+  if(modal)return modal;
+  modal=document.createElement("div");
+  modal.id="emergencyKitRegenerateModal";
+  modal.hidden=true;
+  modal.style.cssText="position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(6,10,18,.85);backdrop-filter:blur(14px);padding:20px;box-sizing:border-box";
+  modal.innerHTML=
+    '<section role="dialog" aria-modal="true" aria-labelledby="emergencyRegenerateTitle" style="box-sizing:border-box;width:300px;min-height:240px;padding:22px 20px 18px;border:1px solid rgba(58,74,96,.6);border-radius:20px;background:#243246;color:#fff;font-family:Inter,system-ui,sans-serif">'+
+      '<h2 id="emergencyRegenerateTitle" style="margin:0;display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;font-size:20px"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0 2 5"/><path d="M20 4v7h-7"/></svg><span>Regenerar kit</span></h2>'+
+      '<p style="margin:18px 0 0;color:#a7b6c9;font-size:14px;text-align:center">Se creará una nueva clave de emergencia.</p>'+
+      '<p style="margin:10px 0 14px;color:#f59e0b;font-size:13px;text-align:center">Guarda una copia segura antes de continuar.</p>'+
+      '<label style="display:block"><span style="display:block;margin:0 0 6px;color:#a7b6c9;font-size:12px">Contraseña maestra</span><input id="emergencyKitMasterInput" type="password" autocomplete="current-password" style="box-sizing:border-box;width:100%;height:42px;padding:0 12px;border:1px solid rgba(58,74,96,.6);border-radius:12px;background:#111827;color:#fff;outline:none"></label>'+
+      '<p id="emergencyKitRegenerateMessage" role="alert" style="min-height:17px;margin:8px 0 0;color:#ff4444;font-size:12px;text-align:center"></p>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">'+
+        '<button id="emergencyKitRegenerateCancel" type="button" style="height:42px;border:1px solid #3a4a60;border-radius:14px;background:transparent;color:#fff">Cancelar</button>'+
+        '<button id="emergencyKitRegenerateConfirm" type="button" style="height:42px;border:0;border-radius:14px;background:#f59e0b;color:#111827;font-weight:600">Regenerar</button>'+
+      '</div>'+
+    '</section>';
+  document.body.appendChild(modal);
+  kitById("emergencyKitRegenerateCancel").onclick=function(){
+    closeEmergencyKitRegenerateDialog();
+  };
+  kitById("emergencyKitRegenerateConfirm").onclick=regenerateEmergencyKit;
+  return modal;
+}
+
+function renderEmergencyKitInfo(){
+  var blob=getKitBlob();
+  var card=kitById("emergencyKitView").querySelector(".vk-kit-card");
+  var actions=kitById("emergencyKitView").querySelector(".vk-kit-actions");
+  if(!card||!actions)return;
+  card.style.height="auto";
+  card.style.minHeight="300px";
+  card.innerHTML=
+    '<h2 class="vk-kit-card-heading"><span class="vk-kit-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg></span>Kit configurado</h2>'+
+    '<p style="margin:28px 0 0;color:#fff;font-size:16px;text-align:center">Kit de emergencia configurado</p>'+
+    '<p style="margin:20px auto 0;max-width:270px;color:#a7b6c9;font-size:14px;line-height:1.45;text-align:center">La clave de emergencia no puede volver a mostrarse por seguridad.</p>'+
+    '<div style="margin:24px 0 0;padding:14px;border:1px solid rgba(245,158,11,.45);border-radius:14px;background:rgba(245,158,11,.08);color:#f59e0b;font-size:13px;line-height:1.4;text-align:center">Al regenerarla, la clave anterior dejará de funcionar.</div>'+
+    '<p style="margin:22px 0 0;color:#a7b6c9;font-size:13px;text-align:center">Fecha de creación o última actualización</p>'+
+    '<p style="margin:6px 0 0;color:#fff;font-size:16px;text-align:center">'+formatKitDate(blob&&(blob.updatedAt||blob.createdAt))+'</p>';
+  actions.innerHTML='<button type="button" class="vk-kit-action" style="width:260px;background:#f59e0b;border-color:#f59e0b;color:#111827;font-weight:600" onclick="openEmergencyKitRegenerateDialog()">Regenerar kit de emergencia</button>';
+}
+
+function renderEmergencyKitSave(){
+  var card=kitById("emergencyKitView").querySelector(".vk-kit-card");
+  var actions=kitById("emergencyKitView").querySelector(".vk-kit-actions");
+  card.style.height="auto";
+  card.style.minHeight="330px";
+  card.innerHTML=
+    '<h2 class="vk-kit-card-heading"><span class="vk-kit-card-icon" aria-hidden="true">🔐</span>Guarda tu nuevo código ahora</h2>'+
+    '<p style="margin:22px 0 0;color:#a7b6c9;font-size:14px;line-height:1.4;text-align:center">Este código solo se mostrará durante esta sesión.</p>'+
+    '<div id="emergencyKitFreshCode" style="margin:22px 0 0;padding:16px 10px;border:1px solid #3b82f6;border-radius:14px;background:#111827;color:#fff;font:600 15px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.6px;text-align:center;overflow-wrap:anywhere"></div>'+
+    '<label style="display:flex;align-items:flex-start;gap:10px;margin:22px 0 0;color:#a7b6c9;font-size:13px;line-height:1.4"><input id="emergencyKitSavedConfirm" type="checkbox" style="margin-top:2px"> <span>Ya guardé este código en un lugar seguro</span></label>'+
+    '<p id="emergencyKitSaveMessage" role="alert" style="min-height:18px;margin:10px 0 0;color:#ff4444;font-size:12px;text-align:center"></p>';
+  kitById("emergencyKitFreshCode").textContent=currentEmergencyKitCode||"";
+  actions.innerHTML=
+    '<button type="button" class="vk-kit-action" onclick="copyEmergencyKitKey()"><span class="vk-kit-action-icon" aria-hidden="true">📋</span>Copiar</button>'+
+    '<button type="button" class="vk-kit-action" onclick="downloadEmergencyKit()"><span class="vk-kit-action-icon" aria-hidden="true">⬇️</span>Descargar</button>'+
+    '<button type="button" class="vk-kit-action" style="width:260px;background:#3b82f6;border-color:#3b82f6;color:#fff" onclick="finishEmergencyKitSave()">Ya lo guardé</button>';
+  actions.style.flexWrap="wrap";
 }
 
 window.openEmergencyKit=function(){
   var screen=kitById("emergencyKitView");
-  if(!screen) return;
-
-  kitById("emergencyVaultId").textContent=EMERGENCY_KIT_DATA.vaultId;
-  kitById("emergencyCreatedDate").textContent=EMERGENCY_KIT_DATA.createdDate;
-
+  if(!screen)return;
+  currentEmergencyKitCode=null;
+  renderEmergencyKitInfo();
   try{
-    if(typeof window.show==="function"){
-      screen.hidden=false;
-      window.show("emergencyKitView","right");
-    }else{
-      showKitScreenFallback("emergencyKitView");
-    }
-  }catch(error){
-    showKitScreenFallback("emergencyKitView");
-  }
+    if(typeof window.show==="function"){screen.hidden=false;window.show("emergencyKitView","right")}
+    else showKitScreenFallback("emergencyKitView");
+  }catch(error){showKitScreenFallback("emergencyKitView")}
 };
 
 window.closeEmergencyKit=function(){
-  try{
-    if(typeof window.show==="function"){
-      window.show("securitySettings","left");
-    }else{
-      showKitScreenFallback("securitySettings");
+  if(currentEmergencyKitCode){
+    var confirmBox=kitById("emergencyKitSavedConfirm");
+    if(!confirmBox||!confirmBox.checked){
+      var message=kitById("emergencyKitSaveMessage");
+      if(message)message.textContent="Confirma que guardaste el código antes de salir.";
+      return;
     }
+  }
+  currentEmergencyKitCode=null;
+  try{
+    if(typeof window.show==="function")window.show("securitySettings","left");
+    else showKitScreenFallback("securitySettings");
+  }catch(error){showKitScreenFallback("securitySettings")}
+};
+
+window.openEmergencyKitRegenerateDialog=function(){
+  var modal=ensureRegenerateDialog();
+  kitById("emergencyKitMasterInput").value="";
+  kitById("emergencyKitRegenerateMessage").textContent="";
+  kitById("emergencyKitRegenerateConfirm").disabled=false;
+  kitById("emergencyKitRegenerateConfirm").textContent="Regenerar";
+  modal.hidden=false;
+  modal.style.display="flex";
+  setTimeout(function(){kitById("emergencyKitMasterInput").focus()},0);
+};
+
+window.closeEmergencyKitRegenerateDialog=function(force){
+  if(emergencyKitBusy&&!force)return;
+  var modal=ensureRegenerateDialog();
+  var input=kitById("emergencyKitMasterInput");
+  var message=kitById("emergencyKitRegenerateMessage");
+  var button=kitById("emergencyKitRegenerateConfirm");
+  if(input)input.value="";
+  if(message)message.textContent="";
+  if(button){
+    button.disabled=false;
+    button.textContent="Regenerar";
+  }
+  emergencyKitBusy=false;
+  modal.hidden=true;
+  modal.style.display="none";
+};
+
+window.regenerateEmergencyKit=async function(){
+  var input=kitById("emergencyKitMasterInput");
+  var message=kitById("emergencyKitRegenerateMessage");
+  var button=kitById("emergencyKitRegenerateConfirm");
+  var master=input.value;
+  var result=null;
+  if(emergencyKitBusy)return;
+  if(!master){
+    message.textContent="Introduce tu contraseña maestra.";
+    input.focus();
+    return;
+  }
+  if(!window.vkKitManager||typeof window.vkKitManager.regenerateKit!=="function"){
+    message.textContent="No se pudo acceder al gestor del kit.";
+    return;
+  }
+  emergencyKitBusy=true;
+  button.disabled=true;
+  button.textContent="Verificando...";
+  message.style.color="#a7b6c9";
+  message.textContent="Verificando...";
+  try{
+    result=await window.vkKitManager.regenerateKit({
+      store:window.vkStore,
+      crypto:window.vkCrypto,
+      master:master
+    });
+    currentEmergencyKitCode=result&&result.kitCode?String(result.kitCode):null;
+    if(!currentEmergencyKitCode)throw new Error("kit-code-missing");
+    input.value="";
+    ensureRegenerateDialog().hidden=true;
+    ensureRegenerateDialog().style.display="none";
+    renderEmergencyKitSave();
   }catch(error){
-    showKitScreenFallback("securitySettings");
+    currentEmergencyKitCode=null;
+    message.style.color="#ff4444";
+    message.textContent="❌ La contraseña maestra no es correcta";
+    button.disabled=false;
+    button.textContent="Regenerar";
+  }finally{
+    emergencyKitBusy=false;
+    master="";
+    result=null;
   }
 };
 
 window.copyEmergencyKitKey=async function(){
-  var key=EMERGENCY_KIT_DATA.emergencyKey;
-
+  var key=currentEmergencyKitCode;
+  if(!key){showKitToast("No hay un código nuevo disponible");return}
   try{
     if(navigator.clipboard&&window.isSecureContext){
       await navigator.clipboard.writeText(key);
@@ -1919,35 +2169,46 @@ window.copyEmergencyKitKey=async function(){
       helper.style.opacity="0";
       document.body.appendChild(helper);
       helper.select();
-      if(!document.execCommand("copy")) throw new Error("copy-failed");
+      if(!document.execCommand("copy"))throw new Error("copy-failed");
       helper.remove();
     }
     showKitToast("✅ Copiado al portapapeles");
-  }catch(error){
-    showKitToast("No se pudo copiar");
-  }
+  }catch(error){showKitToast("No se pudo copiar")}
 };
 
 window.downloadEmergencyKit=function(){
+  var key=currentEmergencyKitCode;
+  if(!key){showKitToast("No hay un código nuevo disponible");return}
   var content=[
-    "VaultKey 2.0 — Kit de emergencia",
+    "VaultKey 2.0 — Nuevo kit de emergencia",
     "",
-    "ID de bóveda: "+EMERGENCY_KIT_DATA.vaultId,
-    "Clave de emergencia: "+EMERGENCY_KIT_DATA.emergencyKey,
-    "Fecha de creación: "+EMERGENCY_KIT_DATA.createdDate
+    "Clave de emergencia: "+key,
+    "Generado el: "+new Date().toLocaleString("es-ES"),
+    "",
+    "Guarda este archivo fuera del dispositivo.",
+    "Al regenerar otro kit, este código dejará de funcionar."
   ].join("\n");
-
   var blob=new Blob([content],{type:"text/plain;charset=utf-8"});
   var url=URL.createObjectURL(blob);
   var link=document.createElement("a");
   link.href=url;
-  link.download="vaultkey-kit-emergencia.txt";
+  link.download="vaultkey-kit-emergencia-nuevo.txt";
   document.body.appendChild(link);
   link.click();
   link.remove();
   setTimeout(function(){URL.revokeObjectURL(url)},0);
-
   showKitToast("✅ Descargado");
+};
+
+window.finishEmergencyKitSave=function(){
+  var checked=kitById("emergencyKitSavedConfirm");
+  var message=kitById("emergencyKitSaveMessage");
+  if(!checked||!checked.checked){
+    if(message)message.textContent="Marca la confirmación antes de continuar.";
+    return;
+  }
+  currentEmergencyKitCode=null;
+  renderEmergencyKitInfo();
 };
 })();
 </script>

@@ -71,9 +71,15 @@
 
     if (option === 'immediate') {
       _onVisibility = function () {
+        if (typeof root.isFilePickerGuardActive === 'function' &&
+            root.isFilePickerGuardActive()) { return; }
         if (root.document && root.document.visibilityState === 'hidden') { lock(); }
       };
-      _onBlur = function () { lock(); };
+      _onBlur = function () {
+        if (typeof root.isFilePickerGuardActive === 'function' &&
+            root.isFilePickerGuardActive()) { return; }
+        lock();
+      };
       root.document && root.document.addEventListener('visibilitychange', _onVisibility);
       root.addEventListener('blur', _onBlur);
     } else {
