@@ -23,6 +23,26 @@
 html,body{margin:0;background:#070B14}
 html.vk-twa #vkSplash{display:none!important}
 
+/* Cambiar PIN — Figma 217:329 */
+#pinChange{box-sizing:border-box;height:100dvh;min-height:0;overflow:hidden;background:linear-gradient(149.3508256958964deg,#111827 15.964%,#182F4E 63.204%);border:1px solid #030508;color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#pinChange[hidden]{display:none!important}
+.vk-pin-header{box-sizing:border-box;height:64px;background:#243246;border-bottom:1px solid #000;display:flex;align-items:center;padding:0 24px}
+.vk-pin-back{width:32px;height:32px;padding:0;border:0;background:transparent;color:#a7b6c9;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.vk-pin-back svg{width:24px;height:24px}
+.vk-pin-content{width:min(392px,calc(100% - 28px));height:calc(100dvh - 64px);margin:0 auto;padding:17px 0 max(14px,env(safe-area-inset-bottom));box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden}
+.vk-pin-title{width:334px;max-width:100%;margin:0 auto;color:#fff;font-size:20px;line-height:normal;font-weight:600;text-align:center}
+.vk-pin-subtitle{width:372px;max-width:100%;margin:12px auto 0;color:#9ca3af;font-size:14px;line-height:normal;font-weight:400;text-align:center}
+.vk-pin-form{width:100%;margin-top:76px;display:flex;flex-direction:column;flex:1;min-height:0}
+.vk-pin-fields{width:100%;display:flex;flex-direction:column;align-items:center;gap:29px}
+.vk-pin-field{display:block;width:360px;max-width:100%}
+.vk-pin-input{box-sizing:border-box;width:100%;height:56px;padding:0 16px;border-radius:16px;border:1px solid rgba(58,74,96,.6);background:#243246;color:#fff;font:400 16px/normal Inter,system-ui,sans-serif;text-align:left;outline:none;appearance:none;-webkit-appearance:none}
+.vk-pin-input::placeholder{color:#8fa3bf;opacity:1}.vk-pin-input:focus{border-color:rgba(0,217,255,.4)}.vk-pin-input[aria-invalid=true]{border-color:rgba(58,74,96,.6)}
+.vk-pin-info{width:392px;max-width:100%;margin:29px auto 0;color:#9ca3af;font-size:14px;line-height:normal;font-weight:400;text-align:center}
+.vk-pin-message{min-height:18px;margin:12px 0 0;color:#ff4444;font-size:12px;line-height:18px;text-align:center}
+.vk-pin-save{box-sizing:border-box;width:360px;max-width:100%;height:56px;margin:auto auto 0;border:0;border-radius:16px;background:#2f6fea;color:#fff;font:600 20px/normal Inter,system-ui,sans-serif;cursor:pointer}
+.vk-pin-save:disabled{opacity:.55;cursor:not-allowed}
+@media(max-height:760px){.vk-pin-form{margin-top:48px}.vk-pin-fields{gap:20px}.vk-pin-info{margin-top:22px}}
+
 /* Figma 217:293 — Cambiar contraseña maestra */
 #masterPasswordChange{box-sizing:border-box;height:100dvh;min-height:0;overflow:hidden;background:linear-gradient(149.3508256958964deg,#111827 15.964%,#182F4E 63.204%);border:1px solid #030508;color:#fff;font-family:Inter,system-ui,sans-serif}
 #masterPasswordChange[hidden]{display:none!important}
@@ -588,7 +608,7 @@ html.vk-twa #vkSplash{display:none!important}
         <span class="vk-security-card__body"><strong>Contraseña maestra</strong><small>Cambiar la contraseña principal</small></span>
         <span class="vk-security-card__chevron" aria-hidden="true"><svg viewBox="354 223 13 16"><path d="M359 237L365 231L359 225" fill="none" stroke="#A7B6C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </button>
-      <button type="button" class="vk-security-card" data-security-target="pin" role="listitem">
+      <button type="button" class="vk-security-card" data-security-target="pin" role="listitem" onclick="openPinChange()">
         <span class="vk-security-card__icon" aria-hidden="true"><svg viewBox="47 304 28 28" fill="none"><path d="M70.3333 316.8H51.6667C50.1939 316.8 49 317.874 49 319.2V327.6C49 328.925 50.1939 330 51.6667 330H70.3333C71.8061 330 73 328.925 73 327.6V319.2C73 317.874 71.8061 316.8 70.3333 316.8Z" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M54.333 316.8V312C54.333 310.409 55.0354 308.883 56.2856 307.757C57.5359 306.632 59.2316 306 60.9997 306C62.7678 306 64.4635 306.632 65.7137 307.757C66.964 308.883 67.6663 310.409 67.6663 312V316.8" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <span class="vk-security-card__body"><strong>PIN de desbloqueo</strong><small>Cambiar el PIN local</small></span>
         <span class="vk-security-card__chevron" aria-hidden="true"><svg viewBox="354 309 10 16"><path d="M356 323L362 317L356 311" fill="none" stroke="#A7B6C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -634,6 +654,29 @@ html.vk-twa #vkSplash{display:none!important}
       <p class="vk-master-note">Después del cambio, tendrás que usar la nueva contraseña maestra para acceder a tu bóveda.</p>
       <p id="masterPasswordMessage" class="vk-master-message" role="alert" aria-live="polite"></p>
       <div class="vk-master-actions"><button id="masterPasswordSave" class="vk-master-save" type="submit" disabled>Guardar cambios</button><button class="vk-master-cancel" type="button" onclick="cancelMasterPasswordChange()">Cancelar</button></div>
+    </form>
+  </main>
+</section>
+
+
+<section id="pinChange" class="screen" aria-labelledby="pinChangeTitle" hidden>
+  <header class="vk-pin-header">
+    <button type="button" class="vk-pin-back" aria-label="Volver a Seguridad" onclick="cancelPinChange()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+  </header>
+  <main class="vk-pin-content">
+    <h1 id="pinChangeTitle" class="vk-pin-title">Cambiar PIN</h1>
+    <p class="vk-pin-subtitle">Actualiza el PIN que usas para desbloquear VaultKey en este dispositivo.</p>
+    <form id="pinChangeForm" class="vk-pin-form" novalidate onsubmit="event.preventDefault();submitPinChange()">
+      <div class="vk-pin-fields">
+        <label class="vk-pin-field"><span hidden>PIN actual</span><input id="pinChangeCurrent" class="vk-pin-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="PIN actual" autocomplete="current-password"></label>
+        <label class="vk-pin-field"><span hidden>Nuevo PIN</span><input id="pinChangeNew" class="vk-pin-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Nuevo PIN" autocomplete="new-password"></label>
+        <label class="vk-pin-field"><span hidden>Confirmar nuevo PIN</span><input id="pinChangeConfirm" class="vk-pin-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Confirmar nuevo PIN" autocomplete="new-password"></label>
+      </div>
+      <p class="vk-pin-info">El PIN solo sirve para desbloquear VaultKey rápidamente en este dispositivo.</p>
+      <p id="pinChangeMessage" class="vk-pin-message" role="alert" aria-live="polite"></p>
+      <button id="pinChangeSave" class="vk-pin-save" type="submit" disabled>Guardar cambios</button>
     </form>
   </main>
 </section>
@@ -1008,6 +1051,23 @@ window.openMasterPasswordChange=function(){var e=$(I.s);if(!e)return;$(I.f).rese
 window.cancelMasterPasswordChange=function(){$(I.f).reset();$(I.m).textContent="";delete $(I.m).dataset.success;update();try{if(typeof window.show==="function")window.show("securitySettings","left");else fallback("securitySettings")}catch(_){fallback("securitySettings")}};
 window.submitMasterPasswordChange=function(){var m=$(I.m);if(!update()){delete m.dataset.success;m.style.color="#ff4444";m.textContent="Revisa los requisitos antes de guardar.";return}window.dispatchEvent(new CustomEvent("vaultkey:master-password-form-valid"));m.dataset.success="true";m.textContent="✅ Contraseña maestra actualizada";m.style.color="#22c55e";document.getElementById("masterPasswordSave").disabled=true;setTimeout(function(){window.cancelMasterPasswordChange()},2000)};
 document.addEventListener("DOMContentLoaded",function(){if(!$(I.s))return;[I.c,I.n,I.x].forEach(function(id){["input","change","keyup","paste"].forEach(function(ev){$(id).addEventListener(ev,function(){setTimeout(update,0)})})});update()});
+})();
+</script>
+
+
+<script>
+(function(){
+"use strict";
+var P={screen:"pinChange",form:"pinChangeForm",current:"pinChangeCurrent",next:"pinChangeNew",confirm:"pinChangeConfirm",message:"pinChangeMessage",save:"pinChangeSave"};
+function byId(id){return document.getElementById(id)}
+function sanitize(input){var clean=input.value.replace(/\D/g,"").slice(0,6);if(input.value!==clean)input.value=clean}
+function state(){var c=byId(P.current).value,n=byId(P.next).value,x=byId(P.confirm).value;return{current:/^\d{6}$/.test(c),next:/^\d{6}$/.test(n),confirm:/^\d{6}$/.test(x)&&x===n,different:/^\d{6}$/.test(c)&&/^\d{6}$/.test(n)&&c!==n}}
+function updatePinChange(){var s=state(),ok=s.current&&s.next&&s.confirm&&s.different;byId(P.current).setAttribute("aria-invalid",s.current?"false":"true");byId(P.next).setAttribute("aria-invalid",(s.next&&s.different)?"false":"true");byId(P.confirm).setAttribute("aria-invalid",s.confirm?"false":"true");byId(P.save).disabled=!ok;if(byId(P.message).dataset.success!=="true")byId(P.message).textContent="";return ok}
+function fallback(id){document.querySelectorAll(".screen").forEach(function(e){e.classList.remove("active");e.hidden=true;e.style.display="none"});var t=byId(id);t.hidden=false;t.style.display="";t.classList.add("active")}
+window.openPinChange=function(){var e=byId(P.screen);if(!e)return;byId(P.form).reset();byId(P.message).textContent="";delete byId(P.message).dataset.success;updatePinChange();try{if(typeof window.show==="function"){e.hidden=false;window.show(P.screen,"right")}else fallback(P.screen)}catch(_){fallback(P.screen)}setTimeout(function(){byId(P.current).focus()},0)};
+window.cancelPinChange=function(){byId(P.form).reset();byId(P.message).textContent="";delete byId(P.message).dataset.success;updatePinChange();try{if(typeof window.show==="function")window.show("securitySettings","left");else fallback("securitySettings")}catch(_){fallback("securitySettings")}};
+window.submitPinChange=function(){var m=byId(P.message);if(!updatePinChange()){delete m.dataset.success;m.style.color="#ff4444";m.textContent="Introduce correctamente los tres PIN de 6 dígitos.";return}window.dispatchEvent(new CustomEvent("vaultkey:pin-change-form-valid"));m.dataset.success="true";m.textContent="✅ PIN actualizado";m.style.color="#22c55e";byId(P.save).disabled=true;setTimeout(function(){window.cancelPinChange()},2000)};
+document.addEventListener("DOMContentLoaded",function(){if(!byId(P.screen))return;[P.current,P.next,P.confirm].forEach(function(id){var input=byId(id);["input","change","keyup","paste"].forEach(function(ev){input.addEventListener(ev,function(){setTimeout(function(){sanitize(input);updatePinChange()},0)})})});updatePinChange()});
 })();
 </script>
 
