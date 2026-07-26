@@ -23,6 +23,30 @@
 html,body{margin:0;background:#070B14}
 html.vk-twa #vkSplash{display:none!important}
 
+/* Bloqueo automático — Figma 217:1437 */
+#autoLockSettings{box-sizing:border-box;height:100dvh;min-height:0;overflow:hidden;background:linear-gradient(149.3508256958964deg,#111827 15.964%,#182F4E 63.204%);border:1px solid #030508;color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#autoLockSettings[hidden]{display:none!important}
+.vk-auto-header{box-sizing:border-box;height:64px;background:#243246;border-bottom:1px solid #000;display:flex;align-items:center;padding:0 24px}
+.vk-auto-back{width:32px;height:32px;padding:0;border:0;background:transparent;color:#a7b6c9;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.vk-auto-back svg{width:24px;height:24px}
+.vk-auto-content{width:min(365px,calc(100% - 46px));height:calc(100dvh - 64px);margin:0 auto;padding:17px 0 max(18px,env(safe-area-inset-bottom));box-sizing:border-box;overflow:hidden}
+.vk-auto-title{margin:0;color:#fff;font-size:20px;line-height:normal;font-weight:700;text-align:center}
+.vk-auto-description{width:375px;max-width:calc(100vw - 34px);margin:36px 50% 0;transform:translateX(-50%);color:#9ca3af;font-size:14px;line-height:normal;font-weight:400;text-align:center}
+.vk-auto-options{display:flex;flex-direction:column;gap:15px;margin-top:18px}
+.vk-auto-option{position:relative;display:block;width:100%;height:72px;cursor:pointer}
+.vk-auto-radio{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.vk-auto-card{box-sizing:border-box;width:100%;height:72px;border:1px solid rgba(58,74,96,.6);border-radius:16px;background:#243246;display:grid;grid-template-columns:46px 1fr 30px;align-items:center;padding:0 18px 0 22px}
+.vk-auto-clock{width:22px;height:22px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;color:#111827}
+.vk-auto-clock svg{width:16px;height:16px}
+.vk-auto-copy{min-width:0}
+.vk-auto-name{display:block;color:#fff;font-size:16px;line-height:normal;font-weight:600}
+.vk-auto-detail{display:block;margin-top:11px;color:#a7b6c9;font-size:13px;line-height:normal;font-weight:400}
+.vk-auto-check{width:24px;height:24px;color:#3b82f6;opacity:0;transition:opacity .12s ease}
+.vk-auto-check svg{display:block;width:100%;height:100%}
+.vk-auto-radio:checked + .vk-auto-card .vk-auto-check{opacity:1}
+.vk-auto-radio:focus-visible + .vk-auto-card{outline:2px solid rgba(0,217,255,.4);outline-offset:2px}
+@media(max-height:720px){.vk-auto-description{margin-top:24px}.vk-auto-options{margin-top:14px;gap:12px}}
+
 /* Ver Kit de emergencia — Figma 217:1764 */
 #emergencyKitView{
   box-sizing:border-box;
@@ -770,7 +794,7 @@ html.vk-twa #vkSplash{display:none!important}
         <span class="vk-security-card__body"><strong>Desbloqueo biométrico</strong><small>Huella y reconocimiento facial</small></span>
         <button type="button" class="vk-security-switch" role="switch" aria-checked="true" aria-label="Desbloqueo biométrico" data-security-target="biometrics"><span></span></button>
       </div>
-      <button type="button" class="vk-security-card" data-security-target="auto-lock" role="listitem">
+      <button type="button" class="vk-security-card" data-security-target="auto-lock" role="listitem" onclick="openAutoLockSettings()">
         <span class="vk-security-card__icon" aria-hidden="true"><svg viewBox="47 479 28 28" fill="none"><path d="M70.3333 491.8H51.6667C50.1939 491.8 49 492.874 49 494.2V502.6C49 503.925 50.1939 505 51.6667 505H70.3333C71.8061 505 73 503.925 73 502.6V494.2C73 492.874 71.8061 491.8 70.3333 491.8Z" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M54.333 491.8V487C54.333 485.409 55.0354 483.883 56.2856 482.757C57.5359 481.632 59.2316 481 60.9997 481C62.7678 481 64.4635 481.632 65.7137 482.757C66.964 483.883 67.6663 485.409 67.6663 487V491.8" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <span class="vk-security-card__body"><strong>Bloqueo automático</strong><small>Configurar tiempo de bloqueo</small></span>
         <span class="vk-security-card__chevron" aria-hidden="true"><svg viewBox="357 480 10 16"><path d="M359 494L365 488L359 482" fill="none" stroke="#A7B6C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -885,6 +909,25 @@ html.vk-twa #vkSplash{display:none!important}
         <span class="vk-kit-action-icon" aria-hidden="true">⬇️</span>
         Descargar
       </button>
+    </div>
+  </main>
+</section>
+
+
+<section id="autoLockSettings" class="screen" aria-labelledby="autoLockTitle" hidden>
+  <header class="vk-auto-header">
+    <button type="button" class="vk-auto-back" aria-label="Volver a Seguridad" onclick="closeAutoLockSettings()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+  </header>
+  <main class="vk-auto-content">
+    <h1 id="autoLockTitle" class="vk-auto-title">Bloqueo automático</h1>
+    <p class="vk-auto-description">Elige cuándo se bloqueará VaultKey después de dejar de usarla.</p>
+    <div class="vk-auto-options" role="radiogroup" aria-label="Tiempo de bloqueo automático">
+      <label class="vk-auto-option"><input class="vk-auto-radio" type="radio" name="autoLockDelay" value="0" onchange="applyExistingAutoLock(0)"><span class="vk-auto-card"><span class="vk-auto-clock" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg></span><span class="vk-auto-copy"><strong class="vk-auto-name">Inmediatamente</strong><small class="vk-auto-detail">Se bloquea al salir de la app</small></span><span class="vk-auto-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12 5 5 11-14"/></svg></span></span></label>
+      <label class="vk-auto-option"><input class="vk-auto-radio" type="radio" name="autoLockDelay" value="30000" onchange="applyExistingAutoLock(30000)"><span class="vk-auto-card"><span class="vk-auto-clock" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg></span><span class="vk-auto-copy"><strong class="vk-auto-name">30 segundos</strong><small class="vk-auto-detail">Bloqueo rápido</small></span><span class="vk-auto-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12 5 5 11-14"/></svg></span></span></label>
+      <label class="vk-auto-option"><input class="vk-auto-radio" type="radio" name="autoLockDelay" value="60000" onchange="applyExistingAutoLock(60000)" checked><span class="vk-auto-card"><span class="vk-auto-clock" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg></span><span class="vk-auto-copy"><strong class="vk-auto-name">1 minuto</strong><small class="vk-auto-detail">Equilibrio recomendado</small></span><span class="vk-auto-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12 5 5 11-14"/></svg></span></span></label>
+      <label class="vk-auto-option"><input class="vk-auto-radio" type="radio" name="autoLockDelay" value="300000" onchange="applyExistingAutoLock(300000)"><span class="vk-auto-card"><span class="vk-auto-clock" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg></span><span class="vk-auto-copy"><strong class="vk-auto-name">5 minutos</strong><small class="vk-auto-detail">Más cómodo, menos restrictivo</small></span><span class="vk-auto-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12 5 5 11-14"/></svg></span></span></label>
     </div>
   </main>
 </section>
@@ -1390,6 +1433,114 @@ window.downloadEmergencyKit=function(){
 
   showKitToast("✅ Descargado");
 };
+})();
+</script>
+
+
+<script>
+(function(){
+"use strict";
+
+var AUTO_LOCK_ALLOWED=[0,30000,60000,300000];
+
+function autoById(id){
+  return document.getElementById(id);
+}
+
+function showAutoScreenFallback(targetId){
+  document.querySelectorAll(".screen").forEach(function(screen){
+    screen.classList.remove("active");
+    screen.hidden=true;
+    screen.style.display="none";
+  });
+
+  var target=autoById(targetId);
+  target.hidden=false;
+  target.style.display="";
+  target.classList.add("active");
+}
+
+function markCurrentAutoLock(){
+  var current=60000;
+
+  try{
+    if(typeof window.getAutoLockMs==="function"){
+      current=Number(window.getAutoLockMs());
+    }
+  }catch(error){
+    current=60000;
+  }
+
+  if(AUTO_LOCK_ALLOWED.indexOf(current)===-1){
+    current=60000;
+  }
+
+  var option=document.querySelector('input[name="autoLockDelay"][value="'+current+'"]');
+  if(option){
+    option.checked=true;
+  }
+}
+
+window.openAutoLockSettings=function(){
+  var screen=autoById("autoLockSettings");
+  if(!screen) return;
+
+  markCurrentAutoLock();
+
+  try{
+    if(typeof window.show==="function"){
+      screen.hidden=false;
+      window.show("autoLockSettings","right");
+    }else{
+      showAutoScreenFallback("autoLockSettings");
+    }
+  }catch(error){
+    showAutoScreenFallback("autoLockSettings");
+  }
+};
+
+window.closeAutoLockSettings=function(){
+  try{
+    if(typeof window.show==="function"){
+      window.show("securitySettings","left");
+    }else{
+      showAutoScreenFallback("securitySettings");
+    }
+  }catch(error){
+    showAutoScreenFallback("securitySettings");
+  }
+};
+
+window.applyExistingAutoLock=function(value){
+  value=Number(value);
+
+  if(AUTO_LOCK_ALLOWED.indexOf(value)===-1){
+    return;
+  }
+
+  if(typeof window.setAutoLock!=="function"){
+    return;
+  }
+
+  window.setAutoLock(value);
+
+  if(value===0){
+    if(typeof window.lock==="function"){
+      window.lock();
+    }
+    return;
+  }
+
+  if(typeof window.show==="function"){
+    window.show("securitySettings","left");
+  }else{
+    showAutoScreenFallback("securitySettings");
+  }
+};
+
+document.addEventListener("DOMContentLoaded",function(){
+  markCurrentAutoLock();
+});
 })();
 </script>
 
