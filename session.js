@@ -19,7 +19,7 @@
   var TIMEOUTS = { 'immediate': 0, '30s': 30000, '1m': 60000, '5m': 300000 };
   var ACTIVITY_EVENTS = ['pointerdown', 'keydown', 'touchstart'];
 
-  var _dek = null;       /* CryptoKey no extraíble; null = bloqueado */
+  var _dek = null;
   var _store = null;
   var _router = null;
   var _timer = null;
@@ -62,17 +62,14 @@
     if (_router) { _router.replace('/unlock'); }
   }
 
-  function start(opts) {
-    stop();  /* limpiar por completo cualquier sesión anterior */
-    _dek = opts.dekKey;
-    _store = opts.store;
-    _router = opts.router;
+  function configureOption(option) {
+    clearTimer();
+    removeListeners();
 
-    var option = (_store && _store.getMeta().autolockOption) || 'immediate';
     _timeoutMs = TIMEOUTS[option] !== undefined ? TIMEOUTS[option] : 0;
+    if (!_dek) { return; }
 
     if (option === 'immediate') {
-      /* Bloquear en cuanto la app pierde visibilidad o foco */
       _onVisibility = function () {
         if (root.document && root.document.visibilityState === 'hidden') { lock(); }
       };
@@ -80,13 +77,41 @@
       root.document && root.document.addEventListener('visibilitychange', _onVisibility);
       root.addEventListener('blur', _onBlur);
     } else {
-      /* Timer de inactividad: se reinicia en cada evento de actividad */
       _onActivity = function () { scheduleTimer(); };
       ACTIVITY_EVENTS.forEach(function (ev) {
         root.addEventListener(ev, _onActivity, true);
       });
       scheduleTimer();
     }
+  }
+
+  function start(opts) {
+    stop();
+    _dek = opts.dekKey;
+    _store = opts.store;
+    _router = opts.router;
+
+    var option = (_store && _store.getMeta().autolockOption) || 'immediate';
+    configureOption(option);
+  }
+
+  function setAutolockOption(option) {
+    if (TIMEOUTS[option] === undefined) { return false; }
+
+    if (_store && typeof _store.setMeta === 'function') {
+      _store.setMeta({ autolockOption: option });
+    }
+
+    configureOption(option);
+    return true;
+  }
+
+  function getAutolockOption() {
+    if (_store && typeof _store.getMeta === 'function') {
+      var option = _store.getMeta().autolockOption;
+      if (TIMEOUTS[option] !== undefined) { return option; }
+    }
+    return 'immediate';
   }
 
   function stop() {
@@ -102,6 +127,8 @@
     TIMEOUTS: TIMEOUTS,
     ACTIVITY_EVENTS: ACTIVITY_EVENTS.slice(),
     start: start,
+    setAutolockOption: setAutolockOption,
+    getAutolockOption: getAutolockOption,
     lock: lock,
     stop: stop,
     getDEK: getDEK,

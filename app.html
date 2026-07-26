@@ -1558,6 +1558,85 @@ document.addEventListener("DOMContentLoaded",function(){
 
 <!-- fin núcleo 2.0 -->
 <script src="app.js"></script>
+
+<script>
+/* Puente de autobloqueo VK2:
+   VK2 usa vkStore.meta.autolockOption + vkSession.
+   VK1 conserva las funciones legacy originales de app.js. */
+(function(){
+"use strict";
+
+var VK2_MS_TO_OPTION={0:"immediate",30000:"30s",60000:"1m",300000:"5m"};
+var VK2_OPTION_TO_MS={immediate:0,"30s":30000,"1m":60000,"5m":300000};
+
+var legacyGetAutoLockMs=window.getAutoLockMs;
+var legacySetAutoLock=window.setAutoLock;
+var legacyResetAutoLockTimer=window.resetAutoLockTimer;
+var legacyHandleVisibilityChange=window.handleVisibilityChange;
+
+function isVK2Vault(){
+  return !!(window.vkStore &&
+    typeof window.vkStore.hasVault==="function" &&
+    window.vkStore.hasVault());
+}
+
+function getVK2AutoLockMs(){
+  var meta=window.vkStore.getMeta();
+  var option=meta && meta.autolockOption;
+  return Object.prototype.hasOwnProperty.call(VK2_OPTION_TO_MS,option)
+    ? VK2_OPTION_TO_MS[option]
+    : 0;
+}
+
+window.getAutoLockMs=function(){
+  if(isVK2Vault()) return getVK2AutoLockMs();
+  return typeof legacyGetAutoLockMs==="function"
+    ? Number(legacyGetAutoLockMs())||0
+    : 0;
+};
+
+window.setAutoLock=function(ms){
+  ms=Number(ms);
+
+  if(!isVK2Vault()){
+    if(typeof legacySetAutoLock==="function") legacySetAutoLock(ms);
+    return;
+  }
+
+  var option=VK2_MS_TO_OPTION[ms];
+  if(!option) return;
+
+  window.vkStore.setMeta({autolockOption:option});
+
+  if(window.vkSession &&
+     typeof window.vkSession.setAutolockOption==="function"){
+    window.vkSession.setAutolockOption(option);
+  }
+};
+
+window.resetAutoLockTimer=function(){
+  if(isVK2Vault()) return;
+  if(typeof legacyResetAutoLockTimer==="function"){
+    legacyResetAutoLockTimer();
+  }
+};
+
+/* Evita que el listener legacy cree un segundo temporizador en VK2. */
+if(typeof legacyHandleVisibilityChange==="function"){
+  document.removeEventListener("visibilitychange",legacyHandleVisibilityChange);
+  document.addEventListener("visibilitychange",function(){
+    if(isVK2Vault()){
+      if(document.hidden &&
+         typeof window.showPrivacyOverlay==="function"){
+        window.showPrivacyOverlay();
+      }
+      return;
+    }
+    legacyHandleVisibilityChange();
+  });
+}
+})();
+</script>
 <script src="drive.js"></script>
 <div class="modal" id="securityModal">
   <div class="sheet" style="max-height:90vh;overflow-y:auto">
