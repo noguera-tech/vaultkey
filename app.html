@@ -330,7 +330,11 @@ html.vk-twa #vkSplash{display:none!important}
   </section>
 <section id="passwords" class="screen vk-passwords-root">
   <header class="vk-passwords-header">
-    <div aria-hidden="true"></div>
+    <button type="button" class="vk-note-back" aria-label="Volver al inicio" onclick="show('home','left')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m15 18-6-6 6-6"/>
+      </svg>
+    </button>
     <nav class="vk-passwords-header__actions" aria-label="Acciones principales">
       <button type="button" class="vk-iconbtn" aria-label="Favoritos" onclick="show('fav')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -1912,13 +1916,6 @@ if(typeof legacyHandleVisibilityChange==="function"){
   </div>
 </div>
 
-  <!-- Indicador de pantalla -->
-  <div class="screenDots" id="screenDots" style="position:fixed;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:7px;z-index:85;pointer-events:none">
-    <div class="dot" data-screen="home"  style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.2);transition:all .25s"></div>
-    <div class="dot" data-screen="vault" style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.2);transition:all .25s"></div>
-    <div class="dot" data-screen="fav"   style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.2);transition:all .25s"></div>
-    <div class="dot" data-screen="settings" style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.2);transition:all .25s"></div>
-  </div>
 </body>
 </html>
 
