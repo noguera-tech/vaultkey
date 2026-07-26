@@ -311,7 +311,7 @@ html.vk-twa #vkSplash{display:none!important}
           <span class="vk-dash-tile__icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h13a3 3 0 0 1 3 3v18a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Z"/><path d="M10 1v6M15 1v6M20 1v6M2 10h6M2 15h6M2 20h6M14 22l9-9 3 3-9 9-5 1 2-4Z"/></svg></span>
           <span class="vk-dash-tile__label">Notas</span><span id="statNotes" class="vk-dash-tile__count">0 notas</span>
         </button>
-        <button type="button" class="vk-dash-tile" onclick="show('vault')">
+        <button type="button" class="vk-dash-tile" onclick="showCards()">
           <span class="vk-dash-tile__icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="26" height="17" rx="3"/><path d="M3 14h26M8 20h8"/></svg></span>
           <span class="vk-dash-tile__label">Tarjetas</span><span id="statCards" class="vk-dash-tile__count">0 tarjetas</span>
         </button>
@@ -705,6 +705,275 @@ html.vk-twa #vkSplash{display:none!important}
     <div class="vk-note-form-actions">
       <button type="button" class="vk-note-form-cancel" onclick="showNoteDetail(window.__vkCurrentNoteId)">Cancelar</button>
       <button type="submit" class="vk-note-form-submit">Guardar</button>
+    </div>
+  </form>
+</section>
+
+
+<!-- =========================================================
+     VaultKey v1.2 — Módulo Tarjetas
+     Figma: 217:1825, 217:690, 217:1117, 217:1148
+     ========================================================= -->
+<section id="cards" class="screen vk-cards-screen" aria-labelledby="cardsTitle">
+  <header class="vk-cards-topbar">
+    <button type="button" class="vk-note-back" aria-label="Volver al Dashboard" onclick="show('home','left')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m15 18-6-6 6-6"/>
+      </svg>
+    </button>
+
+    <div class="vk-cards-topbar-actions">
+      <button type="button" class="vk-cards-icon-button" aria-label="Favoritos" onclick="show('fav')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      </button>
+      <button type="button" class="vk-cards-icon-button" aria-label="Ajustes" onclick="show('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.63.24 1.17.7 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="vk-cards-content">
+    <h1 id="cardsTitle" class="vk-cards-title">Tarjetas</h1>
+
+    <label class="vk-cards-search" for="cardsSearch">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="m20 20-3.6-3.6"/>
+      </svg>
+      <input id="cardsSearch" type="search" placeholder="Buscar tarjeta..." autocomplete="off" spellcheck="false" aria-label="Buscar tarjeta">
+    </label>
+
+    <div id="cardsList" class="vk-cards-list" aria-live="polite"></div>
+  </div>
+
+  <button type="button" class="vk-cards-fab" aria-label="Añadir tarjeta" onclick="openCreateCard()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+      <path d="M12 5v14M5 12h14"/>
+    </svg>
+  </button>
+</section>
+
+<section id="cardDetail" class="screen vk-card-detail-screen" aria-labelledby="cardDetailTitle">
+  <header class="vk-card-editor-topbar">
+    <button type="button" class="vk-note-back" aria-label="Volver a Tarjetas" onclick="showCards('left')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m15 18-6-6 6-6"/>
+      </svg>
+    </button>
+  </header>
+
+  <div class="vk-card-detail-content">
+    <h1 id="cardDetailTitle" class="vk-card-screen-title"></h1>
+
+    <article class="vk-card-detail-card">
+      <div class="vk-card-detail-heading">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="5" width="18" height="14" rx="2"/>
+          <path d="M3 10h18M7 15h4"/>
+        </svg>
+        <strong id="cardDetailHeading"></strong>
+      </div>
+
+      <div class="vk-card-detail-row">
+        <div>
+          <span class="vk-card-detail-label">Titular</span>
+          <strong id="cardDetailHolder" class="vk-card-detail-value"></strong>
+        </div>
+      </div>
+
+      <div class="vk-card-detail-row">
+        <div>
+          <span class="vk-card-detail-label">Número de tarjeta</span>
+          <strong id="cardDetailNumber" class="vk-card-detail-value"></strong>
+        </div>
+        <button type="button" class="vk-card-detail-icon" aria-label="Copiar número de tarjeta" onclick="copyCardNumber(window.__vkCurrentCardId)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="11" height="11" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="vk-card-detail-row">
+        <div>
+          <span class="vk-card-detail-label">Fecha de caducidad</span>
+          <strong id="cardDetailExpiry" class="vk-card-detail-value"></strong>
+        </div>
+      </div>
+
+      <div class="vk-card-detail-row">
+        <div>
+          <span class="vk-card-detail-label">CVV</span>
+          <strong id="cardDetailCvv" class="vk-card-detail-value">•••</strong>
+        </div>
+        <button id="cardDetailCvvToggle" type="button" class="vk-card-detail-icon" aria-label="Mostrar CVV" aria-pressed="false" onclick="toggleCvvVisibility()">
+          <svg id="cardDetailEyeOpen" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6Z"/>
+            <circle cx="12" cy="12" r="2.7"/>
+          </svg>
+          <svg id="cardDetailEyeOff" class="vk-card-hidden" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m3 3 18 18"/>
+            <path d="M10.6 10.7a2 2 0 0 0 2.7 2.7"/>
+            <path d="M9.9 4.4A10.6 10.6 0 0 1 12 4.2c6.2 0 9.9 7.8 9.9 7.8a16.6 16.6 0 0 1-2.7 3.7"/>
+            <path d="M6.7 6.8C3.8 8.7 2.1 12 2.1 12s3.7 7.8 9.9 7.8c1.5 0 2.8-.4 4-1"/>
+          </svg>
+        </button>
+      </div>
+
+      <button id="cardDetailNoteButton" type="button" class="vk-card-detail-note-button" onclick="openEditCard(window.__vkCurrentCardId,true)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 2v20M3 6h4M3 10h4M3 14h4M3 18h4"/>
+          <rect x="7" y="3" width="14" height="18" rx="2"/>
+          <path d="m14 8 4-4 2 2-4 4-3 1 1-3Z"/>
+        </svg>
+        <span id="cardDetailNoteText">Añadir nota</span>
+      </button>
+    </article>
+
+    <div class="vk-card-detail-actions">
+      <button type="button" class="vk-card-action vk-card-action-edit" onclick="openEditCard(window.__vkCurrentCardId)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+        </svg>
+        Editar
+      </button>
+
+      <button type="button" class="vk-card-action vk-card-action-delete" onclick="deleteCard(window.__vkCurrentCardId)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"/>
+        </svg>
+        Eliminar
+      </button>
+    </div>
+  </div>
+</section>
+
+<section id="cardCreate" class="screen vk-card-form-screen" aria-labelledby="cardCreateTitle">
+  <header class="vk-card-editor-topbar">
+    <button type="button" class="vk-note-back" aria-label="Volver a Tarjetas" onclick="showCards('left')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m15 18-6-6 6-6"/>
+      </svg>
+    </button>
+  </header>
+
+  <form id="cardCreateForm" class="vk-card-form" onsubmit="event.preventDefault();saveCard(null,document.getElementById('cardCreateHolder').value,document.getElementById('cardCreateNumber').value,document.getElementById('cardCreateExpiry').value,document.getElementById('cardCreateCvv').value,document.getElementById('cardCreateNote').value)">
+    <h1 id="cardCreateTitle" class="vk-card-screen-title">Añadir tarjeta</h1>
+
+    <label class="vk-card-field">
+      <span>Titular</span>
+      <input id="cardCreateHolder" type="text" maxlength="120" placeholder="Introduce el nombre del titular" autocomplete="cc-name">
+    </label>
+
+    <label class="vk-card-field">
+      <span>Número de tarjeta</span>
+      <div class="vk-card-input-action">
+        <input id="cardCreateNumber" type="text" maxlength="19" inputmode="numeric" placeholder="Introduce el número de tarjeta" autocomplete="cc-number" oninput="formatCardNumberInput(this)">
+        <button type="button" aria-label="Pegar número de tarjeta" onclick="pasteCardNumber('cardCreateNumber')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="11" height="11" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+        </button>
+      </div>
+    </label>
+
+    <label class="vk-card-field">
+      <span>Fecha de caducidad</span>
+      <input id="cardCreateExpiry" type="text" maxlength="5" inputmode="numeric" placeholder="MM / AA" autocomplete="cc-exp" oninput="formatCardExpiryInput(this)">
+    </label>
+
+    <label class="vk-card-field">
+      <span>CVV</span>
+      <div class="vk-card-input-action">
+        <input id="cardCreateCvv" type="password" maxlength="4" inputmode="numeric" placeholder="CVV" autocomplete="cc-csc" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)">
+        <button type="button" aria-label="Mostrar u ocultar CVV" onclick="toggleCardFormCvv('cardCreateCvv',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6Z"/>
+            <circle cx="12" cy="12" r="2.7"/>
+          </svg>
+        </button>
+      </div>
+    </label>
+
+    <button id="cardCreateAddNote" type="button" class="vk-card-add-note" onclick="toggleCardNoteField('cardCreate')">+ Añadir nota</button>
+
+    <label id="cardCreateNoteField" class="vk-card-field vk-card-note-field" hidden>
+      <span>Nota</span>
+      <textarea id="cardCreateNote" maxlength="2000" placeholder="Añade una nota opcional"></textarea>
+    </label>
+
+    <div class="vk-card-form-actions">
+      <button type="button" class="vk-card-form-cancel" onclick="showCards('left')">Cancelar</button>
+      <button type="submit" class="vk-card-form-submit">Crear</button>
+    </div>
+  </form>
+</section>
+
+<section id="cardEdit" class="screen vk-card-form-screen" aria-labelledby="cardEditTitle">
+  <header class="vk-card-editor-topbar">
+    <button type="button" class="vk-note-back" aria-label="Volver al detalle" onclick="showCardDetail(window.__vkCurrentCardId)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m15 18-6-6 6-6"/>
+      </svg>
+    </button>
+  </header>
+
+  <form id="cardEditForm" class="vk-card-form" onsubmit="event.preventDefault();saveCard(window.__vkCurrentCardId,document.getElementById('cardEditHolder').value,document.getElementById('cardEditNumber').value,document.getElementById('cardEditExpiry').value,document.getElementById('cardEditCvv').value,document.getElementById('cardEditNote').value)">
+    <h1 id="cardEditTitle" class="vk-card-screen-title">Editar tarjeta</h1>
+
+    <label class="vk-card-field">
+      <span>Titular</span>
+      <input id="cardEditHolder" type="text" maxlength="120" autocomplete="cc-name">
+    </label>
+
+    <label class="vk-card-field">
+      <span>Número de tarjeta</span>
+      <div class="vk-card-input-action">
+        <input id="cardEditNumber" type="text" maxlength="19" inputmode="numeric" autocomplete="cc-number" oninput="formatCardNumberInput(this)">
+        <button type="button" aria-label="Pegar número de tarjeta" onclick="pasteCardNumber('cardEditNumber')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="11" height="11" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+        </button>
+      </div>
+    </label>
+
+    <label class="vk-card-field">
+      <span>Fecha de caducidad</span>
+      <input id="cardEditExpiry" type="text" maxlength="5" inputmode="numeric" autocomplete="cc-exp" oninput="formatCardExpiryInput(this)">
+    </label>
+
+    <label class="vk-card-field">
+      <span>CVV</span>
+      <div class="vk-card-input-action">
+        <input id="cardEditCvv" type="password" maxlength="4" inputmode="numeric" autocomplete="cc-csc" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)">
+        <button type="button" aria-label="Mostrar u ocultar CVV" onclick="toggleCardFormCvv('cardEditCvv',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6Z"/>
+            <circle cx="12" cy="12" r="2.7"/>
+          </svg>
+        </button>
+      </div>
+    </label>
+
+    <button id="cardEditAddNote" type="button" class="vk-card-add-note" onclick="toggleCardNoteField('cardEdit')">+ Añadir nota</button>
+
+    <label id="cardEditNoteField" class="vk-card-field vk-card-note-field" hidden>
+      <span>Nota</span>
+      <textarea id="cardEditNote" maxlength="2000" placeholder="Añade una nota opcional"></textarea>
+    </label>
+
+    <div class="vk-card-form-actions">
+      <button type="button" class="vk-card-form-cancel" onclick="showCardDetail(window.__vkCurrentCardId)">Cancelar</button>
+      <button type="submit" class="vk-card-form-submit">Guardar</button>
     </div>
   </form>
 </section>

@@ -4699,3 +4699,529 @@ button.vk-security-card:active { background: #243246; }
   }
 }
 
+/* ============================================================
+   VaultKey v1.2 — Módulo Tarjetas
+   Figma nodes: 217:1825, 217:690, 217:1117, 217:1148
+   ============================================================ */
+.vk-cards-screen,
+.vk-card-detail-screen,
+.vk-card-form-screen {
+  background:linear-gradient(149.3508256958964deg,#111827 15.964%,#182F4E 63.204%);
+  color:#FFFFFF;
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+
+.vk-cards-topbar,
+.vk-card-editor-topbar {
+  height:64px;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+  background:#243246;
+  border:1px solid #030508;
+  flex-shrink:0;
+}
+
+.vk-cards-topbar > .vk-note-back,
+.vk-card-editor-topbar > .vk-note-back {
+  margin-right:auto;
+}
+
+.vk-cards-topbar-actions {
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.vk-cards-icon-button {
+  width:24px;
+  height:24px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#FFFFFF;
+  display:grid;
+  place-items:center;
+}
+
+.vk-cards-icon-button svg {
+  width:24px;
+  height:24px;
+}
+
+.vk-cards-content {
+  flex:1;
+  overflow-y:auto;
+  padding:16px 23px 96px;
+  scrollbar-width:none;
+}
+
+.vk-cards-content::-webkit-scrollbar {
+  display:none;
+}
+
+.vk-cards-title,
+.vk-card-screen-title {
+  margin:0;
+  color:#FFFFFF;
+  font-size:20px;
+  line-height:24px;
+  font-weight:700;
+  text-align:center;
+}
+
+.vk-cards-search {
+  height:58px;
+  margin-top:47px;
+  padding:0 14px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  background:#243246;
+  border:1px solid rgba(58,74,96,.6);
+  border-radius:16px;
+}
+
+.vk-cards-search svg {
+  width:24px;
+  height:24px;
+  flex-shrink:0;
+}
+
+.vk-cards-search input {
+  width:100%;
+  min-width:0;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:#FFFFFF;
+  font-size:16px;
+  font-weight:400;
+  cursor:text;
+}
+
+.vk-cards-search input::placeholder {
+  color:#A7B6C9;
+  opacity:1;
+}
+
+.vk-cards-list {
+  display:flex;
+  flex-direction:column;
+  gap:30px;
+  margin-top:29px;
+}
+
+.vk-card-row {
+  width:100%;
+  min-height:72px;
+  padding:10px 14px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  border-radius:16px;
+  border:1px solid rgba(58,74,96,.6);
+  background:#243246;
+  color:#FFFFFF;
+  text-align:left;
+}
+
+.vk-card-row-icon {
+  width:26px;
+  height:26px;
+  flex-shrink:0;
+}
+
+.vk-card-row-main {
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.vk-card-row-main strong {
+  color:#FFFFFF;
+  font-size:14px;
+  line-height:17px;
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.vk-card-row-main small {
+  color:#A7B6C9;
+  font-size:13px;
+  line-height:16px;
+  font-weight:400;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.vk-card-row-chevron {
+  width:20px;
+  height:20px;
+  flex-shrink:0;
+  color:#A7B6C9;
+}
+
+.vk-cards-empty {
+  min-height:220px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  color:#A7B6C9;
+  text-align:center;
+}
+
+.vk-cards-empty strong {
+  color:#FFFFFF;
+  font-size:16px;
+}
+
+.vk-cards-empty span {
+  font-size:13px;
+}
+
+.vk-cards-fab {
+  position:absolute;
+  right:21px;
+  bottom:25px;
+  width:56px;
+  height:56px;
+  border:0;
+  border-radius:50%;
+  background:#3B82F6;
+  color:#FFFFFF;
+  display:grid;
+  place-items:center;
+  z-index:5;
+}
+
+.vk-cards-fab svg {
+  width:26px;
+  height:26px;
+}
+
+.vk-card-detail-content {
+  flex:1;
+  overflow-y:auto;
+  padding:8px 24px 32px;
+}
+
+.vk-card-detail-card {
+  min-height:345px;
+  margin-top:56px;
+  padding:16px 20px 6px;
+  background:#243246;
+  border:1px solid rgba(58,74,96,.6);
+  border-radius:20px;
+}
+
+.vk-card-detail-heading {
+  display:flex;
+  align-items:center;
+  gap:15px;
+  margin-bottom:13px;
+}
+
+.vk-card-detail-heading svg {
+  width:25px;
+  height:25px;
+  flex-shrink:0;
+}
+
+.vk-card-detail-heading strong {
+  color:#FFFFFF;
+  font-size:16px;
+  font-weight:600;
+}
+
+.vk-card-detail-row {
+  min-height:58px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:8px 0;
+  border-bottom:1px solid rgba(58,74,96,.8);
+}
+
+.vk-card-detail-row > div {
+  min-width:0;
+}
+
+.vk-card-detail-label {
+  display:block;
+  margin-bottom:5px;
+  color:#A7B6C9;
+  font-size:14px;
+  font-weight:400;
+}
+
+.vk-card-detail-value {
+  display:block;
+  color:#FFFFFF;
+  font-size:16px;
+  line-height:20px;
+  font-weight:400;
+  overflow-wrap:anywhere;
+}
+
+.vk-card-detail-icon {
+  width:28px;
+  height:28px;
+  padding:0;
+  border:0;
+  background:transparent;
+  display:grid;
+  place-items:center;
+  flex-shrink:0;
+}
+
+.vk-card-detail-icon svg {
+  width:26px;
+  height:26px;
+}
+
+.vk-card-detail-note-button {
+  width:100%;
+  min-height:44px;
+  margin-top:8px;
+  padding:0 14px;
+  border:1px solid rgba(58,74,96,.6);
+  border-radius:12px;
+  background:#243246;
+  color:#A7B6C9;
+  display:flex;
+  align-items:center;
+  gap:25px;
+  text-align:left;
+  font-size:14px;
+}
+
+.vk-card-detail-note-button svg {
+  width:25px;
+  height:25px;
+  flex-shrink:0;
+}
+
+.vk-card-detail-note-button span {
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.vk-card-detail-actions {
+  display:flex;
+  justify-content:center;
+  gap:44px;
+  margin-top:43px;
+}
+
+.vk-card-action {
+  width:120px;
+  height:43px;
+  border-radius:16px;
+  border:1px solid #475569;
+  color:#CBD5E1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  font-size:14px;
+  font-weight:400;
+}
+
+.vk-card-action svg {
+  width:24px;
+  height:24px;
+}
+
+.vk-card-action-edit {
+  background:#334155;
+}
+
+.vk-card-action-delete {
+  background:#DC2626;
+}
+
+.vk-card-form {
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow-y:auto;
+  padding:8px 24px 54px;
+}
+
+.vk-card-form .vk-card-screen-title {
+  margin-bottom:31px;
+}
+
+.vk-card-field {
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.vk-card-field > span {
+  padding-left:13px;
+  color:rgba(167,182,201,.8);
+  font-size:14px;
+  line-height:17px;
+  font-weight:400;
+}
+
+.vk-card-field input,
+.vk-card-field textarea,
+.vk-card-input-action {
+  width:100%;
+  border:1px solid rgba(58,74,96,.6);
+  border-radius:16px;
+  background:#243246;
+  color:#FFFFFF;
+}
+
+.vk-card-field input {
+  height:53px;
+  padding:0 13px;
+  outline:0;
+  font-size:16px;
+  font-weight:400;
+}
+
+.vk-card-field textarea {
+  min-height:84px;
+  padding:12px 13px;
+  outline:0;
+  resize:none;
+  font-size:14px;
+}
+
+.vk-card-field input::placeholder,
+.vk-card-field textarea::placeholder {
+  color:#FFFFFF;
+  opacity:1;
+}
+
+.vk-card-field input:focus,
+.vk-card-field textarea:focus {
+  border-color:#3B82F6;
+}
+
+.vk-card-input-action {
+  height:53px;
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+}
+
+.vk-card-input-action input {
+  flex:1;
+  min-width:0;
+  border:0;
+  background:transparent;
+  border-radius:0;
+}
+
+.vk-card-input-action button {
+  width:48px;
+  height:100%;
+  padding:0;
+  border:0;
+  background:transparent;
+  display:grid;
+  place-items:center;
+  flex-shrink:0;
+}
+
+.vk-card-input-action button svg {
+  width:26px;
+  height:26px;
+}
+
+.vk-card-add-note {
+  align-self:flex-start;
+  margin:0 0 12px 13px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#A7B6C9;
+  font-size:16px;
+  line-height:28px;
+  text-align:left;
+}
+
+.vk-card-note-field[hidden] {
+  display:none;
+}
+
+.vk-card-form-actions {
+  margin-top:auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  padding-top:16px;
+}
+
+.vk-card-form-actions button {
+  height:48px;
+  border-radius:16px;
+  color:#FFFFFF;
+  font-size:14px;
+  font-weight:400;
+}
+
+.vk-card-form-cancel {
+  border:1px solid #3A4A60;
+  background:transparent;
+}
+
+.vk-card-form-submit {
+  border:0;
+  background:#3B82F6;
+}
+
+.vk-card-hidden {
+  display:none !important;
+}
+
+@media (max-height:760px) {
+  .vk-cards-search {
+    margin-top:28px;
+  }
+
+  .vk-cards-list {
+    gap:16px;
+  }
+
+  .vk-card-detail-card {
+    margin-top:30px;
+  }
+
+  .vk-card-detail-actions {
+    margin-top:24px;
+  }
+
+  .vk-card-form {
+    padding-bottom:22px;
+  }
+
+  .vk-card-form .vk-card-screen-title {
+    margin-bottom:18px;
+  }
+
+  .vk-card-field {
+    gap:7px;
+    margin-bottom:9px;
+  }
+}
+

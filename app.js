@@ -3316,8 +3316,8 @@ function render(){
   const _fes=$('favEmptyState');
   if(_fes)_fes.style.display=vault.filter(e=>e.fav).length===0?'block':'none';$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length);
   const _dashPasswords=vault.filter(e=>!e.entryType||e.entryType==='password'||e.entryType==='wifi').length;
-  const _dashNotes=vault.filter(e=>e.entryType==='note').length;
-  const _dashCards=vault.filter(e=>e.entryType==='card').length;
+  const _dashNotes=(typeof window.vkNotes!=='undefined'&&window.vkNotes.read)?window.vkNotes.read().length:vault.filter(e=>e.entryType==='note').length;
+  const _dashCards=(typeof window.vkCards!=='undefined'&&window.vkCards.read)?window.vkCards.read().length:vault.filter(e=>e.entryType==='card').length;
   const _dashDocuments=vault.filter(e=>['id','license','medical'].includes(e.entryType)).length;
   const _setDashCount=(id,count,singular,plural)=>{const el=$(id);if(el)el.textContent=count+' '+(count===1?singular:plural)};
   _setDashCount('statPasswords',_dashPasswords,'elemento','elementos');
@@ -5387,3 +5387,384 @@ try {
     updateCount:updateNotesCount
   };
 })();
+
+/* ============================================================
+   VaultKey v1.2 — Módulo Tarjetas (CRUD local)
+   Almacenamiento independiente: localStorage["vaultkey_cards"]
+   ============================================================ */
+(function(){
+  'use strict';
+
+  var CARDS_KEY='vaultkey_cards';
+  var cardsSearchBound=false;
+  var detailCvvVisible=false;
+
+  function cardsRead(){
+    try{
+      var parsed=JSON.parse(localStorage.getItem(CARDS_KEY)||'[]');
+      return Array.isArray(parsed)?parsed.filter(function(card){
+        return card&&typeof card==='object'&&typeof card.id==='string';
+      }):[];
+    }catch(error){
+      console.warn('VaultKey Cards: JSON inválido',error);
+      return [];
+    }
+  }
+
+  function cardsWrite(cards){
+    localStorage.setItem(CARDS_KEY,JSON.stringify(cards));
+  }
+
+  function cardUuid(){
+    if(window.crypto&&typeof window.crypto.randomUUID==='function'){
+      return 'uuid-'+window.crypto.randomUUID();
+    }
+    return 'uuid-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
+  }
+
+  function cardEscape(value){
+    return String(value==null?'':value)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#039;');
+  }
+
+  function cardDigits(value){
+    return String(value||'').replace(/\D/g,'').slice(0,19);
+  }
+
+  function cardNumberGroups(value){
+    return cardDigits(value).replace(/(.{4})/g,'$1 ').trim();
+  }
+
+  function cardMaskedNumber(value){
+    var digits=cardDigits(value);
+    var last=digits.slice(-4).padStart(4,'•');
+    return '•••• •••• •••• '+last;
+  }
+
+  function normalizeExpiry(value){
+    var digits=String(value||'').replace(/\D/g,'').slice(0,4);
+    if(!digits)return '';
+    var month=digits.slice(0,2);
+    var year=digits.slice(2,4);
+    if(month.length===2){
+      var monthNumber=Math.max(1,Math.min(12,Number(month)||1));
+      month=String(monthNumber).padStart(2,'0');
+    }
+    return year?month+'/'+year:month;
+  }
+
+  function updateCardsCount(){
+    var counter=document.getElementById('statCards');
+    if(!counter)return;
+    var count=cardsRead().length;
+    counter.textContent=count+' tarjeta'+(count===1?'':'s');
+  }
+
+  function renderCardsList(){
+    var list=document.getElementById('cardsList');
+    if(!list)return;
+
+    var search=document.getElementById('cardsSearch');
+    var query=String(search&&search.value||'').trim().toLocaleLowerCase('es');
+    var cards=cardsRead()
+      .filter(function(card){
+        return !query||String(card.holder||'').toLocaleLowerCase('es').includes(query);
+      })
+      .sort(function(a,b){
+        return Number(b.updatedAt||b.createdAt||0)-Number(a.updatedAt||a.createdAt||0);
+      });
+
+    if(!cards.length){
+      list.innerHTML='<div class="vk-cards-empty">'+
+        '<strong>'+(query?'No se encontraron tarjetas':'Aún no hay tarjetas')+'</strong>'+
+        '<span>'+(query?'Prueba con otro titular.':'Pulsa + para añadir la primera tarjeta.')+'</span>'+
+      '</div>';
+      return;
+    }
+
+    list.innerHTML=cards.map(function(card){
+      return '<button type="button" class="vk-card-row" data-card-id="'+cardEscape(card.id)+'">'+
+        '<svg class="vk-card-row-icon" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+
+          '<rect x="3" y="5" width="18" height="14" rx="2"/>'+
+          '<path d="M3 10h18M7 15h4"/>'+
+        '</svg>'+
+        '<span class="vk-card-row-main">'+
+          '<strong>'+cardEscape(card.holder||'Sin titular')+'</strong>'+
+          '<small>'+cardEscape(cardMaskedNumber(card.number))+'</small>'+
+        '</span>'+
+        '<svg class="vk-card-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>'+
+      '</button>';
+    }).join('');
+  }
+
+  window.showCards=function(dir){
+    if(typeof window.show==='function')window.show('cards',dir);
+    renderCardsList();
+    updateCardsCount();
+  };
+
+  window.showCardDetail=function(id){
+    var card=cardsRead().find(function(item){return item.id===id;});
+    if(!card){
+      window.showCards('left');
+      return;
+    }
+
+    window.__vkCurrentCardId=card.id;
+    detailCvvVisible=false;
+
+    document.getElementById('cardDetailTitle').textContent=card.holder||'Tarjeta';
+    document.getElementById('cardDetailHeading').textContent=card.holder||'Tarjeta';
+    document.getElementById('cardDetailHolder').textContent=card.holder||'Sin titular';
+    document.getElementById('cardDetailNumber').textContent=cardMaskedNumber(card.number);
+    document.getElementById('cardDetailExpiry').textContent=(card.expiry||'--/--').replace('/', ' / ');
+    document.getElementById('cardDetailCvv').textContent='•••';
+
+    var noteText=document.getElementById('cardDetailNoteText');
+    if(noteText)noteText.textContent=card.note?card.note:'Añadir nota';
+
+    var toggle=document.getElementById('cardDetailCvvToggle');
+    if(toggle){
+      toggle.setAttribute('aria-pressed','false');
+      toggle.setAttribute('aria-label','Mostrar CVV');
+    }
+    document.getElementById('cardDetailEyeOpen')?.classList.remove('vk-card-hidden');
+    document.getElementById('cardDetailEyeOff')?.classList.add('vk-card-hidden');
+
+    if(typeof window.show==='function')window.show('cardDetail','right');
+  };
+
+  window.openCreateCard=function(){
+    var form=document.getElementById('cardCreateForm');
+    if(form)form.reset();
+
+    window.__vkCurrentCardId=null;
+    var noteField=document.getElementById('cardCreateNoteField');
+    var noteButton=document.getElementById('cardCreateAddNote');
+    if(noteField)noteField.hidden=true;
+    if(noteButton)noteButton.textContent='+ Añadir nota';
+
+    if(typeof window.show==='function')window.show('cardCreate','right');
+    setTimeout(function(){
+      document.getElementById('cardCreateHolder')?.focus();
+    },280);
+  };
+
+  window.openEditCard=function(id,openNote){
+    var card=cardsRead().find(function(item){return item.id===id;});
+    if(!card)return;
+
+    window.__vkCurrentCardId=card.id;
+    document.getElementById('cardEditHolder').value=card.holder||'';
+    document.getElementById('cardEditNumber').value=cardNumberGroups(card.number);
+    document.getElementById('cardEditExpiry').value=normalizeExpiry(card.expiry);
+    document.getElementById('cardEditCvv').value=String(card.cvv||'');
+    document.getElementById('cardEditCvv').type='password';
+    document.getElementById('cardEditNote').value=card.note||'';
+
+    var noteField=document.getElementById('cardEditNoteField');
+    var noteButton=document.getElementById('cardEditAddNote');
+    var showNote=Boolean(openNote||card.note);
+    if(noteField)noteField.hidden=!showNote;
+    if(noteButton)noteButton.textContent=showNote?'− Ocultar nota':'+ Añadir nota';
+
+    if(typeof window.show==='function')window.show('cardEdit','right');
+    if(openNote){
+      setTimeout(function(){
+        document.getElementById('cardEditNote')?.focus();
+      },280);
+    }
+  };
+
+  window.saveCard=function(id,holder,number,expiry,cvv,note){
+    holder=String(holder||'').trim();
+    number=cardDigits(number);
+    expiry=normalizeExpiry(expiry);
+    cvv=String(cvv||'').replace(/\D/g,'').slice(0,4);
+    note=String(note||'').trim();
+
+    if(!holder){
+      if(typeof window.toast==='function')window.toast('El titular es obligatorio','err');
+      document.getElementById(id?'cardEditHolder':'cardCreateHolder')?.focus();
+      return false;
+    }
+
+    if(number.length<13){
+      if(typeof window.toast==='function')window.toast('El número de tarjeta no es válido','err');
+      document.getElementById(id?'cardEditNumber':'cardCreateNumber')?.focus();
+      return false;
+    }
+
+    if(!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)){
+      if(typeof window.toast==='function')window.toast('La fecha debe tener formato MM/AA','err');
+      document.getElementById(id?'cardEditExpiry':'cardCreateExpiry')?.focus();
+      return false;
+    }
+
+    if(!/^\d{3,4}$/.test(cvv)){
+      if(typeof window.toast==='function')window.toast('El CVV debe tener 3 o 4 dígitos','err');
+      document.getElementById(id?'cardEditCvv':'cardCreateCvv')?.focus();
+      return false;
+    }
+
+    var cards=cardsRead();
+    var now=Date.now();
+
+    if(id){
+      var index=cards.findIndex(function(card){return card.id===id;});
+      if(index===-1){
+        window.showCards('left');
+        return false;
+      }
+      cards[index]=Object.assign({},cards[index],{
+        holder:holder,
+        number:number,
+        expiry:expiry,
+        cvv:cvv,
+        note:note,
+        updatedAt:now
+      });
+    }else{
+      id=cardUuid();
+      cards.push({
+        id:id,
+        holder:holder,
+        number:number,
+        expiry:expiry,
+        cvv:cvv,
+        note:note,
+        createdAt:now,
+        updatedAt:now
+      });
+    }
+
+    cardsWrite(cards);
+    updateCardsCount();
+    if(typeof window.toast==='function')window.toast('Tarjeta guardada','ok');
+    window.showCardDetail(id);
+    return true;
+  };
+
+  window.deleteCard=function(id){
+    var card=cardsRead().find(function(item){return item.id===id;});
+    if(!card){
+      window.showCards('left');
+      return;
+    }
+
+    if(!window.confirm('¿Eliminar la tarjeta de "'+(card.holder||'Sin titular')+'"?'))return;
+
+    cardsWrite(cardsRead().filter(function(item){return item.id!==id;}));
+    window.__vkCurrentCardId=null;
+    updateCardsCount();
+    if(typeof window.toast==='function')window.toast('Tarjeta eliminada','ok');
+    window.showCards('left');
+  };
+
+  window.toggleCvvVisibility=function(){
+    var card=cardsRead().find(function(item){return item.id===window.__vkCurrentCardId;});
+    if(!card)return;
+
+    detailCvvVisible=!detailCvvVisible;
+    document.getElementById('cardDetailCvv').textContent=detailCvvVisible?String(card.cvv||''):'•••';
+
+    var toggle=document.getElementById('cardDetailCvvToggle');
+    if(toggle){
+      toggle.setAttribute('aria-pressed',String(detailCvvVisible));
+      toggle.setAttribute('aria-label',detailCvvVisible?'Ocultar CVV':'Mostrar CVV');
+    }
+
+    document.getElementById('cardDetailEyeOpen')?.classList.toggle('vk-card-hidden',detailCvvVisible);
+    document.getElementById('cardDetailEyeOff')?.classList.toggle('vk-card-hidden',!detailCvvVisible);
+  };
+
+  window.copyCardNumber=async function(id){
+    var card=cardsRead().find(function(item){return item.id===id;});
+    if(!card)return;
+
+    try{
+      await navigator.clipboard.writeText(card.number);
+      if(typeof window.toast==='function')window.toast('Número de tarjeta copiado','ok');
+      if(typeof window.soundCopy==='function')window.soundCopy();
+    }catch(error){
+      var helper=document.createElement('textarea');
+      helper.value=card.number;
+      helper.setAttribute('readonly','');
+      helper.style.position='fixed';
+      helper.style.opacity='0';
+      document.body.appendChild(helper);
+      helper.select();
+      document.execCommand('copy');
+      helper.remove();
+      if(typeof window.toast==='function')window.toast('Número de tarjeta copiado','ok');
+    }
+  };
+
+  window.formatCardNumberInput=function(input){
+    input.value=cardNumberGroups(input.value).slice(0,19);
+  };
+
+  window.formatCardExpiryInput=function(input){
+    var digits=String(input.value||'').replace(/\D/g,'').slice(0,4);
+    if(digits.length>=2){
+      var month=Math.max(1,Math.min(12,Number(digits.slice(0,2))||1));
+      digits=String(month).padStart(2,'0')+digits.slice(2);
+    }
+    input.value=digits.length>2?digits.slice(0,2)+'/'+digits.slice(2):digits;
+  };
+
+  window.toggleCardFormCvv=function(inputId,button){
+    var input=document.getElementById(inputId);
+    if(!input)return;
+    var visible=input.type==='text';
+    input.type=visible?'password':'text';
+    if(button)button.setAttribute('aria-label',visible?'Mostrar CVV':'Ocultar CVV');
+  };
+
+  window.toggleCardNoteField=function(prefix){
+    var field=document.getElementById(prefix+'NoteField');
+    var button=document.getElementById(prefix+'AddNote');
+    if(!field)return;
+    field.hidden=!field.hidden;
+    if(button)button.textContent=field.hidden?'+ Añadir nota':'− Ocultar nota';
+    if(!field.hidden)setTimeout(function(){document.getElementById(prefix+'Note')?.focus();},0);
+  };
+
+  window.pasteCardNumber=async function(inputId){
+    var input=document.getElementById(inputId);
+    if(!input)return;
+    try{
+      input.value=await navigator.clipboard.readText();
+      window.formatCardNumberInput(input);
+    }catch(error){
+      if(typeof window.toast==='function')window.toast('No se pudo acceder al portapapeles','err');
+    }
+  };
+
+  document.addEventListener('click',function(event){
+    var row=event.target.closest&&event.target.closest('.vk-card-row[data-card-id]');
+    if(!row)return;
+    window.showCardDetail(row.getAttribute('data-card-id'));
+  });
+
+  document.addEventListener('DOMContentLoaded',function(){
+    var search=document.getElementById('cardsSearch');
+    if(search&&!cardsSearchBound){
+      cardsSearchBound=true;
+      search.addEventListener('input',renderCardsList);
+    }
+    updateCardsCount();
+  });
+
+  window.vkCards={
+    read:cardsRead,
+    render:renderCardsList,
+    updateCount:updateCardsCount,
+    mask:cardMaskedNumber
+  };
+})();
+
