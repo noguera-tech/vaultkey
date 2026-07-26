@@ -315,7 +315,7 @@ html.vk-twa #vkSplash{display:none!important}
           <span class="vk-dash-tile__icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="26" height="17" rx="3"/><path d="M3 14h26M8 20h8"/></svg></span>
           <span class="vk-dash-tile__label">Tarjetas</span><span id="statCards" class="vk-dash-tile__count">0 tarjetas</span>
         </button>
-        <button type="button" class="vk-dash-tile" onclick="show('vault')">
+        <button type="button" class="vk-dash-tile" onclick="showDocuments()">
           <span class="vk-dash-tile__icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h11l6 6v20H8a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Z"/><path d="M19 3v7h6M10 17h10M10 22h10"/></svg></span>
           <span class="vk-dash-tile__label">Documentos</span><span id="statDocuments" class="vk-dash-tile__count">0 documentos</span>
         </button>
@@ -975,6 +975,95 @@ html.vk-twa #vkSplash{display:none!important}
       <button type="button" class="vk-card-form-cancel" onclick="showCardDetail(window.__vkCurrentCardId)">Cancelar</button>
       <button type="submit" class="vk-card-form-submit">Guardar</button>
     </div>
+  </form>
+</section>
+
+
+<!-- VaultKey v1.2 — Módulo Documentos -->
+<section id="documents" class="screen vk-documents-screen" aria-labelledby="documentsTitle">
+  <header class="vk-documents-topbar">
+    <button type="button" class="vk-note-back" aria-label="Volver al Dashboard" onclick="show('home','left')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+    <div class="vk-documents-topbar-actions">
+      <button type="button" class="vk-documents-icon-button" aria-label="Favoritos" onclick="show('fav')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
+      <button type="button" class="vk-documents-icon-button" aria-label="Ajustes" onclick="show('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.63.24 1.17.7 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    </div>
+  </header>
+  <div class="vk-documents-content">
+    <h1 id="documentsTitle" class="vk-documents-title">Documentos</h1>
+    <label class="vk-documents-search" for="documentsSearch"><svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg><input id="documentsSearch" type="search" placeholder="Buscar documento..." autocomplete="off" spellcheck="false"></label>
+    <div id="documentsList" class="vk-documents-list" aria-live="polite"></div>
+  </div>
+  <button type="button" class="vk-documents-fab" aria-label="Añadir documento" onclick="openTypePicker()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+</section>
+
+<div id="documentTypePicker" class="vk-document-modal" hidden>
+  <div class="vk-document-modal-backdrop" onclick="closeDocumentTypePicker()"></div>
+  <section class="vk-document-type-panel" role="dialog" aria-modal="true">
+    <header class="vk-document-modal-header"><button type="button" class="vk-note-back" aria-label="Cerrar" onclick="closeDocumentTypePicker()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button></header>
+    <h2>Elegir tipo</h2>
+    <div class="vk-document-type-grid">
+      <button type="button" onclick="selectDocumentType('dni')"><span data-doc-icon="dni"></span><strong>DNI</strong></button>
+      <button type="button" onclick="selectDocumentType('passport')"><span data-doc-icon="passport"></span><strong>Pasaporte</strong></button>
+      <button type="button" onclick="selectDocumentType('license')"><span data-doc-icon="license"></span><strong>Permiso</strong></button>
+      <button type="button" onclick="selectDocumentType('health')"><span data-doc-icon="health"></span><strong>Sanitaria</strong></button>
+      <button type="button" onclick="selectDocumentType('vaccine')"><span data-doc-icon="vaccine"></span><strong>Vacunas</strong></button>
+      <button type="button" onclick="selectDocumentType('insurance')"><span data-doc-icon="insurance"></span><strong>Seguro</strong></button>
+      <button type="button" onclick="selectDocumentType('other')"><span data-doc-icon="other"></span><strong>Otro</strong></button>
+    </div>
+  </section>
+</div>
+
+<div id="documentSourceSheet" class="vk-document-modal" hidden>
+  <div class="vk-document-modal-backdrop" onclick="closeDocumentSourceSheet()"></div>
+  <section class="vk-document-source-sheet" role="dialog" aria-modal="true">
+    <div class="vk-document-sheet-handle"></div><h2>Añadir documento</h2>
+    <button type="button" class="vk-document-source-option" onclick="openDocumentSource('scan')"><strong>Escanear</strong><svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M4 7V4h3M17 4h3v3M20 17v3h-3M7 20H4v-3"/></svg></button>
+    <button type="button" class="vk-document-source-option" onclick="openDocumentSource('import')"><strong>Importar</strong><svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M12 18v-6M9 15l3-3 3 3"/></svg></button>
+    <div class="vk-document-source-divider"></div>
+    <button type="button" class="vk-document-sheet-cancel" onclick="closeDocumentSourceSheet()">Cancelar</button>
+  </section>
+  <input id="documentScanInput" type="file" accept="image/*" capture="environment" hidden onchange="handleDocumentFile(event)">
+  <input id="documentImportInput" type="file" accept="image/*" hidden onchange="handleDocumentFile(event)">
+</div>
+
+<section id="documentPreview" class="screen vk-document-preview-screen">
+  <header class="vk-document-editor-topbar"><button type="button" class="vk-note-back" aria-label="Volver" onclick="repeatDocumentSelection()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button></header>
+  <div class="vk-document-preview-content"><h1 class="vk-document-screen-title">Vista previa</h1><p>Comprueba que el documento se vea correctamente.</p><img id="documentPreviewImage" class="vk-document-preview-image" alt="Vista previa"><div class="vk-document-preview-actions"><button type="button" class="vk-document-button-secondary" onclick="repeatDocumentSelection()">Repetir</button><button type="button" class="vk-document-button-primary" onclick="openCreateDocumentForm()">Continuar</button></div></div>
+</section>
+
+<section id="documentCreate" class="screen vk-document-form-screen">
+  <header class="vk-document-editor-topbar"><button type="button" class="vk-note-back" aria-label="Volver" onclick="show('documentPreview','left')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button></header>
+  <form id="documentCreateForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(null,documentCreateName.value,documentCreateExpiry.value,documentCreateIssuedBy.value,documentCreateCountry.value)">
+    <h1 class="vk-document-screen-title">Añadir documento</h1><div class="vk-document-category-line"><span id="documentCreateCategoryIcon"></span><strong id="documentCreateCategory"></strong></div>
+    <article class="vk-document-form-card"><span class="vk-document-preview-label">Vista previa</span><img id="documentCreateImage" class="vk-document-form-image" alt="Documento">
+      <label class="vk-document-field"><span>Nombre</span><input id="documentCreateName" type="text" maxlength="150"></label>
+      <button id="documentCreateMoreButton" type="button" class="vk-document-more-button" onclick="toggleDocumentMoreInfo('documentCreate')">+ Más información</button>
+      <label class="vk-document-field"><span>Caduca</span><input id="documentCreateExpiry" type="date"></label>
+      <div id="documentCreateMore" class="vk-document-more-fields" hidden><label class="vk-document-field"><span>Emitido por</span><input id="documentCreateIssuedBy" type="text" maxlength="150"></label><label class="vk-document-field"><span>País</span><input id="documentCreateCountry" type="text" maxlength="100"></label></div>
+    </article>
+    <div class="vk-document-form-actions"><button type="button" class="vk-document-button-secondary" onclick="showDocuments('left')">Cancelar</button><button type="submit" class="vk-document-button-primary">Crear</button></div>
+  </form>
+</section>
+
+<section id="documentDetail" class="screen vk-document-detail-screen">
+  <header class="vk-document-editor-topbar"><button type="button" class="vk-note-back" aria-label="Volver" onclick="showDocuments('left')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button></header>
+  <div class="vk-document-detail-content"><h1 id="documentDetailTitle" class="vk-document-screen-title"></h1><div class="vk-document-category-line"><span id="documentDetailCategoryIcon"></span><strong id="documentDetailCategory"></strong></div>
+    <article class="vk-document-detail-card"><span class="vk-document-preview-label">Vista previa</span><button type="button" class="vk-document-detail-image-button" onclick="viewDocumentImage(window.__vkCurrentDocumentId)"><img id="documentDetailImage" alt="Documento"></button><button type="button" class="vk-document-view-button" onclick="viewDocumentImage(window.__vkCurrentDocumentId)">Ver documento</button><div id="documentDetailFields" class="vk-document-detail-fields"></div></article>
+    <div class="vk-document-detail-actions"><button type="button" class="vk-document-action vk-document-action-edit" onclick="openEditDocument(window.__vkCurrentDocumentId)">Editar</button><button type="button" class="vk-document-action vk-document-action-delete" onclick="deleteDocument(window.__vkCurrentDocumentId)">Eliminar</button></div>
+  </div>
+</section>
+
+<section id="documentEdit" class="screen vk-document-form-screen">
+  <header class="vk-document-editor-topbar"><button type="button" class="vk-note-back" aria-label="Volver al detalle" onclick="showDocumentDetail(window.__vkCurrentDocumentId)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button></header>
+  <form id="documentEditForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(window.__vkCurrentDocumentId,documentEditName.value,documentEditExpiry.value,documentEditIssuedBy.value,documentEditCountry.value)">
+    <h1 class="vk-document-screen-title">Editar documento</h1><div class="vk-document-category-line"><span id="documentEditCategoryIcon"></span><strong id="documentEditCategory"></strong></div>
+    <article class="vk-document-form-card"><span class="vk-document-preview-label">Vista previa</span><img id="documentEditImage" class="vk-document-form-image" alt="Documento"><button type="button" class="vk-document-replace-button" onclick="openDocumentEditSource()">Repetir escaneo/importar</button>
+      <label class="vk-document-field"><span>Nombre</span><input id="documentEditName" type="text" maxlength="150"></label>
+      <label class="vk-document-field"><span>Caduca</span><input id="documentEditExpiry" type="date"></label>
+      <button id="documentEditMoreButton" type="button" class="vk-document-more-button" onclick="toggleDocumentMoreInfo('documentEdit')">+ Más información</button>
+      <div id="documentEditMore" class="vk-document-more-fields" hidden><label class="vk-document-field"><span>Emitido por</span><input id="documentEditIssuedBy" type="text" maxlength="150"></label><label class="vk-document-field"><span>País</span><input id="documentEditCountry" type="text" maxlength="100"></label></div>
+    </article>
+    <div class="vk-document-form-actions"><button type="button" class="vk-document-button-secondary" onclick="showDocumentDetail(window.__vkCurrentDocumentId)">Cancelar</button><button type="submit" class="vk-document-button-primary">Guardar</button></div>
   </form>
 </section>
 
