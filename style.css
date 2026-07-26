@@ -4296,6 +4296,40 @@ button.vk-security-card:active { background: #243246; }
   color:#A7B6C9;
 }
 
+/* La cabecera de Favoritos usa justify-content:flex-end (definida en
+   components.css) — sin esto, la flecha añadida quedaría pegada a la
+   derecha junto al icono de Ajustes en vez de en el extremo izquierdo. */
+#fav .vk-favorites-header .vk-note-back {
+  margin-right:auto;
+}
+
+/* Ajustes: el div placeholder que sustituimos tenía flex:1 para
+   empujar los iconos de Favoritos/Ajustes al extremo derecho;
+   nuestro botón no lo hereda, así que lo replicamos aquí. */
+#settings .vk-settings-header .vk-note-back {
+  margin-right:auto;
+}
+
+/* Favoritos (estado vacío): el icono tenía margin-top fijo de 238px
+   pensado para la altura de un móvil; en ventanas más bajas (escritorio)
+   ese margen fijo desbordaba el contenedor y generaba un scroll no deseado.
+   min() conserva el valor original en pantallas altas y lo reduce en las bajas. */
+#fav .vk-favorites-empty__icon {
+  margin-top:min(238px, 18vh);
+}
+
+/* Segunda causa del mismo scroll: el contenedor exterior forzaba
+   min-height:calc(100vh - 72px). Un segundo cálculo (100vh - 112px)
+   tampoco eliminó el scroll del todo (persistía un pequeño desbordamiento
+   según confirmó José con capturas) — en vez de seguir ajustando el
+   cálculo a ciegas, se elimina el min-height forzado por completo.
+   El espaciado visual ya lo aporta el margin-top del icono de arriba;
+   sin esta restricción de altura mínima, el contenedor mide exactamente
+   lo que ocupa su contenido real y es imposible que desborde. */
+#fav .vk-favorites-empty {
+  min-height:0;
+}
+
 .vk-notes-content {
   flex:1;
   overflow-y:auto;
