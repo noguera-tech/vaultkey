@@ -94,7 +94,17 @@
       mustWipe: m.failedAttempts >= MAX_ATTEMPTS
     };
   }
-  function resetAttempts() { setMeta({ failedAttempts: 0, lockUntil: 0 }); }
+
+  function resetAttempts() {
+    var m = readJSON(K_META);
+    if (!m || typeof m !== 'object' || Array.isArray(m)) {
+      m = getMeta();
+    }
+    m.failedAttempts = 0;
+    m.lockUntil = 0;
+    writeJSON(K_META, m);
+    return m;
+  }
 
   /* ---- AutoWipe local (lista cerrada + pepper) ---- */
   function wipeLocal() {
