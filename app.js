@@ -930,6 +930,12 @@ window.addEventListener('blur', () => {
   if(!appBooted || !unlocked || window._vkSharing || window._vkBiometricFlow) return;
   showPrivacyOverlay();
 });
+// Recuperar overlay al volver el foco cuando NO hay cambio de pestaña
+// (ej. abrir/usar DevTools en la misma ventana no dispara visibilitychange)
+window.addEventListener('focus', () => {
+  if(!appBooted || window._vkSharing || window._vkBiometricFlow) return;
+  handleVisibilityChange();
+});
 window.addEventListener('pagehide',()=>{if(unlocked){unlocked=false;lastKey=null;pin='';showPrivacyOverlay();}});
 ['pointerdown','touchstart','keydown','input','scroll','click'].forEach(ev=>document.addEventListener(ev,markActivity,{capture:true,passive:true}));
 
