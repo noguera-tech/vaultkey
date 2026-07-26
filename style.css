@@ -4129,12 +4129,13 @@ body:has(#settings.active) #screenDots .dot,
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 0 21px 0 0;
+  padding: 0 21px 0 24px;
   background: #243246;
   border: 0;
   border-bottom: 1px solid #000000;
 }
 .vk-security-header__actions { display: flex; align-items: center; gap: 18px; }
+.vk-security-header .vk-note-back { margin-right: auto; }
 .vk-security-header__button {
   width: 24px; height: 28px; padding: 0; border: 0; background: transparent; color: #FFFFFF;
 }
