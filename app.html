@@ -1279,10 +1279,11 @@ html.vk-twa #vkSplash{display:none!important}
 <section id="securitySettings" class="screen vk-security-root" aria-labelledby="securitySettingsTitle">
   <header class="vk-security-header">
     <button type="button" class="vk-note-back" aria-label="Volver a Ajustes" onclick="show('settings','left')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="m15 18-6-6 6-6"/>
-      </svg>
-    </button>
+        <svg viewBox="369 24 22 27" fill="none" aria-hidden="true">
+          <path d="M377.627 28.3913C377.682 27.709 377.952 27.0753 378.382 26.6142C378.813 26.153 379.375 25.8975 379.957 25.8975C380.539 25.8975 381.1 26.153 381.531 26.6142C381.962 27.0753 382.231 27.709 382.286 28.3913C382.319 28.8321 382.442 29.257 382.644 29.6301C382.847 30.0032 383.122 30.3134 383.448 30.5345C383.773 30.7557 384.14 30.8812 384.515 30.9006C384.891 30.9199 385.265 30.8324 385.605 30.6456C386.134 30.3628 386.734 30.3219 387.287 30.5308C387.841 30.7397 388.308 31.1835 388.599 31.7758C388.89 32.3681 388.983 33.0665 388.86 33.7351C388.737 34.4037 388.408 34.9947 387.935 35.393C387.628 35.6471 387.377 35.9847 387.203 36.3772C387.03 36.7696 386.939 37.2055 386.939 37.6479C386.939 38.0902 387.03 38.5261 387.203 38.9186C387.377 39.311 387.628 39.6486 387.935 39.9027C388.408 40.301 388.737 40.892 388.86 41.5606C388.983 42.2292 388.89 42.9277 388.599 43.52C388.308 44.1122 387.841 44.556 387.287 44.7649C386.734 44.9738 386.134 44.9329 385.605 44.6501C385.265 44.4633 384.891 44.3758 384.515 44.3951C384.14 44.4145 383.773 44.54 383.448 44.7612C383.122 44.9823 382.847 45.2926 382.644 45.6656C382.442 46.0387 382.319 46.4636 382.286 46.9044C382.231 47.5867 381.962 48.2204 381.531 48.6815C381.1 49.1427 380.539 49.3983 379.957 49.3983C379.375 49.3983 378.813 49.1427 378.382 48.6815C377.952 48.2204 377.682 47.5867 377.627 46.9044C377.594 46.4634 377.471 46.0384 377.269 45.6652C377.067 45.292 376.791 44.9816 376.466 44.7605C376.14 44.5393 375.774 44.4138 375.398 44.3946C375.022 44.3754 374.648 44.463 374.307 44.6501C373.778 44.9329 373.179 44.9738 372.625 44.7649C372.072 44.556 371.605 44.1122 371.314 43.52C371.023 42.9277 370.93 42.2292 371.053 41.5606C371.175 40.892 371.505 40.301 371.977 39.9027C372.285 39.6486 372.536 39.311 372.709 38.9186C372.883 38.5261 372.973 38.0902 372.973 37.6479C372.973 37.2055 372.883 36.7696 372.709 36.3772C372.536 35.9847 372.285 35.6471 371.977 35.393C371.506 34.9945 371.177 34.4037 371.054 33.7356C370.932 33.0674 371.025 32.3696 371.315 31.7777C371.606 31.1858 372.073 30.7421 372.625 30.5329C373.178 30.3236 373.777 30.3638 374.306 30.6456C374.647 30.8324 375.021 30.9199 375.397 30.9006C375.772 30.8812 376.138 30.7557 376.464 30.5345C376.79 30.3134 377.065 30.0032 377.267 29.6301C377.469 29.257 377.592 28.8321 377.625 28.3913" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M379.956 41.1801C381.613 41.1801 382.956 39.599 382.956 37.6486C382.956 35.6983 381.613 34.1172 379.956 34.1172C378.3 34.1172 376.956 35.6983 376.956 37.6486C376.956 39.599 378.3 41.1801 379.956 41.1801Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
     <div class="vk-security-header__actions">
       <button type="button" class="vk-security-header__button" aria-label="Favoritos" data-security-action="favorites" onclick="show('fav')">
         <svg viewBox="327 24 24 26" fill="none" aria-hidden="true">
@@ -1761,28 +1762,617 @@ html.vk-twa #vkSplash{display:none!important}
   <div class="onboardDots"><i class="onDot on"></i><i class="onDot"></i><i class="onDot"></i><i class="onDot"></i><i class="onDot"></i></div>
   <button class="primary" id="onboardBtn" onclick="nextOnboarding()">Siguiente</button>
 </div></div>
-<div class="modal" id="genModal"><div class="sheet compactGenSheet"><div class="sheetHead compactGenHead"><div><div class="sheetTitle">Generador profesional</div><div class="sub">Crea claves seguras con controles compactos.</div></div><div class="spacer"></div><button class="iconBtn" onclick="closeModals()">✕</button></div>
-  <div class="genCompactPanel genCompactPanelV31">
-    <div class="genMainSelect genMainSelectV31">
-      <label for="gLen"><span>Longitud</span><select id="gLen" onchange="syncRanges(true)"><option value="6">6</option><option value="8">8</option><option value="10">10</option><option value="12" selected>12</option><option value="14">14</option><option value="16">16</option><option value="18">18</option><option value="20">20</option><option value="24">24</option><option value="28">28</option><option value="32">32</option><option value="40">40</option><option value="48">48</option><option value="64">64</option></select></label>
+
+
+<style id="vkGeneratorBottomSheetStyles">
+.vk-generator-modal {
+  z-index:140;
+}
+
+.vk-generator-modal[hidden],
+.vk-generator-modal:not(.open) {
+  display:none !important;
+}
+
+.vk-generator-modal.open {
+  display:flex;
+  animation:vkDocFadeIn .18s ease-out both;
+}
+
+.vk-generator-modal .vk-document-modal-backdrop {
+  background:rgba(0,0,0,.35);
+}
+
+.vk-generator-sheet {
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  box-sizing:border-box;
+  min-height:0;
+  height:92dvh;
+  padding:18px 24px 24px;
+  border-radius:24px 24px 0 0;
+  background:rgba(36,50,70,.35);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  animation:vkDocSheetUp .24s ease-out both;
+  display:flex;
+  flex-direction:column;
+}
+
+.vk-generator-scroll {
+  min-height:0;
+  flex:1 1 auto;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:0 4px 4px 0;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(167,182,201,.4) transparent;
+}
+
+.vk-generator-scroll::-webkit-scrollbar {
+  width:4px;
+}
+
+.vk-generator-scroll::-webkit-scrollbar-thumb {
+  background:rgba(167,182,201,.4);
+  border-radius:2px;
+}
+
+.vk-generator-scroll::-webkit-scrollbar-track {
+  background:transparent;
+}
+
+.vk-generator-title {
+  margin:0 0 22px;
+  color:#fff;
+  font-size:24px;
+  line-height:29px;
+  font-weight:700;
+  text-align:center;
+}
+
+.vk-generator-preview-card,
+.vk-generator-length-card {
+  border:1px solid rgba(58,74,96,.6);
+  border-radius:16px;
+  background:#243246;
+}
+
+.vk-generator-preview-card {
+  padding:14px 16px;
+}
+
+.vk-generator-label {
+  color:#a7b6c9;
+  font-size:14px;
+  line-height:17px;
+  font-weight:400;
+}
+
+.vk-generator-preview-row {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:10px;
+  min-height:32px;
+}
+
+.vk-generator-output {
+  flex:1;
+  min-width:0;
+  color:#fff;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+  font-size:16px;
+  line-height:22px;
+  font-weight:600;
+  overflow-wrap:anywhere;
+}
+
+.vk-generator-icon-button {
+  width:32px;
+  height:32px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#3b82f6;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  line-height:0;
+}
+
+.vk-generator-icon-button svg {
+  width:22px;
+  height:22px;
+  display:block;
+  overflow:visible;
+}
+
+.vk-generator-length-card {
+  margin-top:14px;
+  padding:14px 16px 17px;
+}
+
+.vk-generator-length-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.vk-generator-length-head output {
+  color:#fff;
+  font-size:16px;
+  font-weight:600;
+}
+
+.vk-generator-range {
+  --vk-range-percent:20%;
+  width:100%;
+  height:20px;
+  margin:13px 0 0;
+  padding:0;
+  appearance:none;
+  -webkit-appearance:none;
+  background:transparent;
+}
+
+.vk-generator-range::-webkit-slider-runnable-track {
+  height:5px;
+  border-radius:999px;
+  background:linear-gradient(
+    to right,
+    rgba(59,130,246,.8) 0,
+    rgba(59,130,246,.8) var(--vk-range-percent),
+    rgba(58,74,96,.8) var(--vk-range-percent),
+    rgba(58,74,96,.8) 100%
+  );
+}
+
+.vk-generator-range::-moz-range-track {
+  height:5px;
+  border-radius:999px;
+  background:rgba(58,74,96,.8);
+}
+
+.vk-generator-range::-moz-range-progress {
+  height:5px;
+  border-radius:999px;
+  background:rgba(59,130,246,.8);
+}
+
+.vk-generator-range::-webkit-slider-thumb {
+  width:18px;
+  height:18px;
+  margin-top:-6.5px;
+  border:0;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 0 3px rgba(59,130,246,.3);
+  appearance:none;
+  -webkit-appearance:none;
+}
+
+.vk-generator-range::-moz-range-thumb {
+  width:18px;
+  height:18px;
+  border:0;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 0 3px rgba(59,130,246,.3);
+}
+
+.vk-generator-category-rows,
+.vk-generator-advanced {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:14px;
+}
+
+.vk-generator-toggle-row,
+.vk-generator-stepper-row,
+.vk-generator-symbol-row {
+  box-sizing:border-box;
+  min-height:60px;
+  padding:0 16px;
+  border:1px solid rgba(58,74,96,.6);
+  border-radius:16px;
+  background:#243246;
+  color:#fff;
+}
+
+.vk-generator-toggle-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.vk-generator-toggle-row > input {
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.vk-generator-switch {
+  position:relative;
+  width:44px;
+  height:24px;
+  border-radius:12px;
+  background:#334155;
+  flex-shrink:0;
+}
+
+.vk-generator-switch i {
+  position:absolute;
+  top:3px;
+  left:3px;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:#fff;
+  transition:transform .18s ease;
+}
+
+.vk-generator-toggle-row > input:checked + .vk-generator-switch i {
+  transform:translateX(20px);
+}
+
+.vk-generator-toggle-row > input:focus-visible + .vk-generator-switch {
+  outline:2px solid #3b82f6;
+  outline-offset:2px;
+}
+
+.vk-generator-toggle-row--detail > span:first-child {
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+
+.vk-generator-toggle-row--detail strong {
+  font-size:15px;
+  font-weight:500;
+}
+
+.vk-generator-toggle-row--detail small {
+  color:#a7b6c9;
+  font-size:12px;
+}
+
+.vk-generator-advanced-toggle {
+  margin:18px auto 4px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#3b82f6;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:16px;
+}
+
+.vk-generator-advanced-toggle svg {
+  width:20px;
+  height:20px;
+  transition:transform .2s ease;
+}
+
+.vk-generator-advanced-toggle[aria-expanded="true"] svg {
+  transform:rotate(180deg);
+}
+
+.vk-generator-advanced[hidden] {
+  display:none;
+}
+
+.vk-generator-stepper-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  font-size:14px;
+}
+
+.vk-generator-stepper {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  flex-shrink:0;
+}
+
+.vk-generator-stepper button {
+  width:22px;
+  height:22px;
+  padding:0;
+  border:1px solid #3a4a60;
+  border-radius:5px;
+  background:transparent;
+  color:#3a4a60;
+  display:grid;
+  place-items:center;
+  font-size:16px;
+  line-height:1;
+}
+
+.vk-generator-stepper output {
+  min-width:18px;
+  color:#fff;
+  font-size:14px;
+  font-weight:600;
+  text-align:center;
+}
+
+.vk-generator-symbol-row {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:7px;
+  padding-top:10px;
+  padding-bottom:10px;
+}
+
+.vk-generator-symbol-row > span {
+  color:#a7b6c9;
+  font-size:14px;
+}
+
+.vk-generator-symbol-row input {
+  width:100%;
+  height:32px;
+  padding:0 10px;
+  border:1px solid rgba(58,74,96,.6);
+  border-radius:10px;
+  background:#111827;
+  color:#fff;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+  font-size:14px;
+  outline:0;
+}
+
+.vk-generator-info {
+  margin:2px 4px 0;
+  color:#a7b6c9;
+  font-size:12px;
+  line-height:17px;
+  text-align:center;
+}
+
+.vk-generator-actions {
+  flex:0 0 auto;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,174px));
+  justify-content:center;
+  gap:16px;
+  margin-top:16px;
+  padding-top:14px;
+  border-top:1px solid rgba(58,74,96,.35);
+  background:rgba(36,50,70,.01);
+}
+
+.vk-generator-cancel,
+.vk-generator-use {
+  width:100%;
+  height:55px;
+  border-radius:16px;
+  color:#fff;
+  font-size:14px;
+  font-weight:500;
+}
+
+.vk-generator-cancel {
+  border:1px solid #3a4a60;
+  background:transparent;
+}
+
+.vk-generator-use {
+  border:0;
+  background:#3b82f6;
+}
+
+@media (max-width:390px) {
+  .vk-generator-sheet {
+    padding-left:18px;
+    padding-right:18px;
+  }
+
+  .vk-generator-actions {
+    gap:12px;
+  }
+}
+</style>
+
+<div id="genModal"
+     class="vk-document-modal vk-generator-modal modal"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="vkGeneratorTitle"
+     hidden>
+  <div class="vk-document-modal-backdrop" onclick="closeGenSheet()"></div>
+
+  <section class="vk-document-source-sheet vk-generator-sheet">
+    <div class="vk-document-sheet-handle" aria-hidden="true"></div>
+
+    <div class="vk-generator-scroll">
+      <h2 id="vkGeneratorTitle" class="vk-generator-title">Generador de contraseñas</h2>
+
+      <article class="vk-generator-preview-card">
+        <span class="vk-generator-label">Contraseña generada</span>
+        <div class="vk-generator-preview-row">
+          <output id="genOut" class="vk-generator-output" aria-live="polite"></output>
+
+          <button type="button"
+                  class="vk-generator-icon-button"
+                  aria-label="Regenerar contraseña"
+                  onclick="generatePass()">
+            <svg viewBox="-1 -1 26 26" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20 11a8 8 0 1 0 2 5"/>
+              <path d="M20 4v7h-7"/>
+            </svg>
+          </button>
+
+          <button type="button"
+                  class="vk-generator-icon-button"
+                  aria-label="Copiar contraseña"
+                  onclick="copyGeneratedPassword()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="8" y="8" width="12" height="12" rx="2"/>
+              <path d="M4 16V6a2 2 0 0 1 2-2h10"/>
+            </svg>
+          </button>
+        </div>
+      </article>
+
+      <article class="vk-generator-length-card">
+        <div class="vk-generator-length-head">
+          <label for="gLen" class="vk-generator-label">Longitud</label>
+          <output id="gLenVal" for="gLen">16</output>
+        </div>
+        <input id="gLen"
+               class="vk-generator-range"
+               type="range"
+               min="4"
+               max="32"
+               step="1"
+               value="16"
+               oninput="syncRanges(true)">
+      </article>
+
+      <div id="generatorCategoryRows" class="vk-generator-category-rows">
+        <label class="vk-generator-toggle-row">
+          <span>Mayúsculas</span>
+          <input id="gUpperEnabled" type="checkbox" checked onchange="syncRanges(true)">
+          <span class="vk-generator-switch" aria-hidden="true"><i></i></span>
+        </label>
+
+        <label class="vk-generator-toggle-row">
+          <span>Minúsculas</span>
+          <input id="gLowerEnabled" type="checkbox" checked onchange="syncRanges(true)">
+          <span class="vk-generator-switch" aria-hidden="true"><i></i></span>
+        </label>
+
+        <label class="vk-generator-toggle-row">
+          <span>Números</span>
+          <input id="gNumEnabled" type="checkbox" checked onchange="syncRanges(true)">
+          <span class="vk-generator-switch" aria-hidden="true"><i></i></span>
+        </label>
+
+        <label class="vk-generator-toggle-row">
+          <span>Símbolos</span>
+          <input id="gSymEnabled" type="checkbox" checked onchange="syncRanges(true)">
+          <span class="vk-generator-switch" aria-hidden="true"><i></i></span>
+        </label>
+      </div>
+
+      <button id="generatorAdvancedToggle"
+              type="button"
+              class="vk-generator-advanced-toggle"
+              aria-expanded="false"
+              aria-controls="generatorAdvancedOptions"
+              onclick="toggleGeneratorAdvanced()">
+        <span>Opciones avanzadas</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m6 9 6 6 6-6"/>
+        </svg>
+      </button>
+
+      <div id="generatorAdvancedOptions" class="vk-generator-advanced" hidden>
+        <label class="vk-generator-toggle-row">
+          <span>Solo números (modo PIN)</span>
+          <input id="gPinMode" type="checkbox" onchange="toggleGeneratorPinMode()">
+          <span class="vk-generator-switch" aria-hidden="true"><i></i></span>
+        </label>
+
+        <div class="vk-generator-stepper-row">
+          <span>Mínimo mayúsculas</span>
+          <div class="vk-generator-stepper">
+            <button type="button" aria-label="Aumentar mínimo de mayúsculas"
+                    onclick="stepGeneratorMinimum('gUpper',1)">+</button>
+            <output id="gUpperVal">1</output>
+            <button type="button" aria-label="Reducir mínimo de mayúsculas"
+                    onclick="stepGeneratorMinimum('gUpper',-1)">−</button>
+          </div>
+          <input id="gUpper" type="hidden" value="1">
+        </div>
+
+        <div class="vk-generator-stepper-row">
+          <span>Mínimo minúsculas</span>
+          <div class="vk-generator-stepper">
+            <button type="button" aria-label="Aumentar mínimo de minúsculas"
+                    onclick="stepGeneratorMinimum('gLower',1)">+</button>
+            <output id="gLowerVal">1</output>
+            <button type="button" aria-label="Reducir mínimo de minúsculas"
+                    onclick="stepGeneratorMinimum('gLower',-1)">−</button>
+          </div>
+          <input id="gLower" type="hidden" value="1">
+        </div>
+
+        <div class="vk-generator-stepper-row">
+          <span>Mínimo números</span>
+          <div class="vk-generator-stepper">
+            <button type="button" aria-label="Aumentar mínimo de números"
+                    onclick="stepGeneratorMinimum('gNum',1)">+</button>
+            <output id="gNumVal">1</output>
+            <button type="button" aria-label="Reducir mínimo de números"
+                    onclick="stepGeneratorMinimum('gNum',-1)">−</button>
+          </div>
+          <input id="gNum" type="hidden" value="1">
+        </div>
+
+        <div class="vk-generator-stepper-row">
+          <span>Mínimo símbolos</span>
+          <div class="vk-generator-stepper">
+            <button type="button" aria-label="Aumentar mínimo de símbolos"
+                    onclick="stepGeneratorMinimum('gSym',1)">+</button>
+            <output id="gSymVal">1</output>
+            <button type="button" aria-label="Reducir mínimo de símbolos"
+                    onclick="stepGeneratorMinimum('gSym',-1)">−</button>
+          </div>
+          <input id="gSym" type="hidden" value="1">
+        </div>
+
+        <label class="vk-generator-toggle-row vk-generator-toggle-row--detail">
+          <span>
+            <strong>Evitar caracteres confusos</strong>
+            <small>0/O, 1/l/I</small>
+          </span>
+          <input id="gNoSimilar" type="checkbox" onchange="syncRanges(true)">
+          <span class="vk-generator-switch" aria-hidden="true"><i></i></span>
+        </label>
+
+        <label class="vk-generator-symbol-row">
+          <span>Símbolos personalizados</span>
+          <input id="gSymbols"
+                 type="text"
+                 value="!@#$%&amp;*-_+=?/"
+                 autocomplete="off"
+                 spellcheck="false"
+                 oninput="syncRanges(true)">
+        </label>
+
+        <p id="genInfo" class="vk-generator-info">
+          Mínimos: 4 fijos + 12 aleatorios = 16 caracteres totales
+        </p>
+      </div>
+
+      <input id="gExact" type="checkbox" checked hidden>
+
     </div>
-    <div class="presetBtns compactPresets compactPresetsV31"><button onclick="setGenLen(6)">6</button><button onclick="setGenLen(8)">8</button><button onclick="setGenLen(12)">12</button><button onclick="setGenLen(16)">16</button></div>
-    <div class="genSelectGrid genSelectGridV31">
-      <label><span>Mayús.</span><select id="gUpper" onchange="syncRanges(true)"><option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
-      <label><span>Minús.</span><select id="gLower" onchange="syncRanges(true)"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6" selected>6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
-      <label><span>Núm.</span><select id="gNum" onchange="syncRanges(true)"><option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
-      <label><span>Símb.</span><select id="gSym" onchange="syncRanges(true)"><option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
+
+    <div class="vk-generator-actions">
+      <button type="button" class="vk-generator-cancel" onclick="closeGenSheet()">Cancelar</button>
+      <button id="useGenerated" type="button" class="vk-generator-use" onclick="useGen()">Usar</button>
     </div>
-    <div class="genHiddenCounters" aria-hidden="true"><span id="gLenVal">12</span><span id="gUpperVal">2</span><span id="gLowerVal">6</span><span id="gNumVal">2</span><span id="gSymVal">2</span></div>
-  </div>
-  <label class="checkrow compactCheck"><input type="checkbox" id="gExact" checked onchange="markGeneratorDirty()"> Usar cantidades mínimas y completar</label>
-  <label class="checkrow compactCheck genPinModeRow"><input type="checkbox" id="gPinMode" onchange="markGeneratorDirty();if(this.checked){$('gLen').value=6;syncRanges(true)}else{$('gLen').value=12;syncRanges(true)}"> <span>🔢 Modo PIN numérico</span></label>
-  <label class="checkrow compactCheck"><input type="checkbox" id="gNoSimilar" checked onchange="markGeneratorDirty()"> Evitar caracteres confusos: 0/O, 1/l/I</label>
-  <div class="field compactSymbols"><div class="label">Símbolos permitidos</div><input class="inp" id="gSymbols" value="!@#$%&*-_+=?/" oninput="markGeneratorDirty()"></div>
-  <div class="sub compactGenInfo" id="genInfo">Ajusta los valores y pulsa generar.</div>
-  <button class="primary compactGenerateBtn" onclick="generatePass()" style="width:100%">Generar contraseña</button>
-  <div class="genOut compactGenOut" id="genOut">Pulsa generar</div>
-  <div class="rowBtns compactGenActions"><button class="ghost" onclick="copyText(document.getElementById('genOut').textContent)">Copiar</button><button class="ghost" id="useGenerated" onclick="useGen()">Usar en entrada</button></div></div></div>
+  </section>
+</div>
 
 <div class="modal" id="confirmModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle" id="confirmTitle">Confirmar acción</div><div class="spacer"></div><button class="iconBtn" onclick="resolveConfirm(false)">✕</button></div><p class="sub" id="confirmMsg">¿Confirmas esta acción?</p><div class="rowBtns"><button class="ghost" onclick="resolveConfirm(false)">Cancelar</button><button class="ghost danger" id="confirmOk" onclick="resolveConfirm(true)">Aceptar</button></div></div></div>
 <div class="modal" id="drivePinModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle">PIN del respaldo</div><div class="spacer"></div><button class="iconBtn" onclick="resolveDrivePin(null)">✕</button></div><p class="sub">Introduce el PIN con el que se cifró este respaldo de Drive.</p><div class="field"><input class="inp" id="drivePinInput" type="password" inputmode="numeric" maxlength="8" placeholder="••••••" autocomplete="off" onkeydown="if(event.key==='Enter')resolveDrivePin(this.value)"></div><div class="rowBtns"><button class="ghost" onclick="resolveDrivePin(null)">Cancelar</button><button class="btn" onclick="resolveDrivePin(document.getElementById('drivePinInput').value)">Restaurar</button></div></div></div>
@@ -2335,6 +2925,468 @@ document.addEventListener("DOMContentLoaded",function(){
 
 <!-- fin núcleo 2.0 -->
 <script src="app.js"></script>
+
+<script id="vkGeneratorBottomSheetScript">
+(function(){
+  "use strict";
+
+  var GENERATOR_DEFAULTS={
+    length:16,
+    upper:true,
+    lower:true,
+    numbers:true,
+    symbols:true,
+    pin:false,
+    noSimilar:false,
+    minimums:{gUpper:1,gLower:1,gNum:1,gSym:1},
+    customSymbols:"!@#$%&*-_+=?/"
+  };
+
+  function genEl(id){
+    return document.getElementById(id);
+  }
+
+  function genRandomIndex(max){
+    if(!Number.isInteger(max)||max<=0){
+      throw new Error("Rango aleatorio inválido");
+    }
+
+    var limit=Math.floor(0x100000000/max)*max;
+    var value;
+    var buffer=new Uint32Array(1);
+
+    do{
+      crypto.getRandomValues(buffer);
+      value=buffer[0];
+    }while(value>=limit);
+
+    return value%max;
+  }
+
+  function genPick(pool){
+    if(!pool){
+      throw new Error("No hay caracteres disponibles");
+    }
+    return pool.charAt(genRandomIndex(pool.length));
+  }
+
+  function genShuffle(values){
+    for(var i=values.length-1;i>0;i--){
+      var j=genRandomIndex(i+1);
+      var temp=values[i];
+      values[i]=values[j];
+      values[j]=temp;
+    }
+    return values;
+  }
+
+  function generatorEnabled(id){
+    var element=genEl(id);
+    return Boolean(element&&element.checked);
+  }
+
+  function generatorMinimum(id){
+    var element=genEl(id);
+    return Math.max(0,Number(element&&element.value)||0);
+  }
+
+  function setGeneratorMinimum(id,value){
+    var element=genEl(id);
+    var output=genEl(id+"Val");
+    value=Math.max(0,Math.floor(Number(value)||0));
+
+    if(element)element.value=String(value);
+    if(output)output.textContent=String(value);
+  }
+
+  function activeMinimumSum(){
+    if(generatorEnabled("gPinMode"))return 0;
+
+    return (generatorEnabled("gUpperEnabled")?generatorMinimum("gUpper"):0)+
+      (generatorEnabled("gLowerEnabled")?generatorMinimum("gLower"):0)+
+      (generatorEnabled("gNumEnabled")?generatorMinimum("gNum"):0)+
+      (generatorEnabled("gSymEnabled")?generatorMinimum("gSym"):0);
+  }
+
+  function updateGeneratorInfo(){
+    var length=Math.max(4,Math.min(32,Number(genEl("gLen").value)||16));
+    var fixed=generatorEnabled("gPinMode")?0:activeMinimumSum();
+    var random=Math.max(0,length-fixed);
+    var info=genEl("genInfo");
+
+    if(info){
+      info.textContent="Mínimos: "+fixed+" fijos + "+random+
+        " aleatorios = "+length+" caracteres totales";
+    }
+  }
+
+  function resetGeneratorDefaults(){
+    genEl("gLen").value=String(GENERATOR_DEFAULTS.length);
+    genEl("gUpperEnabled").checked=GENERATOR_DEFAULTS.upper;
+    genEl("gLowerEnabled").checked=GENERATOR_DEFAULTS.lower;
+    genEl("gNumEnabled").checked=GENERATOR_DEFAULTS.numbers;
+    genEl("gSymEnabled").checked=GENERATOR_DEFAULTS.symbols;
+    genEl("gPinMode").checked=GENERATOR_DEFAULTS.pin;
+    genEl("gNoSimilar").checked=GENERATOR_DEFAULTS.noSimilar;
+    genEl("gSymbols").value=GENERATOR_DEFAULTS.customSymbols;
+
+    Object.keys(GENERATOR_DEFAULTS.minimums).forEach(function(id){
+      setGeneratorMinimum(id,GENERATOR_DEFAULTS.minimums[id]);
+    });
+
+    genEl("generatorCategoryRows").hidden=false;
+    genEl("generatorAdvancedOptions").hidden=true;
+    genEl("generatorAdvancedToggle").setAttribute("aria-expanded","false");
+    syncRanges(false);
+  }
+
+  window.syncRanges=function(regenerate){
+    var length=Math.max(4,Math.min(32,Number(genEl("gLen").value)||16));
+    genEl("gLen").value=String(length);
+    genEl("gLenVal").textContent=String(length);
+
+    var rangePercent=((length-4)/(32-4))*100;
+    genEl("gLen").style.setProperty("--vk-range-percent",rangePercent+"%");
+
+    var order=["gSym","gNum","gLower","gUpper"];
+    var overflow=Math.max(0,activeMinimumSum()-length);
+
+    order.forEach(function(id){
+      if(overflow<=0)return;
+
+      var enabledId={
+        gUpper:"gUpperEnabled",
+        gLower:"gLowerEnabled",
+        gNum:"gNumEnabled",
+        gSym:"gSymEnabled"
+      }[id];
+
+      if(!generatorEnabled(enabledId))return;
+
+      var current=generatorMinimum(id);
+      var reduction=Math.min(current,overflow);
+      setGeneratorMinimum(id,current-reduction);
+      overflow-=reduction;
+    });
+
+    ["gUpper","gLower","gNum","gSym"].forEach(function(id){
+      setGeneratorMinimum(id,generatorMinimum(id));
+    });
+
+    updateGeneratorInfo();
+
+    if(regenerate){
+      generatePass();
+    }
+  };
+
+  window.stepGeneratorMinimum=function(id,delta){
+    var enabledId={
+      gUpper:"gUpperEnabled",
+      gLower:"gLowerEnabled",
+      gNum:"gNumEnabled",
+      gSym:"gSymEnabled"
+    }[id];
+
+    if(!enabledId)return;
+
+    var current=generatorMinimum(id);
+    var next=Math.max(0,current+(delta>0?1:-1));
+    var length=Math.max(4,Math.min(32,Number(genEl("gLen").value)||16));
+    var totalWithoutCurrent=activeMinimumSum()-
+      (generatorEnabled(enabledId)?current:0);
+
+    if(delta>0&&generatorEnabled(enabledId)&&totalWithoutCurrent+next>length){
+      return;
+    }
+
+    setGeneratorMinimum(id,next);
+    syncRanges(true);
+  };
+
+  window.toggleGeneratorAdvanced=function(){
+    var panel=genEl("generatorAdvancedOptions");
+    var button=genEl("generatorAdvancedToggle");
+    var expanded=button.getAttribute("aria-expanded")==="true";
+
+    panel.hidden=expanded;
+    button.setAttribute("aria-expanded",expanded?"false":"true");
+  };
+
+  window.toggleGeneratorPinMode=function(){
+    var active=generatorEnabled("gPinMode");
+    genEl("generatorCategoryRows").hidden=active;
+    syncRanges(true);
+  };
+
+  window.generatePass=function(){
+    if(typeof vibe==="function")vibe(40);
+    if(typeof soundGen==="function")soundGen();
+
+    syncRanges(false);
+
+    var length=Math.max(4,Math.min(32,Number(genEl("gLen").value)||16));
+    var output=genEl("genOut");
+
+    if(generatorEnabled("gPinMode")){
+      var pin=[];
+      for(var pinIndex=0;pinIndex<length;pinIndex++){
+        pin.push(genPick("0123456789"));
+      }
+      output.textContent=pin.join("");
+      return output.textContent;
+    }
+
+    var groups={
+      upper:"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      lower:"abcdefghijklmnopqrstuvwxyz",
+      number:"0123456789",
+      symbol:String(genEl("gSymbols").value||GENERATOR_DEFAULTS.customSymbols)
+    };
+
+    if(generatorEnabled("gNoSimilar")){
+      var confusing=/[IOlo01]/g;
+      groups.upper=groups.upper.replace(confusing,"");
+      groups.lower=groups.lower.replace(confusing,"");
+      groups.number=groups.number.replace(confusing,"");
+      groups.symbol=groups.symbol.replace(confusing,"");
+    }
+
+    var active=[];
+    if(generatorEnabled("gUpperEnabled")&&groups.upper){
+      active.push({id:"upper",pool:groups.upper,min:generatorMinimum("gUpper")});
+    }
+    if(generatorEnabled("gLowerEnabled")&&groups.lower){
+      active.push({id:"lower",pool:groups.lower,min:generatorMinimum("gLower")});
+    }
+    if(generatorEnabled("gNumEnabled")&&groups.number){
+      active.push({id:"number",pool:groups.number,min:generatorMinimum("gNum")});
+    }
+    if(generatorEnabled("gSymEnabled")&&groups.symbol){
+      active.push({id:"symbol",pool:groups.symbol,min:generatorMinimum("gSym")});
+    }
+
+    if(!active.length){
+      genEl("gLowerEnabled").checked=true;
+      active=[{id:"lower",pool:groups.lower||"abcdefghijkmnpqrstuvwxyz",min:0}];
+    }
+
+    var minimums={
+      upper:active.find(function(group){return group.id==="upper";})?.min||0,
+      lower:active.find(function(group){return group.id==="lower";})?.min||0,
+      number:active.find(function(group){return group.id==="number";})?.min||0,
+      symbol:active.find(function(group){return group.id==="symbol";})?.min||0
+    };
+
+    var total=minimums.upper+minimums.lower+minimums.number+minimums.symbol;
+    var trimOrder=["symbol","number","lower","upper"];
+
+    trimOrder.forEach(function(key){
+      if(total<=length)return;
+      var reduction=Math.min(minimums[key],total-length);
+      minimums[key]-=reduction;
+      total-=reduction;
+    });
+
+    setGeneratorMinimum("gUpper",minimums.upper);
+    setGeneratorMinimum("gLower",minimums.lower);
+    setGeneratorMinimum("gNum",minimums.number);
+    setGeneratorMinimum("gSym",minimums.symbol);
+
+    var result=[];
+    var combined=active.map(function(group){return group.pool;}).join("");
+
+    active.forEach(function(group){
+      var count=minimums[group.id];
+      for(var index=0;index<count;index++){
+        result.push(genPick(group.pool));
+      }
+    });
+
+    while(result.length<length){
+      result.push(genPick(combined));
+    }
+
+    output.textContent=genShuffle(result).join("");
+    updateGeneratorInfo();
+    return output.textContent;
+  };
+
+  window.copyGeneratedPassword=async function(){
+    var value=genEl("genOut").textContent;
+
+    if(!value){
+      value=generatePass();
+    }
+
+    try{
+      if(navigator.clipboard&&window.isSecureContext){
+        await navigator.clipboard.writeText(value);
+      }else{
+        var helper=document.createElement("textarea");
+        helper.value=value;
+        helper.setAttribute("readonly","");
+        helper.style.position="fixed";
+        helper.style.opacity="0";
+        document.body.appendChild(helper);
+        helper.select();
+
+        if(!document.execCommand("copy")){
+          throw new Error("copy-failed");
+        }
+
+        helper.remove();
+      }
+
+      if(typeof soundCopy==="function")soundCopy();
+      if(typeof toast==="function")toast("✓ Contraseña copiada");
+    }catch(error){
+      if(typeof toast==="function")toast("No se pudo copiar");
+    }
+  };
+
+  var _genScrollGuardEl=null;
+  var _genScrollGuardHandler=null;
+
+  function startGenScrollGuard(){
+    var appEl=document.querySelector(".app");
+    if(!appEl)return;
+
+    stopGenScrollGuard();
+
+    _genScrollGuardEl=appEl;
+    _genScrollGuardHandler=function(){
+      if(appEl.scrollTop!==0||appEl.scrollLeft!==0){
+        appEl.scrollTop=0;
+        appEl.scrollLeft=0;
+      }
+    };
+
+    appEl.addEventListener("scroll",_genScrollGuardHandler,{passive:true});
+  }
+
+  function stopGenScrollGuard(){
+    if(_genScrollGuardEl&&_genScrollGuardHandler){
+      _genScrollGuardEl.removeEventListener("scroll",_genScrollGuardHandler);
+    }
+    _genScrollGuardEl=null;
+    _genScrollGuardHandler=null;
+  }
+
+  window.closeGenSheet=function(){
+    var modal=genEl("genModal");
+    if(!modal)return;
+
+    stopGenScrollGuard();
+
+    modal.classList.remove("open");
+    modal.hidden=true;
+  };
+
+  window.openGen=function(target,targetField){
+    if(target===undefined)target=false;
+    if(targetField===undefined)targetField="ePass";
+
+    useGenTarget=target;
+    window._genTargetField=targetField;
+
+    resetGeneratorDefaults();
+
+    var appEl=document.querySelector(".app");
+    if(appEl){
+      appEl.scrollTop=0;
+      appEl.scrollLeft=0;
+    }
+    startGenScrollGuard();
+
+    var modal=genEl("genModal");
+    modal.hidden=false;
+    modal.classList.add("open");
+
+    generatePass();
+  };
+
+  window.useGen=function(){
+    if(typeof vibe==="function")vibe(35);
+
+    var value=genEl("genOut").textContent;
+    if(!value){
+      value=generatePass();
+    }
+
+    if(useGenTarget){
+      var fieldId=window._genTargetField||"ePass";
+      var field=genEl(fieldId);
+
+      if(field){
+        field.value=value;
+        field.dispatchEvent(new Event("input",{bubbles:true}));
+
+        if(fieldId==="ePass"&&typeof updateStrength==="function"){
+          updateStrength();
+        }
+      }
+
+      closeGenSheet();
+
+      if(fieldId==="vkPasswordCreateSecret"){
+        window._passwordCreateGenerated=true;
+
+        if(typeof show==="function"){
+          show("passwordCreate");
+        }
+
+        if(typeof toast==="function"){
+          toast("Contraseña añadida");
+        }
+      }else{
+        var entryModal=genEl("entryModal");
+
+        if(entryModal){
+          entryModal.classList.add("open");
+        }
+
+        if(typeof syncFabVisibility==="function"){
+          syncFabVisibility();
+        }
+
+        if(typeof toast==="function"){
+          toast("Contraseña añadida a la entrada");
+        }
+      }
+
+      return;
+    }
+
+    closeGenSheet();
+
+    if(typeof openEntry==="function"){
+      openEntry();
+    }
+
+    var defaultField=genEl("ePass");
+    if(defaultField){
+      defaultField.value=value;
+      defaultField.dispatchEvent(new Event("input",{bubbles:true}));
+    }
+
+    if(typeof updateStrength==="function"){
+      updateStrength();
+    }
+
+    if(typeof toast==="function"){
+      toast("Ahora completa servicio y usuario, luego Guardar");
+    }
+  };
+
+  document.addEventListener("keydown",function(event){
+    if(event.key==="Escape"&&genEl("genModal")?.classList.contains("open")){
+      closeGenSheet();
+    }
+  });
+})();
+</script>
+
 
 <script>
 /* Puente de autobloqueo VK2:

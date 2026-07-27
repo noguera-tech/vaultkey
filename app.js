@@ -699,6 +699,7 @@ function closeModals(){
   if(typeof window.closeEmergencyKitRegenerateDialog==='function'){
     window.closeEmergencyKitRegenerateDialog(true);
   }
+  if(typeof window.closeGenSheet==='function')window.closeGenSheet();
   editId=null;useGenTarget=false;selectedEntryIcon='';try{resetNoteReminder();}catch(e){}try{resetEntryTags();}catch(e){}setTimeout(()=>{try{syncFabVisibility();}catch(e){}},0);
 }
 
