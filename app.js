@@ -349,8 +349,28 @@ function syncPreferencesUI(){
   const ss=$('soundStyleSelect'); if(ss)ss.value=style;
   const ssh=$('soundStyleHint'); if(ssh)ssh.textContent=styleNames[style]||style;
 }
-function vkConfirm(title,msg){return new Promise(res=>{confirmResolver=res;$('confirmTitle').textContent=title;$('confirmMsg').textContent=msg;$('confirmModal').classList.add('open')})}
-function resolveConfirm(ok){$('confirmModal').classList.remove('open');if(confirmResolver){confirmResolver(!!ok);confirmResolver=null}}
+function vkConfirm(title,msg,options){
+  options=options||{};
+  return new Promise(function(resolve){
+    const modal=$('confirmModal');
+    const okButton=$('confirmOk');
+    confirmResolver=resolve;
+    $('confirmTitle').textContent=title;
+    $('confirmMsg').textContent=msg;
+    modal.classList.remove('vk-confirm--reset','vk-confirm--wipe');
+    if(options.variant==='reset')modal.classList.add('vk-confirm--reset');
+    if(options.variant==='wipe')modal.classList.add('vk-confirm--wipe');
+    if(okButton)okButton.textContent=options.confirmText||'Aceptar';
+    modal.classList.add('open');
+  });
+}
+function resolveConfirm(ok){
+  const modal=$('confirmModal');
+  const okButton=$('confirmOk');
+  modal.classList.remove('open','vk-confirm--reset','vk-confirm--wipe');
+  if(okButton)okButton.textContent='Aceptar';
+  if(confirmResolver){confirmResolver(!!ok);confirmResolver=null;}
+}
 function initPin(){
   // VK 2.0 — montar vkUnlock si hay boveda 2.0
   if(typeof vkUnlock!=='undefined'&&typeof vkStore!=='undefined'&&vkStore.hasVault()){
@@ -685,7 +705,120 @@ function show(id,dir){
 
 })();
 function lock(){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();vibe(30);soundLock();unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay()}
-async function wipe(){if(await vkConfirm('Borrar todos los datos','⚠️ Se eliminarán el PIN, todas las contraseñas y el código de recuperación. Esta acción es irreversible. ¿Continuar?')){soundError();vibe([60,30,60,30,100]);const isVk2=typeof vkStore!=='undefined'&&vkStore.hasVault();if(isVk2){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();try{await vkStore.wipeLocal();}catch(e){console.warn('VK2 wipe:',e);}localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);localStorage.removeItem('vaultkey_onboarding_v130');openOnboardingHard();return;}localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];lock()}}
+async function wipe(){if(await vkConfirm('Borrar todos los datos','Se eliminará la bóveda de este dispositivo. Esta acción no se puede deshacer.',{variant:'wipe',confirmText:'Borrar'})){soundError();vibe([60,30,60,30,100]);const isVk2=typeof vkStore!=='undefined'&&vkStore.hasVault();if(isVk2){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();try{await vkStore.wipeLocal();}catch(e){console.warn('VK2 wipe:',e);}localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);localStorage.removeItem('vaultkey_onboarding_v130');openOnboardingHard();return;}localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];lock()}}
+
+/* ============================================================
+   Zona de peligro — /settings/danger (pantalla dangerZoneSettings)
+   ============================================================ */
+
+function resetDangerActionState(){
+  document.querySelectorAll('[data-danger-action]').forEach(function(button){
+    button.disabled=false;
+    delete button.dataset.dangerBusy;
+  });
+}
+
+window.openDangerZoneSettings=function(){
+  var screen=document.getElementById('dangerZoneSettings');
+  if(!screen)return;
+  resetDangerActionState();
+  try{
+    if(typeof window.show==='function'){
+      screen.hidden=false;
+      window.show('dangerZoneSettings','right');
+    }
+  }catch(error){
+    console.error('No se pudo abrir Zona de peligro',error);
+  }
+};
+
+function resetDriveSync(){
+  localStorage.removeItem('vk_drive_last_sync');
+  // Conservados deliberadamente: token OAuth en memoria de sesión y vk_drive_auto
+  toast('Sincronización reiniciada. Próxima sync será completa.');
+}
+
+function resetVaultConfig(){
+  const m=meta();
+  if(!m)return false;
+  m.failedAttempts=0;
+  m.totalFailed=0;
+  m.lockLevel=0;
+  m.lockedUntil=0;
+  m.lastOk=null;
+  m.lastFail=null;
+  m.autoLockMs=30000;
+  m.autoWipe=false;
+  saveMeta(m);
+  // Conservados deliberadamente: m.hash, m.pinSalt, m.pinLen, m.created, m.lastBackup
+  return true;
+}
+
+async function executeDangerAction(action){
+  switch(action){
+    case 'wipe':
+      // wipe() ya muestra su propia confirmación destructiva — no añadir otra
+      await wipe();
+      break;
+    case 'disconnect-drive':
+      if(typeof driveDisconnect!=='function'){
+        console.error('Zona de peligro: driveDisconnect() no está disponible.');
+        toast('No se pudo desconectar Google Drive.','err');
+        return;
+      }
+      await Promise.resolve(driveDisconnect());
+      break;
+    case 'reset-sync':
+      resetDriveSync();
+      break;
+    case 'lock':
+      lock();
+      break;
+    case 'reset-config':{
+      const confirmed=await vkConfirm(
+        'Restablecer VaultKey',
+        'Se restablecerán el autobloqueo, el borrado automático y los contadores de seguridad. El PIN y los datos de la bóveda se conservarán.',
+        {variant:'reset',confirmText:'Restablecer'}
+      );
+      if(!confirmed)return;
+      const resetCompleted=resetVaultConfig();
+      if(!resetCompleted){
+        toast('No se encontró la configuración de VaultKey.','err');
+        return;
+      }
+      syncSettingsUI();
+      resetAutoLockTimer();
+      toast('Configuración de VaultKey restablecida.');
+      break;
+    }
+    default:
+      console.warn('Zona de peligro: acción desconocida:',action);
+      return;
+  }
+}
+
+if(!window.__vkDangerActionsBound){
+  window.__vkDangerActionsBound=true;
+  document.addEventListener('click',async function(event){
+    const button=event.target&&event.target.closest?event.target.closest('[data-danger-action]'):null;
+    if(!button)return;
+    if(button.dataset.dangerBusy==='1')return;
+    const action=button.dataset.dangerAction;
+    event.preventDefault();
+    event.stopPropagation();
+    button.dataset.dangerBusy='1';
+    if(action==='reset-sync'||action==='reset-config'){vibe(18);}
+    try{
+      await executeDangerAction(action);
+    }catch(error){
+      console.error('Zona de peligro: error ejecutando "'+action+'".',error);
+      toast('No se pudo completar la acción.','err');
+    }finally{
+      delete button.dataset.dangerBusy;
+    }
+  });
+}
+
 function closeModals(){
   document.querySelectorAll('.modal').forEach(m=>{
     if(m.id==='recoveryModal'){

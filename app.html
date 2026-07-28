@@ -25,6 +25,50 @@ html,body{margin:0;background:#070B14}
 /* Bloqueo automático — Figma 217:1437 */
 #autoLockSettings{box-sizing:border-box;height:100dvh;min-height:0;overflow:hidden;background:linear-gradient(149.3508256958964deg,#111827 15.964%,#182F4E 63.204%);border:1px solid #030508;color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 #autoLockSettings[hidden]{display:none!important}
+/* ============================================================
+   Zona de peligro — Figma 217:1689
+   ============================================================ */
+#dangerZoneSettings{box-sizing:border-box;width:100%;height:100dvh;min-height:0;overflow:hidden;border:1px solid #030508;background:linear-gradient(149.3508256958964deg,#111827 15.964%,#182f4e 63.204%);color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#dangerZoneSettings[hidden]{display:none!important}
+.vk-danger-header{box-sizing:border-box;position:relative;width:100%;height:64px;flex:0 0 64px;display:grid;grid-template-columns:32px minmax(0,1fr) 32px;align-items:center;padding:0 24px;border-bottom:1px solid #000;background:#243246}
+.vk-danger-back{box-sizing:border-box;width:32px;height:32px;padding:0;border:0;background:transparent;color:#a7b6c9;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity 300ms ease-in-out,transform 300ms ease-in-out}
+.vk-danger-back svg{display:block;width:24px;height:24px}
+.vk-danger-back:active{opacity:.72;transform:scale(.94)}
+.vk-danger-back:focus-visible{outline:2px solid rgba(0,217,255,.45);outline-offset:2px;border-radius:8px}
+.vk-danger-title{min-width:0;margin:0;color:#fff;font-size:20px;line-height:normal;font-weight:700;text-align:center}
+.vk-danger-header-spacer{width:32px;height:32px}
+.vk-danger-content{box-sizing:border-box;position:relative;width:min(365px,calc(100% - 40px));height:calc(100dvh - 64px);min-height:0;margin:0 auto;padding:101px 0 max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;overflow:hidden}
+.vk-danger-actions{width:100%;display:flex;flex-direction:column;gap:15px}
+.vk-danger-card{box-sizing:border-box;position:relative;width:100%;height:72px;min-height:72px;padding:0 18px 0 22px;border:1px solid rgba(58,74,96,.6);border-radius:16px;background:#243246;color:#fff;display:grid;grid-template-columns:46px minmax(0,1fr) 24px;align-items:center;text-align:left;cursor:pointer;appearance:none;-webkit-appearance:none;transition:border-color 300ms ease-in-out,background-color 300ms ease-in-out,opacity 300ms ease-in-out,transform 300ms ease-in-out}
+.vk-danger-card:hover{border-color:rgba(90,112,142,.78)}
+.vk-danger-card:active{opacity:.82;transform:scale(.985)}
+.vk-danger-card:focus-visible{outline:2px solid rgba(0,217,255,.45);outline-offset:2px}
+.vk-danger-card[disabled]{opacity:.55;pointer-events:none}
+.vk-danger-icon{width:28px;height:28px;color:#3b82f6;display:flex;align-items:center;justify-content:center}
+.vk-danger-icon-warning{color:#f59e0b}
+.vk-danger-icon svg{display:block;width:28px;height:28px}
+.vk-danger-copy{min-width:0;display:block}
+.vk-danger-copy strong{display:block;overflow:hidden;color:#fff;font-size:16px;line-height:normal;font-weight:600;text-overflow:ellipsis;white-space:nowrap}
+.vk-danger-copy small{display:block;overflow:hidden;margin-top:11px;color:#a7b6c9;font-size:13px;line-height:normal;font-weight:400;text-overflow:ellipsis;white-space:nowrap}
+.vk-danger-chevron{width:24px;height:24px;color:#a7b6c9;display:flex;align-items:center;justify-content:center}
+.vk-danger-chevron svg{display:block;width:24px;height:24px}
+.vk-danger-version{margin:auto 24px 0 0;color:#a7b6c9;font-size:13px;line-height:normal;font-weight:400;text-align:right}
+@media (max-width:390px){.vk-danger-content{width:calc(100% - 32px)}.vk-danger-card{padding-right:14px;padding-left:18px;grid-template-columns:42px minmax(0,1fr) 24px}}
+@media (max-height:760px){.vk-danger-content{padding-top:42px;overflow-y:auto}.vk-danger-version{margin-top:28px;padding-bottom:4px}}
+
+/* Confirmación Restablecer VaultKey — Figma 498:2 */
+#confirmModal.vk-confirm--reset,#confirmModal.vk-confirm--wipe{inset:0;padding:16px;align-items:center;justify-content:center;background:rgba(0,7,18,.85)}
+#confirmModal.vk-confirm--reset .sheet,#confirmModal.vk-confirm--wipe .sheet{box-sizing:border-box;position:relative;width:300px;max-width:calc(100vw - 32px);height:240px;max-height:none;overflow:hidden;padding:45px 24px 20px;border:1px solid #030508;border-radius:16px;background:#243246;box-shadow:none}
+#confirmModal.vk-confirm--reset .sheetHead,#confirmModal.vk-confirm--wipe .sheetHead{display:block;margin:0}
+#confirmModal.vk-confirm--reset .sheetTitle,#confirmModal.vk-confirm--wipe .sheetTitle{margin:0;color:#fff;font-family:Inter,system-ui,sans-serif;font-size:24px;line-height:normal;font-weight:700;text-align:center;text-shadow:none}
+#confirmModal.vk-confirm--reset .spacer,#confirmModal.vk-confirm--reset #confirmClose,#confirmModal.vk-confirm--wipe .spacer,#confirmModal.vk-confirm--wipe #confirmClose{display:none}
+#confirmModal.vk-confirm--reset #confirmMsg,#confirmModal.vk-confirm--wipe #confirmMsg{margin:8px 0 0;color:rgba(167,182,201,.8);font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:500;text-align:center}
+#confirmModal.vk-confirm--reset .rowBtns,#confirmModal.vk-confirm--wipe .rowBtns{position:absolute;left:39px;right:39px;bottom:20px;display:grid;grid-template-columns:85px 85px;justify-content:space-between;gap:0}
+#confirmModal.vk-confirm--reset .rowBtns>button,#confirmModal.vk-confirm--wipe .rowBtns>button{box-sizing:border-box;width:85px;height:43px;min-width:0;padding:0;border:1px solid #3a4a60;border-radius:16px;font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:400;color:#fff;box-shadow:none}
+#confirmModal.vk-confirm--reset #confirmCancel,#confirmModal.vk-confirm--wipe #confirmCancel{background:transparent}
+#confirmModal.vk-confirm--reset #confirmOk{border-color:#3a4a60;background:#f59e0b;color:#fff}
+#confirmModal.vk-confirm--wipe #confirmOk{border-color:#3a4a60;background:#dc2626;color:#fff}
+#confirmModal.vk-confirm--reset #confirmCancel:active,#confirmModal.vk-confirm--reset #confirmOk:active,#confirmModal.vk-confirm--wipe #confirmCancel:active,#confirmModal.vk-confirm--wipe #confirmOk:active{opacity:.84;transform:scale(.97)}
 .vk-auto-header{box-sizing:border-box;height:64px;background:#243246;border-bottom:1px solid #000;display:flex;align-items:center;padding:0 24px}
 .vk-auto-back{width:32px;height:32px;padding:0;border:0;background:transparent;color:#a7b6c9;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .vk-auto-back svg{width:24px;height:24px}
@@ -1256,7 +1300,7 @@ html,body{margin:0;background:#070B14}
         <span class="vk-settings-card__arrow vk-r1-row__chevron" aria-hidden="true">›</span>
       </button>
 
-      <button type="button" class="vk-settings-card vk-settings-card--danger vk-r1-row" data-settings-target="danger">
+      <button type="button" class="vk-settings-card vk-settings-card--danger vk-r1-row" data-settings-target="danger" onclick="openDangerZoneSettings()">
         <span class="vk-settings-card__icon vk-r1-row__icon vk-r1-row__icon--warning" aria-hidden="true">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M10.3 3.7 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z"/>
@@ -1425,6 +1469,141 @@ html,body{margin:0;background:#070B14}
         Descargar
       </button>
     </div>
+  </main>
+</section>
+
+<!-- ============================================================
+     Zona de peligro — Figma 217:1689
+     Navegación real mediante show()
+     ============================================================ -->
+<section
+  id="dangerZoneSettings"
+  class="screen vk-danger-screen"
+  data-screen="dangerZoneSettings"
+  aria-labelledby="settingsDangerTitle"
+  hidden
+>
+  <header class="vk-danger-header">
+    <button
+      type="button"
+      class="vk-danger-back"
+      aria-label="Volver a Ajustes"
+      onclick="show('settings','left')"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m15 18-6-6 6-6"></path>
+      </svg>
+    </button>
+
+    <h1 id="settingsDangerTitle" class="vk-danger-title">Zona de peligro</h1>
+
+    <span class="vk-danger-header-spacer" aria-hidden="true"></span>
+  </header>
+
+  <main class="vk-danger-content">
+    <div class="vk-danger-actions">
+
+      <!-- Restablecer VaultKey -->
+      <button type="button" class="vk-danger-card" data-danger-action="reset-config">
+        <span class="vk-danger-icon vk-danger-icon-warning" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path>
+            <path d="M12 9v4"></path>
+            <path d="M12 17h.01"></path>
+          </svg>
+        </span>
+        <span class="vk-danger-copy">
+          <strong>Restablecer VaultKey</strong>
+          <small>Reiniciar la configuración de la aplicación</small>
+        </span>
+        <span class="vk-danger-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Borrar todos los datos -->
+      <button type="button" class="vk-danger-card" data-danger-action="wipe">
+        <span class="vk-danger-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"></path>
+            <path d="M8 6V4h8v2"></path>
+            <path d="m19 6-1 14H6L5 6"></path>
+          </svg>
+        </span>
+        <span class="vk-danger-copy">
+          <strong>Borrar todos los datos</strong>
+          <small>Eliminar la bóveda de este dispositivo</small>
+        </span>
+        <span class="vk-danger-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Desconectar Google Drive -->
+      <button type="button" class="vk-danger-card" data-danger-action="disconnect-drive">
+        <span class="vk-danger-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+          </svg>
+        </span>
+        <span class="vk-danger-copy">
+          <strong>Desconectar Google Drive</strong>
+          <small>Detener la sincronización</small>
+        </span>
+        <span class="vk-danger-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Restablecer sincronización -->
+      <button type="button" class="vk-danger-card" data-danger-action="reset-sync">
+        <span class="vk-danger-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 7h-5V2"></path>
+            <path d="M4 17h5v5"></path>
+            <path d="M5.1 9A8 8 0 0 1 18.4 5.6L20 7"></path>
+            <path d="M18.9 15A8 8 0 0 1 5.6 18.4L4 17"></path>
+          </svg>
+        </span>
+        <span class="vk-danger-copy">
+          <strong>Restablecer sincronización</strong>
+          <small>Resolver problemas de sincronización</small>
+        </span>
+        <span class="vk-danger-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Cerrar sesión -->
+      <button type="button" class="vk-danger-card" data-danger-action="lock">
+        <span class="vk-danger-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 17l5-5-5-5"></path>
+            <path d="M15 12H3"></path>
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+          </svg>
+        </span>
+        <span class="vk-danger-copy">
+          <strong>Cerrar sesión</strong>
+          <small>Bloquear inmediatamente VaultKey</small>
+        </span>
+        <span class="vk-danger-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </span>
+      </button>
+    </div>
+
+    <p class="vk-danger-version">VaultKey 2.0</p>
   </main>
 </section>
 
@@ -2425,7 +2604,20 @@ html,body{margin:0;background:#070B14}
   </section>
 </div>
 
-<div class="modal" id="confirmModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle" id="confirmTitle">Confirmar acción</div><div class="spacer"></div><button class="iconBtn" onclick="resolveConfirm(false)">✕</button></div><p class="sub" id="confirmMsg">¿Confirmas esta acción?</p><div class="rowBtns"><button class="ghost" onclick="resolveConfirm(false)">Cancelar</button><button class="ghost danger" id="confirmOk" onclick="resolveConfirm(true)">Aceptar</button></div></div></div>
+<div class="modal" id="confirmModal">
+  <div class="sheet">
+    <div class="sheetHead">
+      <div class="sheetTitle" id="confirmTitle">Confirmar acción</div>
+      <div class="spacer"></div>
+      <button type="button" class="iconBtn" id="confirmClose" aria-label="Cerrar" onclick="resolveConfirm(false)">✕</button>
+    </div>
+    <p class="sub" id="confirmMsg">¿Confirmas esta acción?</p>
+    <div class="rowBtns">
+      <button type="button" class="ghost" id="confirmCancel" onclick="resolveConfirm(false)">Cancelar</button>
+      <button type="button" class="ghost danger" id="confirmOk" onclick="resolveConfirm(true)">Aceptar</button>
+    </div>
+  </div>
+</div>
 <div class="modal" id="drivePinModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle">PIN del respaldo</div><div class="spacer"></div><button class="iconBtn" onclick="resolveDrivePin(null)">✕</button></div><p class="sub">Introduce el PIN con el que se cifró este respaldo de Drive.</p><div class="field"><input class="inp" id="drivePinInput" type="password" inputmode="numeric" maxlength="8" placeholder="••••••" autocomplete="off" onkeydown="if(event.key==='Enter')resolveDrivePin(this.value)"></div><div class="rowBtns"><button class="ghost" onclick="resolveDrivePin(null)">Cancelar</button><button class="btn" onclick="resolveDrivePin(document.getElementById('drivePinInput').value)">Restaurar</button></div></div></div>
 <div id="toast" style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(10,30,60,.97);color:#f5f9ff;padding:11px 22px;border-radius:12px;font-size:14px;font-weight:600;pointer-events:none;opacity:0;transition:opacity .25s;z-index:9999;max-width:88vw;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.4);border:1px solid rgba(0,210,255,.2)"></div>
 
