@@ -3905,11 +3905,6 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
   updatePinScale();
   window.addEventListener('resize',updatePinScale);
   function runSplash(cb){
-    if(window.__VK_TWA__){
-      hideSplashHard();
-      cb();
-      return;
-    }
     const splash=$('vkSplash');
     if(!splash){cb();return;}
     updateSplashScale();
