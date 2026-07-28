@@ -55,6 +55,60 @@ html,body{margin:0;background:#070B14}
 .vk-danger-version{margin:auto 24px 0 0;color:#a7b6c9;font-size:13px;line-height:normal;font-weight:400;text-align:right}
 @media (max-width:390px){.vk-danger-content{width:calc(100% - 32px)}.vk-danger-card{padding-right:14px;padding-left:18px;grid-template-columns:42px minmax(0,1fr) 24px}}
 @media (max-height:760px){.vk-danger-content{padding-top:42px;overflow-y:auto}.vk-danger-version{margin-top:28px;padding-bottom:4px}}
+/* ============================================================
+   Información — Figma 139:557
+   ============================================================ */
+#informationSettings[hidden]{display:none!important}
+#informationSettings{box-sizing:border-box;width:100%;height:100dvh;min-height:0;overflow:hidden;border:1px solid #030508;background:linear-gradient(153.28009446302616deg,#111827 15.964%,#182f4e 63.204%);color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.vk-info-screen{position:relative}
+.vk-info-header{box-sizing:border-box;position:relative;z-index:2;display:flex;align-items:center;width:100%;height:64px;padding:0 20px;border-bottom:1px solid rgba(3,5,8,.6);background:#243246}
+.vk-info-back{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin:0;padding:0;border:0;border-radius:12px;background:transparent;color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.vk-info-back svg{display:block;width:24px;height:24px}
+.vk-info-back:active{transform:scale(.96);opacity:.82}
+.vk-info-header-spacer{width:44px;height:44px;margin-left:auto}
+.vk-info-content{box-sizing:border-box;position:relative;display:flex;flex-direction:column;width:100%;height:calc(100dvh - 64px);min-height:0;padding:11px 22px 14px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.vk-info-content::-webkit-scrollbar{display:none}
+.vk-info-title{flex:0 0 auto;margin:0 0 95px;color:#fff;font-family:Inter,system-ui,sans-serif;font-size:20px;line-height:normal;font-weight:700;text-align:center}
+.vk-info-list{display:flex;flex:0 0 auto;flex-direction:column;gap:14px;width:100%}
+.vk-info-card{box-sizing:border-box;display:grid;grid-template-columns:44px minmax(0,1fr) 24px;align-items:center;width:100%;min-height:72px;margin:0;padding:11px 18px 11px 20px;border:1px solid rgba(58,74,96,.6);border-radius:16px;background:#243246;color:#fff;font:inherit;text-align:left;cursor:pointer;appearance:none;-webkit-appearance:none;-webkit-tap-highlight-color:transparent;transition:transform 120ms ease,opacity 120ms ease}
+.vk-info-card--static{grid-template-columns:44px minmax(0,1fr);cursor:default}
+.vk-info-card:not(.vk-info-card--static):active{transform:scale(.985);opacity:.88}
+.vk-info-card__icon{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:flex-start;width:44px;height:44px;color:#3485ff}
+.vk-info-card__icon svg{display:block;width:26px;height:26px}
+.vk-info-card__body{display:flex;min-width:0;flex-direction:column;justify-content:center;gap:6px}
+.vk-info-card__title{display:block;overflow:hidden;color:#fff;font-family:Inter,system-ui,sans-serif;font-size:16px;line-height:normal;font-weight:600;text-overflow:ellipsis;white-space:nowrap}
+.vk-info-card__subtitle{display:block;overflow:hidden;color:#a7b6c9;font-family:Inter,system-ui,sans-serif;font-size:13px;line-height:normal;font-weight:400;text-overflow:ellipsis;white-space:nowrap}
+.vk-info-card__chevron{display:inline-flex;align-items:center;justify-content:flex-end;width:24px;height:24px;color:#a7b6c9}
+.vk-info-card__chevron svg{display:block;width:24px;height:24px}
+.vk-info-version{flex:0 0 auto;margin:51px 3px 0 auto;color:#a7b6c9;font-family:Inter,system-ui,sans-serif;font-size:13px;line-height:normal;font-weight:400;text-align:right}
+@media (max-height:760px){.vk-info-title{margin-bottom:36px}.vk-info-list{gap:12px}.vk-info-version{margin-top:28px}}
+/* ============================================================
+   Notificaciones — Figma 217:1590
+   ============================================================ */
+#notificationsSettings[hidden]{display:none!important}
+#notificationsSettings{box-sizing:border-box;width:100%;height:100dvh;min-height:0;overflow:hidden;border:1px solid #030508;background:linear-gradient(149.3508256958964deg,#111827 15.964%,#182f4e 63.204%);color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.vk-notif-screen{position:relative}
+.vk-notif-header{box-sizing:border-box;position:relative;z-index:2;display:flex;align-items:center;width:100%;height:74px;padding:0 20px;border-bottom:1px solid #030508;background:#243246}
+.vk-notif-back{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin:0;padding:0;border:0;border-radius:12px;background:transparent;color:#fff;cursor:pointer;appearance:none;-webkit-appearance:none;-webkit-tap-highlight-color:transparent}
+.vk-notif-back svg{display:block;width:24px;height:24px}
+.vk-notif-back:active{opacity:.82;transform:scale(.96)}
+.vk-notif-header-spacer{width:44px;height:44px;margin-left:auto}
+.vk-notif-content{box-sizing:border-box;position:relative;display:flex;flex-direction:column;width:100%;height:calc(100dvh - 74px);min-height:0;padding:7px 23px 14px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.vk-notif-content::-webkit-scrollbar{display:none}
+.vk-notif-title{flex:0 0 auto;margin:0 0 124px;color:#fff;font-family:Inter,system-ui,sans-serif;font-size:20px;line-height:normal;font-weight:700;text-align:center}
+.vk-notif-list{display:flex;flex:0 0 auto;flex-direction:column;gap:18px;width:100%}
+.vk-notif-card{box-sizing:border-box;display:grid;grid-template-columns:56px minmax(0,1fr) 24px;align-items:center;width:100%;min-height:85px;margin:0;padding:12px 18px 12px 22px;border:1px solid rgba(58,74,96,.6);border-radius:16px;background:#243246;color:#fff;font:inherit;text-align:left;cursor:pointer;appearance:none;-webkit-appearance:none;-webkit-tap-highlight-color:transparent;transition:transform 120ms ease,opacity 120ms ease}
+.vk-notif-card--flat{grid-template-columns:56px minmax(0,1fr)}
+.vk-notif-card:active{opacity:.88;transform:scale(.985)}
+.vk-notif-card__icon{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:flex-start;width:56px;height:44px;color:#3485ff}
+.vk-notif-card__icon svg{display:block;width:27px;height:27px}
+.vk-notif-card__body{display:flex;min-width:0;flex-direction:column;justify-content:center;gap:8px}
+.vk-notif-card__title{display:block;overflow:hidden;color:#fff;font-family:Inter,system-ui,sans-serif;font-size:16px;line-height:normal;font-weight:600;text-overflow:ellipsis;white-space:nowrap}
+.vk-notif-card__subtitle{display:block;overflow:hidden;color:#a7b6c9;font-family:Inter,system-ui,sans-serif;font-size:13px;line-height:normal;font-weight:400;text-overflow:ellipsis;white-space:nowrap}
+.vk-notif-card__chevron{display:inline-flex;align-items:center;justify-content:flex-end;width:24px;height:24px;color:#a7b6c9}
+.vk-notif-card__chevron svg{display:block;width:24px;height:24px}
+.vk-notif-version{flex:0 0 auto;margin:157px 28px 0 auto;color:#a7b6c9;font-family:Inter,system-ui,sans-serif;font-size:13px;line-height:normal;font-weight:400;text-align:right}
+@media (max-height:820px){.vk-notif-title{margin-bottom:74px}.vk-notif-list{gap:14px}.vk-notif-card{min-height:76px}.vk-notif-version{margin-top:50px}}
 
 /* Confirmación Restablecer VaultKey — Figma 498:2 */
 #confirmModal.vk-confirm--reset,#confirmModal.vk-confirm--wipe{inset:0;padding:16px;align-items:center;justify-content:center;background:rgba(0,7,18,.85)}
@@ -1271,7 +1325,7 @@ html,body{margin:0;background:#070B14}
         <span class="vk-settings-card__arrow vk-r1-row__chevron" aria-hidden="true">›</span>
       </button>
 
-      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="notifications">
+      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="notifications" onclick="openNotificationsSettings()">
         <span class="vk-settings-card__icon vk-r1-row__icon" aria-hidden="true">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M10.3 21a2 2 0 0 0 3.4 0"/>
@@ -1285,7 +1339,7 @@ html,body{margin:0;background:#070B14}
         <span class="vk-settings-card__arrow vk-r1-row__chevron" aria-hidden="true">›</span>
       </button>
 
-      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="information">
+      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="information" onclick="openInformationSettings()">
         <span class="vk-settings-card__icon vk-r1-row__icon" aria-hidden="true">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="9"/>
@@ -1604,6 +1658,263 @@ html,body{margin:0;background:#070B14}
     </div>
 
     <p class="vk-danger-version">VaultKey 2.0</p>
+  </main>
+</section>
+
+<!-- ============================================================
+     Información — Figma 139:557
+     ============================================================ -->
+<section
+  id="informationSettings"
+  class="screen vk-info-screen"
+  aria-labelledby="informationSettingsTitle"
+  hidden
+>
+  <header class="vk-info-header">
+    <button type="button" class="vk-info-back" aria-label="Volver a Ajustes" onclick="show('settings','left')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m15 18-6-6 6-6"></path>
+      </svg>
+    </button>
+    <div class="vk-info-header-spacer" aria-hidden="true"></div>
+  </header>
+
+  <main class="vk-info-content">
+    <h1 id="informationSettingsTitle" class="vk-info-title">Información</h1>
+
+    <div class="vk-info-list">
+      <!-- Versión: informativa, sin acción y sin chevron -->
+      <div class="vk-info-card vk-info-card--static">
+        <span class="vk-info-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M12 11v5"></path>
+            <path d="M12 8h.01"></path>
+          </svg>
+        </span>
+        <span class="vk-info-card__body">
+          <strong class="vk-info-card__title">Versión</strong>
+          <small class="vk-info-card__subtitle">VaultKey 2.0</small>
+        </span>
+      </div>
+
+      <!-- Ayuda -->
+      <button type="button" class="vk-info-card" data-info-action="help">
+        <span class="vk-info-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M9.5 9a2.75 2.75 0 1 1 4.68 1.97c-.94.89-2.18 1.36-2.18 3.03"></path>
+            <path d="M12 18h.01"></path>
+          </svg>
+        </span>
+        <span class="vk-info-card__body">
+          <strong class="vk-info-card__title">Ayuda</strong>
+          <small class="vk-info-card__subtitle">Preguntas frecuentes</small>
+        </span>
+        <span class="vk-info-card__chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Manual de usuario -->
+      <button type="button" class="vk-info-card" data-info-action="manual">
+        <span class="vk-info-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path>
+            <path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5z"></path>
+            <path d="M7 7h2"></path>
+            <path d="M15 7h2"></path>
+          </svg>
+        </span>
+        <span class="vk-info-card__body">
+          <strong class="vk-info-card__title">Manual de usuario</strong>
+          <small class="vk-info-card__subtitle">Guía rápida</small>
+        </span>
+        <span class="vk-info-card__chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Privacidad -->
+      <button type="button" class="vk-info-card" data-info-action="privacy">
+        <span class="vk-info-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"></path>
+          </svg>
+        </span>
+        <span class="vk-info-card__body">
+          <strong class="vk-info-card__title">Privacidad</strong>
+          <small class="vk-info-card__subtitle">Política y términos</small>
+        </span>
+        <span class="vk-info-card__chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Licencias -->
+      <button type="button" class="vk-info-card" data-info-action="licenses">
+        <span class="vk-info-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <path d="M14 2v6h6"></path>
+          </svg>
+        </span>
+        <span class="vk-info-card__body">
+          <strong class="vk-info-card__title">Licencias</strong>
+          <small class="vk-info-card__subtitle">Licencias de terceros</small>
+        </span>
+        <span class="vk-info-card__chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Valorar VaultKey -->
+      <button type="button" class="vk-info-card" data-info-action="rate">
+        <span class="vk-info-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </span>
+        <span class="vk-info-card__body">
+          <strong class="vk-info-card__title">Valorar VaultKey</strong>
+          <small class="vk-info-card__subtitle">Dejar una valoración</small>
+        </span>
+        <span class="vk-info-card__chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </span>
+      </button>
+    </div>
+
+    <p class="vk-info-version">VaultKey 2.0</p>
+  </main>
+</section>
+
+<!-- ============================================================
+     Notificaciones — Figma 217:1590
+     ============================================================ -->
+<section
+  id="notificationsSettings"
+  class="screen vk-notif-screen"
+  aria-labelledby="notificationsSettingsTitle"
+  hidden
+>
+  <header class="vk-notif-header">
+    <button type="button" class="vk-notif-back" aria-label="Volver a Ajustes" onclick="show('settings','left')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m15 18-6-6 6-6"></path>
+      </svg>
+    </button>
+    <span class="vk-notif-header-spacer" aria-hidden="true"></span>
+  </header>
+
+  <main class="vk-notif-content">
+    <h1 id="notificationsSettingsTitle" class="vk-notif-title">Notificaciones</h1>
+
+    <div class="vk-notif-list">
+      <!-- Notificaciones generales -->
+      <button type="button" class="vk-notif-card" data-notif-action="master">
+        <span class="vk-notif-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.3 21a2 2 0 0 0 3.4 0"></path>
+            <path d="M4 17h16c-1.3-1.4-2-3.2-2-6a6 6 0 0 0-12 0c0 2.8-.7 4.6-2 6Z"></path>
+          </svg>
+        </span>
+        <span class="vk-notif-card__body">
+          <strong class="vk-notif-card__title">Notificaciones</strong>
+          <small id="notificationsMasterStatus" class="vk-notif-card__subtitle" aria-live="polite">Desactivadas</small>
+        </span>
+        <span class="vk-notif-card__chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Recordatorios -->
+      <button type="button" class="vk-notif-card" data-notif-action="reminders">
+        <span class="vk-notif-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="13" r="8"></circle>
+            <path d="M12 9v4l2 1"></path>
+            <path d="M9 2h6"></path>
+          </svg>
+        </span>
+        <span class="vk-notif-card__body">
+          <strong class="vk-notif-card__title">Recordatorios</strong>
+          <small class="vk-notif-card__subtitle">Todo · Contraseñas importantes</small>
+        </span>
+        <span class="vk-notif-card__chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Avisos de caducidad -->
+      <button type="button" class="vk-notif-card" data-notif-action="expiry">
+        <span class="vk-notif-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+            <path d="M16 3v4"></path>
+            <path d="M8 3v4"></path>
+            <path d="M3 10h18"></path>
+          </svg>
+        </span>
+        <span class="vk-notif-card__body">
+          <strong class="vk-notif-card__title">Avisos de caducidad</strong>
+          <small class="vk-notif-card__subtitle">Documentos y tarjetas</small>
+        </span>
+        <span class="vk-notif-card__chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Sincronización: sin chevron -->
+      <button type="button" class="vk-notif-card vk-notif-card--flat" data-notif-action="sync">
+        <span class="vk-notif-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 0 1 0 9Z"></path>
+          </svg>
+        </span>
+        <span class="vk-notif-card__body">
+          <strong class="vk-notif-card__title">Sincronización</strong>
+          <small class="vk-notif-card__subtitle">Avisar si falla</small>
+        </span>
+      </button>
+
+      <!-- Modo silencioso -->
+      <button type="button" class="vk-notif-card" data-notif-action="silent">
+        <span class="vk-notif-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.3 21a2 2 0 0 0 3.4 0"></path>
+            <path d="M4 17h16c-1.3-1.4-2-3.2-2-6a6 6 0 0 0-12 0c0 2.8-.7 4.6-2 6Z"></path>
+          </svg>
+        </span>
+        <span class="vk-notif-card__body">
+          <strong class="vk-notif-card__title">Modo silencioso</strong>
+          <small class="vk-notif-card__subtitle">No molestar</small>
+        </span>
+        <span class="vk-notif-card__chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"></path>
+          </svg>
+        </span>
+      </button>
+    </div>
+
+    <p class="vk-notif-version">VaultKey 2.0</p>
   </main>
 </section>
 

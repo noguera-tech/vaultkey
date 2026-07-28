@@ -732,6 +732,189 @@ window.openDangerZoneSettings=function(){
   }
 };
 
+/* ============================================================
+   Información
+   ============================================================ */
+
+window.openInformationSettings=function(){
+  var screen=document.getElementById('informationSettings');
+  if(!screen)return;
+  try{
+    if(typeof window.show==='function'){
+      screen.hidden=false;
+      window.show('informationSettings','right');
+    }
+  }catch(error){
+    console.error('No se pudo abrir Información',error);
+  }
+};
+
+if(!window.__vkInformationActionsBound){
+  window.__vkInformationActionsBound=true;
+  document.addEventListener('click',function(event){
+    var target=event.target.closest('[data-info-action]');
+    if(!target)return;
+    var screen=target.closest('#informationSettings');
+    if(!screen)return;
+    var action=target.getAttribute('data-info-action');
+    if(!action)return;
+    event.preventDefault();
+    switch(action){
+      case 'help':
+        toast('Próximamente');
+        break;
+      case 'manual':
+        toast('Próximamente');
+        break;
+      case 'privacy':
+        window.open('https://nogueratech.app/privacy.html','_blank','noopener');
+        break;
+      case 'licenses':
+        toast('Próximamente');
+        break;
+      case 'rate':
+        toast('Próximamente');
+        break;
+      default:
+        console.warn('Acción de Información desconocida:',action);
+    }
+  });
+}
+
+/* ============================================================
+   Notificaciones
+   ============================================================ */
+
+function getNotificationsMasterStatus(){
+  if(!('Notification' in window)){
+    return 'unavailable';
+  }
+  if(Notification.permission==='denied'){
+    return 'blocked';
+  }
+  if(Notification.permission==='granted'){
+    return localStorage.getItem('vk_notifications_enabled')==='1'
+      ? 'enabled'
+      : 'disabled';
+  }
+  return 'disabled';
+}
+
+function syncNotificationsMasterStatus(){
+  var subtitle=document.getElementById('notificationsMasterStatus');
+  if(!subtitle)return;
+  var status=getNotificationsMasterStatus();
+  switch(status){
+    case 'enabled':
+      subtitle.textContent='Activadas';
+      break;
+    case 'blocked':
+      subtitle.textContent='Bloqueadas';
+      break;
+    case 'unavailable':
+      subtitle.textContent='No disponibles';
+      break;
+    default:
+      subtitle.textContent='Desactivadas';
+  }
+}
+
+window.openNotificationsSettings=function(){
+  var screen=document.getElementById('notificationsSettings');
+  if(!screen)return;
+  try{
+    syncNotificationsMasterStatus();
+    if(typeof window.show==='function'){
+      screen.hidden=false;
+      window.show('notificationsSettings','right');
+    }
+  }catch(error){
+    console.error('No se pudo abrir Notificaciones',error);
+  }
+};
+
+async function toggleMasterNotifications(){
+  var subtitle=document.getElementById('notificationsMasterStatus');
+
+  if(!('Notification' in window)){
+    if(subtitle){subtitle.textContent='No disponibles';}
+    toast('Las notificaciones no están disponibles en este navegador','err');
+    return;
+  }
+
+  if(Notification.permission==='denied'){
+    localStorage.setItem('vk_notifications_enabled','0');
+    if(subtitle){subtitle.textContent='Bloqueadas';}
+    toast('Las notificaciones están bloqueadas en los ajustes de tu dispositivo/navegador');
+    return;
+  }
+
+  if(Notification.permission==='default'){
+    try{
+      var permission=await Notification.requestPermission();
+      if(permission==='granted'){
+        localStorage.setItem('vk_notifications_enabled','1');
+        if(subtitle){subtitle.textContent='Activadas';}
+        toast('Notificaciones activadas','ok');
+        return;
+      }
+      localStorage.setItem('vk_notifications_enabled','0');
+      if(subtitle){subtitle.textContent='Desactivadas';}
+      toast('Notificaciones desactivadas');
+      return;
+    }catch(error){
+      console.error('No se pudo solicitar permiso de notificaciones',error);
+      localStorage.setItem('vk_notifications_enabled','0');
+      syncNotificationsMasterStatus();
+      toast('No se pudo solicitar el permiso de notificaciones','err');
+      return;
+    }
+  }
+
+  var currentlyEnabled=localStorage.getItem('vk_notifications_enabled')==='1';
+  if(currentlyEnabled){
+    localStorage.setItem('vk_notifications_enabled','0');
+    if(subtitle){subtitle.textContent='Desactivadas';}
+    toast('Notificaciones desactivadas');
+    return;
+  }
+  localStorage.setItem('vk_notifications_enabled','1');
+  if(subtitle){subtitle.textContent='Activadas';}
+  toast('Notificaciones activadas','ok');
+}
+
+if(!window.__vkNotificationsActionsBound){
+  window.__vkNotificationsActionsBound=true;
+  document.addEventListener('click',function(event){
+    var target=event.target.closest('[data-notif-action]');
+    if(!target)return;
+    var screen=target.closest('#notificationsSettings');
+    if(!screen)return;
+    var action=target.getAttribute('data-notif-action');
+    if(!action)return;
+    event.preventDefault();
+    switch(action){
+      case 'master':
+        toggleMasterNotifications();
+        break;
+      case 'reminders':
+        toast('Próximamente');
+        break;
+      case 'expiry':
+        toast('Próximamente');
+        break;
+      case 'sync':
+        toast('Próximamente');
+        break;
+      case 'silent':
+        toast('Próximamente');
+        break;
+      default:
+        console.warn('Acción de Notificaciones desconocida:',action);
+    }
+  });
+}
+
 function resetDriveSync(){
   localStorage.removeItem('vk_drive_last_sync');
   // Conservados deliberadamente: token OAuth en memoria de sesión y vk_drive_auto
