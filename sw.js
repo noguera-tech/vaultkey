@@ -3,7 +3,7 @@
 //  Versión auto-generada: no editar CACHE_VERSION manualmente.
 //  Para forzar actualización en usuarios: incrementar el número.
 // ─────────────────────────────────────────────────────────────
-const CACHE_VERSION = 26;
+const CACHE_VERSION = 27;
 const CACHE = `vaultkey-v${CACHE_VERSION}`;
 
 const FILES = [
@@ -88,8 +88,8 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // app.js y style.css — Network first (para recibir actualizaciones)
-  if (url.pathname.endsWith('app.js') || url.pathname.endsWith('style.css') || url.pathname.endsWith('drive.js')) {
+  // app.js, style.css, drive.js, app.html, components.css, theme.css — Network first (para recibir actualizaciones)
+  if (url.pathname.endsWith('app.js') || url.pathname.endsWith('style.css') || url.pathname.endsWith('drive.js') || url.pathname.endsWith('app.html') || url.pathname.endsWith('components.css') || url.pathname.endsWith('theme.css')) {
     event.respondWith(
       fetch(event.request, { cache: 'no-store' })
         .then(response => {
