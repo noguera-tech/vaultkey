@@ -1763,6 +1763,46 @@ html.vk-twa #vkSplash{display:none!important}
 </div></div>
 
 
+<style id="vkEntryTypeCarouselStyles">
+/* Carrusel de tipos de entrada (Contraseña/Nota/Tarjeta/WiFi/etc.) */
+#entryTypeRow,
+#entryModal #entryTypeRow {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  touch-action: pan-x !important;
+}
+
+#entryTypeRow > button,
+#entryModal #entryTypeRow > button {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+}
+
+#entryTypeRow button.entryTypeActive,
+#entryModal #entryTypeRow > button.entryTypeActive {
+  border: 2px solid var(--cyan) !important;
+  background: rgba(0,210,255,.22) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(0,210,255,.35) !important;
+}
+
+#iconStripWrapper {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 4px !important;
+  width: 100% !important;
+}
+
+#iconStripRow { overflow-x:auto; overflow-y:hidden; white-space:nowrap; scrollbar-width:none; padding:4px 0 8px; cursor:grab; scroll-behavior:smooth; touch-action:pan-x; }
+#iconStripRow.dragging { cursor:grabbing; user-select:none; }
+#iconStripRow::-webkit-scrollbar { display:none; }
+</style>
+
 <style id="vkGeneratorBottomSheetStyles">
 .vk-generator-modal {
   z-index:140;
@@ -1810,6 +1850,19 @@ html.vk-twa #vkSplash{display:none!important}
   scrollbar-color:rgba(167,182,201,.4) transparent;
 }
 
+.vk-generator-scroll::after {
+  content:"";
+  display:block;
+  position:sticky;
+  bottom:0;
+  left:0;
+  right:0;
+  height:26px;
+  margin-top:-26px;
+  background:linear-gradient(to bottom, rgba(20,28,42,0), rgba(20,28,42,.82));
+  pointer-events:none;
+}
+
 .vk-generator-scroll::-webkit-scrollbar {
   width:4px;
 }
@@ -1824,7 +1877,7 @@ html.vk-twa #vkSplash{display:none!important}
 }
 
 .vk-generator-title {
-  margin:0 0 22px;
+  margin:0 0 14px;
   color:#fff;
   font-size:24px;
   line-height:29px;
@@ -1840,7 +1893,7 @@ html.vk-twa #vkSplash{display:none!important}
 }
 
 .vk-generator-preview-card {
-  padding:14px 16px;
+  padding:10px 14px;
 }
 
 .vk-generator-label {
@@ -1854,7 +1907,7 @@ html.vk-twa #vkSplash{display:none!important}
   display:flex;
   align-items:center;
   gap:10px;
-  margin-top:10px;
+  margin-top:6px;
   min-height:32px;
 }
 
@@ -1891,8 +1944,8 @@ html.vk-twa #vkSplash{display:none!important}
 }
 
 .vk-generator-length-card {
-  margin-top:14px;
-  padding:14px 16px 17px;
+  margin-top:10px;
+  padding:10px 14px 12px;
 }
 
 .vk-generator-length-head {
@@ -1911,7 +1964,7 @@ html.vk-twa #vkSplash{display:none!important}
   --vk-range-percent:20%;
   width:100%;
   height:20px;
-  margin:13px 0 0;
+  margin:9px 0 0;
   padding:0;
   appearance:none;
   -webkit-appearance:none;
