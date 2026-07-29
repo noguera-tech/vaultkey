@@ -357,9 +357,10 @@ function vkConfirm(title,msg,options){
     confirmResolver=resolve;
     $('confirmTitle').textContent=title;
     $('confirmMsg').textContent=msg;
-    modal.classList.remove('vk-confirm--reset','vk-confirm--wipe');
+    modal.classList.remove('vk-confirm--reset','vk-confirm--wipe','vk-confirm--drive-disconnect');
     if(options.variant==='reset')modal.classList.add('vk-confirm--reset');
     if(options.variant==='wipe')modal.classList.add('vk-confirm--wipe');
+    if(options.variant==='drive-disconnect')modal.classList.add('vk-confirm--drive-disconnect');
     if(okButton)okButton.textContent=options.confirmText||'Aceptar';
     modal.classList.add('open');
   });
@@ -367,7 +368,7 @@ function vkConfirm(title,msg,options){
 function resolveConfirm(ok){
   const modal=$('confirmModal');
   const okButton=$('confirmOk');
-  modal.classList.remove('open','vk-confirm--reset','vk-confirm--wipe');
+  modal.classList.remove('open','vk-confirm--reset','vk-confirm--wipe','vk-confirm--drive-disconnect');
   if(okButton)okButton.textContent='Aceptar';
   if(confirmResolver){confirmResolver(!!ok);confirmResolver=null;}
 }
@@ -915,6 +916,89 @@ if(!window.__vkNotificationsActionsBound){
   });
 }
 
+
+/* ============================================================
+   Google Drive — UI rica conectada a drive.js
+   ============================================================ */
+function formatDriveLastSync(){
+  var raw=localStorage.getItem('vk_drive_last_sync');
+  if(!raw)return 'Nunca';
+  var stamp=parseInt(raw,10);
+  if(!Number.isFinite(stamp))return 'Nunca';
+  return new Date(stamp).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+window.syncDriveSettingsUI=function(state){
+  var screen=document.getElementById('driveSettings');
+  if(!screen)return;
+  state=state||((typeof window.driveGetUiState==='function')?window.driveGetUiState():'disconnected');
+  var ids=['driveConnectCard','driveStatusCard','driveBackupCard','driveRestoreCard','driveRetryCard','driveDisconnectCard'];
+  ids.forEach(function(id){var el=document.getElementById(id);if(el)el.hidden=true;});
+  var accountSub=document.getElementById('driveAccountSub');
+  var statusCard=document.getElementById('driveStatusCard');
+  var statusText=document.getElementById('driveStatusText');
+  var statusIcon=document.getElementById('driveStatusIcon');
+  var lastText=document.getElementById('driveLastText');
+  if(lastText)lastText.textContent=formatDriveLastSync();
+  screen.classList.toggle('vk-drive-busy',state==='syncing');
+  if(statusCard)statusCard.classList.remove('vk-drive-card--warning');
+  if(state==='disconnected'){
+    if(accountSub)accountSub.textContent='Cuenta no conectada';
+    document.getElementById('driveConnectCard').hidden=false;
+    return;
+  }
+  if(accountSub){
+    accountSub.textContent=state==='offline'?'Los cambios se sincronizarán cuando vuelvas a tener Internet.':'Cuenta conectada';
+    accountSub.classList.toggle('vk-drive-copy--wrap',state==='offline');
+  }
+  if(statusCard)statusCard.hidden=false;
+  if(statusIcon){
+    if(state==='syncing')statusIcon.innerHTML='<svg class="vk-drive-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/></svg>';
+    else if(state==='offline')statusIcon.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 0 1 0 9Z"/></svg>';
+    else statusIcon.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg>';
+  }
+  if(state==='offline'){
+    if(statusText)statusText.textContent='Sin conexión';
+    if(statusCard)statusCard.classList.add('vk-drive-card--warning');
+    document.getElementById('driveRestoreCard').hidden=false;
+    document.getElementById('driveRetryCard').hidden=false;
+    return;
+  }
+  if(statusText)statusText.textContent=state==='syncing'?'Sincronizando...':'Todo sincronizado';
+  document.getElementById('driveBackupCard').hidden=false;
+  document.getElementById('driveRestoreCard').hidden=false;
+  if(state==='connected')document.getElementById('driveDisconnectCard').hidden=false;
+};
+
+window.openDriveSettings=function(){
+  var screen=document.getElementById('driveSettings');
+  if(!screen)return;
+  try{
+    if(typeof driveInit==='function')driveInit();
+    window.syncDriveSettingsUI();
+    if(typeof window.show==='function'){
+      screen.hidden=false;
+      window.show('driveSettings','right');
+    }
+  }catch(error){console.error('No se pudo abrir Google Drive',error);}
+};
+
+if(!window.__vkDriveActionsBound){
+  window.__vkDriveActionsBound=true;
+  document.addEventListener('click',async function(event){
+    var target=event.target.closest('[data-drive-action]');
+    if(!target||!target.closest('#driveSettings'))return;
+    event.preventDefault();
+    var action=target.getAttribute('data-drive-action');
+    try{
+      if(action==='connect'&&typeof driveConnect==='function')driveConnect();
+      else if((action==='sync'||action==='retry')&&typeof driveSyncNow==='function')await driveSyncNow(false);
+      else if(action==='restore'&&typeof driveRestore==='function')await driveRestore();
+      else if(action==='disconnect'&&typeof driveDisconnect==='function')await driveDisconnect();
+    }catch(error){console.error('Error en acción de Google Drive',error);toast('No se pudo completar la acción de Google Drive','err');}
+  });
+}
+
 function resetDriveSync(){
   localStorage.removeItem('vk_drive_last_sync');
   // Conservados deliberadamente: token OAuth en memoria de sesión y vk_drive_auto
@@ -1190,7 +1274,9 @@ function showPrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.add('sh
 function hidePrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.remove('show');document.body.classList.remove('vk-locked')}
 window.isFilePickerGuardActive=function(){
   return window._vkFilePickerOpen===true ||
-    Date.now()<Number(window._vkFilePickerGraceUntil||0);
+    Date.now()<Number(window._vkFilePickerGraceUntil||0) ||
+    window._vkGoogleOAuthOpen===true ||
+    Date.now()<Number(window._vkGoogleOAuthGraceUntil||0);
 };
 window.finishFilePicker=function(){
   window._vkFilePickerOpen=false;

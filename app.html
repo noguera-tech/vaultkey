@@ -110,19 +110,46 @@ html,body{margin:0;background:#070B14}
 .vk-notif-version{flex:0 0 auto;margin:157px 28px 0 auto;color:#a7b6c9;font-family:Inter,system-ui,sans-serif;font-size:13px;line-height:normal;font-weight:400;text-align:right}
 @media (max-height:820px){.vk-notif-title{margin-bottom:74px}.vk-notif-list{gap:14px}.vk-notif-card{min-height:76px}.vk-notif-version{margin-top:50px}}
 
+/* ============================================================
+   Google Drive — Figma 507:13, 507:57, 217:1471, 217:1510
+   ============================================================ */
+#driveSettings[hidden]{display:none!important}
+#driveSettings{box-sizing:border-box;width:100%;height:100dvh;min-height:0;overflow:hidden;border:1px solid #030508;background:linear-gradient(149.3508256958964deg,#111827 15.964%,#182f4e 63.204%);color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.vk-drive-screen{position:relative}
+.vk-drive-header{box-sizing:border-box;height:64px;display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;padding:0 20px;border-bottom:1px solid #030508;background:#243246}
+.vk-drive-back{width:44px;height:44px;padding:0;border:0;border-radius:12px;background:transparent;color:#a7b6c9;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.vk-drive-back svg{width:24px;height:24px}.vk-drive-back:active{opacity:.82;transform:scale(.96)}
+.vk-drive-header-spacer{width:44px;height:44px}
+.vk-drive-content{box-sizing:border-box;width:100%;height:calc(100dvh - 64px);min-height:0;padding:17px 22px max(18px,env(safe-area-inset-bottom));display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:none}
+.vk-drive-content::-webkit-scrollbar{display:none}
+.vk-drive-title{margin:0 0 89px;color:#fff;font-size:20px;line-height:normal;font-weight:700;text-align:center}
+.vk-drive-list{display:flex;flex-direction:column;gap:15px;width:100%}
+.vk-drive-card{box-sizing:border-box;width:100%;height:72px;min-height:72px;margin:0;padding:0 18px 0 27px;border:1px solid rgba(58,74,96,.6);border-radius:16px;background:#243246;color:#fff;display:grid;grid-template-columns:53px minmax(0,1fr) 24px;align-items:center;text-align:left;font:inherit;appearance:none;-webkit-appearance:none}
+button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:scale(.985)}
+.vk-drive-card[hidden]{display:none!important}.vk-drive-card--flat{grid-template-columns:53px minmax(0,1fr)}
+.vk-drive-card--warning{background:rgba(245,158,11,.68)}
+.vk-drive-icon{width:29px;height:29px;color:#3485ff;display:flex;align-items:center;justify-content:center}.vk-drive-icon svg{width:29px;height:29px;display:block}
+.vk-drive-copy{min-width:0;display:flex;flex-direction:column;gap:9px}.vk-drive-copy strong{overflow:hidden;color:#fff;font-size:16px;line-height:normal;font-weight:600;text-overflow:ellipsis;white-space:nowrap}.vk-drive-copy small{overflow:hidden;color:#a7b6c9;font-size:13px;line-height:normal;font-weight:400;text-overflow:ellipsis;white-space:nowrap}.vk-drive-copy small.vk-drive-copy--wrap{font-size:12px;white-space:normal;text-align:center;line-height:15px}
+.vk-drive-chevron{width:24px;height:24px;color:#a7b6c9;display:flex;align-items:center;justify-content:center}.vk-drive-chevron svg{width:24px;height:24px}
+.vk-drive-version{margin:auto 28px 0 auto;padding-top:28px;color:#a7b6c9;font-size:13px;font-weight:400;text-align:right}
+.vk-drive-busy .vk-drive-card[data-drive-action]{pointer-events:none;opacity:.62}
+.vk-drive-spin{animation:vkDriveSpin 1s linear infinite}@keyframes vkDriveSpin{to{transform:rotate(360deg)}}
+@media(max-height:820px){.vk-drive-title{margin-bottom:56px}.vk-drive-list{gap:12px}.vk-drive-version{padding-top:24px}}
+
+
 /* Confirmación Restablecer VaultKey — Figma 498:2 */
-#confirmModal.vk-confirm--reset,#confirmModal.vk-confirm--wipe{inset:0;padding:16px;align-items:center;justify-content:center;background:rgba(0,7,18,.85)}
-#confirmModal.vk-confirm--reset .sheet,#confirmModal.vk-confirm--wipe .sheet{box-sizing:border-box;position:relative;width:300px;max-width:calc(100vw - 32px);height:240px;max-height:none;overflow:hidden;padding:45px 24px 20px;border:1px solid #030508;border-radius:16px;background:#243246;box-shadow:none}
-#confirmModal.vk-confirm--reset .sheetHead,#confirmModal.vk-confirm--wipe .sheetHead{display:block;margin:0}
-#confirmModal.vk-confirm--reset .sheetTitle,#confirmModal.vk-confirm--wipe .sheetTitle{margin:0;color:#fff;font-family:Inter,system-ui,sans-serif;font-size:24px;line-height:normal;font-weight:700;text-align:center;text-shadow:none}
-#confirmModal.vk-confirm--reset .spacer,#confirmModal.vk-confirm--reset #confirmClose,#confirmModal.vk-confirm--wipe .spacer,#confirmModal.vk-confirm--wipe #confirmClose{display:none}
-#confirmModal.vk-confirm--reset #confirmMsg,#confirmModal.vk-confirm--wipe #confirmMsg{margin:8px 0 0;color:rgba(167,182,201,.8);font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:500;text-align:center}
-#confirmModal.vk-confirm--reset .rowBtns,#confirmModal.vk-confirm--wipe .rowBtns{position:absolute;left:39px;right:39px;bottom:20px;display:grid;grid-template-columns:85px 85px;justify-content:space-between;gap:0}
-#confirmModal.vk-confirm--reset .rowBtns>button,#confirmModal.vk-confirm--wipe .rowBtns>button{box-sizing:border-box;width:85px;height:43px;min-width:0;padding:0;border:1px solid #3a4a60;border-radius:16px;font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:400;color:#fff;box-shadow:none}
-#confirmModal.vk-confirm--reset #confirmCancel,#confirmModal.vk-confirm--wipe #confirmCancel{background:transparent}
-#confirmModal.vk-confirm--reset #confirmOk{border-color:#3a4a60;background:#f59e0b;color:#fff}
+#confirmModal.vk-confirm--reset,#confirmModal.vk-confirm--wipe,#confirmModal.vk-confirm--drive-disconnect{inset:0;padding:16px;align-items:center;justify-content:center;background:rgba(0,7,18,.85)}
+#confirmModal.vk-confirm--reset .sheet,#confirmModal.vk-confirm--wipe .sheet,#confirmModal.vk-confirm--drive-disconnect .sheet{box-sizing:border-box;position:relative;width:300px;max-width:calc(100vw - 32px);height:240px;max-height:none;overflow:hidden;padding:45px 24px 20px;border:1px solid #030508;border-radius:16px;background:#243246;box-shadow:none}
+#confirmModal.vk-confirm--reset .sheetHead,#confirmModal.vk-confirm--wipe .sheetHead,#confirmModal.vk-confirm--drive-disconnect .sheetHead{display:block;margin:0}
+#confirmModal.vk-confirm--reset .sheetTitle,#confirmModal.vk-confirm--wipe .sheetTitle,#confirmModal.vk-confirm--drive-disconnect .sheetTitle{margin:0;color:#fff;font-family:Inter,system-ui,sans-serif;font-size:24px;line-height:normal;font-weight:700;text-align:center;text-shadow:none}
+#confirmModal.vk-confirm--reset .spacer,#confirmModal.vk-confirm--reset #confirmClose,#confirmModal.vk-confirm--wipe .spacer,#confirmModal.vk-confirm--wipe #confirmClose,#confirmModal.vk-confirm--drive-disconnect .spacer,#confirmModal.vk-confirm--drive-disconnect #confirmClose{display:none}
+#confirmModal.vk-confirm--reset #confirmMsg,#confirmModal.vk-confirm--wipe #confirmMsg,#confirmModal.vk-confirm--drive-disconnect #confirmMsg{margin:8px 0 0;color:rgba(167,182,201,.8);font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:500;text-align:center}
+#confirmModal.vk-confirm--reset .rowBtns,#confirmModal.vk-confirm--wipe .rowBtns,#confirmModal.vk-confirm--drive-disconnect .rowBtns{position:absolute;left:39px;right:39px;bottom:20px;display:grid;grid-template-columns:85px 85px;justify-content:space-between;gap:0}
+#confirmModal.vk-confirm--reset .rowBtns>button,#confirmModal.vk-confirm--wipe .rowBtns>button,#confirmModal.vk-confirm--drive-disconnect .rowBtns>button{box-sizing:border-box;width:85px;height:43px;min-width:0;padding:0;border:1px solid #3a4a60;border-radius:16px;font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:400;color:#fff;box-shadow:none}
+#confirmModal.vk-confirm--reset #confirmCancel,#confirmModal.vk-confirm--wipe #confirmCancel,#confirmModal.vk-confirm--drive-disconnect #confirmCancel{background:transparent}
+#confirmModal.vk-confirm--reset #confirmOk,#confirmModal.vk-confirm--drive-disconnect #confirmOk{border-color:#3a4a60;background:#f59e0b;color:#fff}
 #confirmModal.vk-confirm--wipe #confirmOk{border-color:#3a4a60;background:#dc2626;color:#fff}
-#confirmModal.vk-confirm--reset #confirmCancel:active,#confirmModal.vk-confirm--reset #confirmOk:active,#confirmModal.vk-confirm--wipe #confirmCancel:active,#confirmModal.vk-confirm--wipe #confirmOk:active{opacity:.84;transform:scale(.97)}
+#confirmModal.vk-confirm--reset #confirmCancel:active,#confirmModal.vk-confirm--reset #confirmOk:active,#confirmModal.vk-confirm--wipe #confirmCancel:active,#confirmModal.vk-confirm--wipe #confirmOk:active,#confirmModal.vk-confirm--drive-disconnect #confirmCancel:active,#confirmModal.vk-confirm--drive-disconnect #confirmOk:active{opacity:.84;transform:scale(.97)}
 .vk-auto-header{box-sizing:border-box;height:64px;background:#243246;border-bottom:1px solid #000;display:flex;align-items:center;padding:0 24px}
 .vk-auto-back{width:32px;height:32px;padding:0;border:0;background:transparent;color:#a7b6c9;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .vk-auto-back svg{width:24px;height:24px}
@@ -419,7 +446,6 @@ html,body{margin:0;background:#070B14}
       </div>
     </section>
 
-    <button type="button" class="vk-dash-fab" aria-label="Nueva entrada" onclick="openEntry()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
 
     <div id="recentList" hidden></div>
 
@@ -1247,8 +1273,7 @@ html,body{margin:0;background:#070B14}
   <div id="entryList" style="position:relative;z-index:2"></div>
   <div id="recentListVault" style="display:none;position:relative;z-index:2"></div>
 </div>
-  <!-- FAB nueva entrada -->
-  <button onclick="openEntry()" id="fabAdd" aria-label="Nueva entrada" style="position:fixed;bottom:28px;right:20px;width:56px;height:56px;border-radius:28px;background:linear-gradient(135deg,#5544ff,#0066ff);border:none;color:#fff;font-size:28px;font-weight:200;box-shadow:0 6px 24px rgba(0,100,255,.5);display:none;align-items:center;justify-content:center;z-index:90;transition:transform .15s,opacity .2s">+</button>
+  <!-- FAB nueva entrada — eliminado a petición del usuario (29-jul): se accede desde cada sección -->
 </section>
 <section id="fav" class="screen vk-favorites-root vk-r1-screen">
   <header class="vk-favorites-header">
@@ -1312,7 +1337,7 @@ html,body{margin:0;background:#070B14}
         <span class="vk-settings-card__arrow vk-r1-row__chevron" aria-hidden="true">›</span>
       </button>
 
-      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="drive">
+      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="drive" onclick="openDriveSettings()">
         <span class="vk-settings-card__icon vk-r1-row__icon" aria-hidden="true">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 0 1 0 9Z"/>
@@ -1917,6 +1942,60 @@ html,body{margin:0;background:#070B14}
     <p class="vk-notif-version">VaultKey 2.0</p>
   </main>
 </section>
+
+
+<!-- ============================================================
+     Google Drive — estados reales conectados a drive.js
+     ============================================================ -->
+<section id="driveSettings" class="screen vk-drive-screen" aria-labelledby="driveSettingsTitle" hidden>
+  <header class="vk-drive-header">
+    <button type="button" class="vk-drive-back" aria-label="Volver a Ajustes" onclick="show('settings','left')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <span></span><span class="vk-drive-header-spacer" aria-hidden="true"></span>
+  </header>
+  <main class="vk-drive-content">
+    <h1 id="driveSettingsTitle" class="vk-drive-title">Google Drive</h1>
+    <div id="driveSettingsList" class="vk-drive-list">
+      <div id="driveAccountCard" class="vk-drive-card vk-drive-card--flat">
+        <span class="vk-drive-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 0 1 0 9Z"/></svg></span>
+        <span class="vk-drive-copy"><strong>Google Drive</strong><small id="driveAccountSub">Cuenta no conectada</small></span>
+      </div>
+      <button id="driveConnectCard" type="button" class="vk-drive-card" data-drive-action="connect">
+        <span class="vk-drive-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/></svg></span>
+        <span class="vk-drive-copy"><strong>Conectar Google Drive</strong><small>Iniciar sesión con Google</small></span>
+        <span class="vk-drive-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+      </button>
+      <div id="driveStatusCard" class="vk-drive-card vk-drive-card--flat" hidden>
+        <span id="driveStatusIcon" class="vk-drive-icon" aria-hidden="true"></span>
+        <span class="vk-drive-copy"><strong>Estado de sincronización</strong><small id="driveStatusText">Todo sincronizado</small></span>
+      </div>
+      <button id="driveBackupCard" type="button" class="vk-drive-card vk-drive-card--flat" data-drive-action="sync" hidden>
+        <span class="vk-drive-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14a2 2 0 0 0 2-2v-3"/><path d="M3 15v3a2 2 0 0 0 2 2"/></svg></span>
+        <span class="vk-drive-copy"><strong>Crear copia de seguridad</strong><small>Subir ahora</small></span>
+      </button>
+      <button id="driveRestoreCard" type="button" class="vk-drive-card" data-drive-action="restore" hidden>
+        <span class="vk-drive-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14a2 2 0 0 0 2-2v-3"/><path d="M3 16v3a2 2 0 0 0 2 2"/></svg></span>
+        <span class="vk-drive-copy"><strong>Restaurar copia</strong><small>Desde Google Drive</small></span>
+        <span class="vk-drive-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+      </button>
+      <div id="driveLastCard" class="vk-drive-card vk-drive-card--flat">
+        <span class="vk-drive-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+        <span class="vk-drive-copy"><strong>Última sincronización</strong><small id="driveLastText">Nunca</small></span>
+      </div>
+      <button id="driveRetryCard" type="button" class="vk-drive-card vk-drive-card--flat" data-drive-action="retry" hidden>
+        <span class="vk-drive-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/></svg></span>
+        <span class="vk-drive-copy"><strong>Reintentar sincronización</strong><small>Intentar conectar de nuevo</small></span>
+      </button>
+      <button id="driveDisconnectCard" type="button" class="vk-drive-card vk-drive-card--flat" data-drive-action="disconnect" hidden>
+        <span class="vk-drive-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 2 20 20"/><path d="M5.78 5.78A7 7 0 0 0 9 19h8.5a4.5 4.5 0 0 0 2.34-.66"/><path d="M13.73 5.08A7 7 0 0 1 15.7 10H17.5a4.5 4.5 0 0 1 4.47 4"/></svg></span>
+        <span class="vk-drive-copy"><strong>Desconectar Google Drive</strong><small>Detener la sincronización</small></span>
+      </button>
+    </div>
+    <p class="vk-drive-version">VaultKey 2.0</p>
+  </main>
+</section>
+
 
 
 <section id="autoLockSettings" class="screen" aria-labelledby="autoLockTitle" hidden>
@@ -3478,6 +3557,7 @@ document.addEventListener("DOMContentLoaded",function(){
 <script src="models.js"></script>
 
 <!-- fin núcleo 2.0 -->
+<script src="drive.js"></script>
 <script src="app.js"></script>
 
 <script id="vkGeneratorBottomSheetScript">
@@ -4020,7 +4100,6 @@ if(typeof legacyHandleVisibilityChange==="function"){
 }
 })();
 </script>
-<script src="drive.js"></script>
 <div class="modal" id="securityModal">
   <div class="sheet" style="max-height:90vh;overflow-y:auto">
     <div class="sheetHead">
