@@ -1,190 +1,370 @@
-
+'use strict';
 
 // ============================================================
-// GOOGLE DRIVE SYNC — VaultKey
+// GOOGLE DRIVE — PHASE 1 (versión híbrida: OAuth robusto + UI rica)
+// OAuth2 + respaldo cifrado (vk2_blob si existe, vk_data_v1 como legacy)
 // ============================================================
+
 const DRIVE_CLIENT_ID = '299016319331-5it6s2gdts517jnehshfc1hkfpjgd4ku.apps.googleusercontent.com';
-const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
-const DRIVE_FILE_NAME = 'vaultkey-backup.json';
-const LS_DRIVE_TOKEN = 'vk_drive_token'; // sesión únicamente
-const LS_DRIVE_AUTO = 'vk_drive_auto';
-const LS_DRIVE_LAST = 'vk_drive_last_sync';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const DRIVE_TOKEN_KEY = 'vk_drive_token';
+const DRIVE_LAST_SYNC_KEY = 'vk_drive_last_sync';
+const DRIVE_AUTO_KEY = 'vk_drive_auto';
+const DRIVE_TOKEN_SAFETY_MS = 60 * 1000;
 
-let driveToken = null;
+let driveTokenClient = null;
+let driveUiState = 'disconnected';
 
-function driveSanitizeRestoredEntries(entries){
-  return entries.filter(e => e && typeof e === 'object').map(e => ({
-    ...e,
-    id: normalizeEntryId(e.id),
-    service: String(e.service || ''),
-    entryType: String(e.entryType || 'password'),
-    category: String(e.category || 'general'),
-    user: String(e.user || ''),
-    email: String(e.email || ''),
-    pass: String(e.pass || ''),
-    url: String(e.url || ''),
-    note: String(e.note || ''),
-    fav: !!e.fav,
-    used: Number(e.used || 0),
-    updated: Number(e.updated || 0),
-    tags: Array.isArray(e.tags) ? e.tags.filter(t => typeof t === 'string').slice(0, 10) : [],
-    passHistory: Array.isArray(e.passHistory) ? e.passHistory : [],
-  }));
+// ---------- Estado visual (conectando/sincronizando/conectado/offline) ----------
+function driveSetUiState(state) {
+  driveUiState = state;
+  if (typeof window.syncDriveSettingsUI === 'function') window.syncDriveSettingsUI(state);
+}
+window.driveGetUiState = function () { return driveUiState; };
+
+// ---------- OAuth guards — evita que el auto-bloqueo salte durante el login ----------
+function driveBeginOAuthGuard() {
+  window._vkGoogleOAuthOpen = true;
+  window._vkGoogleOAuthGraceUntil = Date.now() + 120000;
 }
 
-
-// Inicializar Drive al arrancar
-function driveInit() {
-  driveSyncUI(false);
-  const sub = document.getElementById('driveStatusSub');
-  if(sub) sub.textContent = '🔄 Reconecta Drive al abrir la app';
-  // Auto sync por defecto activado
-  const auto = localStorage.getItem(LS_DRIVE_AUTO);
-  if(auto === null) localStorage.setItem(LS_DRIVE_AUTO, '1');
-  const toggle = document.getElementById('driveAutoToggle');
-  if(toggle) toggle.checked = localStorage.getItem(LS_DRIVE_AUTO) !== '0';
+function driveEndOAuthGuard() {
+  window._vkGoogleOAuthOpen = false;
+  window._vkGoogleOAuthGraceUntil = Date.now() + 1500;
 }
 
-// Actualizar UI según estado conexión
-function driveSyncUI(connected) {
-  const rows = ['driveConnectRow','driveStatusRow','driveSyncRow','driveRestoreRow','driveAutoRow','driveDisconnectRow'];
-  rows.forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.style.display = 'none';
-  });
-  if(!connected) {
-    const r = document.getElementById('driveConnectRow');
-    if(r) r.style.display = '';
-  } else {
-    ['driveStatusRow','driveSyncRow','driveRestoreRow','driveAutoRow','driveDisconnectRow'].forEach(id => {
-      const el = document.getElementById(id);
-      if(el) el.style.display = '';
-    });
-    // Update last sync time
-    const last = localStorage.getItem(LS_DRIVE_LAST);
-    const sub = document.getElementById('driveStatusSub');
-    if(sub) sub.textContent = last ? 'Última sync: ' + new Date(parseInt(last)).toLocaleString('es-ES') : '🔄 Conecta Drive para sincronizar';
-  }
-}
-
-// Conectar con Google
-function driveConnect() {
-  if(!window.google || !google.accounts) {
-    // Esperar hasta 5 segundos a que cargue el script de Google
-    let attempts = 0;
-    const wait = setInterval(() => {
-      attempts++;
-      if(window.google && google.accounts) {
-        clearInterval(wait);
-        driveConnectNow();
-      } else if(attempts > 10) {
-        clearInterval(wait);
-        toast('No se pudo conectar con Google. Comprueba tu conexión.');
-      }
-    }, 500);
-    toast('Conectando con Google...');
-    return;
-  }
-  driveConnectNow();
-}
-function driveConnectNow() {
-  const client = google.accounts.oauth2.initTokenClient({
-    client_id: DRIVE_CLIENT_ID,
-    scope: DRIVE_SCOPE,
-    callback: async (resp) => {
-      if(resp.error) { toast('Error al conectar con Google'); return; }
-      driveToken = resp.access_token;
-      driveSyncUI(true);
-      soundSuccess(); vibe([30,20,60]);
-      toast('✅ Google Drive conectado');
-      // Auto sync inmediata al conectar
-      await driveSyncNow(true);
-    }
-  });
-  client.requestAccessToken();
-}
-
-// Subir respaldo a Drive
-async function driveSyncNow(silent) {
-  if(!driveToken) { if(!silent) toast('Primero conecta Google Drive'); return; }
+// ---------- Token (persistente, con expiración) ----------
+function driveReadToken() {
   try {
-    const pack = localStorage.getItem(LS_DATA);
-    if(!pack) { if(!silent) toast('No hay datos para sincronizar'); return; }
-    const localEntries = vault ? vault.length : 0;
-    const data = {app:'VaultKey',version:1,exported:Date.now(),entries:localEntries,payload:JSON.parse(pack)};
-    const content_str = JSON.stringify(data);
+    const raw = localStorage.getItem(DRIVE_TOKEN_KEY);
+    if (!raw) return null;
 
-    // Buscar si ya existe el archivo
-    const search = await fetch(
-      `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id)`,
-      {headers: {Authorization: 'Bearer ' + driveToken}}
-    );
-    const searchData = await search.json();
-    const existingId = searchData.files && searchData.files[0] ? searchData.files[0].id : null;
-
-    const metadata = {name: DRIVE_FILE_NAME, parents: ['appDataFolder']};
-    let response;
-
-    if(existingId) {
-      // Actualizar archivo existente
-      const form = new FormData();
-      form.append('metadata', new Blob([JSON.stringify({})], {type:'application/json'}));
-      form.append('file', new Blob([content_str], {type:'application/json'}));
-      response = await fetch(
-        `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=multipart`,
-        {method:'PATCH', headers:{Authorization:'Bearer '+driveToken}, body:form}
-      );
-    } else {
-      // Crear archivo nuevo
-      const form = new FormData();
-      form.append('metadata', new Blob([JSON.stringify(metadata)], {type:'application/json'}));
-      form.append('file', new Blob([content_str], {type:'application/json'}));
-      response = await fetch(
-        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
-        {method:'POST', headers:{Authorization:'Bearer '+driveToken}, body:form}
-      );
+    // Compatibilidad con una posible versión antigua que guardase solo el string.
+    if (raw.charAt(0) !== '{') {
+      return { access_token: raw, expires_at: 0 };
     }
 
-    if(response.ok) {
-      const now = Date.now();
-      localStorage.setItem(LS_DRIVE_LAST, String(now));
-      driveSyncUI(true);
-      if(!silent) { soundSuccess(); vibe([20,10,40]); toast('✅ Sincronizado con Google Drive'); }
-    } else if(response.status === 401) {
-      // Token expirado
-      driveToken = null;
-      driveSyncUI(false);
-      toast('Sesión de Drive expirada. Vuelve a conectar');
-    } else {
-      if(!silent) toast('Error al sincronizar con Drive');
-    }
-  } catch(e) {
-    console.error('Drive sync error:', e);
-    if(!silent) toast('Error de conexión con Drive');
+    const token = JSON.parse(raw);
+    if (!token || typeof token.access_token !== 'string') return null;
+    return token;
+  } catch (error) {
+    console.warn('Drive: token local inválido', error);
+    return null;
   }
 }
 
-// Restaurar desde Drive
-// Resolver para el modal de PIN de Drive
+function driveGetValidAccessToken() {
+  const token = driveReadToken();
+  if (!token) return null;
+
+  if (token.expires_at && Date.now() >= token.expires_at - DRIVE_TOKEN_SAFETY_MS) {
+    localStorage.removeItem(DRIVE_TOKEN_KEY);
+    return null;
+  }
+
+  return token.access_token;
+}
+
+function driveSaveToken(response) {
+  const expiresInSeconds = Number(response.expires_in || 3600);
+  const token = {
+    access_token: response.access_token,
+    token_type: response.token_type || 'Bearer',
+    scope: response.scope || DRIVE_SCOPE,
+    expires_at: Date.now() + expiresInSeconds * 1000
+  };
+  localStorage.setItem(DRIVE_TOKEN_KEY, JSON.stringify(token));
+}
+
+// ---------- Utilidades ----------
+function driveFormatDate(timestamp, withTime) {
+  const value = Number(timestamp);
+  if (!value) return 'Nunca';
+  return new Intl.DateTimeFormat('es-ES', withTime ? {
+    dateStyle: 'short',
+    timeStyle: 'short'
+  } : {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).format(new Date(value));
+}
+
+function driveBackupFileName(timestamp) {
+  const date = new Date(timestamp);
+  const dd = String(date.getDate()).padStart(2, '0');
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const yyyy = date.getFullYear();
+  return `VaultKey_Backup_${dd}${mm}${yyyy}.vkbak`;
+}
+
+function driveToast(message, sound) {
+  if (typeof toast === 'function') toast(message, sound);
+}
+
+async function driveShowError(title, error) {
+  const message = error && error.message ? error.message : String(error || 'Error desconocido');
+  console.error(`Drive: ${title}`, error);
+  driveToast(`❌ ${title}: ${message}`, 'err');
+
+  if (typeof vkConfirm === 'function') {
+    try {
+      await vkConfirm(title, message, { okText: 'Entendido', cancelText: null });
+    } catch (_) {
+      // El toast ya informa del error; el diálogo es un apoyo visual.
+    }
+  }
+}
+
+// ---------- UI legacy (pantalla simple, se mantiene por compatibilidad) ----------
+function driveSyncUI() {
+  const connected = Boolean(driveGetValidAccessToken());
+  const status = document.getElementById('driveConnectionStatus');
+  const lastSync = document.getElementById('driveLastSync');
+  const connectButton = document.getElementById('driveConnectButton');
+  const syncButton = document.getElementById('driveSyncButton');
+  const disconnectButton = document.getElementById('driveDisconnectButton');
+
+  if (status) {
+    status.textContent = connected ? 'Conectado a Drive' : 'Desconectado de Drive';
+    status.dataset.connected = connected ? 'true' : 'false';
+  }
+
+  if (lastSync) {
+    const timestamp = localStorage.getItem(DRIVE_LAST_SYNC_KEY);
+    lastSync.textContent = timestamp ? `Última sincronización: ${driveFormatDate(timestamp, true)}` : 'Última sincronización: nunca';
+  }
+
+  if (connectButton) connectButton.hidden = connected;
+  if (syncButton) syncButton.disabled = !connected;
+  if (disconnectButton) disconnectButton.hidden = !connected;
+
+  // Refleja también en la UI rica (Figma) si está montada.
+  driveSetUiState(connected ? (navigator.onLine === false ? 'offline' : 'connected') : 'disconnected');
+}
+
+function driveInit() {
+  if (localStorage.getItem(DRIVE_AUTO_KEY) === null) {
+    localStorage.setItem(DRIVE_AUTO_KEY, '1'); // Auto-sync activado por defecto
+  }
+  driveSyncUI();
+}
+
+// ---------- OAuth ----------
+function driveWaitForGoogleIdentity(timeoutMs = 5000) {
+  if (window.google && google.accounts && google.accounts.oauth2) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve, reject) => {
+    const started = Date.now();
+    const timer = window.setInterval(() => {
+      if (window.google && google.accounts && google.accounts.oauth2) {
+        window.clearInterval(timer);
+        resolve();
+      } else if (Date.now() - started >= timeoutMs) {
+        window.clearInterval(timer);
+        reject(new Error('Google Identity Services no se ha cargado. Comprueba tu conexión.'));
+      }
+    }, 100);
+  });
+}
+
+function driveRequestToken() {
+  return new Promise((resolve, reject) => {
+    driveTokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: DRIVE_CLIENT_ID,
+      scope: DRIVE_SCOPE,
+      callback: (response) => {
+        if (response && response.access_token) {
+          resolve(response);
+          return;
+        }
+        const code = response && (response.error_description || response.error);
+        reject(new Error(code || 'La autorización de Google fue cancelada.'));
+      },
+      error_callback: (response) => {
+        const reason = response && (response.message || response.type);
+        reject(new Error(reason || 'No se pudo abrir la autorización de Google.'));
+      }
+    });
+
+    driveTokenClient.requestAccessToken({ prompt: 'consent' });
+  });
+}
+
+async function driveConnect() {
+  driveBeginOAuthGuard();
+  driveSetUiState('syncing');
+  try {
+    await driveWaitForGoogleIdentity();
+    const response = await driveRequestToken();
+    driveSaveToken(response);
+    driveToast('✅ Conectado a Drive', 'ok');
+    console.info('Drive connected');
+
+    // Primer respaldo automático tras conectar (silencioso; si falla no bloquea la conexión)
+    const synced = await driveSyncNow(true);
+    driveSyncUI();
+    if (!synced) driveToast('Drive conectado, pero no se pudo crear la copia inicial', 'err');
+    return true;
+  } catch (error) {
+    localStorage.removeItem(DRIVE_TOKEN_KEY);
+    driveSyncUI();
+    await driveShowError('No se pudo conectar con Drive', error);
+    return false;
+  } finally {
+    driveEndOAuthGuard();
+  }
+}
+
+// ---------- Drive API: buscar / subir / descargar ----------
+async function driveFetchJson(url, options) {
+  const response = await fetch(url, options);
+  const text = await response.text();
+  let body = null;
+
+  if (text) {
+    try { body = JSON.parse(text); } catch (_) { body = text; }
+  }
+
+  if (!response.ok) {
+    const apiMessage = body && body.error && body.error.message;
+    const error = new Error(apiMessage || `Google Drive respondió ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+
+  return body;
+}
+
+async function driveFindBackup(accessToken, fileName) {
+  const escapedName = fileName.replace(/'/g, "\\'");
+  const query = encodeURIComponent(`name='${escapedName}' and trashed=false`);
+  const fields = encodeURIComponent('files(id,name,modifiedTime)');
+  const url = `https://www.googleapis.com/drive/v3/files?q=${query}&spaces=drive&fields=${fields}&pageSize=1`;
+
+  const result = await driveFetchJson(url, {
+    headers: { Authorization: `Bearer ${accessToken}` }
+  });
+
+  return result && Array.isArray(result.files) ? result.files[0] || null : null;
+}
+
+async function driveFindLatestBackup(accessToken) {
+  const query = encodeURIComponent("name contains 'VaultKey_Backup_' and trashed=false");
+  const fields = encodeURIComponent('files(id,name,modifiedTime)');
+  const url = `https://www.googleapis.com/drive/v3/files?q=${query}&spaces=drive&orderBy=modifiedTime desc&fields=${fields}&pageSize=1`;
+
+  const result = await driveFetchJson(url, {
+    headers: { Authorization: `Bearer ${accessToken}` }
+  });
+
+  return result && Array.isArray(result.files) ? result.files[0] || null : null;
+}
+
+// Lee la bóveda cifrada actual, sea cual sea el sistema de guardado activo:
+// VaultKey 2.0 usa vkStore (localStorage 'vk2_blob'); el legacy usa 'vk_data_v1'.
+function driveReadVaultPayload() {
+  if (typeof window.vkStore !== 'undefined' && window.vkStore.hasVault()) {
+    return { format: 'vk2_blob', data: window.vkStore.loadBlob() };
+  }
+  const legacy = localStorage.getItem('vk_data_v1');
+  if (legacy) return { format: 'legacy', data: legacy };
+  return null;
+}
+
+async function driveUploadBackup(accessToken, fileName, payload) {
+  const timestamp = Date.now();
+  const backup = JSON.stringify({
+    app: 'VaultKey',
+    format: 'vkbak',
+    version: 2,
+    vaultFormat: payload.format,
+    createdAt: new Date(timestamp).toISOString(),
+    vk_data_v1: payload.format === 'legacy' ? payload.data : undefined,
+    vk2_blob: payload.format === 'vk2_blob' ? payload.data : undefined
+  });
+
+  const existing = await driveFindBackup(accessToken, fileName);
+  const metadata = { name: fileName, mimeType: 'application/octet-stream' };
+  const form = new FormData();
+  form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+  form.append('file', new Blob([backup], { type: 'application/octet-stream' }), fileName);
+
+  const endpoint = existing
+    ? `https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(existing.id)}?uploadType=multipart&fields=id,name,modifiedTime`
+    : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,modifiedTime';
+
+  return driveFetchJson(endpoint, {
+    method: existing ? 'PATCH' : 'POST',
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: form
+  });
+}
+
+async function driveSyncNow(silent = false) {
+  const accessToken = driveGetValidAccessToken();
+  if (!accessToken) {
+    driveSyncUI();
+    if (!silent) driveToast('❌ Conecta Google Drive antes de sincronizar', 'err');
+    return false;
+  }
+
+  const payload = driveReadVaultPayload();
+  if (!payload) {
+    if (!silent) driveToast('❌ No hay una bóveda cifrada para sincronizar', 'err');
+    return false;
+  }
+
+  driveSetUiState('syncing');
+  try {
+    console.info('Sync started', payload.format);
+    const timestamp = Date.now();
+    const fileName = driveBackupFileName(timestamp);
+    await driveUploadBackup(accessToken, fileName, payload);
+
+    localStorage.setItem(DRIVE_LAST_SYNC_KEY, String(timestamp));
+    driveSyncUI();
+
+    if (!silent) {
+      driveToast(`✅ Respaldo sincronizado ${driveFormatDate(timestamp, true)}`, 'ok');
+    }
+    console.info('VaultKey backup enviado', fileName);
+    return true;
+  } catch (error) {
+    if (error && error.status === 401) {
+      localStorage.removeItem(DRIVE_TOKEN_KEY);
+    }
+    driveSyncUI();
+
+    if (!silent) await driveShowError('Error sync', error);
+    else console.error('Drive auto-sync error', error);
+    return false;
+  }
+}
+
+// ---------- Restaurar copia desde Drive ----------
 let _drivePinResolver = null;
+
 function resolveDrivePin(value) {
   const modal = document.getElementById('drivePinModal');
-  if(modal) modal.classList.remove('open');
+  if (modal) modal.classList.remove('open');
   const input = document.getElementById('drivePinInput');
-  if(input) input.value = '';
-  if(_drivePinResolver) { _drivePinResolver(value); _drivePinResolver = null; }
+  if (input) input.value = '';
+  if (_drivePinResolver) { _drivePinResolver(value); _drivePinResolver = null; }
 }
+
 function askDrivePin() {
-  return new Promise(res => {
+  return new Promise((res) => {
     _drivePinResolver = res;
     const input = document.getElementById('drivePinInput');
-    if(input) input.value = '';
+    if (input) input.value = '';
     const modal = document.getElementById('drivePinModal');
-    if(modal) {
+    if (modal) {
       modal.classList.add('open');
-      setTimeout(() => { if(input) input.focus(); }, 150);
+      setTimeout(() => { if (input) input.focus(); }, 150);
     } else {
-      // Fallback si el modal no está en el DOM
       const val = prompt('Introduce el PIN con el que se cifró este respaldo:');
       res(val);
     }
@@ -192,94 +372,106 @@ function askDrivePin() {
 }
 
 async function driveRestore() {
-  if(!driveToken) { toast('Primero conecta Google Drive'); return; }
+  const accessToken = driveGetValidAccessToken();
+  if (!accessToken) { driveToast('❌ Primero conecta Google Drive', 'err'); return false; }
+
+  driveSetUiState('syncing');
   try {
-    // Buscar archivo
-    const search = await fetch(
-      `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id,modifiedTime)`,
-      {headers: {Authorization: 'Bearer ' + driveToken}}
-    );
-    const searchData = await search.json();
-    if(!searchData.files || !searchData.files[0]) {
-      toast('No se encontró respaldo en Drive'); return;
+    const file = await driveFindLatestBackup(accessToken);
+    if (!file) {
+      driveSyncUI();
+      driveToast('No se encontró ningún respaldo en Drive', 'err');
+      return false;
     }
-    const fileId = searchData.files[0].id;
-    const modified = new Date(searchData.files[0].modifiedTime).toLocaleString('es-ES');
-    const localCount = vault ? vault.length : 0;
+
+    const modified = driveFormatDate(new Date(file.modifiedTime).getTime(), true);
     const ok = await vkConfirm(
       'Restaurar desde Drive',
-      `Respaldo del ${modified}\n\n• Entradas locales actuales: ${localCount}\n\nSe reemplazarán todas las entradas locales con las del respaldo. ¿Continuar?`
+      `Respaldo del ${modified} (${file.name}).\n\nSe reemplazará la bóveda cifrada actual por la del respaldo. Esta acción no se puede deshacer. ¿Continuar?`
     );
-    if(!ok) return;
+    if (!ok) { driveSyncUI(); return false; }
 
-    // Descargar archivo
-    const dl = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
-      {headers: {Authorization: 'Bearer ' + driveToken}}
+    const download = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(file.id)}?alt=media`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
     );
-    const text = await dl.text();
-    const pinForImport = await askDrivePin();
-    if(pinForImport === null || pinForImport === '') return;
-    const data = JSON.parse(text);
-    if(!data.payload) throw new Error('Sin payload');
-    const decrypted = await decryptData(data.payload, pinForImport);
-    if(!decrypted || !Array.isArray(decrypted)) throw new Error('PIN incorrecto o datos inválidos');
-    vault = driveSanitizeRestoredEntries(decrypted);
-    await persist();
-    render();
-    soundSuccess(); vibe([30,20,60,20,80]);
-    toast(`✅ ${vault.length} entradas restauradas desde Drive`);
-  } catch(e) {
-    soundError();
-    toast('No se pudo restaurar el respaldo. Comprueba tu PIN e inténtalo de nuevo.');
+    if (!download.ok) throw new Error(`No se pudo descargar el respaldo (HTTP ${download.status})`);
+
+    const raw = await download.json();
+    if (raw && raw.vaultFormat === 'vk2_blob' && raw.vk2_blob) {
+      if (typeof window.vkStore !== 'undefined') {
+        window.vkStore.saveBlob(raw.vk2_blob);
+      } else {
+        localStorage.setItem('vk2_blob', JSON.stringify(raw.vk2_blob));
+      }
+    } else if (raw && typeof raw.vk_data_v1 === 'string') {
+      localStorage.setItem('vk_data_v1', raw.vk_data_v1);
+    } else {
+      throw new Error('El respaldo no tiene un formato reconocido');
+    }
+
+    driveSyncUI();
+    driveToast('✅ Respaldo restaurado. Vuelve a desbloquear con tu PIN.', 'ok');
+    console.info('Drive restore OK', file.name);
+
+    if (typeof lock === 'function') lock();
+    return true;
+  } catch (error) {
+    driveSyncUI();
+    await driveShowError('No se pudo restaurar el respaldo', error);
+    return false;
   }
 }
 
-// Desconectar Drive
+// ---------- Desconectar ----------
+function driveRevokeToken(accessToken) {
+  return new Promise((resolve) => {
+    if (!accessToken || !window.google || !google.accounts || !google.accounts.oauth2) {
+      resolve(false);
+      return;
+    }
+
+    google.accounts.oauth2.revoke(accessToken, () => resolve(true));
+  });
+}
+
 async function driveDisconnect() {
-  const ok = await vkConfirm('Desconectar Drive', '¿Desconectar Google Drive? No se borrarán los datos guardados en Drive.');
-  if(!ok) return;
-  driveToken = null;
-  localStorage.removeItem(LS_DRIVE_LAST);
-  driveSyncUI(false);
-  toast('Drive desconectado');
-}
+  try {
+    if (typeof vkConfirm === 'function') {
+      const confirmed = await vkConfirm(
+        '¿Desconectar Google Drive?',
+        'Se detendrá la sincronización con Google Drive. Las copias guardadas en Drive no se eliminarán.',
+        { variant: 'drive-disconnect', confirmText: 'Desconectar' }
+      );
+      if (!confirmed) return false;
+    }
 
-// Toggle auto sync
-function driveToggleAuto(checked) {
-  localStorage.setItem(LS_DRIVE_AUTO, checked ? '1' : '0');
-  const sub = document.getElementById('driveAutoSub');
-  if(sub) sub.textContent = checked ? 'Al guardar cada entrada' : 'Desactivada';
-  toast(checked ? 'Sync automática activada' : 'Sync automática desactivada');
-}
+    const accessToken = driveReadToken();
+    await driveRevokeToken(accessToken && accessToken.access_token);
 
-// Sync automática — llamar desde saveEntry
-async function driveAutoSync() {
-  if(!driveToken) return;
-  if(localStorage.getItem(LS_DRIVE_AUTO) === '0') return;
-  await driveSyncNow(true); // silencioso
-}
-// ============================================================
-
-
-function showSecurityInfo(){
-  const m = document.getElementById('securityModal');
-  if(m){ m.classList.add('open'); }
-}
-
-// Category filter — moved to app.js
-
-
-function toggleHistPass(btn) {
-  const el = btn.previousElementSibling && btn.previousElementSibling.querySelector('.histPassEl') 
-             || btn.parentElement.querySelector('.histPassEl');
-  if(!el) return;
-  const pass = el.dataset.pass || '';
-  if(el.textContent === '••••••••') {
-    el.textContent = pass || '(vacía)';
-    btn.textContent = 'Ocultar';
-  } else {
-    el.textContent = '••••••••';
-    btn.textContent = 'Ver';
+    localStorage.removeItem(DRIVE_TOKEN_KEY);
+    driveSyncUI();
+    driveToast('✅ Desconectado de Drive', 'ok');
+    console.info('Drive disconnected');
+    return true;
+  } catch (error) {
+    localStorage.removeItem(DRIVE_TOKEN_KEY);
+    driveSyncUI();
+    await driveShowError('Drive se desconectó localmente, pero no se pudo revocar el token', error);
+    return false;
   }
 }
+
+// ---------- Sync automática (al guardar/borrar entradas) ----------
+async function driveAutoSync() {
+  if (localStorage.getItem(DRIVE_AUTO_KEY) !== '1') return false;
+  if (!driveGetValidAccessToken()) return false;
+  return driveSyncNow(true);
+}
+
+window.driveInit = driveInit;
+window.driveConnect = driveConnect;
+window.driveSyncNow = driveSyncNow;
+window.driveRestore = driveRestore;
+window.driveDisconnect = driveDisconnect;
+window.driveAutoSync = driveAutoSync;
