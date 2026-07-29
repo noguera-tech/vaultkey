@@ -384,10 +384,10 @@ async function driveRestore() {
       return false;
     }
 
-    const modified = driveFormatDate(new Date(file.modifiedTime).getTime(), true);
     const ok = await vkConfirm(
-      'Restaurar desde Drive',
-      `Respaldo del ${modified} (${file.name}).\n\nSe reemplazará la bóveda cifrada actual por la del respaldo. Esta acción no se puede deshacer. ¿Continuar?`
+      'Restaurar copia',
+      'Esta acción reemplazará los datos actuales de este dispositivo por la copia seleccionada.',
+      { variant: 'drive-restore', confirmText: 'Restaurar' }
     );
     if (!ok) { driveSyncUI(); return false; }
 
@@ -398,16 +398,39 @@ async function driveRestore() {
     if (!download.ok) throw new Error(`No se pudo descargar el respaldo (HTTP ${download.status})`);
 
     const raw = await download.json();
-    if (raw && raw.vaultFormat === 'vk2_blob' && raw.vk2_blob) {
-      if (typeof window.vkStore !== 'undefined') {
-        window.vkStore.saveBlob(raw.vk2_blob);
+    const currentVk2 = localStorage.getItem('vk2_blob');
+    const currentLegacy = localStorage.getItem('vk_data_v1');
+    let restoredKey = null;
+
+    try {
+      if (raw && raw.app === 'VaultKey' && raw.format === 'vkbak' && Number(raw.version) >= 2 && raw.vaultFormat === 'vk2_blob') {
+        const blob = raw.vk2_blob;
+        const validBlob = blob && typeof blob === 'object' && !Array.isArray(blob)
+          && blob.app === 'VaultKey' && Number(blob.schemaVersion) === 2
+          && typeof blob.cryptoVersion === 'number'
+          && blob.kdf && typeof blob.kdf === 'object'
+          && blob.wraps && typeof blob.wraps === 'object'
+          && blob.wraps.master && blob.wraps.kit
+          && blob.vault && typeof blob.vault === 'object';
+        if (!validBlob) throw new Error('La copia está dañada o no pertenece a VaultKey 2.0');
+
+        if (typeof window.vkStore !== 'undefined') window.vkStore.saveBlob(blob);
+        else localStorage.setItem('vk2_blob', JSON.stringify(blob));
+        restoredKey = 'vk2_blob';
+      } else if (raw && raw.app === 'VaultKey' && typeof raw.vk_data_v1 === 'string' && raw.vk_data_v1.length > 20) {
+        localStorage.setItem('vk_data_v1', raw.vk_data_v1);
+        restoredKey = 'vk_data_v1';
       } else {
-        localStorage.setItem('vk2_blob', JSON.stringify(raw.vk2_blob));
+        throw new Error('La copia no tiene un formato válido de VaultKey');
       }
-    } else if (raw && typeof raw.vk_data_v1 === 'string') {
-      localStorage.setItem('vk_data_v1', raw.vk_data_v1);
-    } else {
-      throw new Error('El respaldo no tiene un formato reconocido');
+
+      if (!localStorage.getItem(restoredKey)) throw new Error('No se pudo guardar la copia restaurada');
+    } catch (restoreError) {
+      if (currentVk2 === null) localStorage.removeItem('vk2_blob');
+      else localStorage.setItem('vk2_blob', currentVk2);
+      if (currentLegacy === null) localStorage.removeItem('vk_data_v1');
+      else localStorage.setItem('vk_data_v1', currentLegacy);
+      throw restoreError;
     }
 
     driveSyncUI();

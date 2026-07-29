@@ -138,18 +138,26 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 
 
 /* Confirmación Restablecer VaultKey — Figma 498:2 */
-#confirmModal.vk-confirm--reset,#confirmModal.vk-confirm--wipe,#confirmModal.vk-confirm--drive-disconnect{inset:0;padding:16px;align-items:center;justify-content:center;background:rgba(0,7,18,.85)}
-#confirmModal.vk-confirm--reset .sheet,#confirmModal.vk-confirm--wipe .sheet,#confirmModal.vk-confirm--drive-disconnect .sheet{box-sizing:border-box;position:relative;width:300px;max-width:calc(100vw - 32px);height:240px;max-height:none;overflow:hidden;padding:45px 24px 20px;border:1px solid #030508;border-radius:16px;background:#243246;box-shadow:none}
-#confirmModal.vk-confirm--reset .sheetHead,#confirmModal.vk-confirm--wipe .sheetHead,#confirmModal.vk-confirm--drive-disconnect .sheetHead{display:block;margin:0}
-#confirmModal.vk-confirm--reset .sheetTitle,#confirmModal.vk-confirm--wipe .sheetTitle,#confirmModal.vk-confirm--drive-disconnect .sheetTitle{margin:0;color:#fff;font-family:Inter,system-ui,sans-serif;font-size:24px;line-height:normal;font-weight:700;text-align:center;text-shadow:none}
-#confirmModal.vk-confirm--reset .spacer,#confirmModal.vk-confirm--reset #confirmClose,#confirmModal.vk-confirm--wipe .spacer,#confirmModal.vk-confirm--wipe #confirmClose,#confirmModal.vk-confirm--drive-disconnect .spacer,#confirmModal.vk-confirm--drive-disconnect #confirmClose{display:none}
-#confirmModal.vk-confirm--reset #confirmMsg,#confirmModal.vk-confirm--wipe #confirmMsg,#confirmModal.vk-confirm--drive-disconnect #confirmMsg{margin:8px 0 0;color:rgba(167,182,201,.8);font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:500;text-align:center}
-#confirmModal.vk-confirm--reset .rowBtns,#confirmModal.vk-confirm--wipe .rowBtns,#confirmModal.vk-confirm--drive-disconnect .rowBtns{position:absolute;left:39px;right:39px;bottom:20px;display:grid;grid-template-columns:85px 85px;justify-content:space-between;gap:0}
-#confirmModal.vk-confirm--reset .rowBtns>button,#confirmModal.vk-confirm--wipe .rowBtns>button,#confirmModal.vk-confirm--drive-disconnect .rowBtns>button{box-sizing:border-box;width:85px;height:43px;min-width:0;padding:0;border:1px solid #3a4a60;border-radius:16px;font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:400;color:#fff;box-shadow:none}
-#confirmModal.vk-confirm--reset #confirmCancel,#confirmModal.vk-confirm--wipe #confirmCancel,#confirmModal.vk-confirm--drive-disconnect #confirmCancel{background:transparent}
-#confirmModal.vk-confirm--reset #confirmOk,#confirmModal.vk-confirm--drive-disconnect #confirmOk{border-color:#3a4a60;background:#f59e0b;color:#fff}
+#confirmModal.vk-confirm--reset,#confirmModal.vk-confirm--wipe,#confirmModal.vk-confirm--drive-disconnect,#confirmModal.vk-confirm--drive-restore{inset:0;padding:16px;align-items:center;justify-content:center;background:rgba(0,7,18,.85)}
+#confirmModal.vk-confirm--reset .sheet,#confirmModal.vk-confirm--wipe .sheet,#confirmModal.vk-confirm--drive-disconnect .sheet,#confirmModal.vk-confirm--drive-restore .sheet{box-sizing:border-box;position:relative;width:300px;max-width:calc(100vw - 32px);height:240px;max-height:none;overflow:hidden;padding:45px 24px 20px;border:1px solid #030508;border-radius:16px;background:#243246;box-shadow:none}
+#confirmModal.vk-confirm--reset .sheetHead,#confirmModal.vk-confirm--wipe .sheetHead,#confirmModal.vk-confirm--drive-disconnect .sheetHead,#confirmModal.vk-confirm--drive-restore .sheetHead{display:block;margin:0}
+#confirmModal.vk-confirm--reset .sheetTitle,#confirmModal.vk-confirm--wipe .sheetTitle,#confirmModal.vk-confirm--drive-disconnect .sheetTitle,#confirmModal.vk-confirm--drive-restore .sheetTitle{margin:0;color:#fff;font-family:Inter,system-ui,sans-serif;font-size:24px;line-height:normal;font-weight:700;text-align:center;text-shadow:none}
+#confirmModal.vk-confirm--reset .spacer,#confirmModal.vk-confirm--reset #confirmClose,#confirmModal.vk-confirm--wipe .spacer,#confirmModal.vk-confirm--wipe #confirmClose,#confirmModal.vk-confirm--drive-disconnect .spacer,#confirmModal.vk-confirm--drive-disconnect #confirmClose,#confirmModal.vk-confirm--drive-restore .spacer,#confirmModal.vk-confirm--drive-restore #confirmClose{display:none}
+#confirmModal.vk-confirm--reset #confirmMsg,#confirmModal.vk-confirm--wipe #confirmMsg,#confirmModal.vk-confirm--drive-disconnect #confirmMsg,#confirmModal.vk-confirm--drive-restore #confirmMsg{margin:8px 0 0;color:rgba(167,182,201,.8);font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:500;text-align:center}
+#confirmModal.vk-confirm--reset .rowBtns,#confirmModal.vk-confirm--wipe .rowBtns,#confirmModal.vk-confirm--drive-disconnect .rowBtns,#confirmModal.vk-confirm--drive-restore .rowBtns{position:absolute;left:39px;right:39px;bottom:20px;display:grid;grid-template-columns:85px 85px;justify-content:space-between;gap:0}
+#confirmModal.vk-confirm--reset .rowBtns>button,#confirmModal.vk-confirm--wipe .rowBtns>button,#confirmModal.vk-confirm--drive-disconnect .rowBtns>button,#confirmModal.vk-confirm--drive-restore .rowBtns>button{box-sizing:border-box;width:85px;height:43px;min-width:0;padding:0;border:1px solid #3a4a60;border-radius:16px;font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:400;color:#fff;box-shadow:none}
+#confirmModal.vk-confirm--reset #confirmCancel,#confirmModal.vk-confirm--wipe #confirmCancel,#confirmModal.vk-confirm--drive-disconnect #confirmCancel,#confirmModal.vk-confirm--drive-restore #confirmCancel{background:transparent}
+#confirmModal.vk-confirm--reset #confirmOk,#confirmModal.vk-confirm--drive-disconnect #confirmOk,#confirmModal.vk-confirm--drive-restore #confirmOk{border-color:#3a4a60;background:#f59e0b;color:#fff}
 #confirmModal.vk-confirm--wipe #confirmOk{border-color:#3a4a60;background:#dc2626;color:#fff}
-#confirmModal.vk-confirm--reset #confirmCancel:active,#confirmModal.vk-confirm--reset #confirmOk:active,#confirmModal.vk-confirm--wipe #confirmCancel:active,#confirmModal.vk-confirm--wipe #confirmOk:active,#confirmModal.vk-confirm--drive-disconnect #confirmCancel:active,#confirmModal.vk-confirm--drive-disconnect #confirmOk:active{opacity:.84;transform:scale(.97)}
+#confirmModal .vk-confirm-icon{display:none}
+#confirmModal.vk-confirm--drive-restore .sheet{padding-top:15px}
+#confirmModal.vk-confirm--drive-restore .sheetHead{position:relative;min-height:32px;padding-left:38px}
+#confirmModal.vk-confirm--drive-restore .sheetTitle{text-align:left}
+#confirmModal.vk-confirm--drive-restore .vk-confirm-icon{display:block;position:absolute;left:24px;top:20px;width:24px;height:24px;color:#3b82f6}
+#confirmModal.vk-confirm--drive-restore .vk-confirm-icon svg{display:block;width:100%;height:100%}
+#confirmModal.vk-confirm--drive-restore #confirmMsg{margin:36px auto 0;max-width:249px;font-size:12px;line-height:1.25}
+
+#confirmModal.vk-confirm--reset #confirmCancel:active,#confirmModal.vk-confirm--reset #confirmOk:active,#confirmModal.vk-confirm--wipe #confirmCancel:active,#confirmModal.vk-confirm--wipe #confirmOk:active,#confirmModal.vk-confirm--drive-disconnect #confirmCancel:active,#confirmModal.vk-confirm--drive-disconnect #confirmOk:active,#confirmModal.vk-confirm--drive-restore #confirmCancel:active,#confirmModal.vk-confirm--drive-restore #confirmOk:active{opacity:.84;transform:scale(.97)}
 .vk-auto-header{box-sizing:border-box;height:64px;background:#243246;border-bottom:1px solid #000;display:flex;align-items:center;padding:0 24px}
 .vk-auto-back{width:32px;height:32px;padding:0;border:0;background:transparent;color:#a7b6c9;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .vk-auto-back svg{width:24px;height:24px}
@@ -2998,6 +3006,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 
 <div class="modal" id="confirmModal">
   <div class="sheet">
+    <span class="vk-confirm-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14a2 2 0 0 0 2-2v-3"/><path d="M3 16v3a2 2 0 0 0 2 2"/></svg></span>
     <div class="sheetHead">
       <div class="sheetTitle" id="confirmTitle">Confirmar acción</div>
       <div class="spacer"></div>

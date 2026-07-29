@@ -357,10 +357,11 @@ function vkConfirm(title,msg,options){
     confirmResolver=resolve;
     $('confirmTitle').textContent=title;
     $('confirmMsg').textContent=msg;
-    modal.classList.remove('vk-confirm--reset','vk-confirm--wipe','vk-confirm--drive-disconnect');
+    modal.classList.remove('vk-confirm--reset','vk-confirm--wipe','vk-confirm--drive-disconnect','vk-confirm--drive-restore');
     if(options.variant==='reset')modal.classList.add('vk-confirm--reset');
     if(options.variant==='wipe')modal.classList.add('vk-confirm--wipe');
     if(options.variant==='drive-disconnect')modal.classList.add('vk-confirm--drive-disconnect');
+    if(options.variant==='drive-restore')modal.classList.add('vk-confirm--drive-restore');
     if(okButton)okButton.textContent=options.confirmText||'Aceptar';
     modal.classList.add('open');
   });
@@ -368,7 +369,7 @@ function vkConfirm(title,msg,options){
 function resolveConfirm(ok){
   const modal=$('confirmModal');
   const okButton=$('confirmOk');
-  modal.classList.remove('open','vk-confirm--reset','vk-confirm--wipe','vk-confirm--drive-disconnect');
+  modal.classList.remove('open','vk-confirm--reset','vk-confirm--wipe','vk-confirm--drive-disconnect','vk-confirm--drive-restore');
   if(okButton)okButton.textContent='Aceptar';
   if(confirmResolver){confirmResolver(!!ok);confirmResolver=null;}
 }
