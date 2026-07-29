@@ -3569,8 +3569,9 @@ async function savePasswordCreate(){
   }
   if((_passwordCreateType==='web'||_passwordCreateType==='wifi')&&!_passwordCreateGenerated){
     const confirmed=await vkConfirm(
-      'Confirmar contraseña',
-      'Has escrito la contraseña manualmente. Revísala antes de guardar. ¿Quieres continuar?'
+      '¿Confirmar contraseña?',
+      'Has escrito la contraseña manualmente. Revísala antes de guardar. ¿Quieres continuar?',
+      {variant:'wipe',confirmText:'Continuar'}
     );
 
     if(!confirmed){

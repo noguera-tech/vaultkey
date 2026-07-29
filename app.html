@@ -446,6 +446,8 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       </div>
     </section>
 
+    <button type="button" class="vk-dash-fab" aria-label="Nueva contraseña" onclick="openPasswordCreate()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+
 
     <div id="recentList" hidden></div>
 
@@ -3964,7 +3966,7 @@ document.addEventListener("DOMContentLoaded",function(){
       closeGenSheet();
 
       if(fieldId==="vkPasswordCreateSecret"){
-        window._passwordCreateGenerated=true;
+        _passwordCreateGenerated=true;
 
         if(typeof show==="function"){
           show("passwordCreate");
