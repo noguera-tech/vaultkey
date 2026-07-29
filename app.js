@@ -1,7 +1,7 @@
 let _searchDebounce=null;
 let confirmResolver=null;
 let appBooted=false;
-const LS_META='vk_meta_v1',LS_DATA='vk_data_v1',LS_REC='vk_recovery_v1';let pin='',mode='unlock',tempPin='',unlocked=false,vault=[],current=null,editId=null,lastKey=null,useGenTarget=false,autoLockTimer=null,lockCountdownTimer=null,_entryType='password',_catFilter='',_vaultTab='todas';
+const LS_META='vk_meta_v1',LS_DATA='vk_data_v1',LS_REC='vk_recovery_v1';let pin='',mode='unlock',tempPin='',unlocked=false,vault=[],current=null,editId=null,lastKey=null,useGenTarget=false,autoLockTimer=null,hiddenSince=null,lockCountdownTimer=null,_entryType='password',_catFilter='',_vaultTab='todas';
 
 // Category filter — IDs estables + compatibilidad con categorías legacy
 const CATEGORY_ALIASES={
@@ -1305,8 +1305,8 @@ function handleVisibilityChange(){
       }
       showPrivacyOverlay();
       const ms=getAutoLockMs();
-      if(ms===0){unlocked=false;lastKey=null;pin='';clearAutoLockTimer();closeModals();}
-      else{clearAutoLockTimer();autoLockTimer=setTimeout(()=>{if(!unlocked)return;soundLock();unlocked=false;lastKey=null;pin='';closeModals();},ms);}
+      if(ms===0){unlocked=false;lastKey=null;pin='';clearAutoLockTimer();closeModals();hiddenSince=null;}
+      else{hiddenSince=Date.now();clearAutoLockTimer();autoLockTimer=setTimeout(()=>{if(!unlocked)return;soundLock();unlocked=false;lastKey=null;pin='';closeModals();hiddenSince=null;},ms);}
     }
   } else {
     if(!unlocked){
@@ -1319,9 +1319,9 @@ function handleVisibilityChange(){
         pinScreen.style.display='flex';pinScreen.classList.add('active');
       }
       setTimeout(()=>initPin(),50);
-    } else if(autoLockTimer){
-      // Había un timer corriendo — bloquear directamente al volver
-      clearTimeout(autoLockTimer);autoLockTimer=null;
+    } else if(autoLockTimer && hiddenSince && (Date.now()-hiddenSince) >= getAutoLockMs()){
+      // Había un timer corriendo Y ya pasó el tiempo real configurado — bloquear al volver
+      clearTimeout(autoLockTimer);autoLockTimer=null;hiddenSince=null;
       unlocked=false;lastKey=null;pin='';
       closeModals();
       hidePrivacyOverlay();
@@ -1332,6 +1332,9 @@ function handleVisibilityChange(){
       }
       setTimeout(()=>initPin(),50);
     } else {
+      // O no había timer, o volvimos antes de que se cumpliera el tiempo configurado —
+      // no bloquear, solo reiniciar el contador normal de inactividad
+      clearAutoLockTimer();hiddenSince=null;
       hidePrivacyOverlay();resetAutoLockTimer();
     }
   }
