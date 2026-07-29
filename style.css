@@ -217,7 +217,7 @@ select option { background:#001830; color:#e8f6ff; }
   position:relative; isolation:isolate;
 }
 /* IMPORTANTE: no crear halo CSS detrÃ¡s del escudo.
-   El brillo y partÃ­culas viven en vaultkey-shield-scene.png?v=221. */
+   El símbolo usa el SVG limpio de Figma, sin brillo ni partículas heredadas. */
 .shield::before, .onboardHeroWrap::before, .homeBrand::before { display:none !important; content:none !important; }
 .shield > *, .onboardHeroWrap > *, .homeBrand > * { position:relative; z-index:1; }
 /* .shield margin merged into main rule below */
@@ -362,8 +362,8 @@ select option { background:#001830; color:#e8f6ff; }
 .pinAura  { display:none; }
 .pinInner { width:100%; display:flex; flex-direction:column; align-items:center; }
 
-.shield { width:min(72vw,290px); min-width:min(65vw,230px); margin:0 auto 4px; overflow:visible; padding:0; }
-.pinLogo   { width:100%; height:auto; object-fit:contain; object-position:center; }
+.shield { width:150px; min-width:150px; height:180px; margin:48px auto 8px; overflow:visible; padding:0; }
+.pinLogo   { width:150px; height:180px; object-fit:contain; object-position:center; }
 .pinTitle, .pinTag, .bioHint { display:none; }
 
 .pinSub {

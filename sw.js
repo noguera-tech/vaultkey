@@ -3,7 +3,7 @@
 //  Versión auto-generada: no editar CACHE_VERSION manualmente.
 //  Para forzar actualización en usuarios: incrementar el número.
 // ─────────────────────────────────────────────────────────────
-const CACHE_VERSION = 28;
+const CACHE_VERSION = 29;
 const CACHE = `vaultkey-v${CACHE_VERSION}`;
 
 const FILES = [
@@ -25,7 +25,7 @@ const FILES = [
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
-  './vaultkey-shield-scene.png?v=221'
+  './vaultkey-mark.svg?v=010'
 ];
 
 const NO_CACHE_HOSTS = [
