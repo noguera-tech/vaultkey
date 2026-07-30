@@ -437,37 +437,6 @@ select option { background:#001830; color:#e8f6ff; }
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .targetVault { background:var(--grad-bg); }
 
-.vaultHeader { height:54px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:0 14px; position:relative; z-index:5; background:rgba(0,11,28,.6); }
-.vaultTitle  { position:absolute; left:0; right:0; text-align:center; pointer-events:none; font-size:18px; font-weight:900; color:var(--t1); }
-
-.targetSearch { padding:8px 14px 4px; }
-.targetSearch input, .search input {
-  width:100%; height:46px; padding:0 16px; font-size:15px;
-  background:linear-gradient(135deg,rgba(0,62,120,.44),rgba(0,20,50,.92));
-  border:1px solid rgba(0,217,255,.30); border-radius:15px; color:#F4F8FF; outline:none;
-  box-shadow:0 8px 22px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.07);
-  transition:border-color .15s, box-shadow .15s, background .15s;
-}
-.targetSearch input::placeholder, .search input::placeholder { color:rgba(216,230,245,.72); }
-.targetSearch input:focus, .search input:focus { border-color:var(--cyan); box-shadow:0 0 0 3px var(--cyan-a10),0 0 18px rgba(0,217,255,.18); }
-
-/* Tabs */
-.vaultTabs { display:flex; gap:8px; padding:6px 14px 10px; }
-.vaultTabs button {
-  border:1px solid rgba(0,170,255,.22); border-radius:13px; padding:9px 15px;
-  background:linear-gradient(135deg,rgba(0,42,90,.62),rgba(0,13,32,.88));
-  color:rgba(244,248,255,.78); font-size:12px; font-weight:900; letter-spacing:.05px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 6px 16px rgba(0,0,0,.22);
-  transition:all .15s;
-}
-.vaultTabs button.active {
-  background:linear-gradient(135deg,rgba(0,170,255,.30),rgba(0,91,255,.26));
-  border-color:rgba(0,217,255,.62); color:#42F1FF;
-  text-shadow:0 0 8px rgba(0,217,255,.42);
-  box-shadow:0 0 16px rgba(0,217,255,.24), inset 0 1px 0 rgba(255,255,255,.10);
-}
-.vaultTabs span { color:#7AF6FF; font-size:10px; margin-left:3px; text-shadow:0 0 7px rgba(0,217,255,.38); }
-
 .targetListContent { padding-top:0; }
 
 /* Entry card */
@@ -712,7 +681,6 @@ input[type=range]::-moz-range-thumb {
 #genModal .ghost { color:#39F3FF; border-color:rgba(0,217,255,.34); background:linear-gradient(135deg,rgba(0,70,130,.28),rgba(0,12,28,.78)); letter-spacing:.08em; }
 #genModal .sub { color:rgba(216,230,245,.76); }
 #genModal .label { color:#24EFFF; text-shadow:0 0 8px rgba(0,217,255,.35); }
-.targetVault .vaultTitle { text-shadow:0 0 10px rgba(0,217,255,.16); }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    PRIVACY OVERLAY
