@@ -493,19 +493,6 @@ select option { background:#001830; color:#e8f6ff; }
    FAVORITOS
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .favGrid { padding:0; }
-.favRow { display:flex; align-items:center; gap:12px; background:var(--card-bg); border:1px solid var(--card-bdr); border-radius:16px; margin-bottom:9px; padding:13px 12px; box-shadow:var(--card-shd); cursor:pointer; transition:border-color .15s; }
-.favRow:active { border-color:var(--cyan-a20); }
-.favRowIco  { width:48px; height:48px; border-radius:14px; overflow:hidden; flex-shrink:0; box-shadow:0 0 0 1px rgba(0,190,255,.18); }
-.favRowIco .logo { width:48px; height:48px; border-radius:14px; }
-.favRowInfo { flex:1; min-width:0; }
-.favRowName { font-size:15px; font-weight:800; color:var(--t1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.favRowId   { font-size:12px; color:var(--t3); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.favRowBtns { display:flex; gap:6px; flex-shrink:0; }
-.favRowBtn  { height:32px; padding:0 10px; border-radius:9px; font-size:11px; font-weight:900; border:1px solid rgba(0,190,255,.22); background:rgba(0,91,255,.18); color:var(--cyan); cursor:pointer; white-space:nowrap; transition:background .12s; }
-.favRowBtn:active { background:rgba(0,91,255,.35); }
-.favRowBtn2 { height:32px; padding:0 10px; border-radius:9px; font-size:11px; font-weight:900; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.06); color:var(--t2); cursor:pointer; white-space:nowrap; transition:background .12s; }
-.favRowBtn2:active { background:rgba(255,255,255,.12); }
-.favRowWeak { font-size:9px; font-weight:900; color:#ff6b6b; background:rgba(255,80,80,.12); border:1px solid rgba(255,80,80,.25); border-radius:5px; padding:1px 5px; margin-left:5px; vertical-align:middle; letter-spacing:.3px; }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    AJUSTES â€” mismo sistema visual
