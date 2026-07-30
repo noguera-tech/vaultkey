@@ -116,7 +116,6 @@ input, textarea, select { cursor:text; }
 
 .content { flex:1; overflow-y:auto; overflow-x:hidden; padding:16px 16px calc(var(--nav-h) + 20px); position:relative; z-index:1; scrollbar-width:none; }
 .content::-webkit-scrollbar { display:none; }
-#home .vkHomeSplashContent { overflow: hidden !important; }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    COMPONENTES BASE
@@ -191,7 +190,7 @@ select option { background:#001830; color:#e8f6ff; }
 .smallBtn { border:1px solid var(--border); border-radius:11px; padding:9px 14px; background:rgba(0,80,200,.2); color:var(--cyan); font-weight:900; font-size:13px; }
 
 /* Grid */
-.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
 .rowBtns { display:flex; gap:10px; }
 .rowBtns > * { flex:1; }
 
@@ -205,21 +204,21 @@ select option { background:#001830; color:#e8f6ff; }
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    ESCUDO
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-.pinLogo, .heroShield, .onboardHeroImg {
+.pinLogo, .onboardHeroImg {
   display:block;
   background:transparent; border:0; box-shadow:none;
   -webkit-mask-image:none; mask-image:none;
   filter:none;
   opacity:1;
 }
-.shield, .homeBrand, .onboardHeroWrap {
+.shield, .onboardHeroWrap {
   background:transparent; border:0; box-shadow:none; overflow:visible;
   position:relative; isolation:isolate;
 }
 /* IMPORTANTE: no crear halo CSS detrÃ¡s del escudo.
    El símbolo usa el SVG limpio de Figma, sin brillo ni partículas heredadas. */
-.shield::before, .onboardHeroWrap::before, .homeBrand::before { display:none !important; content:none !important; }
-.shield > *, .onboardHeroWrap > *, .homeBrand > * { position:relative; z-index:1; }
+.shield::before, .onboardHeroWrap::before { display:none !important; content:none !important; }
+.shield > *, .onboardHeroWrap > * { position:relative; z-index:1; }
 /* .shield margin merged into main rule below */
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -313,9 +312,6 @@ select option { background:#001830; color:#e8f6ff; }
 .obLine1 { animation:obFadeIn .4s .5s forwards; color:var(--cyan); }
 .obLine2 { animation:obFadeIn .4s 1.3s forwards; color:var(--green); }
 .obLine3 { animation:obFadeIn .4s 2.1s forwards; color:var(--green); }
-.obDot   { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-.obDot2  { background:var(--green); box-shadow:0 0 8px rgba(0,230,118,.7); }
-.obDot4  { background:var(--blue);  box-shadow:0 0 8px rgba(0,123,255,.7); }
 
 /* Password slide 1 */
 .obPassLabel    { font-size:11px; color:var(--t3); font-family:monospace; margin-bottom:8px; display:block; }
@@ -414,13 +410,7 @@ select option { background:#001830; color:#e8f6ff; }
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    HOME
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-.homeHeroPremium, .targetHome { background:var(--grad-bg); }
 
-.mockTop {
-  position:relative; z-index:3; height:54px; flex-shrink:0;
-  display:flex; align-items:center; justify-content:space-between; padding:0 16px;
-}
-.mockIconBtn { width:38px; height:38px; border:0; background:transparent; color:var(--t2); font-size:26px; display:grid; place-items:center; }
 
 #homeMenu {
   position:absolute; top:54px; left:12px; z-index:50;
@@ -432,27 +422,6 @@ select option { background:#001830; color:#e8f6ff; }
 #homeMenu button:last-child { border-bottom:0; }
 #homeMenu button:active { background:var(--cyan-a10); }
 
-.targetHomeContent { flex:1; overflow-y:auto; padding:0 18px calc(var(--nav-h)+18px); display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; z-index:1; }
-
-.homeBrand.targetHero { width:100%; height:38vh; min-height:260px; display:flex; align-items:center; justify-content:center; padding-top:0; overflow:visible; }
-.heroShield { width:min(88vw,354px); height:auto; object-fit:contain; object-position:center; filter:none; padding:0; }
-
-.controlText.targetHomeText { margin-top:22px; width:100%; }
-.heroBrandTitle { font-size:38px; font-weight:950; letter-spacing:-1.2px; color:var(--t1); line-height:1; }
-.heroBrandTitle span { color:var(--blue); }
-.targetHomeText strong { display:block; font-size:16px; font-weight:700; color:var(--t2); margin-top:8px; }
-.targetHomeText p { font-size:14px; line-height:1.55; color:var(--t3); margin-top:10px; }
-.hiddenStats, .targetRecent { display:none; }
-
-.targetHomeContent > button[onclick*="vault"] {
-  display:block; width:100%; margin-top:20px;
-  padding:15px 20px; border-radius:14px; border:0;
-  font-size:15px; font-weight:900; color:#fff;
-  background:var(--btn-grad); box-shadow:var(--btn-shadow);
-  transition:transform .12s;
-}
-.targetHomeContent > button[onclick*="vault"]:active { transform:scale(.97); }
-
 /* FAB externo eliminado: el + vive dentro del nav para evitar cortes reales */
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -462,8 +431,6 @@ select option { background:#001830; color:#e8f6ff; }
 
 /* Iconos por tab */
 
-
-.vkSvgIcon { width:22px; height:22px; display:block; fill:none; stroke:rgba(255,255,255,.80); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    VAULT (Entradas)
@@ -774,7 +741,6 @@ input[type=range]::-moz-range-thumb {
 .safeArt      { font-size:56px; filter:drop-shadow(0 0 20px rgba(0,190,255,.35)); }
 .securityNote { font-size:12px; color:var(--t3); margin-top:8px; line-height:1.4; }
 .vkGenericLogo{ width:100%; height:100%; display:grid; place-items:center; font-weight:900; border-radius:inherit; }
-.controlText  { flex:1; }
 .delIcon      { color:var(--t1); font-size:20px; padding:4px; }
 .fingerIcon   { font-size:24px; }
 
@@ -791,8 +757,6 @@ input[type=range]::-moz-range-thumb {
   .onboardTitle { font-size:22px; margin:14px 0 8px; }
   .keys { grid-template-columns:repeat(3,60px); gap:8px 18px; }
   .key  { width:60px; height:60px; font-size:22px; }
-  .homeBrand.targetHero { height:37vh; min-height:240px; }
-  .heroShield { width:min(86vw,316px); }
   .pinScreen { padding-top:18px; }
 }
 
@@ -1402,10 +1366,6 @@ input[type=range]::-moz-range-thumb {
   font-size: 20px !important;
   color: #6ED0FF !important;
   text-shadow: none !important;
-}
-
-#genModal .grid2 {
-  gap: 10px !important;
 }
 
 #genModal .presetBtns {
@@ -2264,29 +2224,6 @@ body:has(#genModal.open) #screenDots,
   text-shadow: 0 0 12px rgba(0,217,255,.42);
 }
 
-#home.vkHomeSplash .vkHomeSplashContent {
-  padding: 0 20px calc(var(--nav-h) + 14px) !important;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  overflow-y: auto;
-  overflow-x: hidden;
-  position: relative;
-}
-
-#home.vkHomeSplash .vkHomeSplashContent::before {
-  content: "";
-  position: absolute;
-  inset: -80px -40px auto;
-  height: 430px;
-  background:
-    radial-gradient(circle at 50% 20%, rgba(0,121,255,.36) 0%, rgba(0,71,180,.18) 30%, rgba(0,9,24,0) 66%),
-    radial-gradient(circle at 50% 8%, rgba(0,217,255,.16), transparent 45%);
-  pointer-events: none;
-  z-index: -1;
-}
-
 #home.vkHomeSplash .vkHomeShieldWrap {
   width: min(82vw, 315px);
   margin: 0 auto 4px;
@@ -2436,10 +2373,6 @@ body:has(#genModal.open) #screenDots,
   pointer-events: none !important;
 }
 
-#home.vkHomeSplash .targetRecent {
-  display: none !important;
-}
-
 @media (max-height: 760px) {
   #home.vkHomeSplash .vkHomeTop {
     height: 46px;
@@ -2471,10 +2404,6 @@ body:has(#genModal.open) #screenDots,
 }
 
 @media (max-width: 370px) {
-  #home.vkHomeSplash .vkHomeSplashContent {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-  }
 
   #home.vkHomeSplash .vkHomePrimaryActions {
     grid-template-columns: 1fr;
@@ -2504,18 +2433,6 @@ body:has(#genModal.open) #screenDots,
 
 #home.vkHomeSplash .vkHomeTop {
   background: linear-gradient(180deg, rgba(0,16,36,.88), rgba(0,12,28,.48) 72%, transparent) !important;
-}
-
-#home.vkHomeSplash .vkHomeSplashContent {
-  padding-top: 2px !important;
-}
-
-#home.vkHomeSplash .vkHomeSplashContent::before {
-  inset: -72px -50px auto !important;
-  height: 430px !important;
-  background:
-    radial-gradient(circle at 50% 18%, rgba(0,132,255,.34) 0%, rgba(0,76,190,.16) 30%, rgba(0,8,18,0) 66%),
-    radial-gradient(ellipse at 50% 0%, rgba(0,217,255,.14) 0%, rgba(0,80,180,.07) 33%, transparent 62%) !important;
 }
 
 #home.vkHomeSplash .vkHomeShieldWrap {
@@ -2618,26 +2535,9 @@ body:has(#genModal.open) #screenDots,
     linear-gradient(180deg, #000711 0%, #000711 28%, #00060D 58%, #00050A 100%) !important;
 }
 
-#home.vkHomeSplash .vkHomeSplashContent {
-  overflow: hidden !important;
-}
-
 #home.vkHomeSplash .vkHomeTop {
   background: linear-gradient(180deg, rgba(0,7,17,.96), rgba(0,7,17,.80) 68%, rgba(0,7,17,0)) !important;
   border-bottom: 0 !important;
-}
-
-#home.vkHomeSplash .vkHomeSplashContent {
-  background: linear-gradient(180deg, #000711 0%, #00060D 54%, #00050A 100%) !important;
-}
-
-#home.vkHomeSplash .vkHomeSplashContent::before {
-  inset: -60px -60px auto !important;
-  height: 380px !important;
-  background:
-    radial-gradient(circle at 50% 22%, rgba(0,112,255,.22) 0%, rgba(0,70,180,.10) 30%, rgba(0,8,18,0) 62%),
-    radial-gradient(ellipse at 50% 6%, rgba(0,217,255,.08) 0%, rgba(0,80,180,.04) 30%, transparent 58%) !important;
-  opacity: .85 !important;
 }
 
 #home.vkHomeSplash .vkHomeShieldWrap {
@@ -2820,9 +2720,6 @@ body:has(#genModal.open) #screenDots,
    Ajuste más visible: baja acciones y reparte mejor el espacio inferior.
    ========================================================================== */
 
-#home.vkHomeSplash .vkHomeSplashContent {
-  padding-top: 20px !important;
-}
 
 #home.vkHomeSplash .vkHomeShieldWrap {
   margin-top: 8px !important;
@@ -2852,9 +2749,6 @@ body:has(#genModal.open) #screenDots,
 }
 
 @media (max-height: 820px) {
-  #home.vkHomeSplash .vkHomeSplashContent {
-    padding-top: 12px !important;
-  }
 
   #home.vkHomeSplash .vkHomePrimaryActions {
     margin-top: 72px !important;
