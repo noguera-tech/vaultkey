@@ -477,45 +477,10 @@ async function persist(p=lastKey){
   if(!p)return;localStorage.setItem(LS_DATA,JSON.stringify(await encryptData(vault,p)));}
 const NAV_ORDER=['home','passwords','fav','settings'];
 
-function ensureFabInAppShell(){
-  const fab=document.getElementById('fabAdd');
-  const app=document.querySelector('.app');
-  if(fab&&app&&fab.parentElement!==app){
-    app.appendChild(fab);
-  }
-}
-
 function hasOpenModal(){
   return !!document.querySelector('.modal.open');
 }
 
-function syncFabVisibility(){
-  ensureFabInAppShell();
-  const fab=document.getElementById('fabAdd');
-  if(!fab)return;
-
-  const active=document.querySelector('.screen.active');
-  const shouldShow=!!(active&&active.id==='vault'&&!hasOpenModal());
-
-  fab.style.display=shouldShow?'flex':'none';
-}
-
-function initFabVisibilityObserver(){
-  if(window.__vkFabVisibilityObserverReady)return;
-  window.__vkFabVisibilityObserverReady=true;
-
-  const observer=new MutationObserver(()=>syncFabVisibility());
-
-  document.querySelectorAll('.modal').forEach(m=>{
-    observer.observe(m,{attributes:true,attributeFilter:['class','style']});
-  });
-
-  document.querySelectorAll('.screen').forEach(s=>{
-    observer.observe(s,{attributes:true,attributeFilter:['class','style']});
-  });
-
-  syncFabVisibility();
-}
 // VK 2.0 — callback tras desbloqueo real con vkUnlock
 window._vk2UnlockOk=async function(dekKey){
   if(typeof vkSession!=='undefined'){
@@ -585,7 +550,6 @@ function show(id,dir){
      typeof vkSession!=='undefined'&&!vkSession.isActive()&&id!=='pin'){
     initPin();show('pin');return;
   }
-  ensureFabInAppShell();
 
   const activeBefore=document.querySelector('.screen.active');
   if(hasOpenModal()&&id!=='pin'&&activeBefore&&activeBefore.id!==id){
@@ -608,8 +572,6 @@ function show(id,dir){
   if(id==='pin'||current?.id==='pin'){
     next.classList.add('active');
     current&&(current.style.display='none');
-    const fabImmediate=document.getElementById('fabAdd');
-    if(fabImmediate){fabImmediate.style.display=id==='vault'?'flex':'none';}
   } else {
     next.classList.add(goRight?'slide-in-right':'slide-in-left');
     current?.classList.add(goRight?'slide-out-left':'slide-out-right');
@@ -618,25 +580,11 @@ function show(id,dir){
       next.classList.add('active');
       current&&(current.style.display='none');
       current?.classList.remove('slide-out-right','slide-out-left');
-      const fabAfter=document.getElementById('fabAdd');
-      if(fabAfter){fabAfter.style.display=id==='vault'?'flex':'none';}
     },250);
   }
   if(id!=='pin')render();
   syncSettingsUI();
   if(id!=='pin')resetAutoLockTimer();
-  // FAB — visible solo en Entradas y nunca encima de modales
-  syncFabVisibility();
-  // Dots — marcar pantalla activa
-  document.querySelectorAll('.dot').forEach(d=>{
-    const active=d.dataset.screen===id;
-    d.style.width=active?'20px':'6px';
-    d.style.background=active?'rgba(0,210,255,.8)':'rgba(255,255,255,.2)';
-    d.style.borderRadius='3px';
-  });
-  // Dots visibles solo en pantallas principales
-  const dotsEl=document.getElementById('screenDots');
-  if(dotsEl) dotsEl.style.display=['home','passwords','fav','settings'].includes(id)?'flex':'none';
 }
 /* Swipe lateral entre pantallas principales */
 (function(){
@@ -665,19 +613,6 @@ function show(id,dir){
     if(dx<0&&idx<SWIPEABLE.length-1){vibe(10);show(SWIPEABLE[idx+1],'right');}
     else if(dx>0&&idx>0){vibe(10);show(SWIPEABLE[idx-1],'left');}
   },{passive:true});
-
-  // Fallback escritorio: navegación por click en los puntos inferiores
-  document.addEventListener('click', e => {
-    if(hasOpenModal())return;
-    const dot = e.target.closest('#screenDots .dot[data-screen]');
-    if (!dot) return;
-
-    const id = dot.dataset.screen;
-    if (!SWIPEABLE.includes(id)) return;
-
-    vibe(10);
-    show(id);
-  });
 
   // Fallback escritorio: navegación con flechas izquierda/derecha
   document.addEventListener('keydown', e => {
@@ -1101,7 +1036,7 @@ function closeModals(){
     window.closeEmergencyKitRegenerateDialog(true);
   }
   if(typeof window.closeGenSheet==='function')window.closeGenSheet();
-  editId=null;useGenTarget=false;selectedEntryIcon='';try{resetNoteReminder();}catch(e){}try{resetEntryTags();}catch(e){}setTimeout(()=>{try{syncFabVisibility();}catch(e){}},0);
+  editId=null;useGenTarget=false;selectedEntryIcon='';try{resetNoteReminder();}catch(e){}try{resetEntryTags();}catch(e){}
 }
 
 // ══ RECORDATORIO EN NOTAS ══
@@ -2111,7 +2046,6 @@ function useGen(){
       toast('Contraseña añadida');
     }else{
       $('entryModal').classList.add('open');
-      syncFabVisibility();
       toast('Contraseña añadida a la entrada');
     }
   }else{
@@ -2611,10 +2545,9 @@ function showAppInfo(){
 
 document.addEventListener('DOMContentLoaded',()=>{
   initCategoryPagedCarousel();
-  initFabVisibilityObserver();
   });
   if(document.readyState==='complete'||document.readyState==='interactive'){
-    setTimeout(()=>{initCategoryPagedCarousel();initFabVisibilityObserver();},0);
+    setTimeout(()=>{initCategoryPagedCarousel();},0);
   }
 })();
 function setGeneratorRangeFill(el){
@@ -2811,9 +2744,6 @@ function entrySearchText(e){return [e.service,userFromEntry(e),legacyEmailFromEn
 function clearEntryErrors(){document.querySelectorAll('.fieldErrorNote').forEach(x=>x.remove());['eService','eUser','eEmail','eUrl','ePass'].forEach(id=>$(id)?.classList.remove('fieldError'))}
 document.addEventListener('input',ev=>{if(ev.target&&['eService','eUser','eEmail','eUrl','ePass'].includes(ev.target.id))clearFieldError(ev.target.id)},true);
 function openEntry(e=null){
-  syncFabVisibility();
-  const fab=document.getElementById('fabAdd');
-  if(fab)fab.style.display='none';
   vibe(28);soundOpen();
   // Restaurar borrador si es nueva entrada y existe borrador
   if(!e){
@@ -5484,14 +5414,6 @@ function _getEntryTags(){
 
 // ══════════════════════════════════════════════════════════════
 
-// FAB press effect
-document.addEventListener('DOMContentLoaded',()=>{
-  const fab=document.getElementById('fabAdd');
-  if(fab){
-    fab.addEventListener('touchstart',()=>{fab.style.transform='scale(.92)';},{passive:true});
-    fab.addEventListener('touchend',()=>{fab.style.transform='scale(1)';},{passive:true});
-  }
-});
 
 /* ==========================================================================
    VAULTKEY UI v5.1 — Fix selector de tipos de entrada

@@ -870,24 +870,6 @@ input[type=range]::-moz-range-thumb {
 /* Contenido por encima del fondo */
 .screen > * { position: relative; z-index: 1; }
 
-/* Desktop navigation fallback */
-#screenDots {
-  pointer-events: none !important;
-}
-
-#screenDots .dot {
-  pointer-events: auto !important;
-  cursor: pointer;
-}
-
-/* FAB global dentro del shell principal */
-.app > #fabAdd {
-  position: absolute !important;
-  right: 20px !important;
-  bottom: 28px !important;
-  z-index: 90 !important;
-}
-
 /* Category paged carousel */
 #catFilterRow {
   overflow: hidden !important;
@@ -1972,9 +1954,6 @@ input[type=range]::-moz-range-thumb {
 #genModal .compactGenActions .ghost{
   min-height:40px !important;
 }
-#genModal.open ~ #screenDots{
-  display:none !important;
-}
 @media (min-height:820px){
   #genModal .compactGenSheet{
     padding-top:18px !important;
@@ -2053,13 +2032,6 @@ input[type=range]::-moz-range-thumb {
   justify-content:center !important;
   line-height:1.2 !important;
 }
-body:has(#genModal.open) #screenDots,
-.app:has(#genModal.open) #screenDots,
-#genModal.open ~ #screenDots{
-  display:none !important;
-  opacity:0 !important;
-  pointer-events:none !important;
-}
 @media (min-height:820px){
   #genModal .compactGenSheet::after{
     margin-top:18px;
@@ -2107,10 +2079,6 @@ body:has(#genModal.open) #screenDots,
   padding-top:12px !important;
   padding-bottom:2px !important;
   opacity:.9 !important;
-}
-body:has(#genModal.open) #screenDots,
-.app:has(#genModal.open) #screenDots{
-  display:none !important;
 }
 @media (max-height:740px){
   #genModal .compactGenSheet::after{display:none !important;}
@@ -3032,22 +3000,6 @@ body:has(#genModal.open) #screenDots,
   background: rgba(239, 68, 68, .075) !important;
 }
 
-/* VAULTKEY UI v10.1 — Ocultar dots de navegación dentro del detalle */
-body:has(#quickModal.open) #screenDots {
-  display: none !important;
-}/* ==========================================================================
-   VAULTKEY UI v11 — Pulido visual Nueva entrada
-   Solo CSS. No toca guardado, saveEntry, cifrado, PIN, Drive, categorías ni iconos.
-   Objetivo: formulario más limpio, menos pesado y más premium.
-   ========================================================================== */
-
-/* Oculta dots inferiores mientras se crea una entrada */
-body:has(#entryModal.open) #screenDots,
-.app:has(#entryModal.open) #screenDots {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
 
 /* Fondo de Nueva entrada más sobrio */
 #entryModal .sheet {
@@ -3588,20 +3540,6 @@ body:has(#entryModal.open) #screenDots,
    Solo CSS. Restaura los dots de navegación en Ajustes y da color suave
    a los iconos por sección sin tocar lógica.
    ========================================================================== */
-
-/* En Ajustes los dots son navegación real: deben permanecer visibles y clicables */
-body:has(#settings.active) #screenDots,
-.app:has(#settings.active) #screenDots {
-  display: flex !important;
-  opacity: 1 !important;
-  pointer-events: none !important;
-}
-
-body:has(#settings.active) #screenDots .dot,
-.app:has(#settings.active) #screenDots .dot {
-  pointer-events: auto !important;
-  cursor: pointer !important;
-}
 
 /* Base de iconos: color visible pero no chillón */
 #settings .sico {
