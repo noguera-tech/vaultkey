@@ -2150,9 +2150,6 @@ function closeImportModal() {
   if(modal) modal.classList.remove('open');
   _importFile = null;
   _importDecrypted = null;
-  // Reset file input
-  const fi = document.getElementById('importFile');
-  if(fi) fi.value = '';
 }
 
 async function doImportStep1() {
@@ -2615,9 +2612,6 @@ function showAppInfo(){
 document.addEventListener('DOMContentLoaded',()=>{
   initCategoryPagedCarousel();
   initFabVisibilityObserver();
-    const row=document.getElementById('versionRow');
-    if(!row)return;
-    row.addEventListener('click',()=>showAppInfo());
   });
   if(document.readyState==='complete'||document.readyState==='interactive'){
     setTimeout(()=>{initCategoryPagedCarousel();initFabVisibilityObserver();},0);
@@ -4283,13 +4277,6 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     const bright=(0.94 + ((v-60)/80)*0.24).toFixed(2); // 60=0.94, 140=1.18
     document.documentElement.style.setProperty('--vk-live-glow',mult);
     document.documentElement.style.setProperty('--vk-live-bright',bright);
-    const r=document.getElementById('glowRange');
-    if(r){
-      const pct=((v-60)/80)*100;
-      r.style.setProperty('--fill',pct.toFixed(1)+'%');
-      r.value=String(v);
-    }
-    const val=document.getElementById('glowValue'); if(val) val.textContent=v+'%';
   }
 
 
