@@ -1589,9 +1589,6 @@ function finishOnboarding(){
   initPin();
   show('pin');
 }
-function maybeShowOnboarding(){
-  if(!localStorage.getItem('vaultkey_onboarding_v130')) openOnboardingHard();
-}
 // serviceIcon — defined below after VK128_BRAND_ICONS (line ~1860)
 // Stub so calls before the real definition don't throw
 function serviceIcon(s){ return vk128Shield ? vk128Shield() : {bg:'#061a33',svg:''}; }
