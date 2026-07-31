@@ -3603,7 +3603,6 @@ function iconForEntry(e){
 function vkLogoHTML(ic,cls='logo',sz=null){ic=ic&&ic.svg?ic:vk128Shield();const svg=ic.svg.replace(/<svg ([^>]*?)width="[^"]*"\s*/,'<svg $1').replace(/<svg ([^>]*?)height="[^"]*"\s*/,'<svg $1').replace(/<svg /,'<svg style="width:100%;height:100%;display:block" ');const sizeStyle=sz?`width:${sz}px;height:${sz}px;`:'' ;return `<div class="${cls}" style="background:${ic.bg};padding:0;overflow:hidden;${sizeStyle}">${svg}</div>`}
 let currentIconCat='todos';
 window._setIconCat=function(cat,btn){currentIconCat=cat;document.querySelectorAll('.iconCat').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');const s=$('eIconSearch');if(s)s.value='';if(typeof renderIconPicker==='function')renderIconPicker();};
-function setIconCat(cat,btn){window._setIconCat(cat,btn);}
 document.addEventListener('click',function(e){const btn=e.target.closest('[data-cat]');if(btn&&btn.classList.contains('iconCat')){e.stopPropagation();window._setIconCat(btn.dataset.cat,btn);}});
 
 
