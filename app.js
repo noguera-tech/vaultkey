@@ -1189,19 +1189,6 @@ async function bioSettingsAction(){
 }
 function clearAutoLockTimer(){if(autoLockTimer){clearTimeout(autoLockTimer);autoLockTimer=null}}
 function resetAutoLockTimer(){clearAutoLockTimer();if(!unlocked||document.hidden)return;let ms=getAutoLockMs();if(ms>0){autoLockTimer=setTimeout(()=>{if(unlocked&&!document.hidden){soundLock();lock()}},ms)}}
-function toggleHomeMenu(){
-  const m=$('homeMenu');
-  if(!m)return;
-  const open=m.style.display==='none';
-  m.style.display=open?'block':'none';
-  if(open){
-    setTimeout(()=>document.addEventListener('click',function _c(){
-      m.style.display='none';
-      document.removeEventListener('click',_c);
-    }),10);
-  }
-}
-document.addEventListener('click',e=>{const m=$('homeMenu');if(m&&m.style.display==='block'&&!e.target.closest('#homeMenu')&&!e.target.closest('[onclick*="toggleHomeMenu"]'))m.style.display='none';});
 function openBackup(){show('settings');setTimeout(()=>{document.querySelector('[onclick*="exportBackup"]')?.closest('.settingsRow')?.scrollIntoView({behavior:'smooth',block:'center'})},200)}
 function markActivity(){if(unlocked){hidePrivacyOverlay();resetAutoLockTimer()}}
 function beginBiometricFlow(){window._vkBiometricFlow=true;hidePrivacyOverlay()}
@@ -1932,7 +1919,6 @@ function initIconPagedCarousel(){
 
   renderIconPage(true);
 }
-function entryShowStep(n){$('entryStep1').style.display=n===1?'block':'none';$('entryStep2').style.display=n===2?'block':'none';$('dot1').style.width=n===1?'32px':'8px';$('dot1').style.background=n===1?'var(--cyan)':'rgba(255,255,255,.2)';$('dot1').style.boxShadow=n===1?'0 0 14px rgba(0,210,255,.7)':'none';$('dot2').style.width=n===2?'32px':'8px';$('dot2').style.background=n===2?'var(--cyan)':'rgba(255,255,255,.2)';$('dot2').style.boxShadow=n===2?'0 0 14px rgba(0,210,255,.7)':'none';$('entryBackBtn').textContent=n===1?'Cancelar':'\u2190 Atr\xe1s';$('entryNextBtn').textContent=n===2?'Guardar':'Siguiente \u2192';if(n===2){updateEntryStep2Header();renderIconStrip();}$('entryModal')?.querySelector('.sheet')?.scrollTo({top:0,behavior:'smooth'});}
 $('ePass')?.addEventListener('input',updateStrength);
 
 // Vibración al enfocar campos del formulario de entrada
