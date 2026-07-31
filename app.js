@@ -1189,19 +1189,6 @@ async function bioSettingsAction(){
 }
 function clearAutoLockTimer(){if(autoLockTimer){clearTimeout(autoLockTimer);autoLockTimer=null}}
 function resetAutoLockTimer(){clearAutoLockTimer();if(!unlocked||document.hidden)return;let ms=getAutoLockMs();if(ms>0){autoLockTimer=setTimeout(()=>{if(unlocked&&!document.hidden){soundLock();lock()}},ms)}}
-function toggleHomeMenu(){
-  const m=$('homeMenu');
-  if(!m)return;
-  const open=m.style.display==='none';
-  m.style.display=open?'block':'none';
-  if(open){
-    setTimeout(()=>document.addEventListener('click',function _c(){
-      m.style.display='none';
-      document.removeEventListener('click',_c);
-    }),10);
-  }
-}
-document.addEventListener('click',e=>{const m=$('homeMenu');if(m&&m.style.display==='block'&&!e.target.closest('#homeMenu')&&!e.target.closest('[onclick*="toggleHomeMenu"]'))m.style.display='none';});
 function openBackup(){show('settings');setTimeout(()=>{document.querySelector('[onclick*="exportBackup"]')?.closest('.settingsRow')?.scrollIntoView({behavior:'smooth',block:'center'})},200)}
 function markActivity(){if(unlocked){hidePrivacyOverlay();resetAutoLockTimer()}}
 function beginBiometricFlow(){window._vkBiometricFlow=true;hidePrivacyOverlay()}
