@@ -2460,17 +2460,6 @@ function clearFieldError(id){
   const next=el.nextElementSibling;
   if(next&&next.classList&&next.classList.contains('fieldErrorNote'))next.remove();
 }
-function firstScrollableEntrySheet(){return $('entryModal')?.querySelector('.sheet')||null}
-function showFieldError(id,msg){
-  const el=$(id); if(!el)return;
-  clearFieldError(id);
-  el.classList.add('fieldError');
-  el.insertAdjacentHTML('afterend',`<span class="fieldErrorNote">${esc(msg)}</span>`);
-  setTimeout(()=>{
-    try{el.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}
-    try{el.focus({preventScroll:true});}catch(e){try{el.focus();}catch(_){}}
-  },30);
-}
 function manualIconLabel(id){const ic=MANUAL_ICONS.find(x=>x.id===id&&x.id!=='auto');return ic?(ic.label||ic.id):''}
 
 function categoryFromEntryIconId(iconId){
@@ -2616,7 +2605,6 @@ function entryMainIdentity(e){
   return '••••••••';
 }
 function entrySearchText(e){return [e.service,userFromEntry(e),legacyEmailFromEntry(e),e.url,e.note,e.type,e.wifiSsid,e.wifiRouter,e.idName,e.idNumber,e.idType,e.licName,e.licNumber,e.medName,e.medSS,e.cardName,e.cardNumber?'••'+e.cardNumber.slice(-4):''].filter(Boolean).join(' ').toLowerCase()}
-function clearEntryErrors(){document.querySelectorAll('.fieldErrorNote').forEach(x=>x.remove());['eService','eUser','eEmail','eUrl','ePass'].forEach(id=>$(id)?.classList.remove('fieldError'))}
 document.addEventListener('input',ev=>{if(ev.target&&['eService','eUser','eEmail','eUrl','ePass'].includes(ev.target.id))clearFieldError(ev.target.id)},true);
 function openEntry(e=null){
   vibe(28);soundOpen();
