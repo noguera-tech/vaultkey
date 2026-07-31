@@ -320,35 +320,6 @@ function soundError()  { playStyle('error'); }
 function soundLock()   { playStyle('lock'); }
 function soundEmpty()  { playStyle('empty'); }
 // ────────────────────────────────────────────────────────────
-function toggleVibration(){
-  const on=localStorage.getItem('vk_vibe')!=='0';
-  localStorage.setItem('vk_vibe',on?'0':'1');
-  syncPreferencesUI();
-  if(!on)navigator.vibrate&&navigator.vibrate(40);
-}
-function toggleSound(){
-  const on=localStorage.getItem('vk_sound')==='1';
-  localStorage.setItem('vk_sound',on?'0':'1');
-  syncPreferencesUI();
-}
-function setSoundStyle(v){
-  localStorage.setItem('vk_sound_style',v);
-  syncPreferencesUI();
-  setTimeout(()=>soundPinOk(),100);
-}
-function syncPreferencesUI(){
-  const vibeOn=localStorage.getItem('vk_vibe')!=='0';
-  const soundOn=localStorage.getItem('vk_sound')==='1';
-  const style=getSoundStyle();
-  const styleNames={suave:'Suave',cristal:'Cristal',retro:'Retro',minimo:'Mínimo'};
-  const vt=$('vibeToggle'); if(vt){vt.textContent=vibeOn?'●':'○';vt.style.color=vibeOn?'var(--cyan)':'var(--t4)';}
-  const st=$('soundToggle'); if(st){st.textContent=soundOn?'●':'○';st.style.color=soundOn?'var(--cyan)':'var(--t4)';}
-  const vh=$('vibeSettingHint'); if(vh)vh.textContent=vibeOn?'Feedback háptico activado':'Feedback háptico desactivado';
-  const sh=$('soundSettingHint'); if(sh)sh.textContent=soundOn?'Sonidos activados':'Sonidos desactivados';
-  const sr=$('soundStyleRow'); if(sr)sr.style.display=soundOn?'flex':'none';
-  const ss=$('soundStyleSelect'); if(ss)ss.value=style;
-  const ssh=$('soundStyleHint'); if(ssh)ssh.textContent=styleNames[style]||style;
-}
 function vkConfirm(title,msg,options){
   options=options||{};
   return new Promise(function(resolve){
@@ -1120,7 +1091,6 @@ function getAutoLockMs(){let m=defaultSecurity(meta());return m?Number(m.autoLoc
 function setAutoLock(v){let m=defaultSecurity(meta());if(!m)return;m.autoLockMs=Number(v);saveMeta(m);syncSettingsUI();toast(m.autoLockMs===0?'Bloqueo inmediato al salir activado':'Autobloqueo inteligente actualizado');resetAutoLockTimer()}
 function syncSettingsUI(){
   try{driveInit();}catch(e){}
-  syncPreferencesUI();
   let sel=$('autoLockSelect');let m=meta();
   if(sel&&m){defaultSecurity(m);const ms=Number(m.autoLockMs||0);sel.value=String(ms);// Forzar opción visible
   if(!sel.querySelector('option[value="'+ms+'"]'))sel.value='30000';}
