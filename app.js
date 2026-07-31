@@ -1128,35 +1128,6 @@ function syncSettingsUI(){
   if(b6){b6.style.background=plen===6?'rgba(0,210,255,.2)':'';b6.style.borderColor=plen===6?'var(--cyan)':'';}
   if(b8){b8.style.background=plen===8?'rgba(0,210,255,.2)':'';b8.style.borderColor=plen===8?'var(--cyan)':'';}
 }
-async function setPinLen(len){
-  const m=defaultSecurity(meta());
-  const currentLen=(m&&m.pinLen===8)?8:6;
-  if(len===currentLen){toast('Ya estás usando PIN de '+len+' dígitos');return;}
-  const hasPin=!!(m&&m.hash);
-  if(hasPin){
-    await vkConfirm(
-      'Cambio de PIN no disponible',
-      'Por seguridad, el cambio de longitud del PIN estara disponible en una version posterior con re-cifrado completo. Tus datos no se han modificado.'
-    );
-    syncSettingsUI();
-    return;
-  }
-  m.pinLen=len;saveMeta(m);syncSettingsUI();
-  toast('PIN de '+len+' dígitos seleccionado');
-}
-function setAutoWipe(val){let m=defaultSecurity(meta());if(!m)return;m.autoWipe=val;saveMeta(m);syncSettingsUI();toast(val?'⚠️ Borrado automático activado tras 10 intentos fallidos':'Borrado automático desactivado');}
-async function confirmAutoWipe(checked){if(checked){const ok=await vkConfirm('Activar borrado automático','⚠️ Tras 10 intentos fallidos de PIN, toda la bóveda se borrará sin posibilidad de recuperación. Asegúrate de tener un respaldo cifrado. ¿Activar?');if(ok){setAutoWipe(true);}else{const t=$('autoWipeToggle');if(t)t.checked=false;}}else{setAutoWipe(false);}}
-async function bioSettingsAction(){
-  const bioActive=false;
-  if(bioActive){
-    const ok=await vkConfirm('Desactivar biometría','¿Desactivar la biometría de este dispositivo? Tendrás que usar el PIN para entrar.');
-    if(ok){localStorage.removeItem('vk_bio_cred_id');localStorage.removeItem('vk_bio_blob');localStorage.removeItem('vk_bio_offer_dismissed');syncSettingsUI();toast('Biometría desactivada.');}
-  } else if(lastKey){
-    await tryBioRegister(lastKey);syncSettingsUI();
-  } else {
-    toast('Introduce el PIN primero para activar la biometría.');
-  }
-}
 function clearAutoLockTimer(){if(autoLockTimer){clearTimeout(autoLockTimer);autoLockTimer=null}}
 function resetAutoLockTimer(){clearAutoLockTimer();if(!unlocked||document.hidden)return;let ms=getAutoLockMs();if(ms>0){autoLockTimer=setTimeout(()=>{if(unlocked&&!document.hidden){soundLock();lock()}},ms)}}
 function openBackup(){show('settings');setTimeout(()=>{document.querySelector('[onclick*="exportBackup"]')?.closest('.settingsRow')?.scrollIntoView({behavior:'smooth',block:'center'})},200)}
