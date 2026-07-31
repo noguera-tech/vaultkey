@@ -425,12 +425,6 @@ async function pressPin(n){vibe(28);soundPin();let left=lockRemaining();if(left)
 function delPin(){vibe(18);soundPinDel();pin=pin.slice(0,-1);renderDots()}
 async function handlePin(){return window.handlePin?window.handlePin():undefined;}
 async function unlockOk(p){return window.unlockOk?window.unlockOk(p):undefined;}
-async function tryBioRegister(pinKey){
-  // Seguridad V2.3.1: no guardar PIN recuperable en localStorage.
-  // La biometría web basada en vk_bio_blob queda deshabilitada hasta migrar a Android Keystore.
-  localStorage.setItem('vk_bio_offer_dismissed','1');
-  toast('Biometría web desactivada por seguridad. Usa el PIN de VaultKey.');
-}
 async function persist(p=lastKey){
   // VK 2.0 bridge: cifrar en vk2_blob; return para no escribir LS_DATA
   if(typeof vkSession!=='undefined'&&vkSession.isActive()&&typeof vkCrypto!=='undefined'){
@@ -1091,8 +1085,6 @@ function clearAutoLockTimer(){if(autoLockTimer){clearTimeout(autoLockTimer);auto
 function resetAutoLockTimer(){clearAutoLockTimer();if(!unlocked||document.hidden)return;let ms=getAutoLockMs();if(ms>0){autoLockTimer=setTimeout(()=>{if(unlocked&&!document.hidden){soundLock();lock()}},ms)}}
 function openBackup(){show('settings');setTimeout(()=>{document.querySelector('[onclick*="exportBackup"]')?.closest('.settingsRow')?.scrollIntoView({behavior:'smooth',block:'center'})},200)}
 function markActivity(){if(unlocked){hidePrivacyOverlay();resetAutoLockTimer()}}
-function beginBiometricFlow(){window._vkBiometricFlow=true;hidePrivacyOverlay()}
-function endBiometricFlow(){setTimeout(()=>{window._vkBiometricFlow=false;if(unlocked&&!document.hidden)hidePrivacyOverlay()},700)}
 function showPrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.add('show');document.body.classList.add('vk-locked')}
 function hidePrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.remove('show');document.body.classList.remove('vk-locked')}
 window.isFilePickerGuardActive=function(){
