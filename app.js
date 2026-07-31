@@ -417,7 +417,7 @@ function initPin(){
     }
   }
 
-  let m=defaultSecurity(meta());mode=(m&&m.hash)?'unlock':'setup1';let left=lockRemaining();const plen=getPinLen();if($('pinMsg')){$('pinMsg').className='pinSub';$('pinMsg').textContent=mode==='unlock'?(left?'Bóveda bloqueada. Espera '+left+' s':'Introduce tu PIN'):'Crea un PIN de '+plen+' dígitos';if(left)$('pinMsg').classList.add('pinLocked');}renderDots();renderKeys();syncSettingsUI();updateLockCountdown()}
+  let m=defaultSecurity(meta());mode=(m&&m.hash)?'unlock':'setup1';let left=lockRemaining();const plen=getPinLen();if($('pinMsg')){$('pinMsg').className='pinSub';$('pinMsg').textContent=mode==='unlock'?(left?'Bóveda bloqueada. Espera '+left+' s':'Introduce tu PIN'):'Crea un PIN de '+plen+' dígitos';if(left)$('pinMsg').classList.add('pinLocked');}renderDots();renderKeys();updateLockCountdown()}
 function getPinLen(){const m=meta();return(m&&m.pinLen===8)?8:6;}
 function renderDots(){const len=getPinLen();let d=$('dots');if(!d)return;d.innerHTML='';d.className='dots'+(len===8?' dots8':'');for(let i=0;i<len;i++){let x=document.createElement('div');x.className='dot'+(i<pin.length?' on':'');d.appendChild(x)}}
 function renderKeys(){let k=$('keys');k.innerHTML='';['1','2','3','4','5','6','7','8','9','bio','0','del'].forEach(n=>{let b=document.createElement('button');b.className='key';if(n==='bio'){b.innerHTML='<svg class="fingerIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 11c0 5-2 7-2 10"/><path d="M16 8a4 4 0 0 0-8 0c0 1.3.5 2.7 1 4"/><path d="M6 12c.5 2.5 1.5 4 3 5"/><path d="M18 12c-.4 3.2-1.4 5.4-3.2 7"/><path d="M8 6.5A6 6 0 0 1 18 11"/><path d="M5 9a8 8 0 0 1 14.5-4"/><path d="M20 14c-.4 2.4-1.2 4.4-2.5 6"/></svg>';b.classList.add('bioKey');b.onclick=tryBio;b.title='Biometría del dispositivo';b.setAttribute('aria-label','Biometría del dispositivo')}else if(n==='del'){b.innerHTML='<svg class="delIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13z"/><path d="M18 9l-6 6M12 9l6 6"/></svg>';b.onclick=delPin;b.setAttribute('aria-label','Borrar')}else{b.textContent=n;b.setAttribute('aria-label','Dígito '+n);b.onclick=()=>pressPin(n)}k.appendChild(b)})}
@@ -469,7 +469,7 @@ window._vk2UnlockOk=async function(dekKey){
     }
   }catch(e){console.warn('VK2 vault decrypt:',e);vault=[];}
   unlocked=true;lastKey=null;pin='';renderDots();hidePrivacyOverlay();
-  show('home');render();syncSettingsUI();resetAutoLockTimer();
+  show('home');render();resetAutoLockTimer();
   setTimeout(function(){try{checkVaultReminders();}catch(e){}},2000);
   setTimeout(function(){try{maybeShowAutofillPicker();}catch(e){}},300);
   setTimeout(function(){try{checkAutofillSetupBanner();}catch(e){}},1500);
@@ -554,7 +554,6 @@ function show(id,dir){
     },250);
   }
   if(id!=='pin')render();
-  syncSettingsUI();
   if(id!=='pin')resetAutoLockTimer();
 }
 /* Swipe lateral entre pantallas principales */
@@ -960,7 +959,6 @@ async function executeDangerAction(action){
         toast('No se encontró la configuración de VaultKey.','err');
         return;
       }
-      syncSettingsUI();
       resetAutoLockTimer();
       toast('Configuración de VaultKey restablecida.');
       break;
@@ -1088,46 +1086,7 @@ function registerFailedPin(){vibe([40,30,40]);soundPinErr();let m=defaultSecurit
 saveMeta(m);$('pinMsg').className='pinSub '+(m.lockedUntil>Date.now()?'pinLocked':'pinWarn');$('pinMsg').textContent=msg;pin='';renderDots();updateLockCountdown();}
 function updateLockCountdown(){clearInterval(lockCountdownTimer);let left=lockRemaining();if(!left)return;lockCountdownTimer=setInterval(()=>{let s=lockRemaining();if(!s){clearInterval(lockCountdownTimer);$('pinMsg').className='pinSub';$('pinMsg').textContent='Introduce tu PIN';return}$('pinMsg').textContent='Bóveda bloqueada. Espera '+s+' s';},1000)}
 function getAutoLockMs(){let m=defaultSecurity(meta());return m?Number(m.autoLockMs||0):0}
-function setAutoLock(v){let m=defaultSecurity(meta());if(!m)return;m.autoLockMs=Number(v);saveMeta(m);syncSettingsUI();toast(m.autoLockMs===0?'Bloqueo inmediato al salir activado':'Autobloqueo inteligente actualizado');resetAutoLockTimer()}
-function syncSettingsUI(){
-  try{driveInit();}catch(e){}
-  let sel=$('autoLockSelect');let m=meta();
-  if(sel&&m){defaultSecurity(m);const ms=Number(m.autoLockMs||0);sel.value=String(ms);// Forzar opción visible
-  if(!sel.querySelector('option[value="'+ms+'"]'))sel.value='30000';}
-  // Estado de huella
-  const bioActive=false;
-  const span=$('bioSettingsSpan');const pill=$('bioSettingsPill');
-  if(span)span.textContent='Biometría web desactivada por seguridad. El PIN de VaultKey sigue siendo obligatorio.';
-  if(pill){pill.textContent=bioActive?'Activa':'Inactiva';pill.style.background=bioActive?'rgba(0,210,100,.15)':'';pill.style.borderColor=bioActive?'rgba(0,210,100,.4)':'';pill.style.color=bioActive?'#00d46a':'';}
-  // Estado borrado automático
-  const awToggle=$('autoWipeToggle');if(awToggle&&m)awToggle.checked=!!(m.autoWipe);
-  // Estado respaldo
-  const exportSpan=$('exportBackupSpan');
-  const importSpan=$('importBackupSpan');
-  if(exportSpan){
-    const lastBackup=m&&m.lastBackup;
-    const entryCount=vault?vault.length:0;
-    if(lastBackup){
-      const d=new Date(lastBackup).toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'});
-      exportSpan.textContent='Último respaldo: '+d+' · '+entryCount+' entrada'+(entryCount!==1?'s':'');
-    } else {
-      const warnTxt=entryCount>0?'⚠️ Sin respaldo · '+entryCount+' entrada'+(entryCount!==1?'s':'')+' sin guardar':'Sin entradas todavía';
-      exportSpan.textContent=warnTxt;
-      if(entryCount>0) exportSpan.style.color='#f59e0b';
-    }
-  }
-  if(importSpan){
-    const entryCount=vault?vault.length:0;
-    importSpan.textContent=entryCount>0?'Tienes '+entryCount+' entrada'+(entryCount!==1?'s':'')+' en la bóveda':'Restaurar desde archivo cifrado (.json)';
-  }
-
-  // Longitud PIN
-  const plen=(m&&m.pinLen===8)?8:6;
-  const sp=$('pinLenSpan');if(sp)sp.textContent='PIN de '+plen+' dígitos'+(m&&m.hash?' (activo)':' (pendiente)');
-  const b6=$('pinLen6Btn');const b8=$('pinLen8Btn');
-  if(b6){b6.style.background=plen===6?'rgba(0,210,255,.2)':'';b6.style.borderColor=plen===6?'var(--cyan)':'';}
-  if(b8){b8.style.background=plen===8?'rgba(0,210,255,.2)':'';b8.style.borderColor=plen===8?'var(--cyan)':'';}
-}
+function setAutoLock(v){let m=defaultSecurity(meta());if(!m)return;m.autoLockMs=Number(v);saveMeta(m);toast(m.autoLockMs===0?'Bloqueo inmediato al salir activado':'Autobloqueo inteligente actualizado');resetAutoLockTimer()}
 function clearAutoLockTimer(){if(autoLockTimer){clearTimeout(autoLockTimer);autoLockTimer=null}}
 function resetAutoLockTimer(){clearAutoLockTimer();if(!unlocked||document.hidden)return;let ms=getAutoLockMs();if(ms>0){autoLockTimer=setTimeout(()=>{if(unlocked&&!document.hidden){soundLock();lock()}},ms)}}
 function openBackup(){show('settings');setTimeout(()=>{document.querySelector('[onclick*="exportBackup"]')?.closest('.settingsRow')?.scrollIntoView({behavior:'smooth',block:'center'})},200)}
@@ -4346,7 +4305,7 @@ function rankIcon(ic){
     let m=defaultSecurity(meta());
     if(m){m.failedAttempts=0;m.totalFailed=0;m.lockedUntil=0;m.lockLevel=0;m.lastOk=Date.now();saveMeta(m)}
     try{vibe([30,20,60]);soundPinOk()}catch(e){}
-    lastKey=p;unlocked=true;pin='';renderDots();hidePrivacyOverlay();show('home');render();syncSettingsUI();resetAutoLockTimer();
+    lastKey=p;unlocked=true;pin='';renderDots();hidePrivacyOverlay();show('home');render();resetAutoLockTimer();
     setTimeout(()=>{try{checkVaultReminders();}catch(e){}},2000);
     setTimeout(()=>{try{maybeShowAutofillPicker();}catch(e){}},300);
     setTimeout(()=>{try{checkAutofillSetupBanner();}catch(e){}},1500);
@@ -4398,7 +4357,7 @@ function rankIcon(ic){
         localStorage.removeItem(REC_SAVED);
         localStorage.setItem(REC_PENDING,'1');
         // Entramos a la bóveda solo para presentar el recovery como paso bloqueante. No se ofrece huella todavía.
-        lastKey=typedPin;unlocked=true;pin='';renderDots();hidePrivacyOverlay();show('home');render();syncSettingsUI();resetAutoLockTimer();
+        lastKey=typedPin;unlocked=true;pin='';renderDots();hidePrivacyOverlay();show('home');render();resetAutoLockTimer();
         soundPinOk();vibe([30,20,60,20,80]);
         await showRecoveryCode(true);
         return;
