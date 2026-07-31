@@ -1083,7 +1083,6 @@ function getAutoLockMs(){let m=defaultSecurity(meta());return m?Number(m.autoLoc
 function setAutoLock(v){let m=defaultSecurity(meta());if(!m)return;m.autoLockMs=Number(v);saveMeta(m);toast(m.autoLockMs===0?'Bloqueo inmediato al salir activado':'Autobloqueo inteligente actualizado');resetAutoLockTimer()}
 function clearAutoLockTimer(){if(autoLockTimer){clearTimeout(autoLockTimer);autoLockTimer=null}}
 function resetAutoLockTimer(){clearAutoLockTimer();if(!unlocked||document.hidden)return;let ms=getAutoLockMs();if(ms>0){autoLockTimer=setTimeout(()=>{if(unlocked&&!document.hidden){soundLock();lock()}},ms)}}
-function openBackup(){show('settings');setTimeout(()=>{document.querySelector('[onclick*="exportBackup"]')?.closest('.settingsRow')?.scrollIntoView({behavior:'smooth',block:'center'})},200)}
 function markActivity(){if(unlocked){hidePrivacyOverlay();resetAutoLockTimer()}}
 function showPrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.add('show');document.body.classList.add('vk-locked')}
 function hidePrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.remove('show');document.body.classList.remove('vk-locked')}
@@ -2143,19 +2142,6 @@ function shareApp(){
       .finally(()=>{setTimeout(()=>{window._vkSharing=false;},500);});
   }else toast('Enlace de VaultKey: '+url)
 }
-function showAppInfo(){
-  const m=meta();
-  const creado=m&&m.created?new Date(m.created).toLocaleDateString('es-ES'):'—';
-  const backup=m&&m.lastBackup?new Date(m.lastBackup).toLocaleDateString('es-ES'):'Nunca';
-  const total=vault?vault.length:0;
-  const favs=vault?vault.filter(e=>e.fav).length:0;
-  const debiles=vault?vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length:0;
-  vkConfirm(
-    'VaultKey V2.3.4',
-    `📦 Entradas guardadas: ${total}\n⭐ Favoritos: ${favs}\n⚠️ Contraseñas débiles: ${debiles}\n📅 PIN creado: ${creado}\n☁️ Último respaldo: ${backup}\n\n🔒 Cifrado AES-GCM 256 bits\n🔑 PBKDF2 · PIN 200.000 / bóveda 150.000 iteraciones`
-  ).catch(()=>{});
-}
-
 /* Toque en la fila de versión → mostrar info de la bóveda */
 (function(){
   function initCategoryPagedCarousel(){
