@@ -1596,7 +1596,6 @@ function maybeShowOnboarding(){
 // serviceIcon — defined below after VK128_BRAND_ICONS (line ~1860)
 // Stub so calls before the real definition don't throw
 function serviceIcon(s){ return vk128Shield ? vk128Shield() : {bg:'#061a33',svg:''}; }
-function serviceColor(s){return serviceIcon(s).bg;}
 function esc(s=''){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 let _entryFav=false;
 function toggleFavEntry(){_entryFav=!_entryFav;const btn=$('favToggleBtn');if(btn){btn.dataset.fav=String(_entryFav);}}
@@ -1826,7 +1825,6 @@ document.getElementById('entryModal')?.addEventListener('click',e=>{
 function score(p=''){let s=0;if(p.length>=6)s++;if(p.length>=8)s++;if(p.length>=14)s++;if(/[A-Z]/.test(p)&&/[a-z]/.test(p))s++;if(/\d/.test(p))s++;if(/[^A-Za-z0-9]/.test(p))s++;return Math.min(s,5)}
 function updateStrength(){let p=$('ePass').value,s=score(p),w=s*20;$('strBar').style.width=w+'%';$('strBar').style.background=s<2?'var(--red)':s<5?'var(--yellow)':'var(--green)';$('strTxt').textContent=!p?'Mínimo 6 caracteres. Se permite guardar PIN y códigos cortos.':p.length<6?'Demasiado corta: mínimo 6 caracteres':p.length<8?'Débil, pero permitida':'Buena'}
 function isValidEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||'').trim())}
-function serviceRequiresEmail(){return true}
 function toggleQvPass(){let el=$('qvPass');el.textContent=el.textContent.startsWith('•')?current.pass:'••••••••••••'}
 function toggleQvNote(){const el=$('qvNote');if(!el)return;if(el.textContent==='••••••••'){el.textContent=current.note;el.style.whiteSpace='pre-wrap';el.style.fontSize='14px';el.style.lineHeight='1.6';}else{el.textContent='••••••••';el.style.whiteSpace='';el.style.fontSize='';el.style.lineHeight='';}}
 
@@ -1853,7 +1851,6 @@ function copyText(t='',btn=null){
 function scheduleClipboardClear(value){setTimeout(async()=>{try{const txt=await navigator.clipboard.readText?.();if(txt===value)await navigator.clipboard.writeText('');}catch(e){}},30000)}
 function openUrl(u){vibe(20);if(!/^https?:\/\//.test(u))u='https://'+u;window.open(u,'_blank')}
 function openGen(target=false,targetField='ePass'){useGenTarget=target;window._genTargetField=targetField;$('genModal').classList.add('open');syncRanges(false);if($('genOut').textContent==='Pulsa generar')markGeneratorDirty()}
-function setGenLen(n){$('gLen').value=n;syncRanges(true)}
 function markGeneratorDirty(){syncRanges(false);$('genOut').textContent='Pulsa generar';}
 function generatePass(){
   vibe(40);soundGen();
