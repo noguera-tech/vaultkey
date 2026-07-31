@@ -320,35 +320,6 @@ function soundError()  { playStyle('error'); }
 function soundLock()   { playStyle('lock'); }
 function soundEmpty()  { playStyle('empty'); }
 // ────────────────────────────────────────────────────────────
-function toggleVibration(){
-  const on=localStorage.getItem('vk_vibe')!=='0';
-  localStorage.setItem('vk_vibe',on?'0':'1');
-  syncPreferencesUI();
-  if(!on)navigator.vibrate&&navigator.vibrate(40);
-}
-function toggleSound(){
-  const on=localStorage.getItem('vk_sound')==='1';
-  localStorage.setItem('vk_sound',on?'0':'1');
-  syncPreferencesUI();
-}
-function setSoundStyle(v){
-  localStorage.setItem('vk_sound_style',v);
-  syncPreferencesUI();
-  setTimeout(()=>soundPinOk(),100);
-}
-function syncPreferencesUI(){
-  const vibeOn=localStorage.getItem('vk_vibe')!=='0';
-  const soundOn=localStorage.getItem('vk_sound')==='1';
-  const style=getSoundStyle();
-  const styleNames={suave:'Suave',cristal:'Cristal',retro:'Retro',minimo:'Mínimo'};
-  const vt=$('vibeToggle'); if(vt){vt.textContent=vibeOn?'●':'○';vt.style.color=vibeOn?'var(--cyan)':'var(--t4)';}
-  const st=$('soundToggle'); if(st){st.textContent=soundOn?'●':'○';st.style.color=soundOn?'var(--cyan)':'var(--t4)';}
-  const vh=$('vibeSettingHint'); if(vh)vh.textContent=vibeOn?'Feedback háptico activado':'Feedback háptico desactivado';
-  const sh=$('soundSettingHint'); if(sh)sh.textContent=soundOn?'Sonidos activados':'Sonidos desactivados';
-  const sr=$('soundStyleRow'); if(sr)sr.style.display=soundOn?'flex':'none';
-  const ss=$('soundStyleSelect'); if(ss)ss.value=style;
-  const ssh=$('soundStyleHint'); if(ssh)ssh.textContent=styleNames[style]||style;
-}
 function vkConfirm(title,msg,options){
   options=options||{};
   return new Promise(function(resolve){
@@ -1120,7 +1091,6 @@ function getAutoLockMs(){let m=defaultSecurity(meta());return m?Number(m.autoLoc
 function setAutoLock(v){let m=defaultSecurity(meta());if(!m)return;m.autoLockMs=Number(v);saveMeta(m);syncSettingsUI();toast(m.autoLockMs===0?'Bloqueo inmediato al salir activado':'Autobloqueo inteligente actualizado');resetAutoLockTimer()}
 function syncSettingsUI(){
   try{driveInit();}catch(e){}
-  syncPreferencesUI();
   let sel=$('autoLockSelect');let m=meta();
   if(sel&&m){defaultSecurity(m);const ms=Number(m.autoLockMs||0);sel.value=String(ms);// Forzar opción visible
   if(!sel.querySelector('option[value="'+ms+'"]'))sel.value='30000';}
@@ -1157,35 +1127,6 @@ function syncSettingsUI(){
   const b6=$('pinLen6Btn');const b8=$('pinLen8Btn');
   if(b6){b6.style.background=plen===6?'rgba(0,210,255,.2)':'';b6.style.borderColor=plen===6?'var(--cyan)':'';}
   if(b8){b8.style.background=plen===8?'rgba(0,210,255,.2)':'';b8.style.borderColor=plen===8?'var(--cyan)':'';}
-}
-async function setPinLen(len){
-  const m=defaultSecurity(meta());
-  const currentLen=(m&&m.pinLen===8)?8:6;
-  if(len===currentLen){toast('Ya estás usando PIN de '+len+' dígitos');return;}
-  const hasPin=!!(m&&m.hash);
-  if(hasPin){
-    await vkConfirm(
-      'Cambio de PIN no disponible',
-      'Por seguridad, el cambio de longitud del PIN estara disponible en una version posterior con re-cifrado completo. Tus datos no se han modificado.'
-    );
-    syncSettingsUI();
-    return;
-  }
-  m.pinLen=len;saveMeta(m);syncSettingsUI();
-  toast('PIN de '+len+' dígitos seleccionado');
-}
-function setAutoWipe(val){let m=defaultSecurity(meta());if(!m)return;m.autoWipe=val;saveMeta(m);syncSettingsUI();toast(val?'⚠️ Borrado automático activado tras 10 intentos fallidos':'Borrado automático desactivado');}
-async function confirmAutoWipe(checked){if(checked){const ok=await vkConfirm('Activar borrado automático','⚠️ Tras 10 intentos fallidos de PIN, toda la bóveda se borrará sin posibilidad de recuperación. Asegúrate de tener un respaldo cifrado. ¿Activar?');if(ok){setAutoWipe(true);}else{const t=$('autoWipeToggle');if(t)t.checked=false;}}else{setAutoWipe(false);}}
-async function bioSettingsAction(){
-  const bioActive=false;
-  if(bioActive){
-    const ok=await vkConfirm('Desactivar biometría','¿Desactivar la biometría de este dispositivo? Tendrás que usar el PIN para entrar.');
-    if(ok){localStorage.removeItem('vk_bio_cred_id');localStorage.removeItem('vk_bio_blob');localStorage.removeItem('vk_bio_offer_dismissed');syncSettingsUI();toast('Biometría desactivada.');}
-  } else if(lastKey){
-    await tryBioRegister(lastKey);syncSettingsUI();
-  } else {
-    toast('Introduce el PIN primero para activar la biometría.');
-  }
 }
 function clearAutoLockTimer(){if(autoLockTimer){clearTimeout(autoLockTimer);autoLockTimer=null}}
 function resetAutoLockTimer(){clearAutoLockTimer();if(!unlocked||document.hidden)return;let ms=getAutoLockMs();if(ms>0){autoLockTimer=setTimeout(()=>{if(unlocked&&!document.hidden){soundLock();lock()}},ms)}}
@@ -1707,7 +1648,7 @@ function serviceIcon(s){ return vk128Shield ? vk128Shield() : {bg:'#061a33',svg:
 function serviceColor(s){return serviceIcon(s).bg;}
 function esc(s=''){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 let _entryFav=false;
-function toggleFavEntry(){_entryFav=!_entryFav;const btn=$('favToggleBtn');if(btn){btn.dataset.fav=String(_entryFav);}if($('eFav'))$('eFav').value=String(_entryFav);}
+function toggleFavEntry(){_entryFav=!_entryFav;const btn=$('favToggleBtn');if(btn){btn.dataset.fav=String(_entryFav);}}
 function openUrlModal(){$('urlModal')?.classList.add('open');}
 function closeUrlModal(){$('urlModal')?.classList.remove('open');}
 function openNoteModal(){$('noteModal')?.classList.add('open');}
@@ -3669,7 +3610,7 @@ function render(){
   _setDashCount('statNotes',_dashNotes,'nota','notas');
   _setDashCount('statCards',_dashCards,'tarjeta','tarjetas');
   _setDashCount('statDocuments',_dashDocuments,'documento','documentos');
-  let m=meta();$('statBackup')&&($('statBackup').textContent=m?.lastBackup?new Date(m.lastBackup).toLocaleDateString():'Nunca')}
+}
 
 function vk128SvgText(label,bg,fg='#fff',fs=18){return {bg,svg:`<svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="${bg}"/><text x="24" y="31" font-size="${fs}" font-weight="900" fill="${fg}" text-anchor="middle" font-family="Arial, sans-serif">${label}</text></svg>`}}
 function vk128Match(n,k){k=(k||'').toLowerCase().trim();if(!k)return false;if(k.length<=2)return n===k;return n===k||n.includes(k)}
