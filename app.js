@@ -1707,7 +1707,7 @@ function serviceIcon(s){ return vk128Shield ? vk128Shield() : {bg:'#061a33',svg:
 function serviceColor(s){return serviceIcon(s).bg;}
 function esc(s=''){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 let _entryFav=false;
-function toggleFavEntry(){_entryFav=!_entryFav;const btn=$('favToggleBtn');if(btn){btn.dataset.fav=String(_entryFav);}if($('eFav'))$('eFav').value=String(_entryFav);}
+function toggleFavEntry(){_entryFav=!_entryFav;const btn=$('favToggleBtn');if(btn){btn.dataset.fav=String(_entryFav);}}
 function openUrlModal(){$('urlModal')?.classList.add('open');}
 function closeUrlModal(){$('urlModal')?.classList.remove('open');}
 function openNoteModal(){$('noteModal')?.classList.add('open');}
