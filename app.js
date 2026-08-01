@@ -994,6 +994,7 @@ function closeModals(){
     }
     m.classList.remove('open');
   });
+  if(typeof window.closeCreatePicker==='function')window.closeCreatePicker();
   if(typeof window.closeDocumentTypePicker==='function')window.closeDocumentTypePicker();
   if(typeof window.closeDocumentSourceSheet==='function')window.closeDocumentSourceSheet();
   if(typeof window.closeEmergencyKitRegenerateDialog==='function'){
@@ -3101,6 +3102,57 @@ async function savePasswordEdit(){
 
   try{driveAutoSync();}catch(error){}
 }
+
+function openCreatePicker(){
+  const picker=$('createPicker');
+  if(!picker)return;
+
+  picker.hidden=false;
+  document.body.classList.add('vk-create-picker-open');
+
+  setTimeout(()=>{
+    picker.querySelector('.vk-create-picker__options button')?.focus();
+  },0);
+}
+
+function closeCreatePicker(){
+  const picker=$('createPicker');
+  if(!picker)return;
+
+  picker.hidden=true;
+  document.body.classList.remove('vk-create-picker-open');
+}
+
+function selectCreateType(type){
+  closeCreatePicker();
+
+  if(type==='password'){
+    openPasswordCreate();
+    return;
+  }
+
+  if(type==='note'){
+    if(typeof window.openCreateNote==='function'){
+      window.openCreateNote();
+    }
+    return;
+  }
+
+  if(type==='card'){
+    if(typeof window.openCreateCard==='function'){
+      window.openCreateCard();
+    }
+    return;
+  }
+
+  if(type==='document'&&typeof window.openTypePicker==='function'){
+    window.openTypePicker();
+  }
+}
+
+window.openCreatePicker=openCreatePicker;
+window.closeCreatePicker=closeCreatePicker;
+window.selectCreateType=selectCreateType;
 
 let _passwordCreateType='web';
 let _passwordCreateGenerated=false;
