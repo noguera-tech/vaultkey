@@ -2428,8 +2428,8 @@ function syncRanges(dirty=false){
   if(dirty) $('genOut').textContent='Pulsa generar';
 }
 
-function vkSvgBrand(label,bg,fg='#fff'){return {bg,svg:`<svg viewBox="0 0 48 48" width="48" height="48"><rect width="48" height="48" rx="10" fill="${bg}"/><text x="24" y="31" font-size="18" font-weight="900" fill="${fg}" text-anchor="middle" font-family="Arial, sans-serif">${label}</text></svg>`}}
-function vkGenericServiceIcon(){return {bg:'#06213f',svg:'<svg class="vkGenericLogo" viewBox="0 0 48 48" width="48" height="48"><defs><linearGradient id="vkg" x1="0" x2="1"><stop stop-color="#00c8ff"/><stop offset="1" stop-color="#0a84ff"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="#061a33"/><path d="M24 6l16 6v11c0 10-6.7 16.7-16 20-9.3-3.3-16-10-16-20V12z" fill="none" stroke="url(#vkg)" stroke-width="3"/><path d="M19 23a5 5 0 1 1 10 0v2h1.5v10h-13V25H19z" fill="#dff6ff"/><path d="M21 25v-2a3 3 0 1 1 6 0v2z" fill="#061a33"/></svg>'}}
+
+
 
 
 
