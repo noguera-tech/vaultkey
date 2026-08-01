@@ -587,15 +587,6 @@ select option { background:#001830; color:#e8f6ff; }
   box-shadow:0 0 20px rgba(0,190,255,.08);
 }
 
-.rangeField {
-  background:linear-gradient(135deg,rgba(0,78,150,.48),rgba(0,20,52,.92));
-  border:1px solid rgba(0,217,255,.30); border-radius:16px; padding:15px 16px; margin-bottom:10px;
-  box-shadow:0 10px 28px rgba(0,0,0,.36),0 0 18px rgba(0,123,255,.10),inset 0 1px 0 rgba(255,255,255,.08);
-}
-.rangeTop   { display:flex; justify-content:space-between; align-items:center; margin-bottom:11px; }
-.rangeTop b { font-size:11px; text-transform:uppercase; color:#E7F3FF; letter-spacing:.65px; font-weight:950; text-shadow:0 0 9px rgba(0,217,255,.22); }
-.rangeTop span { font-size:18px; font-weight:950; color:#42F1FF; text-shadow:0 0 10px rgba(0,217,255,.46); }
-
 input[type=range] {
   -webkit-appearance:none; appearance:none;
   width:100%; height:16px; cursor:pointer; border-radius:999px; background:transparent;
@@ -641,12 +632,6 @@ input[type=range]::-moz-range-thumb {
   cursor:pointer;
 }
 
-.presetBtns { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin:6px 0 12px; }
-.presetBtns button { border:1px solid rgba(0,170,255,.24); border-radius:13px; background:linear-gradient(135deg,rgba(0,55,110,.46),rgba(0,16,38,.88)); color:#E7F3FF; padding:11px 4px; font-weight:900; font-size:14px; transition:all .15s; box-shadow:inset 0 1px 0 rgba(255,255,255,.06); }
-.presetBtns button:active, .presetBtns button.presetActive { background:rgba(0,91,255,.28); border-color:rgba(0,217,255,.6); color:var(--cyan); box-shadow:0 0 14px rgba(0,217,255,.2); }
-.checkrow   { display:flex; gap:9px; align-items:center; margin:8px 0; color:var(--t2); font-size:14px; }
-.checkrow input { width:18px; height:18px; accent-color:var(--blue); }
-
 
 /* Pulido final â€” entradas y generador */
 #genModal { align-items:stretch; }
@@ -658,8 +643,6 @@ input[type=range]::-moz-range-thumb {
   overflow-y:auto;
 }
 #genModal .iconBtn { background:rgba(0,25,55,.72); border-color:rgba(0,217,255,.18); color:#DFF6FF; }
-#genModal .checkrow { color:#E7F3FF; font-weight:500; }
-#genModal .checkrow input { width:20px; height:20px; accent-color:var(--blue); filter:drop-shadow(0 0 7px rgba(0,123,255,.45)); }
 #genModal .ghost { color:#39F3FF; border-color:rgba(0,217,255,.34); background:linear-gradient(135deg,rgba(0,70,130,.28),rgba(0,12,28,.78)); letter-spacing:.08em; }
 #genModal .sub { color:rgba(216,230,245,.76); }
 #genModal .label { color:#24EFFF; text-shadow:0 0 8px rgba(0,217,255,.35); }
@@ -675,8 +658,6 @@ input[type=range]::-moz-range-thumb {
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    UTILIDADES
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-.safeArt      { font-size:56px; filter:drop-shadow(0 0 20px rgba(0,190,255,.35)); }
-.securityNote { font-size:12px; color:var(--t3); margin-top:8px; line-height:1.4; }
 .vkGenericLogo{ width:100%; height:100%; display:grid; place-items:center; font-weight:900; border-radius:inherit; }
 .delIcon      { color:var(--t1); font-size:20px; padding:4px; }
 .fingerIcon   { font-size:24px; }
@@ -833,21 +814,6 @@ input[type=range]::-moz-range-thumb {
   z-index: 0;
 }
 
-
-.vkShieldBg {
-  display: none;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 75%;
-  max-width: 280px;
-  opacity: .055;
-  filter: blur(1.5px) saturate(1.5);
-  pointer-events: none;
-  z-index: 0;
-  user-select: none;
-}
 
 /* Contenido por encima del fondo */
 .screen > * { position: relative; z-index: 1; }
@@ -1260,72 +1226,6 @@ input[type=range]::-moz-range-thumb {
   background: rgba(8,25,46,.88) !important;
   border-color: rgba(132,178,220,.18) !important;
   color: rgba(244,247,251,.82) !important;
-}
-
-#genModal .rangeField {
-  padding: 14px 16px !important;
-  margin-bottom: 10px !important;
-  border-radius: 17px !important;
-  background: linear-gradient(180deg,rgba(11,34,61,.90),rgba(7,22,42,.96)) !important;
-  border-color: rgba(132,178,220,.17) !important;
-  box-shadow: 0 10px 24px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.04) !important;
-}
-
-#genModal .rangeTop {
-  margin-bottom: 10px !important;
-}
-
-#genModal .rangeTop b {
-  font-size: 11px !important;
-  color: rgba(244,247,251,.86) !important;
-  letter-spacing: .65px !important;
-}
-
-#genModal .rangeTop span {
-  font-size: 20px !important;
-  color: #6ED0FF !important;
-  text-shadow: none !important;
-}
-
-#genModal .presetBtns {
-  gap: 9px !important;
-  margin: 10px 0 14px !important;
-}
-
-#genModal .presetBtns button {
-  padding: 12px 4px !important;
-  border-radius: 15px !important;
-  background: rgba(8,25,46,.90) !important;
-  border-color: rgba(132,178,220,.16) !important;
-  color: rgba(244,247,251,.88) !important;
-  font-size: 15px !important;
-  font-weight: 760 !important;
-}
-
-#genModal .presetBtns button.presetActive,
-#genModal .presetBtns button:active {
-  background: rgba(35,123,255,.18) !important;
-  border-color: rgba(92,200,255,.35) !important;
-  color: #F4F7FB !important;
-}
-
-#genModal .checkrow,
-#genModal div[onclick*="gPinMode"] {
-  margin: 8px 0 !important;
-  padding: 10px 12px !important;
-  border-radius: 14px !important;
-  background: rgba(7,22,42,.72) !important;
-  border: 1px solid rgba(132,178,220,.12) !important;
-  color: rgba(244,247,251,.86) !important;
-  font-size: 14px !important;
-  line-height: 1.3 !important;
-}
-
-#genModal .checkrow input,
-#genModal div[onclick*="gPinMode"] input {
-  width: 19px !important;
-  height: 19px !important;
-  filter: none !important;
 }
 
 #genModal .field {
@@ -3207,8 +3107,7 @@ input[type=range]::-moz-range-thumb {
 
 /* Ayudas de texto más discretas */
 #entryModal .sub,
-#entryModal #strTxt,
-#entryModal .securityNote {
+#entryModal #strTxt {
   color: rgba(150, 181, 210, .66) !important;
   font-size: 11.5px !important;
   line-height: 1.35 !important;
@@ -3367,11 +3266,6 @@ input[type=range]::-moz-range-thumb {
 
 /* Select de autobloqueo inteligente */
 /* Caja de configuración especial */
-/* Alertas dentro de ajustes */
-#settings .securityNote {
-  font-size: 12.2px !important;
-  line-height: 1.35 !important;
-}
 
 /* Checks / toggles pequeños a la derecha */
 #settings input[type="checkbox"] {
