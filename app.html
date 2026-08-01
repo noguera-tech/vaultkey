@@ -455,13 +455,40 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       </div>
     </section>
 
-    <button type="button" class="vk-dash-fab" aria-label="Nueva contraseña" onclick="openPasswordCreate()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button type="button" class="vk-dash-fab" aria-label="Añadir elemento" onclick="openCreatePicker()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
 
 
     <div id="recentList" hidden></div>
 
     <div aria-hidden="true" hidden><span id="statTotal">0</span><span id="statFav">0</span><span id="statWeak">0</span><span id="healthSummaryText">Todo está protegido y listo para usar.</span></div>
   </section>
+
+<div id="createPicker" class="vk-create-picker" hidden>
+  <div class="vk-create-picker__backdrop" onclick="closeCreatePicker()"></div>
+
+  <section class="vk-create-picker__sheet"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="createPickerTitle">
+    <h2 id="createPickerTitle">¿Qué quieres añadir?</h2>
+
+    <div class="vk-create-picker__options">
+      <button type="button" onclick="selectCreateType('password')">Contraseña</button>
+      <button type="button" onclick="selectCreateType('note')">Nota</button>
+      <button type="button" onclick="selectCreateType('card')">Tarjeta</button>
+      <button type="button" onclick="selectCreateType('document')">Documento</button>
+    </div>
+
+    <div class="vk-create-picker__divider"></div>
+
+    <button type="button"
+            class="vk-create-picker__cancel"
+            onclick="closeCreatePicker()">
+      Cancelar
+    </button>
+  </section>
+</div>
+
 <section id="passwords" class="screen vk-passwords-root">
   <header class="vk-passwords-header">
     <button type="button" class="vk-note-back" aria-label="Volver al inicio" onclick="show('home','left')">
