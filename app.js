@@ -4191,11 +4191,6 @@ function iconMatches(ic,q){
   const ids=_synonymMap[q];
   return !!(ids&&ids.includes(String(ic.id)));
 }
-function rankIcon(ic){
-  const order=['auto','bank','banco','bbva','santander','caixa','ing','banesco','mercantil','gmail','outlook','hotmail','yahoo','icloud','proton','google','facebook','instagram','whatsapp','telegram','youtube','netflix','amazon','paypal','spotify','tiktok','discord','github','linkedin','x','microsoft','apple','chatgpt','canva','notion','zoom','binance','coinbase','zelle','revolut','wise','wifi','cloud','safe'];
-  const idx=order.indexOf(String(ic.id));
-  return idx>=0?idx:999;
-}
 
 (function(){
   const REC_PENDING='vk_recovery_pending';
