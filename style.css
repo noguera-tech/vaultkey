@@ -466,9 +466,6 @@ select option { background:#001830; color:#e8f6ff; }
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    AJUSTES â€” mismo sistema visual
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-.settingBlock { margin-bottom:18px; }
-.settingBlock > .label { font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.7px; color:var(--cyan); margin-bottom:8px; padding-left:2px; }
-.settingsGrid { display:grid; gap:8px; }
 
 .settingsRow {
   display:flex; align-items:center; gap:13px;
@@ -482,23 +479,8 @@ select option { background:#001830; color:#e8f6ff; }
 .sico { width:40px; height:40px; border-radius:13px; display:grid; place-items:center; font-size:20px; flex-shrink:0; border:1px solid transparent; }
 
 /* Colores sico por secciÃ³n seguridad */
-.settingBlock:nth-child(1) .settingsRow:nth-child(1) .sico { background:rgba(0,91,255,.25);  border-color:rgba(0,123,255,.35); }
-.settingBlock:nth-child(1) .settingsRow:nth-child(2) .sico { background:rgba(0,160,100,.22); border-color:rgba(0,200,120,.30); }
-.settingBlock:nth-child(1) .settingsRow:nth-child(3) .sico { background:rgba(255,170,0,.20); border-color:rgba(255,200,0,.28); }
-.settingBlock:nth-child(1) .settingsRow:nth-child(4) .sico { background:rgba(255,100,0,.18); border-color:rgba(255,140,0,.26); }
-.settingBlock:nth-child(1) .settingsRow:nth-child(5) .sico { background:rgba(0,180,255,.20); border-color:rgba(0,217,255,.28); }
-.settingBlock:nth-child(1) .settingsRow:nth-child(6) .sico { background:rgba(120,60,255,.22);border-color:rgba(160,100,255,.30);}
-.settingBlock:nth-child(1) .settingsRow:nth-child(7) .sico { background:rgba(255,60,60,.18); border-color:rgba(255,80,80,.26);  }
-.settingBlock:nth-child(2) .settingsRow:nth-child(1) .sico { background:rgba(0,200,160,.20); border-color:rgba(0,230,190,.28); }
-.settingBlock:nth-child(2) .settingsRow:nth-child(2) .sico { background:rgba(0,123,255,.22); border-color:rgba(0,160,255,.30); }
-.settingBlock:nth-child(4) .settingsRow .sico              { background:rgba(0,91,255,.18);  border-color:rgba(0,123,255,.25); }
 
-.stxt { flex:1; min-width:0; }
-.stxt b { display:block; font-size:15px; font-weight:800; color:var(--t1); }
-.stxt span { display:block; font-size:12px; color:var(--t3); margin-top:2px; }
 
-.settingSelect { width:100%; margin-top:10px; background:rgba(0,14,32,.85); border:1px solid var(--border); border-radius:12px; padding:12px 14px; color:var(--t1); outline:none; }
-.settingSelect:focus { border-color:var(--cyan); }
 
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -3316,26 +3298,7 @@ input[type=range]::-moz-range-thumb {
 }
 
 /* Bloques */
-#settings .settingBlock {
-  margin-bottom: 20px !important;
-}
-
-#settings .settingBlock > .label {
-  margin: 0 0 9px 4px !important;
-  padding: 0 !important;
-  font-size: 11.5px !important;
-  line-height: 1 !important;
-  font-weight: 950 !important;
-  letter-spacing: .85px !important;
-  color: #24EFFF !important;
-  text-shadow: 0 0 10px rgba(0, 217, 255, .22) !important;
-}
-
 /* Grid */
-#settings .settingsGrid {
-  gap: 9px !important;
-}
-
 /* Filas de ajustes */
 #settings .settingsRow {
   min-height: 76px !important;
@@ -3374,21 +3337,6 @@ input[type=range]::-moz-range-thumb {
 }
 
 /* Texto */
-#settings .stxt b {
-  font-size: 16px !important;
-  line-height: 1.15 !important;
-  font-weight: 900 !important;
-  letter-spacing: -.20px !important;
-  color: rgba(244, 248, 255, .98) !important;
-}
-
-#settings .stxt span {
-  margin-top: 4px !important;
-  font-size: 13.2px !important;
-  line-height: 1.35 !important;
-  color: rgba(190, 210, 230, .72) !important;
-}
-
 /* Flechas / indicadores derecha */
 #settings .settingsRow > div:last-child {
   font-size: 19px !important;
@@ -3418,52 +3366,9 @@ input[type=range]::-moz-range-thumb {
 }
 
 /* Select de autobloqueo inteligente */
-#settings .settingSelect {
-  height: 58px !important;
-  margin-top: 14px !important;
-  border-radius: 16px !important;
-  padding: 0 18px !important;
-  background: rgba(3, 13, 26, .88) !important;
-  border: 1px solid rgba(118, 178, 224, .16) !important;
-  color: #F4F8FF !important;
-  font-size: 16px !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025) !important;
-}
-
-#settings .settingSelect:focus {
-  border-color: rgba(0, 217, 255, .58) !important;
-  box-shadow: 0 0 0 3px rgba(0, 217, 255, .10) !important;
-}
-
 /* Caja de configuración especial */
-#settings .settingBlock .card {
-  border-radius: 22px !important;
-  padding: 18px 20px !important;
-  background:
-    linear-gradient(180deg, rgba(10, 30, 56, .90), rgba(5, 16, 34, .96)) !important;
-  border: 1px solid rgba(118, 178, 224, .14) !important;
-  box-shadow:
-    0 12px 28px rgba(0, 0, 0, .22),
-    inset 0 1px 0 rgba(255, 255, 255, .04) !important;
-}
-
-#settings .settingBlock .card b,
-#settings .settingBlock .card strong {
-  font-size: 17px !important;
-  line-height: 1.2 !important;
-  color: #F4F8FF !important;
-}
-
-#settings .settingBlock .card p,
-#settings .settingBlock .card .sub {
-  color: rgba(190, 210, 230, .72) !important;
-}
-
 /* Alertas dentro de ajustes */
-#settings .securityNote,
-#settings .settingBlock .danger,
-#settings .settingBlock [style*="red"],
-#settings .settingBlock [style*="#ff"] {
+#settings .securityNote {
   font-size: 12.2px !important;
   line-height: 1.35 !important;
 }
@@ -3476,34 +3381,6 @@ input[type=range]::-moz-range-thumb {
 }
 
 /* Zona de peligro */
-#settings .danger,
-#settings .settingsRow.danger,
-#settings .settingBlock:last-child .settingsRow,
-#settings .settingBlock:last-child .card {
-  background:
-    linear-gradient(135deg, rgba(58, 14, 28, .76), rgba(24, 8, 18, .94)) !important;
-  border-color: rgba(255, 90, 110, .34) !important;
-}
-
-#settings .settingBlock:last-child .label {
-  color: #24EFFF !important;
-}
-
-#settings .settingBlock:last-child .stxt b,
-#settings .settingBlock:last-child b {
-  color: #FF6F82 !important;
-}
-
-#settings .settingBlock:last-child button {
-  min-height: 54px !important;
-  border-radius: 17px !important;
-  font-size: 15px !important;
-  font-weight: 900 !important;
-  color: #FF6F82 !important;
-  background: rgba(255, 90, 110, .08) !important;
-  border: 1px solid rgba(255, 90, 110, .36) !important;
-}
-
 /* Ajuste en pantallas bajas */
 @media (max-height: 760px) {
   #settings .top {
@@ -3526,13 +3403,6 @@ input[type=range]::-moz-range-thumb {
     font-size: 22px !important;
   }
 
-  #settings .stxt b {
-    font-size: 15px !important;
-  }
-
-  #settings .stxt span {
-    font-size: 12.5px !important;
-  }
 }
 
 /* ==========================================================================
@@ -3547,85 +3417,12 @@ input[type=range]::-moz-range-thumb {
 }
 
 /* Seguridad */
-#settings .settingBlock:nth-of-type(1) .settingsRow:nth-child(1) .sico {
-  background: linear-gradient(135deg, rgba(0, 123, 255, .35), rgba(0, 36, 92, .72)) !important;
-  border-color: rgba(82, 180, 255, .34) !important;
-  color: #DDF3FF !important;
-}
-
-#settings .settingBlock:nth-of-type(1) .settingsRow:nth-child(2) .sico {
-  background: linear-gradient(135deg, rgba(0, 200, 160, .26), rgba(0, 62, 72, .72)) !important;
-  border-color: rgba(92, 255, 220, .30) !important;
-  color: #B9FFF0 !important;
-}
-
-#settings .settingBlock:nth-of-type(1) .settingsRow:nth-child(3) .sico,
-#settings .settingBlock:nth-of-type(1) .settingsRow:nth-child(4) .sico {
-  background: linear-gradient(135deg, rgba(255, 196, 65, .24), rgba(70, 48, 10, .76)) !important;
-  border-color: rgba(255, 216, 100, .30) !important;
-  color: #FFE7A3 !important;
-}
-
-#settings .settingBlock:nth-of-type(1) .settingsRow:nth-child(5) .sico {
-  background: linear-gradient(135deg, rgba(0, 217, 255, .24), rgba(0, 60, 110, .76)) !important;
-  border-color: rgba(0, 217, 255, .32) !important;
-  color: #BDEFFF !important;
-}
-
-#settings .settingBlock:nth-of-type(1) .settingsRow:nth-child(6) .sico {
-  background: linear-gradient(135deg, rgba(132, 92, 255, .26), rgba(44, 24, 100, .76)) !important;
-  border-color: rgba(172, 140, 255, .30) !important;
-  color: #DCD1FF !important;
-}
-
-#settings .settingBlock:nth-of-type(1) .settingsRow:nth-child(7) .sico {
-  background: linear-gradient(135deg, rgba(255, 90, 110, .24), rgba(70, 18, 32, .76)) !important;
-  border-color: rgba(255, 120, 140, .34) !important;
-  color: #FFD0D8 !important;
-}
-
 /* Respaldos */
-#settings .settingBlock:nth-of-type(2) .settingsRow .sico {
-  background: linear-gradient(135deg, rgba(0, 190, 165, .26), rgba(0, 54, 70, .78)) !important;
-  border-color: rgba(92, 255, 220, .26) !important;
-  color: #C7FFF2 !important;
-}
-
 /* Google Drive */
-#settings .settingBlock:nth-of-type(3) .settingsRow .sico {
-  background: linear-gradient(135deg, rgba(0, 132, 255, .28), rgba(0, 38, 90, .78)) !important;
-  border-color: rgba(110, 200, 255, .28) !important;
-  color: #DDF3FF !important;
-}
-
 /* Configuración */
-#settings .settingBlock:nth-of-type(4) .sico {
-  background: linear-gradient(135deg, rgba(0, 217, 255, .20), rgba(0, 52, 90, .74)) !important;
-  border-color: rgba(0, 217, 255, .25) !important;
-  color: #C8F6FF !important;
-}
-
 /* Preferencias */
-#settings .settingBlock:nth-of-type(5) .settingsRow .sico {
-  background: linear-gradient(135deg, rgba(92, 200, 255, .20), rgba(20, 42, 78, .78)) !important;
-  border-color: rgba(92, 200, 255, .22) !important;
-  color: #EAF7FF !important;
-}
-
 /* General */
-#settings .settingBlock:nth-of-type(6) .settingsRow .sico {
-  background: linear-gradient(135deg, rgba(210, 232, 255, .14), rgba(16, 34, 62, .80)) !important;
-  border-color: rgba(180, 220, 255, .18) !important;
-  color: #F4F8FF !important;
-}
-
 /* Zona de peligro */
-#settings .settingBlock:last-child .sico {
-  background: linear-gradient(135deg, rgba(255, 90, 110, .28), rgba(70, 18, 32, .82)) !important;
-  border-color: rgba(255, 120, 140, .40) !important;
-  color: #FFD0D8 !important;
-}
-
 /* FIX — Resaltado visible del tipo activo en Nueva entrada */
 #entryModal #entryTypeRow > button[style*="var(--cyan)"] {
   border: 2px solid var(--cyan) !important;
