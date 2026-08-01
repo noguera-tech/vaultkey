@@ -3957,14 +3957,6 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
 })();
 (function(){
   function normVK94(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();}
-  function isShieldVK94(v){return !v || !v.svg || String(v.bg||'').toLowerCase()==='#061a33' || String(v.svg||'').includes('vk128shield');}
-  function initialsVK94(label,id){
-    const raw=String(label||id||'').replace(/\+/g,' plus').trim();
-    const parts=raw.split(/\s+|\/|-/).filter(Boolean);
-    let txt=parts.length>=2 ? (parts[0][0]+parts[1][0]) : raw.slice(0,3);
-    txt=txt.replace(/[^a-zA-Z0-9+]/g,'').toUpperCase();
-    return txt || 'VK';
-  }
   const brandFixes=[
     ['datadog,datadog dd', vk128Icon('DD','#632CA6','#fff',18)],
     ['edge,microsoft edge', vk128Icon('e','#0078D7','#fff',27)],
