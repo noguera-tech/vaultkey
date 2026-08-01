@@ -328,11 +328,12 @@ function vkConfirm(title,msg,options){
     confirmResolver=resolve;
     $('confirmTitle').textContent=title;
     $('confirmMsg').textContent=msg;
-    modal.classList.remove('vk-confirm--reset','vk-confirm--wipe','vk-confirm--drive-disconnect','vk-confirm--drive-restore');
+    modal.classList.remove('vk-confirm--reset','vk-confirm--wipe','vk-confirm--drive-disconnect','vk-confirm--drive-restore','vk-confirm--delete-password');
     if(options.variant==='reset')modal.classList.add('vk-confirm--reset');
     if(options.variant==='wipe')modal.classList.add('vk-confirm--wipe');
     if(options.variant==='drive-disconnect')modal.classList.add('vk-confirm--drive-disconnect');
     if(options.variant==='drive-restore')modal.classList.add('vk-confirm--drive-restore');
+    if(options.variant==='delete-password')modal.classList.add('vk-confirm--delete-password');
     if(okButton)okButton.textContent=options.confirmText||'Aceptar';
     modal.classList.add('open');
   });
@@ -340,7 +341,7 @@ function vkConfirm(title,msg,options){
 function resolveConfirm(ok){
   const modal=$('confirmModal');
   const okButton=$('confirmOk');
-  modal.classList.remove('open','vk-confirm--reset','vk-confirm--wipe','vk-confirm--drive-disconnect','vk-confirm--drive-restore');
+  modal.classList.remove('open','vk-confirm--reset','vk-confirm--wipe','vk-confirm--drive-disconnect','vk-confirm--drive-restore','vk-confirm--delete-password');
   if(okButton)okButton.textContent='Aceptar';
   if(confirmResolver){confirmResolver(!!ok);confirmResolver=null;}
 }
@@ -3432,7 +3433,7 @@ function copyPasswordDetailUrl(){
 async function deletePasswordFromDetail(){
   if(!current)return;
   const id=current.id;
-  if(await vkConfirm('Eliminar contraseña','¿Eliminar esta contraseña de la bóveda?')){
+  if(await vkConfirm('¿Eliminar contraseña?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'})){
     vault=vault.filter(e=>e.id!==id);
     await persist();
     current=null;
