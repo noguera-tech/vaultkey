@@ -2130,15 +2130,6 @@ async function tryBio(){
   // Seguridad V2.3.1: no desbloquear la bóveda recuperando el PIN desde localStorage.
   toast('Biometría web desactivada por seguridad. Introduce tu PIN de VaultKey.');
 }
-function shareApp(){
-  const url=location.origin&&location.origin!=='null'?location.origin:location.href;
-  if(navigator.share){
-    window._vkSharing=true;
-    navigator.share({title:'VaultKey',text:'VaultKey - Tu bóveda digital privada',url})
-      .catch(()=>{})
-      .finally(()=>{setTimeout(()=>{window._vkSharing=false;},500);});
-  }else toast('Enlace de VaultKey: '+url)
-}
 /* Toque en la fila de versión → mostrar info de la bóveda */
 (function(){
   function initCategoryPagedCarousel(){
