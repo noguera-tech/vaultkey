@@ -989,12 +989,6 @@ input[type=range]::-moz-range-thumb {
 }
 
 
-#entryModal .label {
-  font-size: 9.8px !important;
-  margin-bottom: 4px !important;
-  letter-spacing: .48px !important;
-  color: rgba(143,215,255,.86) !important;
-}
 
 #entryModal .inp,
 #entryModal .txt,
