@@ -2828,6 +2828,34 @@ button.vk-security-card:active { background: #243246; }
   overflow-wrap:anywhere;
 }
 
+.vk-note-detail-copy-row {
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+}
+
+.vk-note-detail-copy-row .vk-note-detail-text {
+  flex:1;
+  min-width:0;
+}
+
+.vk-note-detail-copy {
+  width:32px;
+  height:32px;
+  margin-top:2px;
+  padding:0;
+  border:0;
+  background:transparent;
+  display:grid;
+  place-items:center;
+  flex-shrink:0;
+}
+
+.vk-note-detail-copy svg {
+  width:24px;
+  height:24px;
+}
+
 .vk-note-detail-date {
   margin-top:24px;
   color:#A7B6C9;
