@@ -991,11 +991,6 @@ input[type=range]::-moz-range-thumb {
 
 
 
-#entryModal textarea.inp,
-#entryModal .txt {
-  min-height: 72px !important;
-  line-height: 1.42 !important;
-}
 
 #fieldPass .sub,
 #strTxt {
