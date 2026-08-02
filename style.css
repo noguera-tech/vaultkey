@@ -903,11 +903,6 @@ input[type=range]::-moz-range-thumb {
   opacity: .75 !important;
 }
 
-/* 2) Nueva entrada: layout más limpio y notablemente más compacto */
-#entryModal .sheet {
-  padding: 0 12px calc(20px + env(safe-area-inset-bottom,0px)) !important;
-  background: linear-gradient(180deg, #071426 0%, #050e1c 54%, #030812 100%) !important;
-}
 
 .entryTargetHead {
   height: 48px !important;
