@@ -980,19 +980,7 @@ input[type=range]::-moz-range-thumb {
 }
 
 .vkStripIconBtn {
-  width: 42px !important;
-  height: 42px !important;
-  border-radius: 11px !important;
   padding: 2px !important;
-  margin-right: 4px !important;
-  background: rgba(9,27,50,.80) !important;
-}
-
-.vkStripIconBtn svg,
-.vkStripIconBtn img {
-  width: 36px !important;
-  height: 36px !important;
-  border-radius: 9px !important;
 }
 
 #eIconSearch {
