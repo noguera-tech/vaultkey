@@ -3096,8 +3096,7 @@ async function savePasswordEdit(){
   await persist();
 
   render();
-  renderPasswordDetail();
-  show('passwordDetail','left');
+  show('passwords','left');
   toast('Cambios guardados');
 
   try{driveAutoSync();}catch(error){}
