@@ -990,16 +990,6 @@ input[type=range]::-moz-range-thumb {
 
 
 
-#entryModal .inp,
-#entryModal .txt,
-#entryModal select,
-#entryModal textarea {
-  min-height: 36px !important;
-  padding: 8px 10px !important;
-  border-radius: 10px !important;
-  font-size: 13.5px !important;
-  background: rgba(5,14,28,.86) !important;
-}
 
 #entryModal textarea.inp,
 #entryModal .txt {
