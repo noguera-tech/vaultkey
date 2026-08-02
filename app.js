@@ -5860,7 +5860,7 @@ try {
     cardsWrite(cards);
     updateCardsCount();
     if(typeof window.toast==='function')window.toast('Tarjeta guardada','ok');
-    if(id===window.__vkCurrentCardId)window.showCardDetail(id);else window.showCards('left');
+    window.showCards('left');
     return true;
   };
 
