@@ -916,26 +916,26 @@ body.vk-lock { overflow: hidden; }
 
 .vk-unlock:not(.vk-unlock--master) .vk-unlock__keypad {
   position: absolute;
-  top: 420px;
+  top: 426px;
   left: 50%;
   display: grid;
-  grid-template-columns: repeat(3, 50px);
-  gap: 20.6667px 25.5px;
-  width: 201px;
-  height: 262px;
+  grid-template-columns: repeat(3, 56px);
+  gap: 21px 32px;
+  width: 232px;
+  height: 287px;
   margin: 0;
   transform: translateX(-50%);
 }
 
 .vk-unlock:not(.vk-unlock--master) .vk-unlock__key {
-  width: 50px;
-  height: 50px;
+  width: 56px;
+  height: 56px;
   border: 0;
   border-radius: 50%;
   background: var(--vk-r1-neutral-light);
   color: var(--vk-r1-accent);
   font-family: var(--vk-r1-font-family);
-  font-size: 32px;
+  font-size: 35px;
   font-weight: 400;
   line-height: 1;
 }
@@ -957,7 +957,7 @@ body.vk-lock { overflow: hidden; }
 
 .vk-unlock:not(.vk-unlock--master) .vk-unlock__actions {
   position: absolute;
-  top: 694px;
+  top: 741px;
   left: 50%;
   width: 320px;
   margin: 0;
