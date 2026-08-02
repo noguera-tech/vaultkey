@@ -4103,7 +4103,7 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     splash.style.setProperty('--vk-splash-scale',String(scale));
   }
   function updatePinScale(){
-    const scale=Math.min(1,(window.innerHeight-28)/917);
+    const scale=Math.min(1,window.innerWidth/412,window.innerHeight/917);
     document.documentElement.style.setProperty('--vk-pin-scale',String(scale));
   }
   updatePinScale();
