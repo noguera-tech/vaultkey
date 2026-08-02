@@ -916,11 +916,11 @@ body.vk-lock { overflow: hidden; }
 
 .vk-unlock:not(.vk-unlock--master) .vk-unlock__keypad {
   position: absolute;
-  top: 420px;
+  top: 451px;
   left: 50%;
   display: grid;
   grid-template-columns: repeat(3, 50px);
-  gap: 20.6667px 25.5px;
+  gap: 20px 25.5px;
   width: 201px;
   height: 262px;
   margin: 0;
@@ -957,7 +957,7 @@ body.vk-lock { overflow: hidden; }
 
 .vk-unlock:not(.vk-unlock--master) .vk-unlock__actions {
   position: absolute;
-  top: 694px;
+  top: 741px;
   left: 50%;
   width: 320px;
   margin: 0;
