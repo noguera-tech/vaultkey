@@ -5564,7 +5564,7 @@ try {
     notesWrite(notes);
     updateNotesCount();
     if(typeof window.toast==='function')window.toast(id===window.__vkCurrentNoteId?'Nota guardada':'Nota creada','ok');
-    window.showNoteDetail(id);
+    if(id===window.__vkCurrentNoteId)window.showNoteDetail(id);else window.showNotes('left');
     return true;
   };
 
