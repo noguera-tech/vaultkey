@@ -737,10 +737,7 @@ input[type=range]::-moz-range-thumb {
   background:rgba(0,35,80,.95);
   border-color:var(--cyan);
 }
-/* Sheet del formulario de entrada — fondo ligeramente más claro */
-#entryModal .sheet {
-  background:linear-gradient(180deg, rgba(0,18,48,.98) 0%, rgba(0,12,32,.99) 100%);
-}
+
 /* Texto de selects más visible */
 #fieldMedical select, #fieldCard select,
 #fieldId select, #fieldLicense select, #fieldWifi select {
