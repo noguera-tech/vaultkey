@@ -5567,11 +5567,11 @@ try {
     return true;
   };
 
-  window.deleteNote=function(id){
+  window.deleteNote=async function(id){
     var note=notesRead().find(function(item){return item.id===id;});
     if(!note)return;
 
-    if(!window.confirm('¿Eliminar la nota "'+(note.title||'Sin título')+'"?'))return;
+    if(!await vkConfirm('¿Eliminar nota?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'}))return;
 
     notesWrite(notesRead().filter(function(item){return item.id!==id;}));
     window.__vkCurrentNoteId=null;
@@ -5863,14 +5863,14 @@ try {
     return true;
   };
 
-  window.deleteCard=function(id){
+  window.deleteCard=async function(id){
     var card=cardsRead().find(function(item){return item.id===id;});
     if(!card){
       window.showCards('left');
       return;
     }
 
-    if(!window.confirm('¿Eliminar la tarjeta de "'+(card.holder||'Sin titular')+'"?'))return;
+    if(!await vkConfirm('¿Eliminar tarjeta?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'}))return;
 
     cardsWrite(cardsRead().filter(function(item){return item.id!==id;}));
     window.__vkCurrentCardId=null;
@@ -6045,7 +6045,7 @@ window.openCreateDocumentForm=function(){if(!image||!category){toast('Selecciona
 window.openEditDocument=function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;editingId=d.id;category=d.category;image=d.image;window.__vkCurrentDocumentId=d.id;document.getElementById('documentEditImage').src=d.image;document.getElementById('documentEditName').value=d.name||'';document.getElementById('documentEditExpiry').value=d.expiry||'';document.getElementById('documentEditIssuedBy').value=d.issuedBy||'';document.getElementById('documentEditCountry').value=d.country||'';visual('documentEdit',d.category);var more=!!(d.issuedBy||d.country);document.getElementById('documentEditMore').hidden=!more;document.getElementById('documentEditMoreButton').textContent=more?'− Menos información':'+ Más información';show('documentEdit','right');};
 window.openDocumentEditSource=function(){if(editingId)modal('documentSourceSheet',true);};
 window.saveDocument=function(docId,name,expiry,issuedBy,country){name=String(name||'').trim();expiry=String(expiry||'').trim();issuedBy=String(issuedBy||'').trim();country=String(country||'').trim();if(!name){toast('El nombre es obligatorio','err');document.getElementById(docId?'documentEditName':'documentCreateName')?.focus();return false;}if(!image||!image.startsWith('data:image/')){toast('Falta una imagen válida del documento','err');return false;}var items=read(),now=Date.now();if(docId){var i=items.findIndex(function(x){return x.id===docId;});if(i<0){showDocuments('left');return false;}items[i]=Object.assign({},items[i],{category:category||items[i].category,name:name,image:image,expiry:expiry,issuedBy:issuedBy,country:country,updatedAt:now});}else{docId=id();items.push({id:docId,category:category,name:name,image:image,expiry:expiry,issuedBy:issuedBy,country:country,createdAt:now,updatedAt:now});}write(items);count();editingId=null;toast('Documento guardado','ok');showDocuments('left');return true;};
-window.deleteDocument=function(docId){var d=read().find(function(x){return x.id===docId;});if(!d){showDocuments('left');return;}if(!confirm('¿Eliminar el documento "'+(d.name||label(d.category))+'"?'))return;write(read().filter(function(x){return x.id!==docId;}));window.__vkCurrentDocumentId=null;editingId=null;image='';category='';count();toast('Documento eliminado','ok');showDocuments('left');};
+window.deleteDocument=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d){showDocuments('left');return;}if(!await vkConfirm('¿Eliminar documento?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'}))return;write(read().filter(function(x){return x.id!==docId;}));window.__vkCurrentDocumentId=null;editingId=null;image='';category='';count();toast('Documento eliminado','ok');showDocuments('left');};
 window.viewDocumentImage=function(docId){var d=read().find(function(x){return x.id===docId;});if(!d||!d.image)return;var w=window.open('','_blank');if(!w){toast('El navegador bloqueó la vista del documento','err');return;}w.document.write('<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(d.name||'Documento')+'</title><style>html,body{margin:0;min-height:100%;background:#111827;display:grid;place-items:center}img{max-width:100%;max-height:100vh;object-fit:contain}</style></head><body><img src="'+d.image.replace(/"/g,'&quot;')+'"></body></html>');w.document.close();};
 window.toggleDocumentMoreInfo=function(prefix){var b=document.getElementById(prefix+'More'),a=document.getElementById(prefix+'MoreButton');if(!b)return;b.hidden=!b.hidden;if(a)a.textContent=b.hidden?'+ Más información':'− Menos información';};
 document.addEventListener('click',function(e){var r=e.target.closest&&e.target.closest('.vk-document-row[data-document-id]');if(r)showDocumentDetail(r.getAttribute('data-document-id'));});
