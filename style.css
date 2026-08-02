@@ -973,14 +973,6 @@ input[type=range]::-moz-range-thumb {
   color: #F4F7FB !important;
 }
 
-/* 3) Barra de iconos: más baja, menos protagonista */
-#entryModal .sheet > div:has(#iconStripRow) {
-  margin-bottom: 8px !important;
-  padding: 8px 9px 7px !important;
-  border: 1px solid rgba(132,178,220,.12) !important;
-  border-radius: 15px !important;
-  background: rgba(7,20,38,.70) !important;
-}
 
 #iconStripRow {
   padding: 2px 0 6px !important;
