@@ -2648,6 +2648,22 @@ body.vk-lock { overflow: hidden; }
   overscroll-behavior: contain;
 }
 
+.vk-health-footer {
+  flex: 0 0 auto;
+  padding: 12px 18px max(14px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--vk-r1-border-soft);
+  background: rgba(36,50,70,.96);
+}
+
+.vk-health-cancel {
+  display: block;
+  width: min(100%, 174px);
+  min-height: 42px;
+  margin: 0 auto;
+  color: var(--vk-r1-text);
+  background: transparent;
+}
+
 .vk-health-loading {
   padding: 28px 12px;
   color: var(--vk-r1-text-tertiary);

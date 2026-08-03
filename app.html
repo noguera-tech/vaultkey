@@ -4260,12 +4260,14 @@ if(typeof legacyHandleVisibilityChange==="function"){
   <div class="sheet vk-health-sheet">
     <div class="sheetHead vk-health-head">
       <div id="healthModalTitle" class="sheetTitle">Estado de tu bóveda</div>
-      <div class="spacer"></div>
-      <button type="button" class="iconBtn" aria-label="Cerrar Estado de salud" onclick="closeModals()">✕</button>
     </div>
 
     <div id="healthContent" class="vk-health-content" aria-live="polite">
       <div class="vk-health-loading">Analizando...</div>
+    </div>
+
+    <div class="vk-health-footer">
+      <button type="button" class="ghost vk-health-cancel" onclick="closeModals()">Cancelar</button>
     </div>
   </div>
 </div>
