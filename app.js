@@ -5521,9 +5521,7 @@ function healthPanelDetail(title,reason,level){
 
 function healthPanelArea(title,body){
   return '<section class="vk-health-area">'+
-    '<div class="vk-health-area__head">'+
-      '<h3>'+safeEsc(title)+'</h3>'+
-    '</div>'+
+    '<h3 class="vk-health-area__title">'+safeEsc(title)+'</h3>'+
     body+
   '</section>';
 }
@@ -5543,19 +5541,20 @@ function renderHealthPanel(){
   try{
     const report=buildVaultHealthReport();
     const passwordCounts=report.security.passwords.counts;
+    const passwordIssues=passwordCounts.attention+passwordCounts.risk;
     const maintenanceIssues=report.maintenance.items.filter(
       item=>item.level==='attention'||item.level==='risk'
     ).length;
 
     const securityBody=
-      '<div class="vk-health-metrics">'+
+      '<div class="vk-health-metrics vk-health-metrics--two">'+
         healthPanelMetric('Contrase\u00f1as',passwordCounts.total)+
-        healthPanelMetric('A revisar',passwordCounts.attention+passwordCounts.risk)+
+        healthPanelMetric('A revisar',passwordIssues)+
       '</div>'+
       healthPanelDetail(
         'Contrase\u00f1as y secretos',
         passwordCounts.total
-          ?passwordCounts.risk+' en riesgo y '+passwordCounts.attention+' pendientes.'
+          ?passwordCounts.risk+' en riesgo y '+passwordCounts.attention+' que necesitan atenci\u00f3n.'
           :'Todav\u00eda no hay secretos guardados para analizar.',
         report.security.passwords.level
       )+
@@ -5591,7 +5590,7 @@ function renderHealthPanel(){
       );
 
     const maintenanceBody=
-      '<div class="vk-health-metrics">'+
+      '<div class="vk-health-metrics vk-health-metrics--three">'+
         healthPanelMetric('Tarjetas',report.maintenance.cards.length)+
         healthPanelMetric('Documentos',report.maintenance.documents.length)+
         healthPanelMetric('A revisar',maintenanceIssues)+
@@ -5606,13 +5605,13 @@ function renderHealthPanel(){
 
     element.innerHTML=
       '<section class="vk-health-overview" data-health-level="'+safeEsc(report.level)+'">'+
-        '<div class="vk-health-overview__head">'+
+        '<div class="vk-health-overview__row">'+
           '<svg class="vk-health-overview__shield" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1.5c3.4 2.8 6.6 4.1 10 4.1v8.2c0 6-4.3 9.9-10 12.7C6.3 23.7 2 19.8 2 13.8V5.6c3.4 0 6.6-1.3 10-4.1Z"/></svg>'+
-          '<span class="vk-health-overview__eyebrow">Estado general</span>'+
+          healthPanelStatus(report.level)+
+          '<svg class="vk-health-overview__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>'+
         '</div>'+
-        healthPanelStatus(report.level)+
-        '<p>'+safeEsc(report.summary)+'</p>'+
-        '<strong>'+safeEsc(healthDashboardActionText(report))+'</strong>'+
+        '<p class="vk-health-overview__summary">'+safeEsc(report.summary)+'</p>'+
+        '<p class="vk-health-overview__action">'+safeEsc(healthDashboardActionText(report))+'</p>'+
       '</section>'+
       '<div class="vk-health-areas">'+
         healthPanelArea('Seguridad',securityBody)+
