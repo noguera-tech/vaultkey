@@ -2617,6 +2617,7 @@ body.vk-lock { overflow: hidden; }
 }
 
 .vk-health-modal {
+  z-index: 1100;
   align-items: flex-end;
 }
 
