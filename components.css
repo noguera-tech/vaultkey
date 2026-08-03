@@ -2601,13 +2601,7 @@ body.vk-lock { overflow: hidden; }
   background: #ef4444;
 }
 
-.vk-dash-status[data-health-level="attention"] {
-  border-color: rgba(245,158,11,.38);
-}
 
-.vk-dash-status[data-health-level="risk"] {
-  border-color: rgba(239,68,68,.42);
-}
 
 @keyframes vk-health-shield-breathe {
   0%,
