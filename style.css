@@ -3553,3 +3553,51 @@ button.vk-security-card:active { background: #243246; }
 @media(max-height:760px){.vk-documents-search{margin-top:24px}.vk-documents-list{gap:12px}.vk-document-preview-content>p{margin-top:20px}.vk-document-preview-image{height:360px}.vk-document-source-sheet{min-height:430px}}
 @media(max-width:370px){.vk-document-type-grid{gap:12px}.vk-document-form-card,.vk-document-detail-card{padding-left:16px;padding-right:16px}.vk-document-detail-actions{margin-left:0;margin-right:0}}
 
+
+/* Scroll visible en campos de notas */
+.vk-note-field textarea,
+.vk-password-create-textarea,
+.vk-password-edit-field textarea,
+.vk-card-note-field textarea,
+#eSecureNote,
+#eMedNotes,
+#eNote {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color:
+    rgba(96, 165, 250, .9)
+    rgba(255, 255, 255, .08);
+}
+
+.vk-note-field textarea::-webkit-scrollbar,
+.vk-password-create-textarea::-webkit-scrollbar,
+.vk-password-edit-field textarea::-webkit-scrollbar,
+.vk-card-note-field textarea::-webkit-scrollbar,
+#eSecureNote::-webkit-scrollbar,
+#eMedNotes::-webkit-scrollbar,
+#eNote::-webkit-scrollbar {
+  width: 8px;
+}
+
+.vk-note-field textarea::-webkit-scrollbar-track,
+.vk-password-create-textarea::-webkit-scrollbar-track,
+.vk-password-edit-field textarea::-webkit-scrollbar-track,
+.vk-card-note-field textarea::-webkit-scrollbar-track,
+#eSecureNote::-webkit-scrollbar-track,
+#eMedNotes::-webkit-scrollbar-track,
+#eNote::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, .08);
+  border-radius: 999px;
+}
+
+.vk-note-field textarea::-webkit-scrollbar-thumb,
+.vk-password-create-textarea::-webkit-scrollbar-thumb,
+.vk-password-edit-field textarea::-webkit-scrollbar-thumb,
+.vk-card-note-field textarea::-webkit-scrollbar-thumb,
+#eSecureNote::-webkit-scrollbar-thumb,
+#eMedNotes::-webkit-scrollbar-thumb,
+#eNote::-webkit-scrollbar-thumb {
+  background: rgba(96, 165, 250, .9);
+  border: 2px solid #243246;
+  border-radius: 999px;
+}
