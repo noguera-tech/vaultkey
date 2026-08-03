@@ -5177,6 +5177,263 @@ function healthAnalyzeMaintenance(cards,documents,now=Date.now()){
   };
 }
 
+const VK_HEALTH_LEVEL_META={
+  protected:{
+    label:'Protegida',
+    short:'Todo está correctamente protegido.'
+  },
+  good:{
+    label:'Buena',
+    short:'La bóveda está bien, con mejoras preventivas.'
+  },
+  attention:{
+    label:'Necesita atención',
+    short:'Hay elementos que conviene revisar.'
+  },
+  risk:{
+    label:'En riesgo',
+    short:'Hay problemas importantes que requieren revisión.'
+  }
+};
+
+function healthReadLocalSecurity(){
+  let mode='legacy';
+  let hasVault=false;
+  let pinConfigured=false;
+  let onboardingDone=false;
+  let autolockOption='';
+  let legacyMeta=null;
+
+  try{
+    if(window.vkStore&&
+       typeof window.vkStore.hasVault==='function'&&
+       window.vkStore.hasVault()){
+      mode='vk2';
+      hasVault=true;
+      pinConfigured=typeof window.vkStore.hasPinWrap==='function'
+        ?window.vkStore.hasPinWrap()
+        :false;
+
+      const storeMeta=typeof window.vkStore.getMeta==='function'
+        ?window.vkStore.getMeta()
+        :{};
+
+      onboardingDone=storeMeta?.onboardingDone===true;
+      autolockOption=String(storeMeta?.autolockOption||'');
+    }
+  }catch(error){}
+
+  if(mode==='legacy'){
+    try{
+      legacyMeta=typeof meta==='function'?meta():null;
+    }catch(error){
+      legacyMeta=null;
+    }
+
+    hasVault=!!legacyMeta;
+    pinConfigured=!!(
+      legacyMeta&&
+      typeof legacyMeta.hash==='string'&&legacyMeta.hash&&
+      typeof legacyMeta.pinSalt==='string'&&legacyMeta.pinSalt
+    );
+
+    const autoLockMs=legacyMeta&&
+      Object.prototype.hasOwnProperty.call(legacyMeta,'autoLockMs')
+      ?Number(legacyMeta.autoLockMs)
+      :NaN;
+
+    if(autoLockMs===0)autolockOption='immediate';
+    else if(autoLockMs>0&&autoLockMs<=30000)autolockOption='30s';
+    else if(autoLockMs>30000&&autoLockMs<=60000)autolockOption='1m';
+    else if(autoLockMs>60000&&autoLockMs<=300000)autolockOption='5m';
+  }
+
+  const pin={
+    configured:pinConfigured,
+    level:pinConfigured?'protected':'risk',
+    reason:pinConfigured
+      ?'El acceso mediante PIN está configurado.'
+      :'No se ha podido confirmar un PIN configurado.'
+  };
+
+  let autolock;
+
+  if(autolockOption==='immediate'||autolockOption==='30s'){
+    autolock={
+      option:autolockOption,
+      level:'protected',
+      reason:autolockOption==='immediate'
+        ?'La bóveda se bloquea inmediatamente al salir.'
+        :'La bóveda se bloquea tras 30 segundos.'
+    };
+  }else if(autolockOption==='1m'||autolockOption==='5m'){
+    autolock={
+      option:autolockOption,
+      level:'good',
+      reason:autolockOption==='1m'
+        ?'La bóveda se bloquea tras 1 minuto.'
+        :'La bóveda se bloquea tras 5 minutos.'
+    };
+  }else{
+    autolock={
+      option:autolockOption,
+      level:'attention',
+      reason:'No se ha podido confirmar una configuración de autobloqueo válida.'
+    };
+  }
+
+  return {
+    mode,
+    hasVault,
+    onboardingDone,
+    pin,
+    autolock,
+    level:healthWorstLevel([pin,autolock],'protected')
+  };
+}
+
+function healthReadContinuity(now=Date.now()){
+  const rawLastSync=localStorage.getItem('vk_drive_last_sync');
+  const lastSync=Number(rawLastSync);
+  const validLastSync=Number.isFinite(lastSync)&&lastSync>0&&lastSync<=now;
+  const ageDays=validLastSync?Math.floor((now-lastSync)/864e5):null;
+
+  let backup;
+
+  if(!validLastSync){
+    backup={
+      level:'risk',
+      lastSync:0,
+      ageDays:null,
+      reason:'Nunca se ha confirmado un respaldo en Google Drive.'
+    };
+  }else if(ageDays<=7){
+    backup={
+      level:'protected',
+      lastSync,
+      ageDays,
+      reason:'Existe un respaldo confirmado de los últimos 7 días.'
+    };
+  }else if(ageDays<=30){
+    backup={
+      level:'good',
+      lastSync,
+      ageDays,
+      reason:'Existe un respaldo confirmado de los últimos 30 días.'
+    };
+  }else{
+    backup={
+      level:'attention',
+      lastSync,
+      ageDays,
+      reason:'El último respaldo confirmado tiene más de 30 días.'
+    };
+  }
+
+  let kitConfigured=false;
+
+  try{
+    if(window.vkStore&&
+       typeof window.vkStore.hasVault==='function'&&
+       typeof window.vkStore.hasPinWrap==='function'&&
+       typeof window.vkStore.getMeta==='function'){
+      const storeMeta=window.vkStore.getMeta();
+
+      kitConfigured=
+        window.vkStore.hasVault()&&
+        window.vkStore.hasPinWrap()&&
+        storeMeta?.onboardingDone===true;
+    }
+  }catch(error){}
+
+  const kit={
+    configured:kitConfigured,
+    level:kitConfigured?'good':'attention',
+    reason:kitConfigured
+      ?'El kit de emergencia fue configurado durante el alta.'
+      :'No se ha podido confirmar un kit de emergencia configurado.'
+  };
+
+  return {
+    level:backup.level,
+    backup,
+    kit
+  };
+}
+
+function healthCountActions(security,continuity,maintenance){
+  const securityItems=[
+    ...security.passwords.items,
+    security.local.pin,
+    security.local.autolock
+  ];
+
+  const continuityItems=[
+    continuity.backup,
+    continuity.kit
+  ];
+
+  const maintenanceItems=maintenance.items;
+
+  return [...securityItems,...continuityItems,...maintenanceItems]
+    .filter(item=>item.level==='attention'||item.level==='risk')
+    .length;
+}
+
+function buildVaultHealthReport(now=Date.now()){
+  const passwords=healthReadPasswords();
+  const cards=healthReadCards();
+  const documents=healthReadDocuments();
+
+  const passwordAnalysis=healthAnalyzePasswords(passwords);
+  const localSecurity=healthReadLocalSecurity();
+  const maintenance=healthAnalyzeMaintenance(cards,documents,now);
+  const continuity=healthReadContinuity(now);
+
+  const security={
+    level:healthWorstLevel(
+      [
+        {level:passwordAnalysis.level},
+        {level:localSecurity.level}
+      ],
+      'protected'
+    ),
+    passwords:passwordAnalysis,
+    local:localSecurity
+  };
+
+  const overallLevel=healthWorstLevel(
+    [
+      {level:security.level},
+      {level:continuity.level},
+      {level:maintenance.level}
+    ],
+    'protected'
+  );
+
+  const actionCount=healthCountActions(
+    security,
+    continuity,
+    maintenance
+  );
+
+  return {
+    generatedAt:now,
+    level:overallLevel,
+    label:VK_HEALTH_LEVEL_META[overallLevel].label,
+    summary:VK_HEALTH_LEVEL_META[overallLevel].short,
+    actionCount,
+    security,
+    continuity,
+    maintenance,
+    sources:{
+      passwords:passwords.length,
+      cards:cards.length,
+      documents:documents.length
+    }
+  };
+}
+
 function showHealthPanel(){
   if(!vault||!vault.length){
     toast('No hay entradas en la bóveda');return;
