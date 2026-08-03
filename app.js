@@ -5608,7 +5608,6 @@ function renderHealthPanel(){
         '<div class="vk-health-overview__row">'+
           '<svg class="vk-health-overview__shield" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1.5c3.4 2.8 6.6 4.1 10 4.1v8.2c0 6-4.3 9.9-10 12.7C6.3 23.7 2 19.8 2 13.8V5.6c3.4 0 6.6-1.3 10-4.1Z"/></svg>'+
           healthPanelStatus(report.level)+
-          '<svg class="vk-health-overview__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>'+
         '</div>'+
         '<p class="vk-health-overview__summary">'+safeEsc(report.summary)+'</p>'+
         '<p class="vk-health-overview__action">'+safeEsc(healthDashboardActionText(report))+'</p>'+
