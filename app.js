@@ -5519,11 +5519,10 @@ function healthPanelDetail(title,reason,level){
   '</div>';
 }
 
-function healthPanelArea(title,level,body){
-  return '<section class="vk-health-area" data-health-level="'+safeEsc(level)+'">'+
+function healthPanelArea(title,body){
+  return '<section class="vk-health-area">'+
     '<div class="vk-health-area__head">'+
       '<h3>'+safeEsc(title)+'</h3>'+
-      healthPanelStatus(level)+
     '</div>'+
     body+
   '</section>';
@@ -5550,36 +5549,44 @@ function renderHealthPanel(){
 
     const securityBody=
       '<div class="vk-health-metrics">'+
-        healthPanelMetric('Secretos',passwordCounts.total)+
+        healthPanelMetric('Contrase\u00f1as',passwordCounts.total)+
         healthPanelMetric('A revisar',passwordCounts.attention+passwordCounts.risk)+
       '</div>'+
       healthPanelDetail(
-        'Contraseñas y secretos',
+        'Contrase\u00f1as y secretos',
         passwordCounts.total
-          ?passwordCounts.risk+' en riesgo y '+passwordCounts.attention+' que necesitan atención.'
-          :'Todavía no hay secretos guardados para analizar.',
+          ?passwordCounts.risk+' en riesgo y '+passwordCounts.attention+' pendientes.'
+          :'Todav\u00eda no hay secretos guardados para analizar.',
         report.security.passwords.level
       )+
       healthPanelDetail(
         'Acceso mediante PIN',
-        report.security.local.pin.reason,
+        report.security.local.pin.level==='protected'
+          ?'PIN configurado correctamente.'
+          :report.security.local.pin.reason,
         report.security.local.pin.level
       )+
       healthPanelDetail(
         'Autobloqueo',
-        report.security.local.autolock.reason,
+        report.security.local.autolock.level==='protected'
+          ?'Bloqueo autom\u00e1tico activo.'
+          :report.security.local.autolock.reason,
         report.security.local.autolock.level
       );
 
     const continuityBody=
       healthPanelDetail(
         'Respaldo en Google Drive',
-        report.continuity.backup.reason,
+        report.continuity.backup.level==='risk'
+          ?'No hay ninguna copia de seguridad configurada.'
+          :report.continuity.backup.reason,
         report.continuity.backup.level
       )+
       healthPanelDetail(
         'Kit de emergencia',
-        report.continuity.kit.reason,
+        report.continuity.kit.level==='good'||report.continuity.kit.level==='protected'
+          ?'Kit de recuperaci\u00f3n disponible.'
+          :report.continuity.kit.reason,
         report.continuity.kit.level
       );
 
@@ -5589,43 +5596,35 @@ function renderHealthPanel(){
         healthPanelMetric('Documentos',report.maintenance.documents.length)+
         healthPanelMetric('A revisar',maintenanceIssues)+
       '</div>'+
-      (
-        report.maintenance.items.length
-          ?healthPanelDetail(
-            'Caducidades',
-            maintenanceIssues
-              ?maintenanceIssues+' elemento'+(maintenanceIssues===1?'':'s')+' requiere'+(maintenanceIssues===1?'':'n')+' revisión.'
-              :'No hay caducidades que requieran revisión.',
-            report.maintenance.level
-          )
-          :healthPanelDetail(
-            'Caducidades',
-            'Todavía no hay tarjetas ni documentos que analizar.',
-            'good'
-          )
+      healthPanelDetail(
+        'Caducidades',
+        maintenanceIssues
+          ?maintenanceIssues+' elemento'+(maintenanceIssues===1?'':'s')+' requiere'+(maintenanceIssues===1?'':'n')+' revisi\u00f3n.'
+          :'No hay caducidades pendientes.',
+        report.maintenance.level
       );
 
     element.innerHTML=
       '<section class="vk-health-overview" data-health-level="'+safeEsc(report.level)+'">'+
-        '<div class="vk-health-overview__shield" aria-hidden="true">◇</div>'+
-        '<div class="vk-health-overview__copy">'+
+        '<div class="vk-health-overview__head">'+
+          '<svg class="vk-health-overview__shield" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1.5c3.4 2.8 6.6 4.1 10 4.1v8.2c0 6-4.3 9.9-10 12.7C6.3 23.7 2 19.8 2 13.8V5.6c3.4 0 6.6-1.3 10-4.1Z"/></svg>'+
           '<span class="vk-health-overview__eyebrow">Estado general</span>'+
-          '<h2>'+safeEsc(report.label)+'</h2>'+
-          '<p>'+safeEsc(report.summary)+'</p>'+
-          '<strong>'+safeEsc(healthDashboardActionText(report))+'</strong>'+
         '</div>'+
+        healthPanelStatus(report.level)+
+        '<p>'+safeEsc(report.summary)+'</p>'+
+        '<strong>'+safeEsc(healthDashboardActionText(report))+'</strong>'+
       '</section>'+
       '<div class="vk-health-areas">'+
-        healthPanelArea('Seguridad',report.security.level,securityBody)+
-        healthPanelArea('Continuidad',report.continuity.level,continuityBody)+
-        healthPanelArea('Mantenimiento',report.maintenance.level,maintenanceBody)+
+        healthPanelArea('Seguridad',securityBody)+
+        healthPanelArea('Continuidad',continuityBody)+
+        healthPanelArea('Mantenimiento',maintenanceBody)+
       '</div>';
   }catch(error){
     console.warn('Vault health panel:',error);
 
     element.innerHTML=
       '<div class="vk-health-error">'+
-        '<strong>No se ha podido completar el análisis.</strong>'+
+        '<strong>No se ha podido completar el an\u00e1lisis.</strong>'+
         '<p>Cierra el panel y vuelve a intentarlo.</p>'+
       '</div>';
   }
