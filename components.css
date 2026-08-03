@@ -2665,76 +2665,51 @@ body.vk-lock { overflow: hidden; }
 }
 
 .vk-health-overview {
-  display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
-  gap: 14px;
   padding: 18px;
   border: 1px solid var(--vk-r1-border-soft);
-  border-radius: 18px;
+  border-radius: 20px;
   background: rgba(36,50,70,.72);
 }
 
+.vk-health-overview__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .vk-health-overview__shield {
-  width: 52px;
-  height: 52px;
-  display: grid;
-  place-items: center;
-  border-radius: 16px;
-  background: rgba(59,130,246,.14);
-  color: #3b82f6;
-  font-size: 30px;
-  line-height: 1;
-}
-
-.vk-health-overview[data-health-level="protected"] .vk-health-overview__shield {
-  background: rgba(34,197,94,.14);
-  color: var(--vk-success);
-}
-
-.vk-health-overview[data-health-level="attention"] .vk-health-overview__shield {
-  background: rgba(245,158,11,.14);
-  color: #f59e0b;
-}
-
-.vk-health-overview[data-health-level="risk"] .vk-health-overview__shield {
-  background: rgba(239,68,68,.14);
-  color: #ef4444;
-}
-
-.vk-health-overview__copy {
-  min-width: 0;
+  width: 28px;
+  height: 33px;
+  flex: none;
+  color: var(--vk-r1-accent);
 }
 
 .vk-health-overview__eyebrow {
-  display: block;
-  color: var(--vk-r1-text-tertiary);
-  font-size: 11px;
+  color: var(--vk-r1-text);
+  font-size: 18px;
   font-weight: 700;
   line-height: 1.2;
   text-transform: uppercase;
-  letter-spacing: .08em;
 }
 
-.vk-health-overview h2 {
-  margin: 5px 0 0;
-  color: var(--vk-r1-text);
-  font-size: 21px;
-  line-height: 1.2;
+.vk-health-overview > .vk-health-status {
+  margin-top: 14px;
 }
 
 .vk-health-overview p {
-  margin: 8px 0 0;
+  margin: 14px 0 0;
   color: var(--vk-r1-text-tertiary);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.45;
 }
 
 .vk-health-overview strong {
   display: block;
-  margin-top: 9px;
+  margin-top: 8px;
   color: var(--vk-r1-text-secondary);
   font-size: 12px;
-  line-height: 1.35;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 .vk-health-areas {
@@ -2747,43 +2722,30 @@ body.vk-lock { overflow: hidden; }
   padding: 16px;
   border: 1px solid var(--vk-r1-border-soft);
   border-radius: 16px;
-  background: rgba(17,24,39,.5);
-}
-
-.vk-health-area[data-health-level="attention"] {
-  border-color: rgba(245,158,11,.3);
-}
-
-.vk-health-area[data-health-level="risk"] {
-  border-color: rgba(239,68,68,.34);
-}
-
-.vk-health-area__head,
-.vk-health-detail__top,
-.vk-health-status,
-.vk-health-metrics {
-  display: flex;
-  align-items: center;
-}
-
-.vk-health-area__head {
-  justify-content: space-between;
-  gap: 12px;
+  background: rgba(17,24,39,.38);
 }
 
 .vk-health-area__head h3 {
   margin: 0;
   color: var(--vk-r1-text);
-  font-size: 16px;
-  line-height: 1.25;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.vk-health-status,
+.vk-health-detail__top,
+.vk-health-metrics {
+  display: flex;
+  align-items: center;
 }
 
 .vk-health-status {
   flex: none;
   gap: 6px;
-  color: var(--vk-r1-text-tertiary);
+  color: var(--vk-r1-text-secondary);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.2;
 }
 
@@ -2808,16 +2770,16 @@ body.vk-lock { overflow: hidden; }
 }
 
 .vk-health-metrics {
-  gap: 8px;
+  gap: 10px;
   margin-top: 14px;
 }
 
 .vk-health-metric {
   min-width: 0;
   flex: 1 1 0;
-  padding: 11px 8px;
+  padding: 12px 8px;
   border-radius: 12px;
-  background: rgba(36,50,70,.66);
+  background: rgba(36,50,70,.7);
   text-align: center;
 }
 
@@ -2828,22 +2790,20 @@ body.vk-lock { overflow: hidden; }
 
 .vk-health-metric__value {
   color: var(--vk-r1-text);
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.15;
 }
 
 .vk-health-metric__label {
-  margin-top: 4px;
+  margin-top: 5px;
   color: var(--vk-r1-text-tertiary);
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.2;
 }
 
 .vk-health-detail {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--vk-r1-border-soft);
+  margin-top: 18px;
 }
 
 .vk-health-detail__top {
@@ -2854,9 +2814,9 @@ body.vk-lock { overflow: hidden; }
 .vk-health-detail__title {
   min-width: 0;
   color: var(--vk-r1-text-secondary);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.3;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
 }
 
 .vk-health-detail__reason {
@@ -2887,20 +2847,18 @@ body.vk-lock { overflow: hidden; }
 }
 
 @media (max-width: 380px) {
-  .vk-health-overview {
-    grid-template-columns: 44px minmax(0, 1fr);
-    padding: 16px;
+  .vk-health-overview,
+  .vk-health-area {
+    padding: 15px;
   }
 
-  .vk-health-overview__shield {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    font-size: 26px;
+  .vk-health-overview__eyebrow {
+    font-size: 16px;
   }
 
   .vk-health-metrics {
     align-items: stretch;
+    gap: 8px;
   }
 
   .vk-health-metric {
