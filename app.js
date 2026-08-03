@@ -5188,11 +5188,11 @@ const VK_HEALTH_LEVEL_META={
     short:'La bóveda está bien, con mejoras preventivas.'
   },
   attention:{
-    label:'Necesita atención',
+    label:'Atención',
     short:'Hay elementos que conviene revisar.'
   },
   risk:{
-    label:'En riesgo',
+    label:'Riesgo crítico',
     short:'Hay problemas importantes que requieren revisión.'
   }
 };
@@ -5483,7 +5483,7 @@ function renderVaultHealthDashboard(){
     const description=$('healthStatusDesc');
     const action=$('healthStatusAction');
 
-    if(label)label.textContent='Necesita atención';
+    if(label)label.textContent='Atención';
     if(description)description.textContent='No se ha podido completar el análisis.';
     if(action)action.textContent='Abre el panel para volver a intentarlo.';
 
