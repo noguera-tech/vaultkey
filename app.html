@@ -994,14 +994,14 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
         </button>
       </div>
 
-      <button id="cardDetailNoteButton" type="button" class="vk-card-detail-note-button" onclick="openEditCard(window.__vkCurrentCardId,true)">
+      <div id="cardDetailNoteButton" class="vk-card-detail-note-button" role="group" aria-label="Nota de la tarjeta">
         <svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M6 2v20M3 6h4M3 10h4M3 14h4M3 18h4"/>
           <rect x="7" y="3" width="14" height="18" rx="2"/>
           <path d="m14 8 4-4 2 2-4 4-3 1 1-3Z"/>
         </svg>
-        <span id="cardDetailNoteText">Añadir nota</span>
-      </button>
+        <span id="cardDetailNoteText">Sin nota</span>
+      </div>
     </article>
 
     <div class="vk-card-detail-actions">

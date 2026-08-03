@@ -5739,7 +5739,7 @@ try {
     document.getElementById('cardDetailCvv').textContent='•••';
 
     var noteText=document.getElementById('cardDetailNoteText');
-    if(noteText)noteText.textContent=card.note?card.note:'Añadir nota';
+    if(noteText)noteText.textContent=card.note?card.note:'Sin nota';
 
     var toggle=document.getElementById('cardDetailCvvToggle');
     if(toggle){
