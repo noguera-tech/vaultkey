@@ -3265,9 +3265,9 @@ body.vk-create-picker-open {
   overflow-y: auto;
   overflow-x: hidden;
   padding:
-    24px
+    16px
     var(--vk-r1-screen-padding-inline)
-    calc(32px + env(safe-area-inset-bottom, 0px));
+    calc(16px + env(safe-area-inset-bottom, 0px));
   scrollbar-width: none;
 }
 
@@ -3276,7 +3276,7 @@ body.vk-create-picker-open {
 }
 
 .vk-password-edit-title {
-  margin: 0 0 24px;
+  margin: 0 0 16px;
   color: var(--vk-r1-text);
   font-size: var(--vk-r1-font-size-screen-title);
   font-weight: var(--vk-r1-font-weight-bold);
@@ -3288,7 +3288,7 @@ body.vk-create-picker-open {
 .vk-password-edit-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 
 .vk-password-edit-field {
@@ -3330,7 +3330,8 @@ body.vk-create-picker-open {
 }
 
 .vk-password-edit-field textarea {
-  min-height: 104px;
+  height: 96px;
+  min-height: 96px;
   padding: 14px 16px;
   resize: none;
 }
@@ -3429,8 +3430,8 @@ body.vk-create-picker-open {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-top: 8px;
-  padding-bottom: 4px;
+  margin-top: 0;
+  padding-bottom: 0;
 }
 
 .vk-password-edit-actions button {
