@@ -419,14 +419,25 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       <h1 class="vk-dash-brand">VaultKey</h1>
       <p id="homeGreeting" class="vk-dash-greeting">Buenos días 👋</p>
 
-      <article class="vk-card vk-dash-status">
-        <div class="vk-dash-status__row1">
-          <svg class="vk-dash-status__shield" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1.5c3.4 2.8 6.6 4.1 10 4.1v8.2c0 6-4.3 9.9-10 12.7C6.3 23.7 2 19.8 2 13.8V5.6c3.4 0 6.6-1.3 10-4.1Z"/></svg>
-          <span class="vk-dash-status__title">Tu bóveda</span>
-        </div>
-        <div class="vk-dash-status__row2"><span class="vk-dash-status__dot" aria-hidden="true"></span><span class="vk-dash-status__label">Estado seguro</span></div>
-        <div class="vk-dash-status__desc">Todo está protegido y listo para usar.</div>
-      </article>
+      <button id="healthStatusCard" type="button" class="vk-card vk-dash-status" data-health-level="good" aria-describedby="healthStatusDesc" onclick="showHealthPanel()">
+        <span class="vk-dash-status__header">
+          <span class="vk-dash-status__identity">
+            <svg class="vk-dash-status__shield" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1.5c3.4 2.8 6.6 4.1 10 4.1v8.2c0 6-4.3 9.9-10 12.7C6.3 23.7 2 19.8 2 13.8V5.6c3.4 0 6.6-1.3 10-4.1Z"/></svg>
+            <span class="vk-dash-status__copy">
+              <span class="vk-dash-status__title">Tu bóveda</span>
+              <span class="vk-dash-status__state"><span class="vk-dash-status__dot" aria-hidden="true"></span><span id="healthStatusLabel" class="vk-dash-status__label">Buena</span></span>
+            </span>
+          </span>
+          <svg class="vk-dash-status__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </span>
+        <span id="healthStatusDesc" class="vk-dash-status__desc">Analizando el estado de la bóveda...</span>
+        <span id="healthStatusAction" class="vk-dash-status__action">Abre el panel para ver los detalles</span>
+        <span class="vk-dash-status__areas" aria-label="Estado por áreas">
+          <span class="vk-dash-status__area"><span id="healthAreaSecurity" class="vk-dash-status__area-dot" data-health-level="good" aria-hidden="true"></span><span>Seguridad</span></span>
+          <span class="vk-dash-status__area"><span id="healthAreaContinuity" class="vk-dash-status__area-dot" data-health-level="good" aria-hidden="true"></span><span>Continuidad</span></span>
+          <span class="vk-dash-status__area"><span id="healthAreaMaintenance" class="vk-dash-status__area-dot" data-health-level="good" aria-hidden="true"></span><span>Mantenimiento</span></span>
+        </span>
+      </button>
 
       <div class="vk-dash-grid">
         <button type="button" class="vk-dash-tile" onclick="show('passwords')">
@@ -4245,20 +4256,21 @@ if(typeof legacyHandleVisibilityChange==="function"){
 </div>
 
 
-<div class="modal" id="healthModal">
-  <div class="sheet" style="max-height:92vh;overflow-y:auto">
-    <div class="sheetHead">
-      <div class="sheetTitle">🛡️ Panel de salud</div>
-      <div class="spacer"></div>
-      <button class="iconBtn" onclick="closeModals()">✕</button>
+<div class="modal vk-health-modal" id="healthModal" role="dialog" aria-modal="true" aria-labelledby="healthModalTitle">
+  <div class="sheet vk-health-sheet">
+    <div class="sheetHead vk-health-head">
+      <div id="healthModalTitle" class="sheetTitle">Estado de tu bóveda</div>
     </div>
 
-    <div id="healthContent" style="padding:0 4px">
-      <div style="text-align:center;padding:20px;color:#4a7090">Analizando...</div>
+    <div id="healthContent" class="vk-health-content" aria-live="polite">
+      <div class="vk-health-loading">Analizando...</div>
+    </div>
+
+    <div class="vk-health-footer">
+      <button type="button" class="ghost vk-health-cancel" onclick="closeModals()">Cancelar</button>
     </div>
   </div>
 </div>
-
 <!-- MODAL IMPORTAR CSV -->
 <div class="modal" id="csvImportModal">
   <div class="sheet" style="max-height:92dvh;overflow-y:auto">

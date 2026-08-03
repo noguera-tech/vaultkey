@@ -3502,6 +3502,7 @@ function render(){
     const _g=_h<6?'Buenas noches \u{1F44B}':_h<13?'Buenos d\u00edas \u{1F44B}':_h<20?'Buenas tardes \u{1F44B}':'Buenas noches \u{1F44B}';
     const _gel=$('homeGreeting');if(_gel)_gel.textContent=_g;
   }catch(e){}
+  renderVaultHealthDashboard();
   renderPasswordFamilyList();
   let q=($('search')?.value||'').toLowerCase();
   let _visibleEntryCount=null;
@@ -4742,186 +4743,894 @@ function checkVaultReminders(){
 
 window._checkVaultReminders=checkVaultReminders;
 
-// ══ PANEL DE SALUD ══════════════════════════════════════
-function showHealthPanel(){
-  if(!vault||!vault.length){
-    toast('No hay entradas en la bóveda');return;
+/* Estado de salud: lectura normalizada, sin modificar datos persistidos. */
+const VK_HEALTH_LEVELS={
+  protected:0,
+  good:1,
+  attention:2,
+  risk:3
+};
+
+function healthReadJson(key,fallback=null){
+  try{
+    const raw=localStorage.getItem(key);
+    return raw===null?fallback:JSON.parse(raw);
+  }catch(error){
+    return fallback;
   }
-  $('healthModal').classList.add('open');
+}
+
+function healthEntryType(entry){
+  const raw=String(entry?.entryType||entry?.type||'password').toLowerCase();
+  return raw||'password';
+}
+
+function healthPasswordSubtype(entry){
+  const type=healthEntryType(entry);
+
+  if(type==='wifi'||type==='pin'||type==='recovery'){
+    return type;
+  }
+
+  const subtype=String(entry?.subtype||'web').toLowerCase();
+  return ['web','wifi','pin','recovery'].includes(subtype)?subtype:'web';
+}
+
+function healthRecoverySecret(codes){
+  if(Array.isArray(codes)){
+    const value=codes.find(code=>typeof code==='string'&&code.trim());
+    return value?value.trim():'';
+  }
+
+  return typeof codes==='string'?codes.trim():'';
+}
+
+function healthPasswordSecret(entry,subtype){
+  if(subtype==='recovery'){
+    return healthRecoverySecret(entry?.codes);
+  }
+
+  if(subtype==='wifi'){
+    return String(entry?.password||entry?.pass||entry?.wifiPass||'');
+  }
+
+  return String(entry?.password||entry?.pass||'');
+}
+
+function healthEntryTitle(entry,fallback){
+  return String(
+    entry?.title||
+    entry?.service||
+    entry?.wifiSsid||
+    entry?.holder||
+    entry?.name||
+    fallback||
+    ''
+  ).trim();
+}
+
+function healthEntryUpdatedAt(entry){
+  const value=Number(entry?.updatedAt||entry?.updated||entry?.createdAt||0);
+  return Number.isFinite(value)&&value>0?value:0;
+}
+
+function healthReadPasswords(){
+  if(!Array.isArray(vault))return [];
+
+  return vault
+    .filter(isPasswordFamilyEntry)
+    .map(entry=>{
+      const subtype=healthPasswordSubtype(entry);
+
+      return {
+        id:String(entry.id||''),
+        source:'vault',
+        kind:'password',
+        subtype,
+        title:healthEntryTitle(entry,subtype==='wifi'?'WiFi':'Contrase\u00f1a'),
+        secret:healthPasswordSecret(entry,subtype),
+        updatedAt:healthEntryUpdatedAt(entry),
+        raw:entry
+      };
+    })
+    .filter(item=>item.id);
+}
+
+function healthReadCards(){
+  const items=[];
+  const moduleCards=window.vkCards&&typeof window.vkCards.read==='function'
+    ?window.vkCards.read()
+    :[];
+
+  if(Array.isArray(moduleCards)){
+    moduleCards.forEach(card=>{
+      if(!card||typeof card!=='object'||!card.id)return;
+
+      items.push({
+        id:String(card.id),
+        source:'cards',
+        kind:'card',
+        title:healthEntryTitle(card,'Tarjeta'),
+        expiry:String(card.expiry||'').trim(),
+        updatedAt:healthEntryUpdatedAt(card),
+        raw:card
+      });
+    });
+  }
+
+  if(Array.isArray(vault)){
+    vault
+      .filter(entry=>healthEntryType(entry)==='card')
+      .forEach(card=>{
+        if(!card?.id)return;
+
+        items.push({
+          id:String(card.id),
+          source:'vault',
+          kind:'card',
+          title:healthEntryTitle(card,'Tarjeta'),
+          expiry:String(card.cardExpiry||card.expiry||'').trim(),
+          updatedAt:healthEntryUpdatedAt(card),
+          raw:card
+        });
+      });
+  }
+
+  return items;
+}
+
+function healthReadDocuments(){
+  const items=[];
+  const moduleDocuments=window.vkDocuments&&typeof window.vkDocuments.read==='function'
+    ?window.vkDocuments.read()
+    :[];
+
+  if(Array.isArray(moduleDocuments)){
+    moduleDocuments.forEach(documentEntry=>{
+      if(!documentEntry||typeof documentEntry!=='object'||!documentEntry.id)return;
+
+      items.push({
+        id:String(documentEntry.id),
+        source:'documents',
+        kind:'document',
+        subtype:String(documentEntry.category||'other'),
+        title:healthEntryTitle(documentEntry,'Documento'),
+        expiry:String(documentEntry.expiry||'').trim(),
+        updatedAt:healthEntryUpdatedAt(documentEntry),
+        raw:documentEntry
+      });
+    });
+  }
+
+  if(Array.isArray(vault)){
+    vault
+      .filter(entry=>['id','license'].includes(healthEntryType(entry)))
+      .forEach(documentEntry=>{
+        if(!documentEntry?.id)return;
+
+        const type=healthEntryType(documentEntry);
+
+        items.push({
+          id:String(documentEntry.id),
+          source:'vault',
+          kind:'document',
+          subtype:type,
+          title:healthEntryTitle(documentEntry,'Documento'),
+          expiry:String(
+            type==='license'
+              ?documentEntry.licExpiry||''
+              :documentEntry.idExpiry||''
+          ).trim(),
+          updatedAt:healthEntryUpdatedAt(documentEntry),
+          raw:documentEntry
+        });
+      });
+  }
+
+  return items;
+}
+
+// ══ PANEL DE SALUD ══════════════════════════════════════
+function healthWorstLevel(items,fallback='protected'){
+  return items.reduce((worst,item)=>{
+    const level=item&&item.level in VK_HEALTH_LEVELS?item.level:fallback;
+    return VK_HEALTH_LEVELS[level]>VK_HEALTH_LEVELS[worst]?level:worst;
+  },fallback);
+}
+
+function healthSecretKey(value){
+  return String(value||'').trim();
+}
+
+function healthCharacterGroups(value){
+  const secret=String(value||'');
+  let groups=0;
+  if(/[a-z]/.test(secret))groups++;
+  if(/[A-Z]/.test(secret))groups++;
+  if(/\d/.test(secret))groups++;
+  if(/[^A-Za-z0-9]/.test(secret))groups++;
+  return groups;
+}
+
+function healthHasObviousPasswordPattern(value){
+  const secret=String(value||'').trim();
+  const lower=secret.toLowerCase();
+
+  if(!secret)return true;
+  if(/^(.)\1+$/.test(secret))return true;
+  if(/^(0123456789|1234567890|9876543210|0987654321)/.test(secret))return true;
+  if(/^(abcdefghijklmnopqrstuvwxyz|zyxwvutsrqponmlkjihgfedcba)/i.test(secret))return true;
+  if(/^(password|contrase(?:n|\u00f1)a|qwerty|admin|welcome|bienvenido|letmein|iloveyou|abc123|123456)/i.test(lower))return true;
+  if(/^(19|20)\d{2}$/.test(secret))return true;
+
+  return false;
+}
+
+function healthHasObviousPinPattern(value){
+  const pin=String(value||'').trim();
+
+  if(!/^\d+$/.test(pin))return true;
+  if(/^(.)\1+$/.test(pin))return true;
+  if(['0123','1234','2345','3456','4567','5678','6789','9876','8765','7654','6543','5432','4321','3210','0000','1111'].includes(pin))return true;
+
+  let ascending=true;
+  let descending=true;
+
+  for(let index=1;index<pin.length;index++){
+    const previous=Number(pin[index-1]);
+    const current=Number(pin[index]);
+
+    if(current!==previous+1)ascending=false;
+    if(current!==previous-1)descending=false;
+  }
+
+  return ascending||descending;
+}
+
+function healthPasswordBaseAssessment(item){
+  const secret=healthSecretKey(item.secret);
+  const length=secret.length;
+
+  if(item.subtype==='pin'){
+    if(!secret){
+      return {level:'risk',reason:'El PIN est\u00e1 vac\u00edo.'};
+    }
+
+    if(length<4||healthHasObviousPinPattern(secret)){
+      return {level:'risk',reason:'El PIN es demasiado corto o predecible.'};
+    }
+
+    if(length<6){
+      return {level:'attention',reason:'Conviene utilizar un PIN de al menos 6 d\u00edgitos.'};
+    }
+
+    return {
+      level:length>=8?'protected':'good',
+      reason:length>=8?'PIN largo y sin patrones evidentes.':'PIN correcto y sin patrones evidentes.'
+    };
+  }
+
+  if(item.subtype==='recovery'){
+    if(!secret){
+      return {level:'risk',reason:'El c\u00f3digo de recuperaci\u00f3n est\u00e1 vac\u00edo.'};
+    }
+
+    return {
+      level:'good',
+      reason:'C\u00f3digo de recuperaci\u00f3n presente.'
+    };
+  }
+
+  if(!secret){
+    return {level:'risk',reason:'La contrase\u00f1a est\u00e1 vac\u00eda.'};
+  }
+
+  if(length<8||healthHasObviousPasswordPattern(secret)){
+    return {level:'risk',reason:'La contrase\u00f1a es demasiado corta o predecible.'};
+  }
+
+  const groups=healthCharacterGroups(secret);
+
+  if(length<12||groups<2){
+    return {level:'attention',reason:'Conviene aumentar la longitud o la variedad.'};
+  }
+
+  if(length>=16&&groups>=3){
+    return {level:'protected',reason:'Contrase\u00f1a larga, variada y sin patrones evidentes.'};
+  }
+
+  return {level:'good',reason:'Contrase\u00f1a adecuada y sin patrones evidentes.'};
+}
+
+function healthAnalyzePasswords(passwords){
+  const counts=new Map();
+
+  passwords.forEach(item=>{
+    const key=healthSecretKey(item.secret);
+    if(key)counts.set(key,(counts.get(key)||0)+1);
+  });
+
+  const items=passwords.map(item=>{
+    const assessment=healthPasswordBaseAssessment(item);
+    const key=healthSecretKey(item.secret);
+    const duplicate=!!key&&counts.get(key)>1;
+
+    if(duplicate){
+      return {
+        ...item,
+        level:'risk',
+        issue:'duplicate',
+        reason:item.subtype==='recovery'
+          ?'Este c\u00f3digo de recuperaci\u00f3n est\u00e1 repetido.'
+          :'Este secreto se utiliza en m\u00e1s de una entrada.'
+      };
+    }
+
+    return {
+      ...item,
+      level:assessment.level,
+      issue:assessment.level==='protected'||assessment.level==='good'?'none':'strength',
+      reason:assessment.reason
+    };
+  });
+
+  return {
+    level:items.length?healthWorstLevel(items,'protected'):'good',
+    items,
+    counts:{
+      total:items.length,
+      protected:items.filter(item=>item.level==='protected').length,
+      good:items.filter(item=>item.level==='good').length,
+      attention:items.filter(item=>item.level==='attention').length,
+      risk:items.filter(item=>item.level==='risk').length
+    }
+  };
+}
+
+function healthParseCardExpiry(value){
+  const match=String(value||'').trim().match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
+  if(!match)return null;
+
+  const month=Number(match[1]);
+  const year=2000+Number(match[2]);
+  return new Date(year,month,0,23,59,59,999);
+}
+
+function healthParseDocumentExpiry(value){
+  const raw=String(value||'').trim();
+  let match=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if(match){
+    const year=Number(match[1]);
+    const month=Number(match[2]);
+    const day=Number(match[3]);
+    const date=new Date(year,month-1,day,23,59,59,999);
+
+    return date.getFullYear()===year&&date.getMonth()===month-1&&date.getDate()===day
+      ?date
+      :null;
+  }
+
+  match=raw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+
+  if(match){
+    const day=Number(match[1]);
+    const month=Number(match[2]);
+    const year=Number(match[3]);
+    const date=new Date(year,month-1,day,23,59,59,999);
+
+    return date.getFullYear()===year&&date.getMonth()===month-1&&date.getDate()===day
+      ?date
+      :null;
+  }
+
+  return null;
+}
+
+function healthDaysUntil(date,now=Date.now()){
+  return Math.ceil((date.getTime()-now)/864e5);
+}
+
+function healthAnalyzeMaintenance(cards,documents,now=Date.now()){
+  const cardItems=cards.map(item=>{
+    const expiry=healthParseCardExpiry(item.expiry);
+
+    if(!expiry){
+      return {...item,level:'attention',days:null,reason:'La fecha de caducidad no es v\u00e1lida.'};
+    }
+
+    const days=healthDaysUntil(expiry,now);
+
+    if(days<0)return {...item,level:'risk',days,reason:'La tarjeta est\u00e1 caducada.'};
+    if(days<=30)return {...item,level:'attention',days,reason:'La tarjeta caduca en 30 d\u00edas o menos.'};
+    if(days<=60)return {...item,level:'good',days,reason:'La tarjeta caducar\u00e1 pr\u00f3ximamente.'};
+
+    return {...item,level:'protected',days,reason:'La tarjeta no caduca pr\u00f3ximamente.'};
+  });
+
+  const documentItems=documents.map(item=>{
+    if(!item.expiry){
+      return {...item,level:'good',days:null,reason:'Sin fecha de caducidad registrada.'};
+    }
+
+    const expiry=healthParseDocumentExpiry(item.expiry);
+
+    if(!expiry){
+      return {...item,level:'attention',days:null,reason:'La fecha de caducidad no es v\u00e1lida.'};
+    }
+
+    const days=healthDaysUntil(expiry,now);
+
+    if(days<0)return {...item,level:'risk',days,reason:'El documento est\u00e1 caducado.'};
+    if(days<=30)return {...item,level:'attention',days,reason:'El documento caduca en 30 d\u00edas o menos.'};
+    if(days<=90)return {...item,level:'good',days,reason:'El documento caducar\u00e1 pr\u00f3ximamente.'};
+
+    return {...item,level:'protected',days,reason:'El documento no caduca pr\u00f3ximamente.'};
+  });
+
+  const items=[...cardItems,...documentItems];
+
+  return {
+    level:items.length?healthWorstLevel(items,'protected'):'good',
+    cards:cardItems,
+    documents:documentItems,
+    items
+  };
+}
+
+const VK_HEALTH_LEVEL_META={
+  protected:{
+    label:'Protegida',
+    short:'Todo está correctamente protegido.'
+  },
+  good:{
+    label:'Buena',
+    short:'La bóveda está bien, con mejoras preventivas.'
+  },
+  attention:{
+    label:'Atención',
+    short:'Hay elementos que conviene revisar.'
+  },
+  risk:{
+    label:'Riesgo crítico',
+    short:'Hay problemas importantes que requieren revisión.'
+  }
+};
+
+function healthReadLocalSecurity(){
+  let mode='legacy';
+  let hasVault=false;
+  let pinConfigured=false;
+  let onboardingDone=false;
+  let autolockOption='';
+  let legacyMeta=null;
+
+  try{
+    if(window.vkStore&&
+       typeof window.vkStore.hasVault==='function'&&
+       window.vkStore.hasVault()){
+      mode='vk2';
+      hasVault=true;
+      pinConfigured=typeof window.vkStore.hasPinWrap==='function'
+        ?window.vkStore.hasPinWrap()
+        :false;
+
+      const storeMeta=typeof window.vkStore.getMeta==='function'
+        ?window.vkStore.getMeta()
+        :{};
+
+      onboardingDone=storeMeta?.onboardingDone===true;
+      autolockOption=String(storeMeta?.autolockOption||'');
+    }
+  }catch(error){}
+
+  if(mode==='legacy'){
+    try{
+      legacyMeta=typeof meta==='function'?meta():null;
+    }catch(error){
+      legacyMeta=null;
+    }
+
+    hasVault=!!legacyMeta;
+    pinConfigured=!!(
+      legacyMeta&&
+      typeof legacyMeta.hash==='string'&&legacyMeta.hash&&
+      typeof legacyMeta.pinSalt==='string'&&legacyMeta.pinSalt
+    );
+
+    const autoLockMs=legacyMeta&&
+      Object.prototype.hasOwnProperty.call(legacyMeta,'autoLockMs')
+      ?Number(legacyMeta.autoLockMs)
+      :NaN;
+
+    if(autoLockMs===0)autolockOption='immediate';
+    else if(autoLockMs>0&&autoLockMs<=30000)autolockOption='30s';
+    else if(autoLockMs>30000&&autoLockMs<=60000)autolockOption='1m';
+    else if(autoLockMs>60000&&autoLockMs<=300000)autolockOption='5m';
+  }
+
+  const pin={
+    configured:pinConfigured,
+    level:pinConfigured?'protected':'risk',
+    reason:pinConfigured
+      ?'El acceso mediante PIN está configurado.'
+      :'No se ha podido confirmar un PIN configurado.'
+  };
+
+  let autolock;
+
+  if(autolockOption==='immediate'||autolockOption==='30s'){
+    autolock={
+      option:autolockOption,
+      level:'protected',
+      reason:autolockOption==='immediate'
+        ?'La bóveda se bloquea inmediatamente al salir.'
+        :'La bóveda se bloquea tras 30 segundos.'
+    };
+  }else if(autolockOption==='1m'||autolockOption==='5m'){
+    autolock={
+      option:autolockOption,
+      level:'good',
+      reason:autolockOption==='1m'
+        ?'La bóveda se bloquea tras 1 minuto.'
+        :'La bóveda se bloquea tras 5 minutos.'
+    };
+  }else{
+    autolock={
+      option:autolockOption,
+      level:'attention',
+      reason:'No se ha podido confirmar una configuración de autobloqueo válida.'
+    };
+  }
+
+  return {
+    mode,
+    hasVault,
+    onboardingDone,
+    pin,
+    autolock,
+    level:healthWorstLevel([pin,autolock],'protected')
+  };
+}
+
+function healthReadContinuity(now=Date.now()){
+  const rawLastSync=localStorage.getItem('vk_drive_last_sync');
+  const lastSync=Number(rawLastSync);
+  const validLastSync=Number.isFinite(lastSync)&&lastSync>0&&lastSync<=now;
+  const ageDays=validLastSync?Math.floor((now-lastSync)/864e5):null;
+
+  let backup;
+
+  if(!validLastSync){
+    backup={
+      level:'risk',
+      lastSync:0,
+      ageDays:null,
+      reason:'Nunca se ha confirmado un respaldo en Google Drive.'
+    };
+  }else if(ageDays<=7){
+    backup={
+      level:'protected',
+      lastSync,
+      ageDays,
+      reason:'Existe un respaldo confirmado de los últimos 7 días.'
+    };
+  }else if(ageDays<=30){
+    backup={
+      level:'good',
+      lastSync,
+      ageDays,
+      reason:'Existe un respaldo confirmado de los últimos 30 días.'
+    };
+  }else{
+    backup={
+      level:'attention',
+      lastSync,
+      ageDays,
+      reason:'El último respaldo confirmado tiene más de 30 días.'
+    };
+  }
+
+  let kitConfigured=false;
+
+  try{
+    if(window.vkStore&&
+       typeof window.vkStore.hasVault==='function'&&
+       typeof window.vkStore.hasPinWrap==='function'&&
+       typeof window.vkStore.getMeta==='function'){
+      const storeMeta=window.vkStore.getMeta();
+
+      kitConfigured=
+        window.vkStore.hasVault()&&
+        window.vkStore.hasPinWrap()&&
+        storeMeta?.onboardingDone===true;
+    }
+  }catch(error){}
+
+  const kit={
+    configured:kitConfigured,
+    level:kitConfigured?'good':'attention',
+    reason:kitConfigured
+      ?'El kit de emergencia fue configurado durante el alta.'
+      :'No se ha podido confirmar un kit de emergencia configurado.'
+  };
+
+  return {
+    level:backup.level,
+    backup,
+    kit
+  };
+}
+
+function healthCountActions(security,continuity,maintenance){
+  const securityItems=[
+    ...security.passwords.items,
+    security.local.pin,
+    security.local.autolock
+  ];
+
+  const continuityItems=[
+    continuity.backup,
+    continuity.kit
+  ];
+
+  const maintenanceItems=maintenance.items;
+
+  return [...securityItems,...continuityItems,...maintenanceItems]
+    .filter(item=>item.level==='attention'||item.level==='risk')
+    .length;
+}
+
+function buildVaultHealthReport(now=Date.now()){
+  const passwords=healthReadPasswords();
+  const cards=healthReadCards();
+  const documents=healthReadDocuments();
+
+  const passwordAnalysis=healthAnalyzePasswords(passwords);
+  const localSecurity=healthReadLocalSecurity();
+  const maintenance=healthAnalyzeMaintenance(cards,documents,now);
+  const continuity=healthReadContinuity(now);
+
+  const security={
+    level:healthWorstLevel(
+      [
+        {level:passwordAnalysis.level},
+        {level:localSecurity.level}
+      ],
+      'protected'
+    ),
+    passwords:passwordAnalysis,
+    local:localSecurity
+  };
+
+  const overallLevel=healthWorstLevel(
+    [
+      {level:security.level},
+      {level:continuity.level},
+      {level:maintenance.level}
+    ],
+    'protected'
+  );
+
+  const actionCount=healthCountActions(
+    security,
+    continuity,
+    maintenance
+  );
+
+  return {
+    generatedAt:now,
+    level:overallLevel,
+    label:VK_HEALTH_LEVEL_META[overallLevel].label,
+    summary:VK_HEALTH_LEVEL_META[overallLevel].short,
+    actionCount,
+    security,
+    continuity,
+    maintenance,
+    sources:{
+      passwords:passwords.length,
+      cards:cards.length,
+      documents:documents.length
+    }
+  };
+}
+
+function healthDashboardActionText(report){
+  if(report.actionCount===0){
+    return 'No hay acciones pendientes.';
+  }
+
+  if(report.actionCount===1){
+    return 'Hay 1 elemento que conviene revisar.';
+  }
+
+  return 'Hay '+report.actionCount+' elementos que conviene revisar.';
+}
+
+function healthSetAreaLevel(id,level){
+  const element=$(id);
+  if(element)element.dataset.healthLevel=level;
+}
+
+function renderVaultHealthDashboard(){
+  const card=$('healthStatusCard');
+  if(!card)return;
+
+  try{
+    const report=buildVaultHealthReport();
+    const label=$('healthStatusLabel');
+    const description=$('healthStatusDesc');
+    const action=$('healthStatusAction');
+
+    card.dataset.healthLevel=report.level;
+    card.setAttribute(
+      'aria-label',
+      'Estado de tu bóveda: '+report.label+'. '+healthDashboardActionText(report)
+    );
+
+    if(label)label.textContent=report.label;
+    if(description)description.textContent=report.summary;
+    if(action)action.textContent=healthDashboardActionText(report);
+
+    healthSetAreaLevel('healthAreaSecurity',report.security.level);
+    healthSetAreaLevel('healthAreaContinuity',report.continuity.level);
+    healthSetAreaLevel('healthAreaMaintenance',report.maintenance.level);
+  }catch(error){
+    console.warn('Vault health dashboard:',error);
+    card.dataset.healthLevel='attention';
+
+    const label=$('healthStatusLabel');
+    const description=$('healthStatusDesc');
+    const action=$('healthStatusAction');
+
+    if(label)label.textContent='Atención';
+    if(description)description.textContent='No se ha podido completar el análisis.';
+    if(action)action.textContent='Abre el panel para volver a intentarlo.';
+
+    healthSetAreaLevel('healthAreaSecurity','attention');
+    healthSetAreaLevel('healthAreaContinuity','attention');
+    healthSetAreaLevel('healthAreaMaintenance','attention');
+  }
+}
+
+function healthPanelStatus(level){
+  const meta=VK_HEALTH_LEVEL_META[level]||VK_HEALTH_LEVEL_META.attention;
+
+  return '<span class="vk-health-status" data-health-level="'+safeEsc(level)+'">'+
+    '<span class="vk-health-status__dot" aria-hidden="true"></span>'+
+    '<span>'+safeEsc(meta.label)+'</span>'+
+  '</span>';
+}
+
+function healthPanelMetric(label,value){
+  return '<div class="vk-health-metric">'+
+    '<span class="vk-health-metric__value">'+safeEsc(String(value))+'</span>'+
+    '<span class="vk-health-metric__label">'+safeEsc(label)+'</span>'+
+  '</div>';
+}
+
+function healthPanelDetail(title,reason,level){
+  return '<div class="vk-health-detail">'+
+    '<div class="vk-health-detail__top">'+
+      '<span class="vk-health-detail__title">'+safeEsc(title)+'</span>'+
+      healthPanelStatus(level)+
+    '</div>'+
+    '<p class="vk-health-detail__reason">'+safeEsc(reason)+'</p>'+
+  '</div>';
+}
+
+function healthPanelArea(title,body){
+  return '<section class="vk-health-area">'+
+    '<h3 class="vk-health-area__title">'+safeEsc(title)+'</h3>'+
+    body+
+  '</section>';
+}
+
+function showHealthPanel(){
+  const modal=$('healthModal');
+  if(!modal)return;
+
+  modal.classList.add('open');
   renderHealthPanel();
 }
 
 function renderHealthPanel(){
-  const el=$('healthContent');
-  if(!el)return;
+  const element=$('healthContent');
+  if(!element)return;
 
-  const passes=vault.filter(e=>e.entryType==='password'&&e.pass);
-  const now=Date.now();
+  try{
+    const report=buildVaultHealthReport();
+    const passwordCounts=report.security.passwords.counts;
+    const passwordIssues=passwordCounts.attention+passwordCounts.risk;
+    const maintenanceIssues=report.maintenance.items.filter(
+      item=>item.level==='attention'||item.level==='risk'
+    ).length;
 
-  // Clasificar por score
-  const strong=passes.filter(e=>score(e.pass)>=4);
-  const medium=passes.filter(e=>score(e.pass)===3);
-  const weak=passes.filter(e=>score(e.pass)<=2);
+    const securityBody=
+      '<div class="vk-health-metrics vk-health-metrics--two">'+
+        healthPanelMetric('Contrase\u00f1as',passwordCounts.total)+
+        healthPanelMetric('A revisar',passwordIssues)+
+      '</div>'+
+      healthPanelDetail(
+        'Contrase\u00f1as y secretos',
+        passwordCounts.total
+          ?passwordCounts.risk+' en riesgo y '+passwordCounts.attention+' que necesitan atenci\u00f3n.'
+          :'Todav\u00eda no hay secretos guardados para analizar.',
+        report.security.passwords.level
+      )+
+      healthPanelDetail(
+        'Acceso mediante PIN',
+        report.security.local.pin.level==='protected'
+          ?'PIN configurado correctamente.'
+          :report.security.local.pin.reason,
+        report.security.local.pin.level
+      )+
+      healthPanelDetail(
+        'Autobloqueo',
+        report.security.local.autolock.level==='protected'
+          ?'Bloqueo autom\u00e1tico activo.'
+          :report.security.local.autolock.reason,
+        report.security.local.autolock.level
+      );
 
-  // Duplicadas
-  const passCounts={};
-  passes.forEach(e=>{if(e.pass)passCounts[e.pass]=(passCounts[e.pass]||0)+1;});
-  const dupes=passes.filter(e=>passCounts[e.pass]>1);
+    const continuityBody=
+      healthPanelDetail(
+        'Respaldo en Google Drive',
+        report.continuity.backup.level==='risk'
+          ?'No hay ninguna copia de seguridad configurada.'
+          :report.continuity.backup.reason,
+        report.continuity.backup.level
+      )+
+      healthPanelDetail(
+        'Kit de emergencia',
+        report.continuity.kit.level==='good'||report.continuity.kit.level==='protected'
+          ?'Kit de recuperaci\u00f3n disponible.'
+          :report.continuity.kit.reason,
+        report.continuity.kit.level
+      );
 
-  // Antiguas (>90 días)
-  const old=passes.filter(e=>Math.floor((now-(e.updated||now))/(864e5))>=90);
+    const maintenanceBody=
+      '<div class="vk-health-metrics vk-health-metrics--three">'+
+        healthPanelMetric('Tarjetas',report.maintenance.cards.length)+
+        healthPanelMetric('Documentos',report.maintenance.documents.length)+
+        healthPanelMetric('A revisar',maintenanceIssues)+
+      '</div>'+
+      healthPanelDetail(
+        'Caducidades',
+        maintenanceIssues
+          ?maintenanceIssues+' elemento'+(maintenanceIssues===1?'':'s')+' requiere'+(maintenanceIssues===1?'':'n')+' revisi\u00f3n.'
+          :'No hay caducidades pendientes.',
+        report.maintenance.level
+      );
 
-  // Tarjetas próximas a caducar
-  const cards=vault.filter(e=>e.entryType==='card'&&e.cardExpiry);
-  const cardWarn=cards.filter(e=>{
-    const[mm,yy]=e.cardExpiry.split('/').map(Number);
-    if(!mm||!yy)return false;
-    return Math.floor((new Date(2000+yy,mm-1,1)-now)/864e5)<=30;
-  });
+    element.innerHTML=
+      '<section class="vk-health-overview" data-health-level="'+safeEsc(report.level)+'">'+
+        '<div class="vk-health-overview__row">'+
+          '<svg class="vk-health-overview__shield" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1.5c3.4 2.8 6.6 4.1 10 4.1v8.2c0 6-4.3 9.9-10 12.7C6.3 23.7 2 19.8 2 13.8V5.6c3.4 0 6.6-1.3 10-4.1Z"/></svg>'+
+          healthPanelStatus(report.level)+
+        '</div>'+
+        '<p class="vk-health-overview__summary">'+safeEsc(report.summary)+'</p>'+
+        '<p class="vk-health-overview__action">'+safeEsc(healthDashboardActionText(report))+'</p>'+
+      '</section>'+
+      '<div class="vk-health-areas">'+
+        healthPanelArea('Seguridad',securityBody)+
+        healthPanelArea('Continuidad',continuityBody)+
+        healthPanelArea('Mantenimiento',maintenanceBody)+
+      '</div>';
+  }catch(error){
+    console.warn('Vault health panel:',error);
 
-  // Documentos próximos a caducar
-  const docWarn=vault.filter(e=>{
-    if(!['id','license'].includes(e.entryType))return false;
-    const exp=e.idExpiry||e.licExpiry||'';
-    if(exp.length!==10)return false;
-    const[dd,mm,yyyy]=exp.split('/').map(Number);
-    return Math.floor((new Date(yyyy,mm-1,dd)-now)/864e5)<=60;
-  });
-
-  // Score global (0-100)
-  const total=passes.length;
-
-  // Si no hay contraseñas, mostrar panel informativo sin score engañoso
-  if(total===0){
-    const sumEl=$('healthSummaryText');
-    if(sumEl){sumEl.textContent='Sin contraseñas que analizar';sumEl.style.color='#4a7090';}
-    const el=$('healthContent');
-    if(el)el.innerHTML=`
-      <div style="text-align:center;padding:32px 16px">
-        <div style="font-size:48px;margin-bottom:12px">🔐</div>
-        <div style="font-size:16px;font-weight:800;color:#c0d8f0;margin-bottom:8px">Sin contraseñas que analizar</div>
-        <div style="font-size:13px;color:#4a7090;line-height:1.5">El panel de salud analiza tus entradas de tipo contraseña.<br>Tus notas, tarjetas y documentos están guardados correctamente.</div>
-        <button class="btn" onclick="closeModals()" style="margin-top:24px;width:100%">Cerrar</button>
-      </div>`;
-    return;
+    element.innerHTML=
+      '<div class="vk-health-error">'+
+        '<strong>No se ha podido completar el an\u00e1lisis.</strong>'+
+        '<p>Cierra el panel y vuelve a intentarlo.</p>'+
+      '</div>';
   }
-
-  const globalScore=Math.round(
-    ((strong.length*100+medium.length*60+weak.length*20)/total)
-    - (dupes.length/total)*20
-    - (old.length/total)*15
-  );
-  const clampedScore=Math.max(0,Math.min(100,globalScore));
-
-  // Color del score
-  const scoreColor=clampedScore>=80?'#00e676':clampedScore>=50?'#f59e0b':'#ff5252';
-  const scoreLabel=clampedScore>=80?'Excelente':clampedScore>=60?'Buena':clampedScore>=40?'Regular':'Mejorable';
-
-  // Actualizar resumen en home
-  const sumEl=$('healthSummaryText');
-  if(sumEl){
-    const hasIssues=weak.length>0||dupes.length>0||old.length>0||cardWarn.length>0||docWarn.length>0;
-    if(!hasIssues){
-      sumEl.textContent='✅ Todo en orden · Toca para ver detalles';
-      sumEl.style.color='#00e676';
-    } else {
-      const parts=[];
-      if(weak.length)   parts.push(weak.length+' débil'+(weak.length>1?'es':''));
-      if(dupes.length)  parts.push(dupes.length+' repetida'+(dupes.length>1?'s':''));
-      if(old.length)    parts.push(old.length+' antigua'+(old.length>1?'s':''));
-      if(cardWarn.length) parts.push(cardWarn.length+' tarjeta'+(cardWarn.length>1?'s':'')+' por caducar');
-      if(docWarn.length)  parts.push(docWarn.length+' doc'+(docWarn.length>1?'s':'')+' por caducar');
-      sumEl.textContent='⚠️ '+parts.join(', ')+' · Toca para ver';
-      sumEl.style.color=clampedScore>=50?'#f59e0b':'#ff5252';
-    }
-  }
-
-  let h='';
-
-  // ── Score circular ──
-  h+=`<div style="text-align:center;padding:16px 0 20px">
-    <div style="position:relative;display:inline-block">
-      <svg width="110" height="110" viewBox="0 0 110 110">
-        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(0,180,255,.1)" stroke-width="10"/>
-        <circle cx="55" cy="55" r="46" fill="none" stroke="${scoreColor}" stroke-width="10"
-          stroke-dasharray="${Math.round(clampedScore*2.89)} 289"
-          stroke-dashoffset="72" stroke-linecap="round" transform="rotate(-90 55 55)"/>
-      </svg>
-      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-        <div style="font-size:26px;font-weight:900;color:${scoreColor}">${clampedScore}</div>
-        <div style="font-size:10px;color:#4a7090;font-weight:700">/ 100</div>
-      </div>
-    </div>
-    <div style="font-size:16px;font-weight:900;color:${scoreColor};margin-top:6px">${scoreLabel}</div>
-    <div style="font-size:12px;color:#4a7090;margin-top:2px">${total} contraseñas analizadas</div>
-  </div>`;
-
-  // ── Resumen de barras ──
-  h+=`<div style="background:rgba(0,14,32,.6);border:1px solid rgba(0,210,255,.12);border-radius:14px;padding:14px;margin-bottom:12px">`;
-  const bars=[
-    {label:'Fuertes',count:strong.length,color:'#00e676'},
-    {label:'Medias', count:medium.length,color:'#f59e0b'},
-    {label:'Débiles',count:weak.length,  color:'#ff5252'},
-  ];
-  bars.forEach(b=>{
-    const pct=total>0?Math.round(b.count/total*100):0;
-    h+=`<div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-        <span style="color:#c0d8f0;font-weight:700">${b.label}</span>
-        <span style="color:${b.color};font-weight:800">${b.count} (${pct}%)</span>
-      </div>
-      <div style="height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">
-        <div style="height:100%;width:${pct}%;background:${b.color};border-radius:3px;transition:.4s"></div>
-      </div>
-    </div>`;
-  });
-  h+=`</div>`;
-
-  // ── Alertas ──
-  const alerts=[];
-  if(weak.length)   alerts.push({icon:'🔴',title:`${weak.length} contraseña${weak.length>1?'s':''} débil${weak.length>1?'es':''}`,sub:'Menos de 8 caracteres o sin variedad',entries:weak,color:'#ff5252'});
-  if(dupes.length)  alerts.push({icon:'🟡',title:`${dupes.length} contraseña${dupes.length>1?'s':''} repetida${dupes.length>1?'s':''}`,sub:'Usada en más de un servicio',entries:[...new Map(dupes.map(e=>[e.pass,e])).values()],color:'#f59e0b'});
-  if(old.length)    alerts.push({icon:'🟠',title:`${old.length} contraseña${old.length>1?'s':''} antigua${old.length>1?'s':''}`,sub:'Sin actualizar en más de 90 días',entries:old,color:'#fb923c'});
-  if(cardWarn.length) alerts.push({icon:'💳',title:`${cardWarn.length} tarjeta${cardWarn.length>1?'s':''} por caducar`,sub:'En menos de 30 días',entries:cardWarn,color:'#a78bfa'});
-  if(docWarn.length)  alerts.push({icon:'🪪',title:`${docWarn.length} documento${docWarn.length>1?'s':''} por caducar`,sub:'En menos de 60 días',entries:docWarn,color:'#60a5fa'});
-
-  if(alerts.length){
-    alerts.forEach(a=>{
-      h+=`<div style="background:rgba(0,14,32,.6);border:1px solid ${a.color}33;border-radius:14px;padding:12px 14px;margin-bottom:10px">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-          <span style="font-size:18px">${a.icon}</span>
-          <div>
-            <div style="font-size:13px;font-weight:800;color:${a.color}">${a.title}</div>
-            <div style="font-size:11px;color:#4a7090">${a.sub}</div>
-          </div>
-        </div>`;
-      a.entries.slice(0,4).forEach(e=>{
-        h+=`<div onclick="closeModals();setTimeout(()=>quick('${e.id}'),200)"
-          style="display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid rgba(255,255,255,.05);cursor:pointer">
-          <span style="font-size:13px;color:#c0d8f0;flex:1">${safeEsc(e.service)}</span>
-          <span style="font-size:11px;color:${a.color};font-weight:700">Ver →</span>
-        </div>`;
-      });
-      if(a.entries.length>4) h+=`<div style="font-size:11px;color:#4a7090;padding-top:6px;border-top:1px solid rgba(255,255,255,.05)">y ${a.entries.length-4} más...</div>`;
-      h+=`</div>`;
-    });
-  } else {
-    h+=`<div style="text-align:center;padding:20px;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:14px;margin-bottom:12px">
-      <div style="font-size:32px;margin-bottom:8px">✅</div>
-      <div style="font-size:14px;font-weight:800;color:#00e676">Todo en orden</div>
-      <div style="font-size:12px;color:#4a7090;margin-top:4px">No se detectaron problemas de seguridad</div>
-    </div>`;
-  }
-
-  el.innerHTML=h;
 }
-// ════════════════════════════════════════════════════════
 
-// ══════════════════════════════════════════════════════════════
-//  IMPORTADOR CSV — LastPass, Bitwarden, 1Password, Chrome
-// ══════════════════════════════════════════════════════════════
-
-// Detectar formato del CSV y mapear columnas
+// ============================================================
+//  IMPORTADOR CSV - LastPass, Bitwarden, 1Password, Chrome
+// ============================================================
 function detectCsvFormat(headers){
   const h = headers.map(x=>x.toLowerCase().trim());
   // LastPass: url,username,password,totp,extra,name,grouping,fav
