@@ -4930,6 +4930,253 @@ function healthReadDocuments(){
 }
 
 // ══ PANEL DE SALUD ══════════════════════════════════════
+function healthWorstLevel(items,fallback='protected'){
+  return items.reduce((worst,item)=>{
+    const level=item&&item.level in VK_HEALTH_LEVELS?item.level:fallback;
+    return VK_HEALTH_LEVELS[level]>VK_HEALTH_LEVELS[worst]?level:worst;
+  },fallback);
+}
+
+function healthSecretKey(value){
+  return String(value||'').trim();
+}
+
+function healthCharacterGroups(value){
+  const secret=String(value||'');
+  let groups=0;
+  if(/[a-z]/.test(secret))groups++;
+  if(/[A-Z]/.test(secret))groups++;
+  if(/\d/.test(secret))groups++;
+  if(/[^A-Za-z0-9]/.test(secret))groups++;
+  return groups;
+}
+
+function healthHasObviousPasswordPattern(value){
+  const secret=String(value||'').trim();
+  const lower=secret.toLowerCase();
+
+  if(!secret)return true;
+  if(/^(.)\1+$/.test(secret))return true;
+  if(/^(0123456789|1234567890|9876543210|0987654321)/.test(secret))return true;
+  if(/^(abcdefghijklmnopqrstuvwxyz|zyxwvutsrqponmlkjihgfedcba)/i.test(secret))return true;
+  if(/^(password|contrase(?:n|\u00f1)a|qwerty|admin|welcome|bienvenido|letmein|iloveyou|abc123|123456)/i.test(lower))return true;
+  if(/^(19|20)\d{2}$/.test(secret))return true;
+
+  return false;
+}
+
+function healthHasObviousPinPattern(value){
+  const pin=String(value||'').trim();
+
+  if(!/^\d+$/.test(pin))return true;
+  if(/^(.)\1+$/.test(pin))return true;
+  if(['0123','1234','2345','3456','4567','5678','6789','9876','8765','7654','6543','5432','4321','3210','0000','1111'].includes(pin))return true;
+
+  let ascending=true;
+  let descending=true;
+
+  for(let index=1;index<pin.length;index++){
+    const previous=Number(pin[index-1]);
+    const current=Number(pin[index]);
+
+    if(current!==previous+1)ascending=false;
+    if(current!==previous-1)descending=false;
+  }
+
+  return ascending||descending;
+}
+
+function healthPasswordBaseAssessment(item){
+  const secret=healthSecretKey(item.secret);
+  const length=secret.length;
+
+  if(item.subtype==='pin'){
+    if(!secret){
+      return {level:'risk',reason:'El PIN est\u00e1 vac\u00edo.'};
+    }
+
+    if(length<4||healthHasObviousPinPattern(secret)){
+      return {level:'risk',reason:'El PIN es demasiado corto o predecible.'};
+    }
+
+    if(length<6){
+      return {level:'attention',reason:'Conviene utilizar un PIN de al menos 6 d\u00edgitos.'};
+    }
+
+    return {
+      level:length>=8?'protected':'good',
+      reason:length>=8?'PIN largo y sin patrones evidentes.':'PIN correcto y sin patrones evidentes.'
+    };
+  }
+
+  if(item.subtype==='recovery'){
+    if(!secret){
+      return {level:'risk',reason:'El c\u00f3digo de recuperaci\u00f3n est\u00e1 vac\u00edo.'};
+    }
+
+    return {
+      level:'good',
+      reason:'C\u00f3digo de recuperaci\u00f3n presente.'
+    };
+  }
+
+  if(!secret){
+    return {level:'risk',reason:'La contrase\u00f1a est\u00e1 vac\u00eda.'};
+  }
+
+  if(length<8||healthHasObviousPasswordPattern(secret)){
+    return {level:'risk',reason:'La contrase\u00f1a es demasiado corta o predecible.'};
+  }
+
+  const groups=healthCharacterGroups(secret);
+
+  if(length<12||groups<2){
+    return {level:'attention',reason:'Conviene aumentar la longitud o la variedad.'};
+  }
+
+  if(length>=16&&groups>=3){
+    return {level:'protected',reason:'Contrase\u00f1a larga, variada y sin patrones evidentes.'};
+  }
+
+  return {level:'good',reason:'Contrase\u00f1a adecuada y sin patrones evidentes.'};
+}
+
+function healthAnalyzePasswords(passwords){
+  const counts=new Map();
+
+  passwords.forEach(item=>{
+    const key=healthSecretKey(item.secret);
+    if(key)counts.set(key,(counts.get(key)||0)+1);
+  });
+
+  const items=passwords.map(item=>{
+    const assessment=healthPasswordBaseAssessment(item);
+    const key=healthSecretKey(item.secret);
+    const duplicate=!!key&&counts.get(key)>1;
+
+    if(duplicate){
+      return {
+        ...item,
+        level:'risk',
+        issue:'duplicate',
+        reason:item.subtype==='recovery'
+          ?'Este c\u00f3digo de recuperaci\u00f3n est\u00e1 repetido.'
+          :'Este secreto se utiliza en m\u00e1s de una entrada.'
+      };
+    }
+
+    return {
+      ...item,
+      level:assessment.level,
+      issue:assessment.level==='protected'||assessment.level==='good'?'none':'strength',
+      reason:assessment.reason
+    };
+  });
+
+  return {
+    level:items.length?healthWorstLevel(items,'protected'):'good',
+    items,
+    counts:{
+      total:items.length,
+      protected:items.filter(item=>item.level==='protected').length,
+      good:items.filter(item=>item.level==='good').length,
+      attention:items.filter(item=>item.level==='attention').length,
+      risk:items.filter(item=>item.level==='risk').length
+    }
+  };
+}
+
+function healthParseCardExpiry(value){
+  const match=String(value||'').trim().match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
+  if(!match)return null;
+
+  const month=Number(match[1]);
+  const year=2000+Number(match[2]);
+  return new Date(year,month,0,23,59,59,999);
+}
+
+function healthParseDocumentExpiry(value){
+  const raw=String(value||'').trim();
+  let match=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if(match){
+    const year=Number(match[1]);
+    const month=Number(match[2]);
+    const day=Number(match[3]);
+    const date=new Date(year,month-1,day,23,59,59,999);
+
+    return date.getFullYear()===year&&date.getMonth()===month-1&&date.getDate()===day
+      ?date
+      :null;
+  }
+
+  match=raw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+
+  if(match){
+    const day=Number(match[1]);
+    const month=Number(match[2]);
+    const year=Number(match[3]);
+    const date=new Date(year,month-1,day,23,59,59,999);
+
+    return date.getFullYear()===year&&date.getMonth()===month-1&&date.getDate()===day
+      ?date
+      :null;
+  }
+
+  return null;
+}
+
+function healthDaysUntil(date,now=Date.now()){
+  return Math.ceil((date.getTime()-now)/864e5);
+}
+
+function healthAnalyzeMaintenance(cards,documents,now=Date.now()){
+  const cardItems=cards.map(item=>{
+    const expiry=healthParseCardExpiry(item.expiry);
+
+    if(!expiry){
+      return {...item,level:'attention',days:null,reason:'La fecha de caducidad no es v\u00e1lida.'};
+    }
+
+    const days=healthDaysUntil(expiry,now);
+
+    if(days<0)return {...item,level:'risk',days,reason:'La tarjeta est\u00e1 caducada.'};
+    if(days<=30)return {...item,level:'attention',days,reason:'La tarjeta caduca en 30 d\u00edas o menos.'};
+    if(days<=60)return {...item,level:'good',days,reason:'La tarjeta caducar\u00e1 pr\u00f3ximamente.'};
+
+    return {...item,level:'protected',days,reason:'La tarjeta no caduca pr\u00f3ximamente.'};
+  });
+
+  const documentItems=documents.map(item=>{
+    if(!item.expiry){
+      return {...item,level:'good',days:null,reason:'Sin fecha de caducidad registrada.'};
+    }
+
+    const expiry=healthParseDocumentExpiry(item.expiry);
+
+    if(!expiry){
+      return {...item,level:'attention',days:null,reason:'La fecha de caducidad no es v\u00e1lida.'};
+    }
+
+    const days=healthDaysUntil(expiry,now);
+
+    if(days<0)return {...item,level:'risk',days,reason:'El documento est\u00e1 caducado.'};
+    if(days<=30)return {...item,level:'attention',days,reason:'El documento caduca en 30 d\u00edas o menos.'};
+    if(days<=90)return {...item,level:'good',days,reason:'El documento caducar\u00e1 pr\u00f3ximamente.'};
+
+    return {...item,level:'protected',days,reason:'El documento no caduca pr\u00f3ximamente.'};
+  });
+
+  const items=[...cardItems,...documentItems];
+
+  return {
+    level:items.length?healthWorstLevel(items,'protected'):'good',
+    cards:cardItems,
+    documents:documentItems,
+    items
+  };
+}
+
 function showHealthPanel(){
   if(!vault||!vault.length){
     toast('No hay entradas en la bóveda');return;
