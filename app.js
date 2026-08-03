@@ -4742,6 +4742,193 @@ function checkVaultReminders(){
 
 window._checkVaultReminders=checkVaultReminders;
 
+/* Estado de salud: lectura normalizada, sin modificar datos persistidos. */
+const VK_HEALTH_LEVELS={
+  protected:0,
+  good:1,
+  attention:2,
+  risk:3
+};
+
+function healthReadJson(key,fallback=null){
+  try{
+    const raw=localStorage.getItem(key);
+    return raw===null?fallback:JSON.parse(raw);
+  }catch(error){
+    return fallback;
+  }
+}
+
+function healthEntryType(entry){
+  const raw=String(entry?.entryType||entry?.type||'password').toLowerCase();
+  return raw||'password';
+}
+
+function healthPasswordSubtype(entry){
+  const type=healthEntryType(entry);
+
+  if(type==='wifi'||type==='pin'||type==='recovery'){
+    return type;
+  }
+
+  const subtype=String(entry?.subtype||'web').toLowerCase();
+  return ['web','wifi','pin','recovery'].includes(subtype)?subtype:'web';
+}
+
+function healthRecoverySecret(codes){
+  if(Array.isArray(codes)){
+    const value=codes.find(code=>typeof code==='string'&&code.trim());
+    return value?value.trim():'';
+  }
+
+  return typeof codes==='string'?codes.trim():'';
+}
+
+function healthPasswordSecret(entry,subtype){
+  if(subtype==='recovery'){
+    return healthRecoverySecret(entry?.codes);
+  }
+
+  if(subtype==='wifi'){
+    return String(entry?.password||entry?.pass||entry?.wifiPass||'');
+  }
+
+  return String(entry?.password||entry?.pass||'');
+}
+
+function healthEntryTitle(entry,fallback){
+  return String(
+    entry?.title||
+    entry?.service||
+    entry?.wifiSsid||
+    entry?.holder||
+    entry?.name||
+    fallback||
+    ''
+  ).trim();
+}
+
+function healthEntryUpdatedAt(entry){
+  const value=Number(entry?.updatedAt||entry?.updated||entry?.createdAt||0);
+  return Number.isFinite(value)&&value>0?value:0;
+}
+
+function healthReadPasswords(){
+  if(!Array.isArray(vault))return [];
+
+  return vault
+    .filter(isPasswordFamilyEntry)
+    .map(entry=>{
+      const subtype=healthPasswordSubtype(entry);
+
+      return {
+        id:String(entry.id||''),
+        source:'vault',
+        kind:'password',
+        subtype,
+        title:healthEntryTitle(entry,subtype==='wifi'?'WiFi':'Contrase\u00f1a'),
+        secret:healthPasswordSecret(entry,subtype),
+        updatedAt:healthEntryUpdatedAt(entry),
+        raw:entry
+      };
+    })
+    .filter(item=>item.id);
+}
+
+function healthReadCards(){
+  const items=[];
+  const moduleCards=window.vkCards&&typeof window.vkCards.read==='function'
+    ?window.vkCards.read()
+    :[];
+
+  if(Array.isArray(moduleCards)){
+    moduleCards.forEach(card=>{
+      if(!card||typeof card!=='object'||!card.id)return;
+
+      items.push({
+        id:String(card.id),
+        source:'cards',
+        kind:'card',
+        title:healthEntryTitle(card,'Tarjeta'),
+        expiry:String(card.expiry||'').trim(),
+        updatedAt:healthEntryUpdatedAt(card),
+        raw:card
+      });
+    });
+  }
+
+  if(Array.isArray(vault)){
+    vault
+      .filter(entry=>healthEntryType(entry)==='card')
+      .forEach(card=>{
+        if(!card?.id)return;
+
+        items.push({
+          id:String(card.id),
+          source:'vault',
+          kind:'card',
+          title:healthEntryTitle(card,'Tarjeta'),
+          expiry:String(card.cardExpiry||card.expiry||'').trim(),
+          updatedAt:healthEntryUpdatedAt(card),
+          raw:card
+        });
+      });
+  }
+
+  return items;
+}
+
+function healthReadDocuments(){
+  const items=[];
+  const moduleDocuments=window.vkDocuments&&typeof window.vkDocuments.read==='function'
+    ?window.vkDocuments.read()
+    :[];
+
+  if(Array.isArray(moduleDocuments)){
+    moduleDocuments.forEach(documentEntry=>{
+      if(!documentEntry||typeof documentEntry!=='object'||!documentEntry.id)return;
+
+      items.push({
+        id:String(documentEntry.id),
+        source:'documents',
+        kind:'document',
+        subtype:String(documentEntry.category||'other'),
+        title:healthEntryTitle(documentEntry,'Documento'),
+        expiry:String(documentEntry.expiry||'').trim(),
+        updatedAt:healthEntryUpdatedAt(documentEntry),
+        raw:documentEntry
+      });
+    });
+  }
+
+  if(Array.isArray(vault)){
+    vault
+      .filter(entry=>['id','license'].includes(healthEntryType(entry)))
+      .forEach(documentEntry=>{
+        if(!documentEntry?.id)return;
+
+        const type=healthEntryType(documentEntry);
+
+        items.push({
+          id:String(documentEntry.id),
+          source:'vault',
+          kind:'document',
+          subtype:type,
+          title:healthEntryTitle(documentEntry,'Documento'),
+          expiry:String(
+            type==='license'
+              ?documentEntry.licExpiry||''
+              :documentEntry.idExpiry||''
+          ).trim(),
+          updatedAt:healthEntryUpdatedAt(documentEntry),
+          raw:documentEntry
+        });
+      });
+  }
+
+  return items;
+}
+
 // ══ PANEL DE SALUD ══════════════════════════════════════
 function showHealthPanel(){
   if(!vault||!vault.length){
