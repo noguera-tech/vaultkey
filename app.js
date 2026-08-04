@@ -211,7 +211,7 @@ function lockRemaining(){
   return m.lockedUntil>now?Math.ceil((m.lockedUntil-now)/1000):0;
 }
 function toast(t,snd){const el=$('toast');if(!el)return;el.textContent=t;el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>{el.style.opacity='0'},2200);if(snd==='ok'||(!snd&&(t.startsWith('✓')||t.startsWith('✅')||t.includes('activad')||t.includes('guardad')||t.includes('importad')||t.includes('exportad')||t.includes('restaurad')||t.includes('desactivad')))){soundSuccess&&soundSuccess();}else if(snd==='err'||(!snd&&(t.includes('obligatorio')||t.includes('inválido')||t.includes('no tiene formato')||t.includes('no es válida')||t.includes('mínimo')||t.includes('No se pudo')||t.includes('no soporta')||t.includes('no reconocida')))){soundError&&soundError();}}
-function vibe(ms=40){try{if(localStorage.getItem('vk_vibe')==='0')return;navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+function vibe(ms=40){try{if(localStorage.getItem('vk_vibe')!=='1')return;navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
 
 // ── SISTEMA DE SONIDOS ──────────────────────────────────────
 let _actx=null;
@@ -743,13 +743,13 @@ window.openInteractionSettings=function(){
 function syncInteractionHapticSwitch(){
   var btn=document.getElementById('interactionHapticSwitch');
   if(!btn)return;
-  var enabled=localStorage.getItem('vk_vibe')!=='0';
+  var enabled=localStorage.getItem('vk_vibe')==='1';
   btn.setAttribute('aria-checked',enabled?'true':'false');
 }
 
 window.toggleHapticFeedback=function(){
   var btn=document.getElementById('interactionHapticSwitch');
-  var enabled=localStorage.getItem('vk_vibe')!=='0';
+  var enabled=localStorage.getItem('vk_vibe')==='1';
   var next=!enabled;
   localStorage.setItem('vk_vibe',next?'1':'0');
   if(btn)btn.setAttribute('aria-checked',next?'true':'false');
