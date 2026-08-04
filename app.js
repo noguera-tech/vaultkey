@@ -6281,7 +6281,7 @@ try {
     if(typeof window.show==='function')window.show('noteEdit','right');
   };
 
-  window.saveNote=function(id,title,content){
+  window.saveNote=async function(id,title,content){
     title=String(title||'').trim();
     content=String(content||'').trim();
 
@@ -6291,6 +6291,27 @@ try {
       var input=document.getElementById(target);
       if(input)input.focus();
       return false;
+    }
+
+    // VK 2.0 bridge: las notas nuevas pasan a la bóveda cifrada.
+    if(typeof vkStore!=='undefined'&&vkStore.hasVault()&&
+       typeof vkModels!=='undefined'){
+      try{
+        var entry=vkModels.create('note',{
+          title:title,
+          body:content
+        });
+        vault.push(entry);
+        await persist();
+        if(typeof render==='function')render();
+        if(typeof window.toast==='function')window.toast('Nota guardada','ok');
+        window.showNotes('left');
+        return true;
+      }catch(error){
+        console.error('saveNote VK2:',error);
+        if(typeof window.toast==='function')window.toast('No se pudo guardar la nota','err');
+        return false;
+      }
     }
 
     var notes=notesRead();
