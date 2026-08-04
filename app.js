@@ -5339,10 +5339,10 @@ function healthReadContinuity(hasContent,now=Date.now()){
       };
     }else{
       backup={
-        level:'risk',
+        level:'attention',
         lastSync:0,
         ageDays:null,
-        reason:'Nunca se ha confirmado un respaldo en Google Drive.'
+        reason:'A\u00fan no has creado una copia de seguridad en Google Drive.'
       };
     }
   }else if(ageDays<=7){
@@ -5406,14 +5406,9 @@ function healthCountActions(security,continuity,maintenance){
     security.local.autolock
   ];
 
-  const continuityItems=[
-    continuity.backup,
-    continuity.kit
-  ];
-
   const maintenanceItems=maintenance.items;
 
-  return [...securityItems,...continuityItems,...maintenanceItems]
+  return [...securityItems,...maintenanceItems]
     .filter(item=>item.level==='attention'||item.level==='risk')
     .length;
 }
@@ -5446,7 +5441,6 @@ function buildVaultHealthReport(now=Date.now()){
   const overallLevel=hasContent?healthWorstLevel(
     [
       {level:security.level},
-      {level:continuity.level},
       {level:maintenance.level}
     ],
     'protected'
