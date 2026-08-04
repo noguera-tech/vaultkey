@@ -6570,7 +6570,7 @@ try {
     }
   };
 
-  window.saveCard=function(id,holder,number,expiry,cvv,note){
+  window.saveCard=async function(id,holder,number,expiry,cvv,note){
     holder=String(holder||'').trim();
     number=cardDigits(number);
     expiry=normalizeExpiry(expiry);
@@ -6599,6 +6599,30 @@ try {
       if(typeof window.toast==='function')window.toast('El CVV debe tener 3 o 4 dígitos','err');
       document.getElementById(id?'cardEditCvv':'cardCreateCvv')?.focus();
       return false;
+    }
+
+    // VK 2.0 bridge: las tarjetas nuevas pasan a la bóveda cifrada.
+    if(typeof vkStore!=='undefined'&&vkStore.hasVault()&&
+       typeof vkModels!=='undefined'){
+      try{
+        var entry=vkModels.create('card',{
+          holder:holder,
+          number:number,
+          expiry:expiry,
+          cvv:cvv,
+          notes:note
+        });
+        vault.push(entry);
+        await persist();
+        if(typeof render==='function')render();
+        if(typeof window.toast==='function')window.toast('Tarjeta guardada','ok');
+        window.showCards('left');
+        return true;
+      }catch(error){
+        console.error('saveCard VK2:',error);
+        if(typeof window.toast==='function')window.toast('No se pudo guardar la tarjeta','err');
+        return false;
+      }
     }
 
     var cards=cardsRead();
