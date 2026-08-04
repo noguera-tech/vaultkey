@@ -6611,6 +6611,7 @@ try {
     }
 
     cardsWrite(cards);
+    if(typeof renderVaultHealthDashboard==='function')renderVaultHealthDashboard();
     updateCardsCount();
     if(typeof window.toast==='function')window.toast('Tarjeta guardada','ok');
     window.showCards('left');
@@ -6627,6 +6628,7 @@ try {
     if(!await vkConfirm('¿Eliminar tarjeta?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'}))return;
 
     cardsWrite(cardsRead().filter(function(item){return item.id!==id;}));
+    if(typeof renderVaultHealthDashboard==='function')renderVaultHealthDashboard();
     window.__vkCurrentCardId=null;
     updateCardsCount();
     if(typeof window.toast==='function')window.toast('Tarjeta eliminada','ok');
