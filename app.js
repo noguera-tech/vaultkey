@@ -5651,6 +5651,12 @@ function renderHealthPanel(){
         '<p class="vk-health-overview__summary">'+safeEsc(report.summary)+'</p>'+
         '<p class="vk-health-overview__action">'+safeEsc(healthDashboardActionText(report))+'</p>'+
       '</section>'+
+      '<div class="vk-health-inventory vk-health-metrics vk-health-metrics--four">'+
+        healthPanelMetric('Contrase\u00f1as',report.sources.passwords)+
+        healthPanelMetric('Notas',report.sources.notes)+
+        healthPanelMetric('Tarjetas',report.sources.cards)+
+        healthPanelMetric('Documentos',report.sources.documents)+
+      '</div>'+
       '<div class="vk-health-areas">'+
         healthPanelArea('Seguridad',securityBody)+
         healthPanelArea('Continuidad',continuityBody)+

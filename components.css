@@ -2918,6 +2918,22 @@ body.vk-lock { overflow: hidden; }
   grid-template-columns: repeat(3,minmax(0,1fr));
 }
 
+.vk-health-metrics--four {
+  grid-template-columns: repeat(4,minmax(0,1fr));
+}
+
+.vk-health-inventory {
+  margin-top: 16px;
+}
+
+.vk-health-inventory .vk-health-metric {
+  padding: 8px 4px 7px;
+}
+
+.vk-health-inventory .vk-health-metric__label {
+  font-size: 11px;
+}
+
 .vk-health-metric {
   min-width: 0;
   padding: 10px 8px 9px;
