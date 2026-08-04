@@ -5317,7 +5317,7 @@ function healthReadLocalSecurity(){
   };
 }
 
-function healthReadContinuity(now=Date.now()){
+function healthReadContinuity(hasContent,now=Date.now()){
   const rawLastSync=localStorage.getItem('vk_drive_last_sync');
   const lastSync=Number(rawLastSync);
   const validLastSync=Number.isFinite(lastSync)&&lastSync>0&&lastSync<=now;
@@ -5326,12 +5326,21 @@ function healthReadContinuity(now=Date.now()){
   let backup;
 
   if(!validLastSync){
-    backup={
-      level:'risk',
-      lastSync:0,
-      ageDays:null,
-      reason:'Nunca se ha confirmado un respaldo en Google Drive.'
-    };
+    if(!hasContent){
+      backup={
+        level:'good',
+        lastSync:0,
+        ageDays:null,
+        reason:'La b\u00f3veda todav\u00eda no contiene datos que necesiten respaldo.'
+      };
+    }else{
+      backup={
+        level:'risk',
+        lastSync:0,
+        ageDays:null,
+        reason:'Nunca se ha confirmado un respaldo en Google Drive.'
+      };
+    }
   }else if(ageDays<=7){
     backup={
       level:'protected',
@@ -5410,11 +5419,13 @@ function buildVaultHealthReport(now=Date.now()){
   const notes=healthReadNotes();
   const cards=healthReadCards();
   const documents=healthReadDocuments();
+  const hasContent=
+    passwords.length+notes.length+cards.length+documents.length>0;
 
   const passwordAnalysis=healthAnalyzePasswords(passwords);
   const localSecurity=healthReadLocalSecurity();
   const maintenance=healthAnalyzeMaintenance(cards,documents,now);
-  const continuity=healthReadContinuity(now);
+  const continuity=healthReadContinuity(hasContent,now);
 
   const security={
     level:healthWorstLevel(
