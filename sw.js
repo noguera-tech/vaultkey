@@ -3,11 +3,12 @@
 //  Versión auto-generada: no editar CACHE_VERSION manualmente.
 //  Para forzar actualización en usuarios: incrementar el número.
 // ─────────────────────────────────────────────────────────────
-const CACHE_VERSION = 29;
+const CACHE_VERSION = 30;
 const CACHE = `vaultkey-v${CACHE_VERSION}`;
 
 const FILES = [
   './index.html',
+  './app.html',
   './style.css',
   './theme.css',
   './components.css',
@@ -24,8 +25,7 @@ const FILES = [
   './drive.js',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png',
-  './vaultkey-mark.svg?v=010'
+  './icon-512.png'
 ];
 
 const NO_CACHE_HOSTS = [
