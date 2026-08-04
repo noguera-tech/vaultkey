@@ -4836,6 +4836,30 @@ function healthReadPasswords(){
     .filter(item=>item.id);
 }
 
+function healthReadNotes(){
+  const moduleNotes=
+    window.vkNotes&&typeof window.vkNotes.read==='function'
+      ?window.vkNotes.read()
+      :null;
+
+  const source=Array.isArray(moduleNotes)
+    ?moduleNotes
+    :Array.isArray(vault)
+      ?vault.filter(entry=>healthEntryType(entry)==='note')
+      :[];
+
+  return source
+    .filter(note=>note&&typeof note==='object'&&note.id)
+    .map(note=>({
+      id:String(note.id),
+      source:Array.isArray(moduleNotes)?'notes':'vault',
+      kind:'note',
+      title:healthEntryTitle(note,'Nota'),
+      updatedAt:healthEntryUpdatedAt(note),
+      raw:note
+    }));
+}
+
 function healthReadCards(){
   const items=[];
   const moduleCards=window.vkCards&&typeof window.vkCards.read==='function'
@@ -5179,6 +5203,10 @@ function healthAnalyzeMaintenance(cards,documents,now=Date.now()){
 }
 
 const VK_HEALTH_LEVEL_META={
+  empty:{
+    label:'Sin datos',
+    short:'A\u00fan no hay datos en la b\u00f3veda.'
+  },
   protected:{
     label:'Protegida',
     short:'Todo está correctamente protegido.'
@@ -5293,7 +5321,7 @@ function healthReadLocalSecurity(){
   };
 }
 
-function healthReadContinuity(now=Date.now()){
+function healthReadContinuity(hasContent,now=Date.now()){
   const rawLastSync=localStorage.getItem('vk_drive_last_sync');
   const lastSync=Number(rawLastSync);
   const validLastSync=Number.isFinite(lastSync)&&lastSync>0&&lastSync<=now;
@@ -5302,12 +5330,21 @@ function healthReadContinuity(now=Date.now()){
   let backup;
 
   if(!validLastSync){
-    backup={
-      level:'risk',
-      lastSync:0,
-      ageDays:null,
-      reason:'Nunca se ha confirmado un respaldo en Google Drive.'
-    };
+    if(!hasContent){
+      backup={
+        level:'good',
+        lastSync:0,
+        ageDays:null,
+        reason:'La b\u00f3veda todav\u00eda no contiene datos que necesiten respaldo.'
+      };
+    }else{
+      backup={
+        level:'attention',
+        lastSync:0,
+        ageDays:null,
+        reason:'A\u00fan no has creado una copia de seguridad en Google Drive.'
+      };
+    }
   }else if(ageDays<=7){
     backup={
       level:'protected',
@@ -5369,27 +5406,25 @@ function healthCountActions(security,continuity,maintenance){
     security.local.autolock
   ];
 
-  const continuityItems=[
-    continuity.backup,
-    continuity.kit
-  ];
-
   const maintenanceItems=maintenance.items;
 
-  return [...securityItems,...continuityItems,...maintenanceItems]
+  return [...securityItems,...maintenanceItems]
     .filter(item=>item.level==='attention'||item.level==='risk')
     .length;
 }
 
 function buildVaultHealthReport(now=Date.now()){
   const passwords=healthReadPasswords();
+  const notes=healthReadNotes();
   const cards=healthReadCards();
   const documents=healthReadDocuments();
+  const hasContent=
+    passwords.length+notes.length+cards.length+documents.length>0;
 
   const passwordAnalysis=healthAnalyzePasswords(passwords);
   const localSecurity=healthReadLocalSecurity();
   const maintenance=healthAnalyzeMaintenance(cards,documents,now);
-  const continuity=healthReadContinuity(now);
+  const continuity=healthReadContinuity(hasContent,now);
 
   const security={
     level:healthWorstLevel(
@@ -5403,14 +5438,13 @@ function buildVaultHealthReport(now=Date.now()){
     local:localSecurity
   };
 
-  const overallLevel=healthWorstLevel(
+  const overallLevel=hasContent?healthWorstLevel(
     [
       {level:security.level},
-      {level:continuity.level},
       {level:maintenance.level}
     ],
     'protected'
-  );
+  ):'empty';
 
   const actionCount=healthCountActions(
     security,
@@ -5429,6 +5463,7 @@ function buildVaultHealthReport(now=Date.now()){
     maintenance,
     sources:{
       passwords:passwords.length,
+      notes:notes.length,
       cards:cards.length,
       documents:documents.length
     }
@@ -5436,6 +5471,10 @@ function buildVaultHealthReport(now=Date.now()){
 }
 
 function healthDashboardActionText(report){
+  if(report.level==='empty'){
+    return 'A\u00f1ade tu primera entrada para comenzar el an\u00e1lisis.';
+  }
+
   if(report.actionCount===0){
     return 'No hay acciones pendientes.';
   }
@@ -5612,6 +5651,12 @@ function renderHealthPanel(){
         '<p class="vk-health-overview__summary">'+safeEsc(report.summary)+'</p>'+
         '<p class="vk-health-overview__action">'+safeEsc(healthDashboardActionText(report))+'</p>'+
       '</section>'+
+      '<div class="vk-health-inventory vk-health-metrics vk-health-metrics--four">'+
+        healthPanelMetric('Contrase\u00f1as',report.sources.passwords)+
+        healthPanelMetric('Notas',report.sources.notes)+
+        healthPanelMetric('Tarjetas',report.sources.cards)+
+        healthPanelMetric('Documentos',report.sources.documents)+
+      '</div>'+
       '<div class="vk-health-areas">'+
         healthPanelArea('Seguridad',securityBody)+
         healthPanelArea('Continuidad',continuityBody)+
@@ -6566,6 +6611,7 @@ try {
     }
 
     cardsWrite(cards);
+    if(typeof renderVaultHealthDashboard==='function')renderVaultHealthDashboard();
     updateCardsCount();
     if(typeof window.toast==='function')window.toast('Tarjeta guardada','ok');
     window.showCards('left');
@@ -6582,6 +6628,7 @@ try {
     if(!await vkConfirm('¿Eliminar tarjeta?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'}))return;
 
     cardsWrite(cardsRead().filter(function(item){return item.id!==id;}));
+    if(typeof renderVaultHealthDashboard==='function')renderVaultHealthDashboard();
     window.__vkCurrentCardId=null;
     updateCardsCount();
     if(typeof window.toast==='function')window.toast('Tarjeta eliminada','ok');

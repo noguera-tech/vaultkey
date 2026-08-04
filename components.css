@@ -2581,6 +2581,11 @@ body.vk-lock { overflow: hidden; }
   white-space: nowrap;
 }
 
+.vk-dash-status[data-health-level="empty"] .vk-dash-status__dot,
+.vk-dash-status__area-dot[data-health-level="empty"] {
+  background: #64748b;
+}
+
 .vk-dash-status[data-health-level="protected"] .vk-dash-status__dot,
 .vk-dash-status__area-dot[data-health-level="protected"] {
   background: var(--vk-success);
@@ -2883,6 +2888,10 @@ body.vk-lock { overflow: hidden; }
   background: #3b82f6;
 }
 
+.vk-health-status[data-health-level="empty"] .vk-health-status__dot {
+  background: #64748b;
+}
+
 .vk-health-status[data-health-level="protected"] .vk-health-status__dot {
   background: var(--vk-success);
 }
@@ -2907,6 +2916,22 @@ body.vk-lock { overflow: hidden; }
 
 .vk-health-metrics--three {
   grid-template-columns: repeat(3,minmax(0,1fr));
+}
+
+.vk-health-metrics--four {
+  grid-template-columns: repeat(4,minmax(0,1fr));
+}
+
+.vk-health-inventory {
+  margin-top: 16px;
+}
+
+.vk-health-inventory .vk-health-metric {
+  padding: 8px 4px 7px;
+}
+
+.vk-health-inventory .vk-health-metric__label {
+  font-size: 11px;
 }
 
 .vk-health-metric {
