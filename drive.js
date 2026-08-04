@@ -196,6 +196,8 @@ function driveRequestToken() {
 async function driveConnect() {
   driveBeginOAuthGuard();
   driveSetUiState('syncing');
+  let retry = false;
+
   try {
     await driveWaitForGoogleIdentity();
     const response = await driveRequestToken();
@@ -211,11 +213,24 @@ async function driveConnect() {
   } catch (error) {
     localStorage.removeItem(DRIVE_TOKEN_KEY);
     driveSyncUI();
-    await driveShowError('No se pudo conectar con Drive', error);
-    return false;
+    console.error('Drive: No se pudo conectar con Google Drive', error);
+
+    if (typeof vkConfirm === 'function') {
+      retry = await vkConfirm(
+        'No se pudo conectar con Google Drive',
+        'No hemos podido establecer la conexi?n.\n\nComprueba tu conexi?n a Internet e int?ntalo de nuevo.',
+        {
+          variant: 'drive-connect-error',
+          confirmText: 'Reintentar'
+        }
+      );
+    }
   } finally {
     driveEndOAuthGuard();
   }
+
+  if (retry) return driveConnect();
+  return false;
 }
 
 // ---------- Drive API: buscar / subir / descargar ----------

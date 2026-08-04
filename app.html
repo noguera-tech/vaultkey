@@ -158,6 +158,93 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 #confirmModal.vk-confirm--drive-restore .vk-confirm-icon svg{display:block;width:100%;height:100%}
 #confirmModal.vk-confirm--drive-restore #confirmMsg{margin:36px auto 0;max-width:249px;font-size:12px;line-height:1.25}
 
+#confirmModal.vk-confirm--drive-connect-error{
+  inset:0;
+  padding:16px;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,7,18,.85)
+}
+#confirmModal.vk-confirm--drive-connect-error .sheet{
+  box-sizing:border-box;
+  position:relative;
+  width:300px;
+  max-width:calc(100vw - 32px);
+  height:240px;
+  max-height:none;
+  overflow:hidden;
+  padding:21px 10px 20px;
+  border:1px solid rgba(58,74,96,.6);
+  border-radius:16px;
+  background:#243246;
+  box-shadow:none
+}
+#confirmModal.vk-confirm--drive-connect-error .sheetHead{
+  display:block;
+  margin:0
+}
+#confirmModal.vk-confirm--drive-connect-error .sheetTitle{
+  margin:0;
+  color:#fff;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:24px;
+  line-height:normal;
+  font-weight:700;
+  text-align:center;
+  text-shadow:none
+}
+#confirmModal.vk-confirm--drive-connect-error .spacer,
+#confirmModal.vk-confirm--drive-connect-error #confirmClose{
+  display:none
+}
+#confirmModal.vk-confirm--drive-connect-error #confirmMsg{
+  margin:12px 0 0;
+  color:rgba(167,182,201,.8);
+  font-family:Inter,system-ui,sans-serif;
+  font-size:14px;
+  line-height:1.25;
+  font-weight:500;
+  text-align:center;
+  white-space:pre-line
+}
+#confirmModal.vk-confirm--drive-connect-error .rowBtns{
+  position:absolute;
+  left:39px;
+  right:39px;
+  bottom:20px;
+  display:grid;
+  grid-template-columns:85px 85px;
+  justify-content:space-between;
+  gap:0
+}
+#confirmModal.vk-confirm--drive-connect-error .rowBtns>button{
+  box-sizing:border-box;
+  width:85px;
+  height:43px;
+  min-width:0;
+  padding:0;
+  border:1px solid #3a4a60;
+  border-radius:16px;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:14px;
+  line-height:normal;
+  font-weight:400;
+  color:#fff;
+  box-shadow:none
+}
+#confirmModal.vk-confirm--drive-connect-error #confirmCancel{
+  background:transparent
+}
+#confirmModal.vk-confirm--drive-connect-error #confirmOk{
+  border-color:#3a4a60;
+  background:#f59e0b;
+  color:#fff
+}
+#confirmModal.vk-confirm--drive-connect-error #confirmCancel:active,
+#confirmModal.vk-confirm--drive-connect-error #confirmOk:active{
+  opacity:.84;
+  transform:scale(.97)
+}
 #confirmModal.vk-confirm--reset #confirmCancel:active,#confirmModal.vk-confirm--reset #confirmOk:active,#confirmModal.vk-confirm--wipe #confirmCancel:active,#confirmModal.vk-confirm--wipe #confirmOk:active,#confirmModal.vk-confirm--drive-disconnect #confirmCancel:active,#confirmModal.vk-confirm--drive-disconnect #confirmOk:active,#confirmModal.vk-confirm--drive-restore #confirmCancel:active,#confirmModal.vk-confirm--drive-restore #confirmOk:active,#confirmModal.vk-confirm--delete-password #confirmCancel:active,#confirmModal.vk-confirm--delete-password #confirmOk:active{opacity:.84;transform:scale(.97)}
 .vk-auto-header{box-sizing:border-box;height:64px;background:#243246;border-bottom:1px solid #000;display:flex;align-items:center;padding:0 24px}
 .vk-auto-back{width:32px;height:32px;padding:0;border:0;background:transparent;color:#a7b6c9;display:flex;align-items:center;justify-content:center;cursor:pointer}
