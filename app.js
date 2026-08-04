@@ -801,6 +801,23 @@ function syncNotificationsMasterStatus(){
   }
 }
 
+/* ============================================================
+   Interacción
+   ============================================================ */
+
+window.openInteractionSettings=function(){
+  var screen=document.getElementById('interactionSettings');
+  if(!screen)return;
+  try{
+    if(typeof window.show==='function'){
+      screen.hidden=false;
+      window.show('interactionSettings','right');
+    }
+  }catch(error){
+    console.error('No se pudo abrir Interacción',error);
+  }
+};
+
 window.openNotificationsSettings=function(){
   var screen=document.getElementById('notificationsSettings');
   if(!screen)return;
