@@ -4836,6 +4836,30 @@ function healthReadPasswords(){
     .filter(item=>item.id);
 }
 
+function healthReadNotes(){
+  const moduleNotes=
+    window.vkNotes&&typeof window.vkNotes.read==='function'
+      ?window.vkNotes.read()
+      :null;
+
+  const source=Array.isArray(moduleNotes)
+    ?moduleNotes
+    :Array.isArray(vault)
+      ?vault.filter(entry=>healthEntryType(entry)==='note')
+      :[];
+
+  return source
+    .filter(note=>note&&typeof note==='object'&&note.id)
+    .map(note=>({
+      id:String(note.id),
+      source:Array.isArray(moduleNotes)?'notes':'vault',
+      kind:'note',
+      title:healthEntryTitle(note,'Nota'),
+      updatedAt:healthEntryUpdatedAt(note),
+      raw:note
+    }));
+}
+
 function healthReadCards(){
   const items=[];
   const moduleCards=window.vkCards&&typeof window.vkCards.read==='function'
@@ -5383,6 +5407,7 @@ function healthCountActions(security,continuity,maintenance){
 
 function buildVaultHealthReport(now=Date.now()){
   const passwords=healthReadPasswords();
+  const notes=healthReadNotes();
   const cards=healthReadCards();
   const documents=healthReadDocuments();
 
@@ -5429,6 +5454,7 @@ function buildVaultHealthReport(now=Date.now()){
     maintenance,
     sources:{
       passwords:passwords.length,
+      notes:notes.length,
       cards:cards.length,
       documents:documents.length
     }
