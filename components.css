@@ -2581,6 +2581,11 @@ body.vk-lock { overflow: hidden; }
   white-space: nowrap;
 }
 
+.vk-dash-status[data-health-level="empty"] .vk-dash-status__dot,
+.vk-dash-status__area-dot[data-health-level="empty"] {
+  background: #64748b;
+}
+
 .vk-dash-status[data-health-level="protected"] .vk-dash-status__dot,
 .vk-dash-status__area-dot[data-health-level="protected"] {
   background: var(--vk-success);
@@ -2881,6 +2886,10 @@ body.vk-lock { overflow: hidden; }
   flex: none;
   border-radius: 50%;
   background: #3b82f6;
+}
+
+.vk-health-status[data-health-level="empty"] .vk-health-status__dot {
+  background: #64748b;
 }
 
 .vk-health-status[data-health-level="protected"] .vk-health-status__dot {

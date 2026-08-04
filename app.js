@@ -5203,6 +5203,10 @@ function healthAnalyzeMaintenance(cards,documents,now=Date.now()){
 }
 
 const VK_HEALTH_LEVEL_META={
+  empty:{
+    label:'Sin datos',
+    short:'A\u00fan no hay datos en la b\u00f3veda.'
+  },
   protected:{
     label:'Protegida',
     short:'Todo está correctamente protegido.'
@@ -5439,14 +5443,14 @@ function buildVaultHealthReport(now=Date.now()){
     local:localSecurity
   };
 
-  const overallLevel=healthWorstLevel(
+  const overallLevel=hasContent?healthWorstLevel(
     [
       {level:security.level},
       {level:continuity.level},
       {level:maintenance.level}
     ],
     'protected'
-  );
+  ):'empty';
 
   const actionCount=healthCountActions(
     security,
@@ -5473,6 +5477,10 @@ function buildVaultHealthReport(now=Date.now()){
 }
 
 function healthDashboardActionText(report){
+  if(report.level==='empty'){
+    return 'A\u00f1ade tu primera entrada para comenzar el an\u00e1lisis.';
+  }
+
   if(report.actionCount===0){
     return 'No hay acciones pendientes.';
   }
