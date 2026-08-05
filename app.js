@@ -429,17 +429,21 @@ async function handlePin(){return window.handlePin?window.handlePin():undefined;
 async function unlockOk(p){return window.unlockOk?window.unlockOk(p):undefined;}
 async function persist(p=lastKey){
   // VK 2.0 bridge: cifrar en vk2_blob; return para no escribir LS_DATA
-  if(typeof vkSession!=='undefined'&&vkSession.isActive()&&typeof vkCrypto!=='undefined'){
-    const _dek=vkSession.getDEK();
-    if(_dek){
-      try{
-        const _ct=await vkCrypto.encryptVault(_dek,
-          JSON.stringify({app:'VaultKey',schemaVersion:2,entries:vault||[]}));
-        const _blob=vkStore.loadBlob();
-        if(_blob){_blob.vault=_ct;_blob.updatedAt=Date.now();vkStore.saveBlob(_blob);}
-      }catch(e){console.warn('VK2 persist:',e);}
-      return;
+  if(typeof vkSession!=='undefined'&&vkSession.isActive()){
+    try{
+      const _dek=vkSession.getDEK();
+      if(!_dek)throw new Error('No hay una DEK activa para persistir la bóveda VK2');
+      const _ct=await vkCrypto.encryptVault(_dek,
+        JSON.stringify({app:'VaultKey',schemaVersion:2,entries:vault||[]}));
+      const _blob=vkStore.loadBlob();
+      if(!_blob)throw new Error('vk2_blob no existe, no se puede persistir');
+      _blob.vault=_ct;_blob.updatedAt=Date.now();
+      vkStore.saveBlob(_blob);
+    }catch(e){
+      console.warn('VK2 persist:',e);
+      throw e;
     }
+    return;
   }
   if(!p)return;localStorage.setItem(LS_DATA,JSON.stringify(await encryptData(vault,p)));}
 const NAV_ORDER=['home','passwords','fav','settings'];
@@ -608,7 +612,21 @@ function show(id,dir){
 
 })();
 function lock(){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();vibe(30);soundLock();unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay()}
-async function wipe(){if(await vkConfirm('Borrar todos los datos','Se eliminará la bóveda de este dispositivo. Esta acción no se puede deshacer.',{variant:'wipe',confirmText:'Borrar'})){soundError();vibe([60,30,60,30,100]);const isVk2=typeof vkStore!=='undefined'&&vkStore.hasVault();if(isVk2){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();try{await vkStore.wipeLocal();}catch(e){console.warn('VK2 wipe:',e);}localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);localStorage.removeItem('vaultkey_onboarding_v130');openOnboardingHard();return;}localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];lock()}}
+async function wipe(){if(await vkConfirm('Borrar todos los datos','Se eliminará la bóveda de este dispositivo. Esta acción no se puede deshacer.',{variant:'wipe',confirmText:'Borrar'})){soundError();vibe([60,30,60,30,100]);const isVk2=typeof vkStore!=='undefined'&&vkStore.hasVault();if(isVk2){
+      if(typeof vkAttachments==='undefined'||typeof vkAttachments.deleteAll!=='function'){
+        console.error('wipe: vkAttachments no disponible, borrado abortado');
+        toast('No se pudo completar el borrado. Inténtalo de nuevo.','err');
+        return;
+      }
+      try{
+        await vkAttachments.deleteAll();
+      }catch(err){
+        console.error('wipe: fallo al borrar adjuntos IndexedDB',err);
+        toast('No se pudo completar el borrado. Inténtalo de nuevo.','err');
+        return;
+      }
+      if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();try{await vkStore.wipeLocal();}catch(err){console.error('wipe: fallo al borrar la bóveda VK2',err);toast('No se pudo completar el borrado. Inténtalo de nuevo.','err');return;}localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);localStorage.removeItem('vaultkey_onboarding_v130');openOnboardingHard();return;
+    }localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];lock()}}
 
 /* ============================================================
    Zona de peligro — /settings/danger (pantalla dangerZoneSettings)
@@ -1830,8 +1848,8 @@ function toggleQvNote(){const el=$('qvNote');if(!el)return;if(el.textContent==='
 function toggleQvCard(){const el=$('qvCardNum');if(!el)return;if(el.textContent.includes('•')){el.textContent=current.cardNumber;}else{el.textContent='•••• •••• •••• '+current.cardNumber.slice(-4);}}
 function toggleQvCvv(){const el=$('qvCvv');if(!el)return;el.textContent=el.textContent==='•••'?current.cardCvv:'•••';}
 function toggleQvWifiPass(){const el=$('qvWifiPass');if(!el)return;el.textContent=el.textContent==='••••••••'?current.wifiPass:'••••••••';}
-async function toggleFav(id){let e=vault.find(x=>x.id===id);if(e){e.fav=!e.fav;await persist();closeModals();render();toast('Actualizado')}}
-async function delEntry(id){vibe([40,20,40]);soundDelete();if(await vkConfirm('Eliminar entrada','¿Eliminar esta entrada de la bóveda?')){vault=vault.filter(e=>e.id!==id);await persist();closeModals();render();toast('Entrada eliminada');try{driveAutoSync();}catch(e){}}}
+async function toggleFav(id){let e=vault.find(x=>x.id===id);if(e){const _prevFav=e.fav;e.fav=!e.fav;try{await persist();closeModals();render();toast('Actualizado')}catch(err){e.fav=_prevFav;console.error('toggleFav:',err);toast('No se pudo actualizar','err')}}}
+async function delEntry(id){vibe([40,20,40]);soundDelete();if(await vkConfirm('Eliminar entrada','¿Eliminar esta entrada de la bóveda?')){const _delIdx=vault.findIndex(e=>e.id===id);if(_delIdx===-1)return;const _delEntry=vault[_delIdx];vault.splice(_delIdx,1);try{await persist();closeModals();render();toast('Entrada eliminada');try{driveAutoSync();}catch(e){}}catch(err){vault.splice(_delIdx,0,_delEntry);console.error('delEntry:',err);toast('No se pudo eliminar la entrada','err')}}}
 function copyText(t='',btn=null){
   navigator.clipboard?.writeText(t).then(()=>{
     vibe(35);soundCopy();
@@ -1929,8 +1947,93 @@ function useGen(){
     toast('Ahora completa servicio y usuario, luego Guardar');
   }
 }
-async function exportBackup(){// VK2 export: bloquear respaldo legacy si hay boveda 2.0
-if(typeof vkStore!=='undefined'&&vkStore.hasVault()){toast('Los respaldos de VaultKey 2.0 se gestionan desde Drive. El respaldo legacy no contiene tus datos actuales.');return;}let pack=localStorage.getItem(LS_DATA);if(!pack){vibe([30,30]);soundError();toast('No hay datos');return}let data={app:'VaultKey',version:1,exported:Date.now(),payload:JSON.parse(pack)};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='VaultKey-respaldo-cifrado.json';a.click();let m=meta();m.lastBackup=Date.now();localStorage.setItem(LS_META,JSON.stringify(m));render();soundSuccess();toast('Respaldo cifrado exportado. Solo se restaura con tu PIN')}
+async function exportBackup(){
+  if(typeof vkStore!=='undefined'&&vkStore.hasVault()){
+    try{
+      if(typeof vkAttachments==='undefined'||typeof vkAttachments.exportAll!=='function'){
+        throw new Error('vkAttachments.exportAll no está disponible');
+      }
+
+      const vk2Blob=vkStore.loadBlob();
+      const validBlob=vk2Blob&&typeof vk2Blob==='object'&&!Array.isArray(vk2Blob)
+        &&vk2Blob.app==='VaultKey'
+        &&Number(vk2Blob.schemaVersion)===2
+        &&typeof vk2Blob.cryptoVersion==='number'
+        &&vk2Blob.kdf&&typeof vk2Blob.kdf==='object'
+        &&vk2Blob.wraps&&typeof vk2Blob.wraps==='object'
+        &&vk2Blob.wraps.master
+        &&vk2Blob.wraps.kit
+        &&vk2Blob.vault&&typeof vk2Blob.vault==='object';
+
+      if(!validBlob){
+        throw new Error('La bóveda VaultKey 2.0 no tiene un formato válido');
+      }
+
+      const attachments=await vkAttachments.exportAll();
+      const now=Date.now();
+      const date=new Date(now);
+      const dd=String(date.getDate()).padStart(2,'0');
+      const mm=String(date.getMonth()+1).padStart(2,'0');
+      const yyyy=date.getFullYear();
+
+      const data={
+        app:'VaultKey',
+        format:'vkbak',
+        version:3,
+        vaultFormat:'vk2_blob',
+        createdAt:new Date(now).toISOString(),
+        vk2_blob:vk2Blob,
+        attachments:attachments
+      };
+
+      const fileBlob=new Blob(
+        [JSON.stringify(data,null,2)],
+        {type:'application/octet-stream'}
+      );
+      const url=URL.createObjectURL(fileBlob);
+      const a=document.createElement('a');
+      a.href=url;
+      a.download='VaultKey_Backup_'+dd+mm+yyyy+'.vkbak';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function(){URL.revokeObjectURL(url);},1000);
+
+      soundSuccess();
+      toast('Respaldo local cifrado exportado correctamente','ok');
+    }catch(err){
+      console.error('exportBackup VK2:',err);
+      soundError();
+      toast('No se pudo exportar el respaldo local','err');
+    }
+    return;
+  }
+
+  let pack=localStorage.getItem(LS_DATA);
+  if(!pack){
+    vibe([30,30]);
+    soundError();
+    toast('No hay datos');
+    return;
+  }
+  let data={
+    app:'VaultKey',
+    version:1,
+    exported:Date.now(),
+    payload:JSON.parse(pack)
+  };
+  let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  let a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='VaultKey-respaldo-cifrado.json';
+  a.click();
+  let m=meta();
+  m.lastBackup=Date.now();
+  localStorage.setItem(LS_META,JSON.stringify(m));
+  render();
+  soundSuccess();
+  toast('Respaldo cifrado exportado. Solo se restaura con tu PIN');
+}
 
 // ============================================================
 // IMPORTACIÓN CON PANTALLA PROPIA
@@ -2022,6 +2125,7 @@ function normalizeEntryId(id){
 
 async function doImportConfirm() {
   if(!_importDecrypted) { closeImportModal(); return; }
+  const _prevVault = vault;
   try {
     vault = _importDecrypted.filter(e=>e&&typeof e==='object').map(e=>({
       id: normalizeEntryId(e.id),
@@ -2063,16 +2167,62 @@ async function doImportConfirm() {
     toast('✓ Respaldo importado — ' + count + ' entradas restauradas');
     try{ driveAutoSync(); }catch(e){}
   } catch(e) {
+    vault = _prevVault;
     soundError();
     toast('Error al importar el respaldo');
   }
 }
 
 async function importBackup(file) {
-  // VK2 import: bloquear import legacy si hay boveda 2.0
-  if(typeof vkStore!=='undefined'&&vkStore.hasVault()){toast('No puedes importar un respaldo legacy mientras tienes una bóveda VaultKey 2.0 activa.');return;}
   if(!file) return;
-  openImportModal(file);
+
+  try {
+    const raw = await file.text();
+    const data = JSON.parse(raw);
+
+    // VaultKey 2.0 backup con blob cifrado + adjuntos
+    if(
+      data &&
+      data.app==='VaultKey' &&
+      data.format==='vkbak' &&
+      data.vaultFormat==='vk2_blob' &&
+      data.vk2_blob &&
+      typeof vkStore!=='undefined'
+    ){
+      if(typeof vkAttachments==='undefined'||typeof vkAttachments.importAll!=='function'){
+        throw new Error('vkAttachments.importAll no está disponible');
+      }
+
+      if(typeof vkStore.hasVault==='function' && vkStore.hasVault()){
+        const ok = await vkConfirm(
+          'Restaurar bóveda VaultKey 2.0',
+          'Se reemplazará la bóveda local actual por el respaldo seleccionado.',
+          {variant:'drive-restore',confirmText:'Restaurar'}
+        );
+        if(!ok)return;
+      }
+
+      if(data.attachments){
+        await vkAttachments.importAll(data.attachments,{mode:'replace'});
+      }
+
+      vkStore.saveBlob(data.vk2_blob);
+
+      toast('✓ Respaldo VaultKey 2.0 restaurado','ok');
+      return;
+    }
+
+    // Flujo legacy existente
+    if(typeof vkStore!=='undefined'&&vkStore.hasVault()){
+      toast('No puedes importar un respaldo legacy mientras tienes una bóveda VaultKey 2.0 activa.');
+      return;
+    }
+
+    openImportModal(file);
+  }catch(err){
+    console.error('importBackup:',err);
+    toast('No se pudo importar el respaldo','err');
+  }
 }
 
 
@@ -2686,9 +2836,16 @@ async function saveEntry(){
       url:_url, notes:_note, subtype:'web'
     });
     vault.push(entry);
-    await persist();
-    vibe([30,20,60]);soundSave();
-    closeModals();render();
+    try{
+      await persist();
+      vibe([30,20,60]);soundSave();
+      closeModals();render();
+    }catch(err){
+      const _idx=vault.indexOf(entry);
+      if(_idx!==-1)vault.splice(_idx,1);
+      console.error('saveEntry VK2:',err);
+      toast('No se pudo guardar la entrada','err');
+    }
     return;
   }
   vibe([30,20,60]);soundSave();
@@ -2820,9 +2977,16 @@ async function saveEntry(){
   const isPassType=_entryType==='password';
   let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,...cardData,...idData,...licData,...medData,...wifiData,type:'Cuenta',category:normalizeCategoryId($('eCategory')?.value||'general')||'general',user:isPassType?userVal:'',email:isPassType?emailVal:'',pass:isPassType?pass:'',url:isPassType?urlVal:'',note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),reminder:reminderData||null,tags:_getEntryTags(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
   let i=vault.findIndex(x=>x.id===entry.id);
+  const _prevLegacyEntry=i>=0?vault[i]:null;
   if(i>=0)vault[i]=entry;else vault.unshift(entry);
   _catFilter='';_vaultTab='todas';document.querySelectorAll('.catChip').forEach(c=>c.classList.remove('active'));const _fc=document.querySelectorAll('.catChip')[0];if(_fc)_fc.classList.add('active');
-  await persist();closeModals();show('vault');render();try{driveAutoSync();}catch(e){}toast('Guardado \u2713');
+  try{
+    await persist();closeModals();show('vault');render();try{driveAutoSync();}catch(e){}toast('Guardado \u2713');
+  }catch(err){
+    if(_prevLegacyEntry){vault[i]=_prevLegacyEntry;}else{const _idx=vault.indexOf(entry);if(_idx!==-1)vault.splice(_idx,1);}
+    console.error('saveEntry legacy:',err);
+    toast('No se pudo guardar la entrada','err');
+  }
 }
 // Tab switcher para Recientes
 function switchVaultTab(tab, btn){
@@ -3094,13 +3258,20 @@ async function savePasswordEdit(){
   vault[index]=next;
   current=next;
 
-  await persist();
+  try{
+    await persist();
 
-  render();
-  show('passwords','left');
-  toast('Cambios guardados');
+    render();
+    show('passwords','left');
+    toast('Cambios guardados');
 
-  try{driveAutoSync();}catch(error){}
+    try{driveAutoSync();}catch(error){}
+  }catch(error){
+    vault[index]=previous;
+    current=previous;
+    console.error('savePasswordEdit:',error);
+    toast('No se pudo guardar la contraseña','err');
+  }
 }
 
 function openCreatePicker(){
@@ -3398,6 +3569,7 @@ async function savePasswordCreate(){
     }
   }
 
+  let entry;
   try{
     const data={
       title,
@@ -3411,7 +3583,7 @@ async function savePasswordCreate(){
       passHistory:[]
     };
 
-    const entry=vkModels.create('password',data);
+    entry=vkModels.create('password',data);
     vault.push(entry);
     await persist();
 
@@ -3421,6 +3593,10 @@ async function savePasswordCreate(){
 
     try{driveAutoSync();}catch(error){}
   }catch(error){
+    if(entry){
+      const _idx=vault.indexOf(entry);
+      if(_idx!==-1)vault.splice(_idx,1);
+    }
     console.error('savePasswordCreate',error);
     toast('No se pudo crear la contraseña.');
   }
@@ -3429,7 +3605,7 @@ function openPasswordDetail(id){
   const e=vault.find(x=>x.id===id);
   if(!e)return;
   e.used=Date.now();
-  persist();
+  persist().catch(err=>console.warn('openPasswordDetail persist:',err));
   current=e;
   renderPasswordDetail();
   show('passwordDetail','right');
@@ -3486,13 +3662,22 @@ async function deletePasswordFromDetail(){
   if(!current)return;
   const id=current.id;
   if(await vkConfirm('¿Eliminar contraseña?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'})){
-    vault=vault.filter(e=>e.id!==id);
-    await persist();
-    current=null;
-    render();
-    show('passwords','left');
-    toast('Contraseña eliminada');
-    try{driveAutoSync();}catch(e){}
+    const _delIdx=vault.findIndex(e=>e.id===id);
+    if(_delIdx===-1)return;
+    const _delEntry=vault[_delIdx];
+    vault.splice(_delIdx,1);
+    try{
+      await persist();
+      current=null;
+      render();
+      show('passwords','left');
+      toast('Contraseña eliminada');
+      try{driveAutoSync();}catch(e){}
+    }catch(err){
+      vault.splice(_delIdx,0,_delEntry);
+      console.error('deletePasswordFromDetail:',err);
+      toast('No se pudo eliminar la contraseña','err');
+    }
   }
 }
 
@@ -3774,7 +3959,7 @@ function renderFav(){
     grid.appendChild(row);
   });
 }
-function quick(id){let e=vault.find(x=>x.id===id);if(!e)return;e.used=Date.now();persist();current=e;let ic=iconForEntry(e);const u=userFromEntry(e);const em=legacyEmailFromEntry(e);
+function quick(id){let e=vault.find(x=>x.id===id);if(!e)return;e.used=Date.now();persist().catch(err=>console.warn('quick persist:',err));current=e;let ic=iconForEntry(e);const u=userFromEntry(e);const em=legacyEmailFromEntry(e);
 
 /* ── Top bar ── */
 let h='<div style="height:58px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 4px">';
@@ -5844,6 +6029,7 @@ async function confirmCsvImport(){
   if(!entries||!entries.length){closeModals();return;}
   
   const btn = document.getElementById('csvImportConfirmBtn');
+  const _btnOrigText = btn?btn.textContent:'';
   if(btn){btn.disabled=true;btn.textContent='Importando...';}
   
   let imported=0;
@@ -5871,13 +6057,21 @@ async function confirmCsvImport(){
     imported++;
   }
   
-  await persist();
-  window._csvImportEntries = null;
-  closeModals();
-  render();
-  vibe([30,20,60]);
-  soundSuccess?.();
-  toast(`✅ ${imported} entradas importadas correctamente`);
+  try{
+    await persist();
+    window._csvImportEntries = null;
+    closeModals();
+    render();
+    vibe([30,20,60]);
+    soundSuccess?.();
+    toast(`✅ ${imported} entradas importadas correctamente`);
+  }catch(err){
+    vault.splice(0,imported);
+    console.error('confirmCsvImport:',err);
+    toast('No se pudo importar el CSV','err');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=_btnOrigText;}
+  }
 }
 // ═════════════════════════════════════════════════════════════
 
@@ -6147,7 +6341,30 @@ try {
   var NOTES_KEY='vaultkey_notes';
   var notesSearchBound=false;
 
+  function notesUseVK2(){
+    return typeof vkStore!=='undefined'&&vkStore.hasVault()&&
+      typeof vkSession!=='undefined'&&vkSession.isActive();
+  }
+
+  function noteFromVK2(entry){
+    return {
+      id:entry.id,
+      title:entry.title||'',
+      content:entry.body||'',
+      createdAt:entry.createdAt,
+      updatedAt:entry.updatedAt
+    };
+  }
+
   function notesRead(){
+    if(notesUseVK2()){
+      return (vault||[])
+        .filter(function(entry){
+          return entry&&entry.type==='note'&&typeof entry.id==='string';
+        })
+        .map(noteFromVK2);
+    }
+
     try{
       var parsed=JSON.parse(localStorage.getItem(NOTES_KEY)||'[]');
       return Array.isArray(parsed)?parsed.filter(function(note){
@@ -6281,7 +6498,7 @@ try {
     if(typeof window.show==='function')window.show('noteEdit','right');
   };
 
-  window.saveNote=function(id,title,content){
+  window.saveNote=async function(id,title,content){
     title=String(title||'').trim();
     content=String(content||'').trim();
 
@@ -6291,6 +6508,50 @@ try {
       var input=document.getElementById(target);
       if(input)input.focus();
       return false;
+    }
+
+    // VK 2.0: crear o actualizar la nota en la bóveda cifrada.
+    if(notesUseVK2()&&typeof vkModels!=='undefined'){
+      var _prevNoteEntry=null,_prevNoteIndex=-1,_pushedNoteEntry=null;
+      try{
+        var entry;
+        if(id){
+          var vaultIndex=(vault||[]).findIndex(function(item){
+            return item&&item.type==='note'&&item.id===id;
+          });
+          if(vaultIndex===-1)return false;
+          _prevNoteEntry=vault[vaultIndex];
+          _prevNoteIndex=vaultIndex;
+          entry=Object.assign({},vault[vaultIndex],{
+            title:title,
+            body:content,
+            updatedAt:Date.now()
+          });
+          vault[vaultIndex]=entry;
+        }else{
+          entry=vkModels.create('note',{
+            title:title,
+            body:content
+          });
+          vault.push(entry);
+          _pushedNoteEntry=entry;
+        }
+        await persist();
+        if(typeof render==='function')render();
+        if(typeof window.toast==='function')window.toast(id?'Nota guardada':'Nota creada','ok');
+        window.showNotes('left');
+        return true;
+      }catch(error){
+        if(_pushedNoteEntry){
+          var _pushedNoteIdx=vault.indexOf(_pushedNoteEntry);
+          if(_pushedNoteIdx!==-1)vault.splice(_pushedNoteIdx,1);
+        }else if(_prevNoteIndex!==-1&&_prevNoteEntry){
+          vault[_prevNoteIndex]=_prevNoteEntry;
+        }
+        console.error('saveNote VK2:',error);
+        if(typeof window.toast==='function')window.toast('No se pudo guardar la nota','err');
+        return false;
+      }
     }
 
     var notes=notesRead();
@@ -6328,7 +6589,25 @@ try {
 
     if(!await vkConfirm('¿Eliminar nota?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'}))return;
 
-    notesWrite(notesRead().filter(function(item){return item.id!==id;}));
+    if(notesUseVK2()){
+      var vaultIndex=(vault||[]).findIndex(function(item){
+        return item&&item.type==='note'&&item.id===id;
+      });
+      if(vaultIndex===-1)return;
+      var _removedNoteEntry=vault[vaultIndex];
+      vault.splice(vaultIndex,1);
+      try{
+        await persist();
+      }catch(error){
+        vault.splice(vaultIndex,0,_removedNoteEntry);
+        console.error('deleteNote VK2:',error);
+        if(typeof window.toast==='function')window.toast('No se pudo eliminar la nota','err');
+        return;
+      }
+      if(typeof render==='function')render();
+    }else{
+      notesWrite(notesRead().filter(function(item){return item.id!==id;}));
+    }
     window.__vkCurrentNoteId=null;
     updateNotesCount();
     if(typeof window.toast==='function')window.toast('Nota eliminada','ok');
@@ -6368,7 +6647,33 @@ try {
   var cardsSearchBound=false;
   var detailCvvVisible=false;
 
+  function cardsUseVK2(){
+    return typeof vkStore!=='undefined'&&vkStore.hasVault()&&
+      typeof vkSession!=='undefined'&&vkSession.isActive();
+  }
+
+  function cardFromVK2(entry){
+    return {
+      id:entry.id,
+      holder:entry.holder||'',
+      number:entry.number||'',
+      expiry:entry.expiry||'',
+      cvv:entry.cvv||'',
+      note:entry.notes||'',
+      createdAt:entry.createdAt,
+      updatedAt:entry.updatedAt
+    };
+  }
+
   function cardsRead(){
+    if(cardsUseVK2()){
+      return (vault||[])
+        .filter(function(entry){
+          return entry&&entry.type==='card'&&typeof entry.id==='string';
+        })
+        .map(cardFromVK2);
+    }
+
     try{
       var parsed=JSON.parse(localStorage.getItem(CARDS_KEY)||'[]');
       return Array.isArray(parsed)?parsed.filter(function(card){
@@ -6549,7 +6854,7 @@ try {
     }
   };
 
-  window.saveCard=function(id,holder,number,expiry,cvv,note){
+  window.saveCard=async function(id,holder,number,expiry,cvv,note){
     holder=String(holder||'').trim();
     number=cardDigits(number);
     expiry=normalizeExpiry(expiry);
@@ -6578,6 +6883,56 @@ try {
       if(typeof window.toast==='function')window.toast('El CVV debe tener 3 o 4 dígitos','err');
       document.getElementById(id?'cardEditCvv':'cardCreateCvv')?.focus();
       return false;
+    }
+
+    // VK 2.0: crear o actualizar la tarjeta en la bóveda cifrada.
+    if(cardsUseVK2()&&typeof vkModels!=='undefined'){
+      var _prevCardEntry=null,_prevCardIndex=-1,_pushedCardEntry=null;
+      try{
+        var entry;
+        if(id){
+          var vaultIndex=(vault||[]).findIndex(function(item){
+            return item&&item.type==='card'&&item.id===id;
+          });
+          if(vaultIndex===-1)return false;
+          _prevCardEntry=vault[vaultIndex];
+          _prevCardIndex=vaultIndex;
+          entry=Object.assign({},vault[vaultIndex],{
+            holder:holder,
+            number:number,
+            expiry:expiry,
+            cvv:cvv,
+            notes:note,
+            updatedAt:Date.now()
+          });
+          vault[vaultIndex]=entry;
+        }else{
+          entry=vkModels.create('card',{
+            holder:holder,
+            number:number,
+            expiry:expiry,
+            cvv:cvv,
+            notes:note
+          });
+          vault.push(entry);
+          _pushedCardEntry=entry;
+        }
+        await persist();
+        if(typeof render==='function')render();
+        if(typeof window.toast==='function')window.toast(id?'Tarjeta guardada':'Tarjeta creada','ok');
+        window.showCards('left');
+        return true;
+      }catch(error){
+        if(_pushedCardEntry){
+          var _pushedCardIdx=vault.indexOf(_pushedCardEntry);
+          if(_pushedCardIdx!==-1)vault.splice(_pushedCardIdx,1);
+        }else if(_prevCardIndex!==-1&&_prevCardEntry){
+          vault[_prevCardIndex]=_prevCardEntry;
+        }
+        console.error('saveCard VK2:',error);
+        if(typeof window.toast==='function')window.toast('No se pudo guardar la tarjeta','err');
+        return false;
+      }
     }
 
     var cards=cardsRead();
@@ -6628,7 +6983,25 @@ try {
 
     if(!await vkConfirm('¿Eliminar tarjeta?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'}))return;
 
-    cardsWrite(cardsRead().filter(function(item){return item.id!==id;}));
+    if(cardsUseVK2()){
+      var vaultIndex=(vault||[]).findIndex(function(item){
+        return item&&item.type==='card'&&item.id===id;
+      });
+      if(vaultIndex===-1)return;
+      var _removedCardEntry=vault[vaultIndex];
+      vault.splice(vaultIndex,1);
+      try{
+        await persist();
+      }catch(error){
+        vault.splice(vaultIndex,0,_removedCardEntry);
+        console.error('deleteCard VK2:',error);
+        if(typeof window.toast==='function')window.toast('No se pudo eliminar la tarjeta','err');
+        return;
+      }
+      if(typeof render==='function')render();
+    }else{
+      cardsWrite(cardsRead().filter(function(item){return item.id!==id;}));
+    }
     if(typeof renderVaultHealthDashboard==='function')renderVaultHealthDashboard();
     window.__vkCurrentCardId=null;
     updateCardsCount();
@@ -6763,7 +7136,26 @@ function modal(id,on){var e=document.getElementById(id);if(e)e.hidden=!on;docume
 function visual(prefix,c){var a=document.getElementById(prefix+'Category'),b=document.getElementById(prefix+'CategoryIcon');if(a)a.textContent=label(c);if(b)b.innerHTML=icon(c);}
 function render(){var list=document.getElementById('documentsList');if(!list)return;var q=String(document.getElementById('documentsSearch')?.value||'').trim().toLowerCase();var items=read().filter(function(d){return !q||String(d.name||'').toLowerCase().includes(q);}).sort(function(a,b){return Number(b.updatedAt||b.createdAt||0)-Number(a.updatedAt||a.createdAt||0);});if(!items.length){list.innerHTML='<div class="vk-documents-empty"><strong>'+(q?'No se encontraron documentos':'Aún no hay documentos')+'</strong><span>'+(q?'Prueba con otro nombre.':'Pulsa + para añadir el primero.')+'</span></div>';return;}list.innerHTML=items.map(function(d){var sub=d.expiry?'Caduca: '+date(d.expiry):(d.issuedBy||d.country||label(d.category));return '<button type="button" class="vk-document-row" data-document-id="'+esc(d.id)+'"><span class="vk-document-row-icon">'+icon(d.category)+'</span><span class="vk-document-row-main"><strong>'+esc(d.name||label(d.category))+'</strong><small>'+esc(sub)+'</small></span><svg class="vk-document-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg></button>';}).join('');}
 window.showDocuments=function(dir){modal('documentTypePicker',false);modal('documentSourceSheet',false);show('documents',dir);render();count();};
-window.showDocumentDetail=function(docId){var d=read().find(function(x){return x.id===docId;});if(!d){showDocuments('left');return;}window.__vkCurrentDocumentId=d.id;document.getElementById('documentDetailTitle').textContent=d.name||label(d.category);document.getElementById('documentDetailImage').src=d.image;visual('documentDetail',d.category);var rows=[['Número / Nombre',d.name],['Caduca',date(d.expiry)],['Emitido por',d.issuedBy],['País',d.country]].filter(function(r){return r[1];});document.getElementById('documentDetailFields').innerHTML=rows.map(function(r){return '<div class="vk-document-detail-field"><span>'+esc(r[0])+'</span><strong>'+esc(r[1])+'</strong></div>';}).join('');show('documentDetail','right');};
+function documentDataUrlToBlob(dataUrl){
+  var parts=String(dataUrl||'').split(',');
+  if(parts.length!==2){throw new Error('Imagen de documento inválida');}
+  var mime=(parts[0].match(/data:([^;]+)/)||[])[1]||'image/jpeg';
+  var bin=atob(parts[1]);
+  var bytes=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++){bytes[i]=bin.charCodeAt(i);}
+  return new Blob([bytes],{type:mime});
+}
+function _vkAttachmentDek(){
+  return (typeof vkSession!=='undefined'&&vkSession.isActive()&&vkSession.getDEK())||lastKey||null;
+}
+async function documentImageUrl(d){
+  if(d&&d.attachmentRef&&typeof vkAttachments!=='undefined'&&typeof vkAttachments.load==='function'){
+    var blob=await vkAttachments.load({id:d.attachmentRef,dekKey:_vkAttachmentDek()});
+    return URL.createObjectURL(blob);
+  }
+  return d&&d.image?d.image:'';
+}
+window.showDocumentDetail=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d){showDocuments('left');return;}window.__vkCurrentDocumentId=d.id;document.getElementById('documentDetailTitle').textContent=d.name||label(d.category);document.getElementById('documentDetailImage').src=await documentImageUrl(d);visual('documentDetail',d.category);var rows=[['Número / Nombre',d.name],['Caduca',date(d.expiry)],['Emitido por',d.issuedBy],['País',d.country]].filter(function(r){return r[1];});document.getElementById('documentDetailFields').innerHTML=rows.map(function(r){return '<div class="vk-document-detail-field"><span>'+esc(r[0])+'</span><strong>'+esc(r[1])+'</strong></div>';}).join('');show('documentDetail','right');};
 window.openTypePicker=function(){category='';image='';editingId=null;modal('documentTypePicker',true);};
 window.closeDocumentTypePicker=function(){modal('documentTypePicker',false);};
 window.selectDocumentType=function(c){if(!labels[c])return;category=c;image='';editingId=null;modal('documentTypePicker',false);modal('documentSourceSheet',true);};
@@ -6801,9 +7193,9 @@ window.repeatDocumentSelection=function(){modal('documentSourceSheet',true);};
 window.openCreateDocumentForm=function(){if(!image||!category){toast('Selecciona primero una imagen','err');openTypePicker();return;}document.getElementById('documentCreateForm').reset();document.getElementById('documentCreateImage').src=image;document.getElementById('documentCreateName').value=label(category);document.getElementById('documentCreateMore').hidden=true;document.getElementById('documentCreateMoreButton').textContent='+ Más información';visual('documentCreate',category);show('documentCreate','right');};
 window.openEditDocument=function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;editingId=d.id;category=d.category;image=d.image;window.__vkCurrentDocumentId=d.id;document.getElementById('documentEditImage').src=d.image;document.getElementById('documentEditName').value=d.name||'';document.getElementById('documentEditExpiry').value=d.expiry||'';document.getElementById('documentEditIssuedBy').value=d.issuedBy||'';document.getElementById('documentEditCountry').value=d.country||'';visual('documentEdit',d.category);var more=!!(d.issuedBy||d.country);document.getElementById('documentEditMore').hidden=!more;document.getElementById('documentEditMoreButton').textContent=more?'− Menos información':'+ Más información';show('documentEdit','right');};
 window.openDocumentEditSource=function(){if(editingId)modal('documentSourceSheet',true);};
-window.saveDocument=function(docId,name,expiry,issuedBy,country){name=String(name||'').trim();expiry=String(expiry||'').trim();issuedBy=String(issuedBy||'').trim();country=String(country||'').trim();if(!name){toast('El nombre es obligatorio','err');document.getElementById(docId?'documentEditName':'documentCreateName')?.focus();return false;}if(!image||!image.startsWith('data:image/')){toast('Falta una imagen válida del documento','err');return false;}var items=read(),now=Date.now();if(docId){var i=items.findIndex(function(x){return x.id===docId;});if(i<0){showDocuments('left');return false;}items[i]=Object.assign({},items[i],{category:category||items[i].category,name:name,image:image,expiry:expiry,issuedBy:issuedBy,country:country,updatedAt:now});}else{docId=id();items.push({id:docId,category:category,name:name,image:image,expiry:expiry,issuedBy:issuedBy,country:country,createdAt:now,updatedAt:now});}write(items);count();editingId=null;toast('Documento guardado','ok');showDocuments('left');return true;};
-window.deleteDocument=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d){showDocuments('left');return;}if(!await vkConfirm('¿Eliminar documento?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'}))return;write(read().filter(function(x){return x.id!==docId;}));window.__vkCurrentDocumentId=null;editingId=null;image='';category='';count();toast('Documento eliminado','ok');showDocuments('left');};
-window.viewDocumentImage=function(docId){var d=read().find(function(x){return x.id===docId;});if(!d||!d.image)return;var w=window.open('','_blank');if(!w){toast('El navegador bloqueó la vista del documento','err');return;}w.document.write('<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(d.name||'Documento')+'</title><style>html,body{margin:0;min-height:100%;background:#111827;display:grid;place-items:center}img{max-width:100%;max-height:100vh;object-fit:contain}</style></head><body><img src="'+d.image.replace(/"/g,'&quot;')+'"></body></html>');w.document.close();};
+window.saveDocument=async function(docId,name,expiry,issuedBy,country){name=String(name||'').trim();expiry=String(expiry||'').trim();issuedBy=String(issuedBy||'').trim();country=String(country||'').trim();if(!name){toast('El nombre es obligatorio','err');document.getElementById(docId?'documentEditName':'documentCreateName')?.focus();return false;}if(!image||!image.startsWith('data:image/')){toast('Falta una imagen válida del documento','err');return false;}var items=read(),now=Date.now();try{var attachmentRef=null;var isEdit=!!docId;if(!docId){docId=id();}var old=isEdit&&items.find(function(x){return x.id===docId;});var _dek=_vkAttachmentDek();if(old&&old.attachmentRef&&!_dek){throw new Error('No hay clave activa para modificar el adjunto');}if(typeof vkAttachments!=='undefined'&&typeof vkAttachments.save==='function'&&_dek){attachmentRef=old&&old.attachmentRef;if(attachmentRef){await vkAttachments.replace({id:attachmentRef,file:documentDataUrlToBlob(image),dekKey:_dek});}else{attachmentRef=crypto.randomUUID();await vkAttachments.save({id:attachmentRef,entryId:docId,file:documentDataUrlToBlob(image),dekKey:_dek});}}if(isEdit){var i=items.findIndex(function(x){return x.id===docId;});if(i<0){showDocuments('left');return false;}items[i]=Object.assign({},items[i],{category:category||items[i].category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef||items[i].attachmentRef,image:attachmentRef?'':image,updatedAt:now});}else{items.push({id:docId,category:category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:attachmentRef?'':image,createdAt:now,updatedAt:now});}write(items);count();editingId=null;toast('Documento guardado','ok');showDocuments('left');return true;}catch(e){console.error('saveDocument:',e);toast('No se pudo guardar el documento','err');return false;}};
+window.deleteDocument=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d){showDocuments('left');return;}if(!await vkConfirm('¿Eliminar documento?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'}))return;try{if(d.attachmentRef&&typeof vkAttachments!=='undefined'&&typeof vkAttachments.delete==='function'){await vkAttachments.delete({id:d.attachmentRef});}}catch(e){console.error('deleteDocument attachment:',e);toast('No se pudo eliminar el adjunto','err');return;}write(read().filter(function(x){return x.id!==docId;}));window.__vkCurrentDocumentId=null;editingId=null;image='';category='';count();toast('Documento eliminado','ok');showDocuments('left');};
+window.viewDocumentImage=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;var src=await documentImageUrl(d);if(!src)return;var w=window.open('','_blank');if(!w){toast('El navegador bloqueó la vista del documento','err');return;}w.document.write('<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(d.name||'Documento')+'</title><style>html,body{margin:0;min-height:100%;background:#111827;display:grid;place-items:center}img{max-width:100%;max-height:100vh;object-fit:contain}</style></head><body><img src="'+src.replace(/"/g,'&quot;')+'"></body></html>');w.document.close();};
 window.toggleDocumentMoreInfo=function(prefix){var b=document.getElementById(prefix+'More'),a=document.getElementById(prefix+'MoreButton');if(!b)return;b.hidden=!b.hidden;if(a)a.textContent=b.hidden?'+ Más información':'− Menos información';};
 document.addEventListener('click',function(e){var r=e.target.closest&&e.target.closest('.vk-document-row[data-document-id]');if(r)showDocumentDetail(r.getAttribute('data-document-id'));});
 document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('[data-doc-icon]').forEach(function(n){n.innerHTML=icon(n.getAttribute('data-doc-icon'));});var s=document.getElementById('documentsSearch');if(s&&!bound){bound=true;s.addEventListener('input',render);}count();});

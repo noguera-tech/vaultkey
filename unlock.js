@@ -284,15 +284,42 @@
             ui.pinState = 'wiping';
             ui.message = 'Décimo intento fallido. Borrando datos locales…';
             rerender(ctx);
-            ctx.store.wipeLocal().then(function (result) {
-              /* La bóveda principal ya se eliminó de forma síncrona dentro de
-                 wipeLocal() antes de intentar el pepper (ver vault-store.js) --
-                 este resultado nunca puede dejarnos con una bóveda a medias. */
-              if (result && result.pepperDeleted === false) {
-                console.error('[VK2] wipeLocal: el pepper del dispositivo no se pudo borrar', result.pepperError);
-              }
-              resetUi();
-              ctx.router.replace('/welcome');
+
+            function failAutoWipe(message, err) {
+              console.error(message, err);
+              ui.busy = false;
+              ui.pinState = 'error';
+              ui.message = 'No se pudo completar el borrado. Inténtalo de nuevo.';
+              rerender(ctx);
+            }
+
+            var attachments = typeof globalThis !== 'undefined'
+              ? globalThis.vkAttachments
+              : null;
+
+            if (!attachments || typeof attachments.deleteAll !== 'function') {
+              failAutoWipe(
+                '[VK2] auto-wipe: vkAttachments no disponible, borrado abortado',
+                new Error('vkAttachments.deleteAll no está disponible')
+              );
+              return;
+            }
+
+            attachments.deleteAll().then(function () {
+              return ctx.store.wipeLocal().then(function (result) {
+                /* La bóveda principal ya se eliminó de forma síncrona dentro de
+                   wipeLocal() antes de intentar el pepper (ver vault-store.js) --
+                   este resultado nunca puede dejarnos con una bóveda a medias. */
+                if (result && result.pepperDeleted === false) {
+                  console.error('[VK2] wipeLocal: el pepper del dispositivo no se pudo borrar', result.pepperError);
+                }
+                resetUi();
+                ctx.router.replace('/welcome');
+              }, function (err) {
+                failAutoWipe('[VK2] auto-wipe: fallo al borrar la bóveda local', err);
+              });
+            }, function (err) {
+              failAutoWipe('[VK2] auto-wipe: fallo al borrar adjuntos IndexedDB', err);
             });
           } else {
             ui.busy = false;
