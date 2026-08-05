@@ -612,7 +612,21 @@ function show(id,dir){
 
 })();
 function lock(){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();vibe(30);soundLock();unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay()}
-async function wipe(){if(await vkConfirm('Borrar todos los datos','Se eliminará la bóveda de este dispositivo. Esta acción no se puede deshacer.',{variant:'wipe',confirmText:'Borrar'})){soundError();vibe([60,30,60,30,100]);const isVk2=typeof vkStore!=='undefined'&&vkStore.hasVault();if(isVk2){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();try{await vkStore.wipeLocal();}catch(e){console.warn('VK2 wipe:',e);}localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);localStorage.removeItem('vaultkey_onboarding_v130');openOnboardingHard();return;}localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];lock()}}
+async function wipe(){if(await vkConfirm('Borrar todos los datos','Se eliminará la bóveda de este dispositivo. Esta acción no se puede deshacer.',{variant:'wipe',confirmText:'Borrar'})){soundError();vibe([60,30,60,30,100]);const isVk2=typeof vkStore!=='undefined'&&vkStore.hasVault();if(isVk2){
+      if(typeof vkAttachments==='undefined'||typeof vkAttachments.deleteAll!=='function'){
+        console.error('wipe: vkAttachments no disponible, borrado abortado');
+        toast('No se pudo completar el borrado. Inténtalo de nuevo.','err');
+        return;
+      }
+      try{
+        await vkAttachments.deleteAll();
+      }catch(err){
+        console.error('wipe: fallo al borrar adjuntos IndexedDB',err);
+        toast('No se pudo completar el borrado. Inténtalo de nuevo.','err');
+        return;
+      }
+      if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();try{await vkStore.wipeLocal();}catch(err){console.error('wipe: fallo al borrar la bóveda VK2',err);toast('No se pudo completar el borrado. Inténtalo de nuevo.','err');return;}localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);localStorage.removeItem('vaultkey_onboarding_v130');openOnboardingHard();return;
+    }localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];lock()}}
 
 /* ============================================================
    Zona de peligro — /settings/danger (pantalla dangerZoneSettings)
