@@ -7330,8 +7330,8 @@ function _vkAttachmentDek(){
 }
 async function documentImageUrl(d){
   if(d&&d.attachmentRef&&typeof vkAttachments!=='undefined'&&typeof vkAttachments.load==='function'){
-    var blob=await vkAttachments.load({id:d.attachmentRef,dekKey:_vkAttachmentDek()});
-    return URL.createObjectURL(blob);
+    var result=await vkAttachments.load({id:d.attachmentRef,dekKey:_vkAttachmentDek()});
+    return URL.createObjectURL(result.blob);
   }
   return d&&d.image?d.image:'';
 }
@@ -7376,7 +7376,7 @@ window.openDocumentEditSource=function(){if(editingId)modal('documentSourceSheet
 window.saveDocument=async function(docId,name,expiry,issuedBy,country){
   name=String(name||'').trim();expiry=String(expiry||'').trim();issuedBy=String(issuedBy||'').trim();country=String(country||'').trim();
   if(!name){toast('El nombre es obligatorio','err');document.getElementById(docId?'documentEditName':'documentCreateName')?.focus();return false;}
-  if(!image||!image.startsWith('data:image/')){toast('Falta una imagen válida del documento','err');return false;}
+  if(!image||!image.startsWith('data:image/')){if(!docId){toast('Falta una imagen válida del documento','err');return false;}var existing=read().find(function(x){return x.id===docId;});if(!existing||!existing.attachmentRef){toast('Falta una imagen válida del documento','err');return false;}}
   if(typeof vkAttachments==='undefined'||typeof vkAttachments.save!=='function'||typeof vkAttachments.replace!=='function'){
     toast('No se pudo guardar el documento: almacenamiento de adjuntos no disponible','err');
     return false;
