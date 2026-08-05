@@ -6435,7 +6435,33 @@ try {
   var cardsSearchBound=false;
   var detailCvvVisible=false;
 
+  function cardsUseVK2(){
+    return typeof vkStore!=='undefined'&&vkStore.hasVault()&&
+      typeof vkSession!=='undefined'&&vkSession.isActive();
+  }
+
+  function cardFromVK2(entry){
+    return {
+      id:entry.id,
+      holder:entry.holder||'',
+      number:entry.number||'',
+      expiry:entry.expiry||'',
+      cvv:entry.cvv||'',
+      note:entry.notes||'',
+      createdAt:entry.createdAt,
+      updatedAt:entry.updatedAt
+    };
+  }
+
   function cardsRead(){
+    if(cardsUseVK2()){
+      return (vault||[])
+        .filter(function(entry){
+          return entry&&entry.type==='card'&&typeof entry.id==='string';
+        })
+        .map(cardFromVK2);
+    }
+
     try{
       var parsed=JSON.parse(localStorage.getItem(CARDS_KEY)||'[]');
       return Array.isArray(parsed)?parsed.filter(function(card){
@@ -6647,21 +6673,37 @@ try {
       return false;
     }
 
-    // VK 2.0 bridge: las tarjetas nuevas pasan a la bóveda cifrada.
-    if(typeof vkStore!=='undefined'&&vkStore.hasVault()&&
-       typeof vkModels!=='undefined'){
+    // VK 2.0: crear o actualizar la tarjeta en la bóveda cifrada.
+    if(cardsUseVK2()&&typeof vkModels!=='undefined'){
       try{
-        var entry=vkModels.create('card',{
-          holder:holder,
-          number:number,
-          expiry:expiry,
-          cvv:cvv,
-          notes:note
-        });
-        vault.push(entry);
+        var entry;
+        if(id){
+          var vaultIndex=(vault||[]).findIndex(function(item){
+            return item&&item.type==='card'&&item.id===id;
+          });
+          if(vaultIndex===-1)return false;
+          entry=Object.assign({},vault[vaultIndex],{
+            holder:holder,
+            number:number,
+            expiry:expiry,
+            cvv:cvv,
+            notes:note,
+            updatedAt:Date.now()
+          });
+          vault[vaultIndex]=entry;
+        }else{
+          entry=vkModels.create('card',{
+            holder:holder,
+            number:number,
+            expiry:expiry,
+            cvv:cvv,
+            notes:note
+          });
+          vault.push(entry);
+        }
         await persist();
         if(typeof render==='function')render();
-        if(typeof window.toast==='function')window.toast('Tarjeta guardada','ok');
+        if(typeof window.toast==='function')window.toast(id?'Tarjeta guardada':'Tarjeta creada','ok');
         window.showCards('left');
         return true;
       }catch(error){
@@ -6719,7 +6761,17 @@ try {
 
     if(!await vkConfirm('¿Eliminar tarjeta?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'}))return;
 
-    cardsWrite(cardsRead().filter(function(item){return item.id!==id;}));
+    if(cardsUseVK2()){
+      var vaultIndex=(vault||[]).findIndex(function(item){
+        return item&&item.type==='card'&&item.id===id;
+      });
+      if(vaultIndex===-1)return;
+      vault.splice(vaultIndex,1);
+      await persist();
+      if(typeof render==='function')render();
+    }else{
+      cardsWrite(cardsRead().filter(function(item){return item.id!==id;}));
+    }
     if(typeof renderVaultHealthDashboard==='function')renderVaultHealthDashboard();
     window.__vkCurrentCardId=null;
     updateCardsCount();
