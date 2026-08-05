@@ -181,15 +181,24 @@
   }
 
   function finish(ctx, dekKey) {
+    haptic('success');
     resetUi();
     if (typeof ctx.onUnlocked === 'function') { ctx.onUnlocked({ dekKey: dekKey }); }
     ctx.router.replace('/dashboard');
+  }
+
+  function haptic(name) {
+    try {
+      var api = typeof globalThis !== 'undefined' ? globalThis.vkHaptics : null;
+      if (api && typeof api[name] === 'function') { api[name](); }
+    } catch (e) { /* hápticos opcionales: nunca bloquear el desbloqueo */ }
   }
 
   function handleAction(action, ctx) {
     if (ui.busy) { return; }
 
     if (action === 'go-master') {
+      haptic('navigation');
       ui.mode = 'master';
       ui.masterState = 'normal';
       ui.masterValue = '';
@@ -198,6 +207,7 @@
       return;
     }
     if (action === 'go-pin') {
+  haptic('navigation');
   ui.mode = 'pin';
   ui.pinState = ui.pinBuffer.length === currentPinLen() ? 'ready' : 'initial';
   ui.message = '';
@@ -207,6 +217,7 @@
   return;
 }
     if (action === 'toggle-master') {
+      haptic('tap');
       ui.masterValue = val('ul-master');
       ui.masterVisible = !ui.masterVisible;
       rerender(ctx);
@@ -214,6 +225,7 @@
     }
 
     if (action.indexOf('digit-') === 0) {
+      haptic('key');
       var n = action.slice(6);
       if (/^[0-9]$/.test(n) && ui.pinBuffer.length < currentPinLen()) {
         if (ui.pinState === 'error') { ui.message = ''; }
@@ -225,6 +237,7 @@
     }
 
     if (action === 'del') {
+      haptic('backspace');
       ui.pinBuffer = ui.pinBuffer.slice(0, -1);
       ui.message = '';
       ui.pinState = ui.pinBuffer.length === currentPinLen() ? 'ready' : 'initial';
@@ -233,6 +246,7 @@
     }
 
     if (action === 'submit-pin') {
+      haptic('tap');
       if (ui.pinBuffer.length !== currentPinLen()) { return; }
       var pin = ui.pinBuffer;
 
@@ -250,6 +264,7 @@
             resetUi();
             ctx.router.replace('/dashboard');
           }, function (err) {
+            haptic('error');
             ui.busy = false;
             ui.pinBuffer = '';
             ui.pinState = 'error';
@@ -278,6 +293,7 @@
           ctx.store.resetAttempts();
           finish(ctx, dekKey);
         }, function () {
+          haptic('error');
           var r = ctx.store.recordFailedAttempt();
           ui.pinBuffer = '';
           if (r.mustWipe) {
@@ -332,6 +348,7 @@
     }
 
     if (action === 'submit-master') {
+      haptic('tap');
       var master = val('ul-master');
       ui.masterValue = master;
       var blob = ctx.store.loadBlob();
@@ -358,6 +375,7 @@
           ctx.store.resetAttempts();
           finish(ctx, res.dekKey);
         }, function () {
+          haptic('error');
           ui.busy = false;
           ui.masterState = 'error';
           ui.message = 'Contraseña incorrecta.';

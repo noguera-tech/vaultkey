@@ -341,6 +341,21 @@
     var el = root.document.getElementById(id);
     return el ? el.value : '';
   }
+  function haptic(name) {
+    try {
+      var api = root && root.vkHaptics;
+      if (api && typeof api[name] === 'function') { api[name](); }
+    } catch (_) {}
+  }
+  function bindInputHaptics(input) {
+    if (!input) { return; }
+    var previousLength = input.value.length;
+    input.addEventListener('input', function () {
+      var nextLength = input.value.length;
+      haptic(nextLength < previousLength ? 'backspace' : 'key');
+      previousLength = nextLength;
+    });
+  }
 
   function handleAction(action, ctx) {
     var R = ctx.router;
@@ -352,11 +367,12 @@
       var m1 = val('ob-master'), m2 = val('ob-master2');
       var strength = masterStrength(m1);
       if (strength !== 'fuerte') {
+        haptic('error');
         setHint('ob-master-hint', 'Contraseña ' + strength + ': usa al menos 12 caracteres con mayúsculas, minúsculas y números o símbolos.', 'error');
         return;
       }
       setHint('ob-master-hint', 'Contraseña fuerte', 'ok');
-      if (m1 !== m2) { setHint('ob-master2-hint', 'Las contraseñas no coinciden', 'error'); return; }
+      if (m1 !== m2) { haptic('error'); setHint('ob-master2-hint', 'Las contraseñas no coinciden', 'error'); return; }
       draft.master = m1;
       R.navigate('/onboarding/pin');
       return;
@@ -364,8 +380,8 @@
 
     if (action === 'submit-pin') {
       var p1 = val('ob-pin'), p2 = val('ob-pin2');
-      if (!pinValid(p1)) { setHint('ob-pin-hint', 'El PIN debe tener exactamente 6 dígitos', 'error'); return; }
-      if (p1 !== p2) { setHint('ob-pin2-hint', 'Los PIN no coinciden', 'error'); return; }
+      if (!pinValid(p1)) { haptic('error'); setHint('ob-pin-hint', 'El PIN debe tener exactamente 6 dígitos', 'error'); return; }
+      if (p1 !== p2) { haptic('error'); setHint('ob-pin2-hint', 'Los PIN no coinciden', 'error'); return; }
       draft.pin = p1;
       draft.kitCode = ctx.crypto.generateKitCode();
       R.navigate('/onboarding/kit-save');
@@ -393,6 +409,7 @@
       var typed = ctx.crypto.normalizeKitCode(val('ob-kit4'));
       var expected = ctx.crypto.normalizeKitCode(draft.kitCode).slice(-4);
       if (typed !== expected) {
+        haptic('error');
         setHint('ob-kit4-hint', 'No coincide. Comprueba los 4 últimos caracteres de tu código.', 'error');
         return;
       }
@@ -485,8 +502,8 @@
           if (ruleExtra) { ruleExtra.className = hasExtra ? 'is-ok' : ''; }
         };
 
-        if (masterInput) { masterInput.addEventListener('input', updateMasterUi); }
-        if (masterConfirm) { masterConfirm.addEventListener('input', updateMasterUi); }
+        if (masterInput) { masterInput.addEventListener('input', updateMasterUi); bindInputHaptics(masterInput); }
+        if (masterConfirm) { masterConfirm.addEventListener('input', updateMasterUi); bindInputHaptics(masterConfirm); }
         updateMasterUi();
         setupKeyboardAwareOnboarding('.vk-onb-master', '.vk-onb-master__input');
       }
@@ -506,8 +523,8 @@
           if (pinSubmit) { pinSubmit.disabled = !valid; }
         };
 
-        if (pinInput) { pinInput.addEventListener('input', updatePinUi); }
-        if (pinConfirm) { pinConfirm.addEventListener('input', updatePinUi); }
+        if (pinInput) { pinInput.addEventListener('input', updatePinUi); bindInputHaptics(pinInput); }
+        if (pinConfirm) { pinConfirm.addEventListener('input', updatePinUi); bindInputHaptics(pinConfirm); }
         updatePinUi();
         setupKeyboardAwareOnboarding('.vk-onb-pin', '.vk-onb-pin__input');
       }
@@ -532,6 +549,7 @@
 
         if (kitVerifyInput) {
           kitVerifyInput.addEventListener('input', updateKitVerifyUi);
+          bindInputHaptics(kitVerifyInput);
         }
         updateKitVerifyUi();
       }
@@ -542,6 +560,7 @@
           var wait = Math.max(0, 2000 - (Date.now() - creatingStartedAt));
 
           setTimeout(function () {
+            haptic('success');
             if (ctx && typeof ctx.onCreated === 'function') {
               ctx.onCreated({ dekKey: dekKey });
               return;
@@ -549,6 +568,7 @@
             setTimeout(function () { ctx.router.replace('/dashboard'); }, 300);
           }, wait);
         }, function (e) {
+          haptic('error');
           setHint('ob-creating-status', 'Error en el alta: ' + e.message, 'error');
         });
       }
