@@ -2022,6 +2022,7 @@ function normalizeEntryId(id){
 
 async function doImportConfirm() {
   if(!_importDecrypted) { closeImportModal(); return; }
+  const _prevVault = vault;
   try {
     vault = _importDecrypted.filter(e=>e&&typeof e==='object').map(e=>({
       id: normalizeEntryId(e.id),
@@ -2063,6 +2064,7 @@ async function doImportConfirm() {
     toast('✓ Respaldo importado — ' + count + ' entradas restauradas');
     try{ driveAutoSync(); }catch(e){}
   } catch(e) {
+    vault = _prevVault;
     soundError();
     toast('Error al importar el respaldo');
   }
@@ -5879,6 +5881,7 @@ async function confirmCsvImport(){
   if(!entries||!entries.length){closeModals();return;}
   
   const btn = document.getElementById('csvImportConfirmBtn');
+  const _btnOrigText = btn?btn.textContent:'';
   if(btn){btn.disabled=true;btn.textContent='Importando...';}
   
   let imported=0;
@@ -5906,13 +5909,21 @@ async function confirmCsvImport(){
     imported++;
   }
   
-  await persist();
-  window._csvImportEntries = null;
-  closeModals();
-  render();
-  vibe([30,20,60]);
-  soundSuccess?.();
-  toast(`✅ ${imported} entradas importadas correctamente`);
+  try{
+    await persist();
+    window._csvImportEntries = null;
+    closeModals();
+    render();
+    vibe([30,20,60]);
+    soundSuccess?.();
+    toast(`✅ ${imported} entradas importadas correctamente`);
+  }catch(err){
+    vault.splice(0,imported);
+    console.error('confirmCsvImport:',err);
+    toast('No se pudo importar el CSV','err');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=_btnOrigText;}
+  }
 }
 // ═════════════════════════════════════════════════════════════
 
