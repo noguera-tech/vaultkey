@@ -568,6 +568,13 @@ function vk2EntryUrl(e){   return e.url||''; }
 function normalizeVK2Entry(e){
   if(!e || typeof e!=='object') return e;
 
+  if(String(e.type||e.entryType||'').toLowerCase()==='document'){
+    return Object.assign({}, e, {
+      type:'document',
+      entryType:'document'
+    });
+  }
+
   return Object.assign({}, e, {
     service: e.service || e.title || e.wifiSsid || '',
     user: e.user || e.username || e.email || '',
@@ -3213,7 +3220,11 @@ function setSortOrder(v){
   render();
 }
 function isPasswordFamilyEntry(e){
-  const type=(e?.entryType||e?.type||'password').toLowerCase();
+  /* Regla explícita (auditoría documentos, punto 5): solo type/entryType
+     'password' (o sus subtipos legacy planos wifi/pin/recovery) cuentan
+     como contraseña. Nunca por defecto — un documento con campos
+     service/user/pass no debe colarse aquí. */
+  const type=(e?.entryType||e?.type||'').toLowerCase();
   return type==='password'||type==='wifi'||type==='pin'||type==='recovery';
 }
 function passwordFamilyIdentity(e){
@@ -5127,8 +5138,9 @@ function healthReadJson(key,fallback=null){
 }
 
 function healthEntryType(entry){
-  const raw=String(entry?.entryType||entry?.type||'password').toLowerCase();
-  return raw||'password';
+  /* Regla explícita: nunca clasificar por defecto como contraseña.
+     Solo cuenta como tal lo que la propia entrada declara. */
+  return String(entry?.entryType||entry?.type||'').toLowerCase();
 }
 
 function healthPasswordSubtype(entry){
@@ -7304,7 +7316,36 @@ health:'<svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" s
 vaccine:'<svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 4 6 6M17 3l4 4M5 20l7-7M7 8l9 9M4 17l3 3M10 5l9 9"/></svg>',
 insurance:'<svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5Z"/></svg>',
 other:'<svg viewBox="0 0 24 24" fill="#3B82F6" stroke="#3B82F6" stroke-width="1.5"><path d="M3 7h7l2 2h9v11H3Z"/><path d="M3 7V4h7l2 3"/></svg>'};
-function read(){try{var x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x.filter(function(d){return d&&typeof d.id==='string';}):[];}catch(e){console.warn('VaultKey Documents:',e);return[];}}
+/* Fuente legacy (compatibilidad, nunca se borra aquí) */
+function readLegacy(){try{var x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x.filter(function(d){return d&&typeof d.id==='string';}):[];}catch(e){console.warn('VaultKey Documents:',e);return[];}}
+/* ¿Hay bóveda VK2 activa? Documentos usa vault[] como fuente principal solo en ese caso. */
+function vk2DocsActive(){return typeof vkStore!=='undefined'&&vkStore.hasVault()&&typeof vkSession!=='undefined'&&vkSession.isActive();}
+/* Traduce una entry VK2 (vault[], type:'document') al shape que espera este módulo */
+function vk2EntryToDocument(e){
+  return {
+    id:e.id,
+    category:e.docType||'other',
+    name:e.title||'',
+    expiry:e.expiry||'',
+    issuedBy:e.issuer||'',
+    country:e.country||'',
+    attachmentRef:e.attachmentRef||'',
+    image:'',
+    createdAt:e.createdAt||0,
+    updatedAt:e.updatedAt||0
+  };
+}
+/* Fuente única: vault[] VK2 primero; los documentos legacy que aún no se
+   hayan editado (y por tanto no se hayan promovido a vault[], ver
+   saveDocument) se siguen mostrando para no perder visibilidad de datos
+   existentes. Sin bóveda VK2 activa, comportamiento legacy sin cambios. */
+function read(){
+  var legacy=readLegacy();
+  if(!vk2DocsActive()||!Array.isArray(vault))return legacy;
+  var vk2Docs=vault.filter(function(e){return e&&(e.type==='document'||e.entryType==='document');}).map(vk2EntryToDocument);
+  var vk2Ids={};vk2Docs.forEach(function(d){vk2Ids[d.id]=true;});
+  return vk2Docs.concat(legacy.filter(function(d){return !vk2Ids[d.id];}));
+}
 function write(x){localStorage.setItem(KEY,JSON.stringify(x));}
 function id(){return 'uuid-'+(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));}
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
@@ -7371,7 +7412,7 @@ window.openDocumentSource=function(m){
 window.handleDocumentFile=function(ev){var input=ev&&ev.target,file=input&&input.files&&input.files[0];if(!file)return;if(!file.type||!file.type.startsWith('image/')){toast('Selecciona un archivo de imagen válido','err');input.value='';return;}var r=new FileReader();r.onerror=function(){toast('No se pudo leer la imagen seleccionada','err');input.value='';};r.onload=function(){if(typeof r.result!=='string'||!r.result.startsWith('data:image/')){toast('La imagen seleccionada no es válida','err');input.value='';return;}image=r.result;modal('documentSourceSheet',false);if(editingId){document.getElementById('documentEditImage').src=image;show('documentEdit','right');}else{document.getElementById('documentPreviewImage').src=image;show('documentPreview','right');}input.value='';};r.readAsDataURL(file);};
 window.repeatDocumentSelection=function(){modal('documentSourceSheet',true);};
 window.openCreateDocumentForm=function(){if(!image||!category){toast('Selecciona primero una imagen','err');openTypePicker();return;}document.getElementById('documentCreateForm').reset();document.getElementById('documentCreateImage').src=image;document.getElementById('documentCreateName').value=label(category);document.getElementById('documentCreateMore').hidden=true;document.getElementById('documentCreateMoreButton').textContent='+ Más información';visual('documentCreate',category);show('documentCreate','right');};
-window.openEditDocument=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;editingId=d.id;category=d.category;image=await documentImageUrl(d);window.__vkCurrentDocumentId=d.id;document.getElementById('documentEditImage').src=image;document.getElementById('documentEditName').value=d.name||'';document.getElementById('documentEditExpiry').value=d.expiry||'';document.getElementById('documentEditIssuedBy').value=d.issuedBy||'';document.getElementById('documentEditCountry').value=d.country||'';visual('documentEdit',d.category);var more=!!(d.issuedBy||d.country);document.getElementById('documentEditMore').hidden=!more;document.getElementById('documentEditMoreButton').textContent=more?'− Menos información':'+ Más información';show('documentEdit','right');};
+window.openEditDocument=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;editingId=d.id;category=d.category;image=await documentImageUrl(d);window.__vkCurrentDocumentId=d.id;document.getElementById('documentEditImage').src=image;document.getElementById('documentEditName').value=d.name||'';document.getElementById('documentEditExpiry').value=date(d.expiry);document.getElementById('documentEditIssuedBy').value=d.issuedBy||'';document.getElementById('documentEditCountry').value=d.country||'';visual('documentEdit',d.category);var more=!!(d.issuedBy||d.country);document.getElementById('documentEditMore').hidden=!more;document.getElementById('documentEditMoreButton').textContent=more?'− Menos información':'+ Más información';show('documentEdit','right');};
 window.openDocumentEditSource=function(){if(editingId)modal('documentSourceSheet',true);};
 window.formatDocumentExpiry=function(el){
   var v=String(el.value||'').replace(/\D/g,'').slice(0,8);
@@ -7386,9 +7427,31 @@ function normalizeDocumentExpiry(v){
   if(m)return m[3]+'-'+m[2]+'-'+m[1];
   return v;
 }
+/* Validación estricta DD/MM/AAAA: día 01-31, mes 01-12, año 1900-2100,
+   y fecha de calendario real (rechaza 31/02, 29/02 en año no bisiesto,
+   etc. vía redondeo de Date). Vacío se considera válido (campo opcional). */
+function isValidDocumentExpiry(v){
+  v=String(v||'').trim();
+  if(!v)return true;
+  var m=v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if(!m)return false;
+  var day=Number(m[1]),month=Number(m[2]),year=Number(m[3]);
+  if(year<1900||year>2100)return false;
+  if(month<1||month>12)return false;
+  if(day<1||day>31)return false;
+  var d=new Date(year,month-1,day);
+  return d.getFullYear()===year&&d.getMonth()===month-1&&d.getDate()===day;
+}
 
 window.saveDocument=async function(docId,name,expiry,issuedBy,country){
-  name=String(name||'').trim();expiry=normalizeDocumentExpiry(expiry);issuedBy=String(issuedBy||'').trim();country=String(country||'').trim();
+  name=String(name||'').trim();
+  var rawExpiry=String(expiry||'').trim();
+  if(!isValidDocumentExpiry(rawExpiry)){
+    toast('Fecha de caducidad no válida. Usa el formato DD/MM/AAAA con una fecha real entre 1900 y 2100.','err');
+    document.getElementById(docId?'documentEditExpiry':'documentCreateExpiry')?.focus();
+    return false;
+  }
+  expiry=normalizeDocumentExpiry(rawExpiry);issuedBy=String(issuedBy||'').trim();country=String(country||'').trim();
   if(!name){toast('El nombre es obligatorio','err');document.getElementById(docId?'documentEditName':'documentCreateName')?.focus();return false;}
   if(!image||!image.startsWith('data:image/')){if(!docId){toast('Falta una imagen válida del documento','err');return false;}var existing=read().find(function(x){return x.id===docId;});if(!existing||!existing.attachmentRef){toast('Falta una imagen válida del documento','err');return false;}}
   if(typeof vkAttachments==='undefined'||typeof vkAttachments.save!=='function'||typeof vkAttachments.replace!=='function'){
@@ -7417,21 +7480,77 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country){
       throw new Error('No existe adjunto para el documento');
     }
     if(!attachmentRef){throw new Error('No se generó un identificador de adjunto válido');}
-    if(isEdit){
-      var i=items.findIndex(function(x){return x.id===docId;});
-      if(i<0){showDocuments('left');return false;}
-      items[i]=Object.assign({},items[i],{category:category||items[i].category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:'',updatedAt:now});
+    if(typeof vkStore!=='undefined' &&
+       vkStore.hasVault() &&
+       typeof vkSession!=='undefined' &&
+       vkSession.isActive() &&
+       typeof vkModels!=='undefined'){
+
+      var vkEntryIndex=(vault||[]).findIndex(function(e){return e.id===docId;});
+
+      if(isEdit && vkEntryIndex>=0){
+        vault[vkEntryIndex]=Object.assign({},vault[vkEntryIndex],{
+          title:name,
+          docType:category||vault[vkEntryIndex].docType,
+          expiry:expiry,
+          issuer:issuedBy,
+          country:country,
+          attachmentRef:attachmentRef,
+          updatedAt:now
+        });
+      }else{
+        var vkEntry=vkModels.create('document',{
+          title:name,
+          docType:category||'other',
+          expiry:expiry,
+          issuer:issuedBy,
+          country:country,
+          attachmentRef:attachmentRef
+        });
+        vkEntry.type='document';
+        vkEntry.entryType='document';
+        vkEntry.id=docId;
+        vkEntry.createdAt=now;
+        vkEntry.updatedAt=now;
+        vault.push(vkEntry);
+      }
+
+      await persist();
     }else{
-      items.push({id:docId,category:category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:'',createdAt:now,updatedAt:now});
+      if(isEdit){
+        var i=items.findIndex(function(x){return x.id===docId;});
+        if(i<0){showDocuments('left');return false;}
+        items[i]=Object.assign({},items[i],{category:category||items[i].category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:'',updatedAt:now});
+      }else{
+        items.push({id:docId,category:category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:'',createdAt:now,updatedAt:now});
+      }
+      write(items);
     }
-    write(items);count();editingId=null;toast('Documento guardado','ok');showDocuments('left');return true;
+    count();editingId=null;toast('Documento guardado','ok');showDocuments('left');return true;
   }catch(e){
     console.error('saveDocument:',e);
     toast('No se pudo guardar el documento','err');
     return false;
   }
 };
-window.deleteDocument=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d){showDocuments('left');return;}if(!await vkConfirm('¿Eliminar documento?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'}))return;try{if(d.attachmentRef&&typeof vkAttachments!=='undefined'&&typeof vkAttachments.delete==='function'){await vkAttachments.delete({id:d.attachmentRef});}}catch(e){console.error('deleteDocument attachment:',e);toast('No se pudo eliminar el adjunto','err');return;}write(read().filter(function(x){return x.id!==docId;}));window.__vkCurrentDocumentId=null;editingId=null;image='';category='';count();toast('Documento eliminado','ok');showDocuments('left');};
+window.deleteDocument=async function(docId){
+  var d=read().find(function(x){return x.id===docId;});
+  if(!d){showDocuments('left');return;}
+  if(!await vkConfirm('¿Eliminar documento?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'}))return;
+  try{
+    if(d.attachmentRef&&typeof vkAttachments!=='undefined'&&typeof vkAttachments.delete==='function'){
+      await vkAttachments.delete({id:d.attachmentRef});
+    }
+  }catch(e){console.error('deleteDocument attachment:',e);toast('No se pudo eliminar el adjunto','err');return;}
+  var isVk2Doc=vk2DocsActive()&&Array.isArray(vault)&&vault.some(function(e){return e&&e.id===docId&&(e.type==='document'||e.entryType==='document');});
+  if(isVk2Doc){
+    vault=vault.filter(function(e){return e.id!==docId;});
+    try{await persist();}catch(e){console.error('deleteDocument persist:',e);toast('No se pudo eliminar el documento','err');return;}
+  }else{
+    write(readLegacy().filter(function(x){return x.id!==docId;}));
+  }
+  window.__vkCurrentDocumentId=null;editingId=null;image='';category='';count();toast('Documento eliminado','ok');showDocuments('left');
+};
 window.viewDocumentImage=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;var src=await documentImageUrl(d);if(!src)return;var w=window.open('','_blank');if(!w){toast('El navegador bloqueó la vista del documento','err');return;}w.document.write('<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(d.name||'Documento')+'</title><style>html,body{margin:0;min-height:100%;background:#111827;display:grid;place-items:center}img{max-width:100%;max-height:100vh;object-fit:contain}</style></head><body><img src="'+src.replace(/"/g,'&quot;')+'"></body></html>');w.document.close();};
 window.toggleDocumentMoreInfo=function(prefix){var b=document.getElementById(prefix+'More'),a=document.getElementById(prefix+'MoreButton');if(!b)return;b.hidden=!b.hidden;if(a)a.textContent=b.hidden?'+ Más información':'− Menos información';};
 document.addEventListener('click',function(e){var r=e.target.closest&&e.target.closest('.vk-document-row[data-document-id]');if(r)showDocumentDetail(r.getAttribute('data-document-id'));});
