@@ -6318,6 +6318,7 @@ try {
 
     // VK 2.0: crear o actualizar la nota en la bóveda cifrada.
     if(notesUseVK2()&&typeof vkModels!=='undefined'){
+      var _prevNoteEntry=null,_prevNoteIndex=-1,_pushedNoteEntry=null;
       try{
         var entry;
         if(id){
@@ -6325,6 +6326,8 @@ try {
             return item&&item.type==='note'&&item.id===id;
           });
           if(vaultIndex===-1)return false;
+          _prevNoteEntry=vault[vaultIndex];
+          _prevNoteIndex=vaultIndex;
           entry=Object.assign({},vault[vaultIndex],{
             title:title,
             body:content,
@@ -6337,6 +6340,7 @@ try {
             body:content
           });
           vault.push(entry);
+          _pushedNoteEntry=entry;
         }
         await persist();
         if(typeof render==='function')render();
@@ -6344,6 +6348,12 @@ try {
         window.showNotes('left');
         return true;
       }catch(error){
+        if(_pushedNoteEntry){
+          var _pushedNoteIdx=vault.indexOf(_pushedNoteEntry);
+          if(_pushedNoteIdx!==-1)vault.splice(_pushedNoteIdx,1);
+        }else if(_prevNoteIndex!==-1&&_prevNoteEntry){
+          vault[_prevNoteIndex]=_prevNoteEntry;
+        }
         console.error('saveNote VK2:',error);
         if(typeof window.toast==='function')window.toast('No se pudo guardar la nota','err');
         return false;
@@ -6390,8 +6400,16 @@ try {
         return item&&item.type==='note'&&item.id===id;
       });
       if(vaultIndex===-1)return;
+      var _removedNoteEntry=vault[vaultIndex];
       vault.splice(vaultIndex,1);
-      await persist();
+      try{
+        await persist();
+      }catch(error){
+        vault.splice(vaultIndex,0,_removedNoteEntry);
+        console.error('deleteNote VK2:',error);
+        if(typeof window.toast==='function')window.toast('No se pudo eliminar la nota','err');
+        return;
+      }
       if(typeof render==='function')render();
     }else{
       notesWrite(notesRead().filter(function(item){return item.id!==id;}));
@@ -6675,6 +6693,7 @@ try {
 
     // VK 2.0: crear o actualizar la tarjeta en la bóveda cifrada.
     if(cardsUseVK2()&&typeof vkModels!=='undefined'){
+      var _prevCardEntry=null,_prevCardIndex=-1,_pushedCardEntry=null;
       try{
         var entry;
         if(id){
@@ -6682,6 +6701,8 @@ try {
             return item&&item.type==='card'&&item.id===id;
           });
           if(vaultIndex===-1)return false;
+          _prevCardEntry=vault[vaultIndex];
+          _prevCardIndex=vaultIndex;
           entry=Object.assign({},vault[vaultIndex],{
             holder:holder,
             number:number,
@@ -6700,6 +6721,7 @@ try {
             notes:note
           });
           vault.push(entry);
+          _pushedCardEntry=entry;
         }
         await persist();
         if(typeof render==='function')render();
@@ -6707,6 +6729,12 @@ try {
         window.showCards('left');
         return true;
       }catch(error){
+        if(_pushedCardEntry){
+          var _pushedCardIdx=vault.indexOf(_pushedCardEntry);
+          if(_pushedCardIdx!==-1)vault.splice(_pushedCardIdx,1);
+        }else if(_prevCardIndex!==-1&&_prevCardEntry){
+          vault[_prevCardIndex]=_prevCardEntry;
+        }
         console.error('saveCard VK2:',error);
         if(typeof window.toast==='function')window.toast('No se pudo guardar la tarjeta','err');
         return false;
@@ -6766,8 +6794,16 @@ try {
         return item&&item.type==='card'&&item.id===id;
       });
       if(vaultIndex===-1)return;
+      var _removedCardEntry=vault[vaultIndex];
       vault.splice(vaultIndex,1);
-      await persist();
+      try{
+        await persist();
+      }catch(error){
+        vault.splice(vaultIndex,0,_removedCardEntry);
+        console.error('deleteCard VK2:',error);
+        if(typeof window.toast==='function')window.toast('No se pudo eliminar la tarjeta','err');
+        return;
+      }
       if(typeof render==='function')render();
     }else{
       cardsWrite(cardsRead().filter(function(item){return item.id!==id;}));
