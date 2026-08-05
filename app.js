@@ -801,6 +801,40 @@ function syncNotificationsMasterStatus(){
   }
 }
 
+/* ============================================================
+   Interacción
+   ============================================================ */
+
+window.openInteractionSettings=function(){
+  var screen=document.getElementById('interactionSettings');
+  if(!screen)return;
+  try{
+    syncInteractionHapticSwitch();
+    if(typeof window.show==='function'){
+      screen.hidden=false;
+      window.show('interactionSettings','right');
+    }
+  }catch(error){
+    console.error('No se pudo abrir Interacción',error);
+  }
+};
+
+function syncInteractionHapticSwitch(){
+  var btn=document.getElementById('interactionHapticSwitch');
+  if(!btn)return;
+  var enabled=localStorage.getItem('vk_vibe')!=='0';
+  btn.setAttribute('aria-checked',enabled?'true':'false');
+}
+
+window.toggleHapticFeedback=function(){
+  var btn=document.getElementById('interactionHapticSwitch');
+  var enabled=localStorage.getItem('vk_vibe')!=='0';
+  var next=!enabled;
+  localStorage.setItem('vk_vibe',next?'1':'0');
+  if(btn)btn.setAttribute('aria-checked',next?'true':'false');
+  if(next&&typeof vibe==='function')vibe(30);
+};
+
 window.openNotificationsSettings=function(){
   var screen=document.getElementById('notificationsSettings');
   if(!screen)return;
