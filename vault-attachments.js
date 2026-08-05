@@ -24,7 +24,7 @@
   'use strict';
 
   var DB_NAME = 'vk2-attachments';
-  var DB_VERSION = 1;
+  var DB_VERSION = 2;
   var STORE_NAME = 'blobs';
   var INDEX_ENTRY_ID = 'entryId';
 
@@ -154,6 +154,11 @@
         var db = req.result;
         if (settled) {
           db.close();
+          return;
+        }
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.close();
+          settleReject(new Error('vk2-attachments: falta el object store "' + STORE_NAME + '" tras abrir (versión ' + db.version + ')'));
           return;
         }
         db.onversionchange = function () {
