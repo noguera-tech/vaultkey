@@ -51,19 +51,29 @@
     return typeof size === 'number' && isFinite(size) && Math.floor(size) === size && size > 0 && size <= MAX_FILE_SIZE;
   }
 
+  function isPositiveInteger(v) {
+    return typeof v === 'number' && isFinite(v) && Math.floor(v) === v && v > 0;
+  }
+
   function isValidBase64(str) {
     return typeof str === 'string' && str.length > 0 && str.length % 4 === 0 && /^[A-Za-z0-9+/]+={0,2}$/.test(str);
   }
 
-  /* Valida la forma mínima de un registro ya leído de IndexedDB,
-     antes de intentar descifrarlo. No comprueba 'id'/'entryId' (ya
-     vienen de una búsqueda por clave/índice válida). */
+  /* Valida la forma mínima de un registro ya leído de IndexedDB (o de
+     un payload de importAll), antes de intentar descifrarlo o de
+     exportarlo/importarlo. Cubre id/entryId/timestamps además del
+     resto de campos — los registros creados por save()/replace()
+     siempre los cumplen, así que ampliarla aquí no les afecta. */
   function validateStoredRecord(record, vc) {
     if (!record || typeof record !== 'object') { return false; }
+    if (!isNonEmptyString(record.id)) { return false; }
+    if (!isNonEmptyString(record.entryId)) { return false; }
     if (record.formatVersion !== FORMAT_VERSION) { return false; }
     if (!vc || record.cryptoVersion !== vc.CRYPTO_VERSION) { return false; }
     if (!isAllowedMime(record.mime)) { return false; }
     if (!isValidSize(record.size)) { return false; }
+    if (!isPositiveInteger(record.createdAt)) { return false; }
+    if (!isPositiveInteger(record.updatedAt)) { return false; }
     if (!record.enc || !isNonEmptyString(record.enc.iv) || !isNonEmptyString(record.enc.ct)) { return false; }
     return true;
   }
@@ -521,6 +531,177 @@
     });
   }
 
+  /* exportAll(): lee todo el store en una transacción readonly y
+     resuelve solo tras tx.oncomplete. Valida cada registro con
+     validateStoredRecord() antes de exportarlo — si alguno no pasa,
+     rechaza la exportación entera. Nunca descifra ni expone
+     referencias vivas: cada registro exportado es un objeto nuevo. */
+  function exportAll() {
+    var vc = vkCryptoRef();
+    if (!vc || typeof vc.CRYPTO_VERSION === 'undefined') {
+      return Promise.reject(new Error('exportAll: vkCrypto no está disponible'));
+    }
+    return _getDB().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var records = null;
+        var tx = db.transaction(STORE_NAME, 'readonly');
+        var store = tx.objectStore(STORE_NAME);
+        var req = store.getAll();
+
+        req.onsuccess = function () { records = req.result || []; };
+        req.onerror = function () { reject(req.error || new Error('exportAll: fallo al leer IndexedDB')); };
+
+        tx.oncomplete = function () {
+          try {
+            var out = [];
+            for (var i = 0; i < records.length; i++) {
+              var record = records[i];
+              if (!validateStoredRecord(record, vc)) {
+                var label = record && isNonEmptyString(record.id) ? record.id : '(sin id)';
+                throw new Error('exportAll: registro inválido: ' + label);
+              }
+              out.push({
+                id: record.id,
+                entryId: record.entryId,
+                mime: record.mime,
+                size: record.size,
+                createdAt: record.createdAt,
+                updatedAt: record.updatedAt,
+                formatVersion: record.formatVersion,
+                cryptoVersion: record.cryptoVersion,
+                enc: { iv: record.enc.iv, ct: record.enc.ct }
+              });
+            }
+            out.sort(function (a, b) {
+              if (a.createdAt !== b.createdAt) { return a.createdAt - b.createdAt; }
+              return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
+            });
+            resolve({
+              format: 'VaultKeyAttachments',
+              formatVersion: FORMAT_VERSION,
+              exportedAt: Date.now(),
+              records: out
+            });
+          } catch (err) {
+            reject(err);
+          }
+        };
+        tx.onerror = function () { reject(tx.error || new Error('exportAll: fallo al leer los adjuntos')); };
+        tx.onabort = function () { reject(tx.error || new Error('exportAll: la transacción se abortó')); };
+      });
+    });
+  }
+
+  /* importAll(): valida el payload completo y construye copias
+     normalizadas de todos los registros ANTES de abrir la
+     transacción. Después procesa los registros secuencialmente
+     dentro de una única transacción readwrite, comprobando cada id
+     con store.get() (nunca has(), nunca una transacción por
+     registro). Resuelve solo en tx.oncomplete; cualquier fallo
+     aborta la transacción entera (sin resolución parcial). */
+  function importAll(payload, opts) {
+    opts = opts || {};
+    var mode = opts.mode || 'merge';
+
+    if (mode !== 'merge' && mode !== 'replace') {
+      return Promise.reject(new Error("importAll: mode debe ser 'merge' o 'replace'"));
+    }
+    if (!payload || typeof payload !== 'object') {
+      return Promise.reject(new Error('importAll: payload debe ser un objeto'));
+    }
+    if (payload.format !== 'VaultKeyAttachments') {
+      return Promise.reject(new Error('importAll: payload.format inválido'));
+    }
+    if (payload.formatVersion !== FORMAT_VERSION) {
+      return Promise.reject(new Error('importAll: payload.formatVersion no soportada'));
+    }
+    if (!Array.isArray(payload.records)) {
+      return Promise.reject(new Error('importAll: payload.records debe ser un array'));
+    }
+    var vc = vkCryptoRef();
+    if (!vc || typeof vc.CRYPTO_VERSION === 'undefined') {
+      return Promise.reject(new Error('importAll: vkCrypto no está disponible'));
+    }
+
+    var seenIds = Object.create(null);
+    var normalized = [];
+    for (var i = 0; i < payload.records.length; i++) {
+      var raw = payload.records[i];
+      if (!validateStoredRecord(raw, vc)) {
+        var label = raw && isNonEmptyString(raw.id) ? raw.id : '(sin id)';
+        return Promise.reject(new Error('importAll: registro inválido: ' + label));
+      }
+      if (Object.prototype.hasOwnProperty.call(seenIds, raw.id)) {
+        return Promise.reject(new Error('importAll: id duplicada en payload: ' + raw.id));
+      }
+      seenIds[raw.id] = true;
+      normalized.push({
+        id: raw.id,
+        entryId: raw.entryId,
+        mime: raw.mime,
+        size: raw.size,
+        createdAt: raw.createdAt,
+        updatedAt: raw.updatedAt,
+        formatVersion: raw.formatVersion,
+        cryptoVersion: raw.cryptoVersion,
+        enc: { iv: raw.enc.iv, ct: raw.enc.ct }
+      });
+    }
+    var total = normalized.length;
+
+    return _getDB().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var abortError = null;
+        var imported = 0;
+        var skipped = 0;
+        var replaced = 0;
+        var tx = db.transaction(STORE_NAME, 'readwrite');
+        var store = tx.objectStore(STORE_NAME);
+
+        function fail(err) {
+          abortError = err;
+          try { tx.abort(); } catch (e) { /* onabort se encarga del rechazo */ }
+        }
+
+        function processIndex(idx) {
+          if (abortError || idx >= normalized.length) { return; }
+          var record = normalized[idx];
+          var getReq = store.get(record.id);
+          getReq.onsuccess = function () {
+            if (abortError) { return; }
+            if (!getReq.result) {
+              var addReq = store.add(record);
+              addReq.onsuccess = function () { imported++; processIndex(idx + 1); };
+              addReq.onerror = function () {
+                fail(addReq.error || new Error('importAll: fallo al insertar ' + record.id));
+              };
+            } else if (mode === 'merge') {
+              skipped++;
+              processIndex(idx + 1);
+            } else {
+              var putReq = store.put(record);
+              putReq.onsuccess = function () { replaced++; processIndex(idx + 1); };
+              putReq.onerror = function () {
+                fail(putReq.error || new Error('importAll: fallo al reemplazar ' + record.id));
+              };
+            }
+          };
+          getReq.onerror = function () {
+            fail(getReq.error || new Error('importAll: fallo al comprobar ' + record.id));
+          };
+        }
+
+        tx.oncomplete = function () {
+          resolve({ imported: imported, skipped: skipped, replaced: replaced, total: total });
+        };
+        tx.onerror = function () { reject(abortError || tx.error || new Error('importAll: fallo al importar los adjuntos')); };
+        tx.onabort = function () { reject(abortError || tx.error || new Error('importAll: la transacción se abortó')); };
+
+        processIndex(0);
+      });
+    });
+  }
+
   return {
     init: init,
     has: has,
@@ -529,6 +710,8 @@
     load: load,
     replace: replace,
     delete: del,
-    deleteAll: deleteAll
+    deleteAll: deleteAll,
+    exportAll: exportAll,
+    importAll: importAll
   };
 });
