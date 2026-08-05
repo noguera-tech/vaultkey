@@ -1830,8 +1830,8 @@ function toggleQvNote(){const el=$('qvNote');if(!el)return;if(el.textContent==='
 function toggleQvCard(){const el=$('qvCardNum');if(!el)return;if(el.textContent.includes('•')){el.textContent=current.cardNumber;}else{el.textContent='•••• •••• •••• '+current.cardNumber.slice(-4);}}
 function toggleQvCvv(){const el=$('qvCvv');if(!el)return;el.textContent=el.textContent==='•••'?current.cardCvv:'•••';}
 function toggleQvWifiPass(){const el=$('qvWifiPass');if(!el)return;el.textContent=el.textContent==='••••••••'?current.wifiPass:'••••••••';}
-async function toggleFav(id){let e=vault.find(x=>x.id===id);if(e){e.fav=!e.fav;await persist();closeModals();render();toast('Actualizado')}}
-async function delEntry(id){vibe([40,20,40]);soundDelete();if(await vkConfirm('Eliminar entrada','¿Eliminar esta entrada de la bóveda?')){vault=vault.filter(e=>e.id!==id);await persist();closeModals();render();toast('Entrada eliminada');try{driveAutoSync();}catch(e){}}}
+async function toggleFav(id){let e=vault.find(x=>x.id===id);if(e){const _prevFav=e.fav;e.fav=!e.fav;try{await persist();closeModals();render();toast('Actualizado')}catch(err){e.fav=_prevFav;console.error('toggleFav:',err);toast('No se pudo actualizar','err')}}}
+async function delEntry(id){vibe([40,20,40]);soundDelete();if(await vkConfirm('Eliminar entrada','¿Eliminar esta entrada de la bóveda?')){const _delIdx=vault.findIndex(e=>e.id===id);if(_delIdx===-1)return;const _delEntry=vault[_delIdx];vault.splice(_delIdx,1);try{await persist();closeModals();render();toast('Entrada eliminada');try{driveAutoSync();}catch(e){}}catch(err){vault.splice(_delIdx,0,_delEntry);console.error('delEntry:',err);toast('No se pudo eliminar la entrada','err')}}}
 function copyText(t='',btn=null){
   navigator.clipboard?.writeText(t).then(()=>{
     vibe(35);soundCopy();
@@ -2686,9 +2686,16 @@ async function saveEntry(){
       url:_url, notes:_note, subtype:'web'
     });
     vault.push(entry);
-    await persist();
-    vibe([30,20,60]);soundSave();
-    closeModals();render();
+    try{
+      await persist();
+      vibe([30,20,60]);soundSave();
+      closeModals();render();
+    }catch(err){
+      const _idx=vault.indexOf(entry);
+      if(_idx!==-1)vault.splice(_idx,1);
+      console.error('saveEntry VK2:',err);
+      toast('No se pudo guardar la entrada','err');
+    }
     return;
   }
   vibe([30,20,60]);soundSave();
@@ -2820,9 +2827,16 @@ async function saveEntry(){
   const isPassType=_entryType==='password';
   let entry={id:editId||crypto.randomUUID(),service:serviceVal,entryType:_entryType,...cardData,...idData,...licData,...medData,...wifiData,type:'Cuenta',category:normalizeCategoryId($('eCategory')?.value||'general')||'general',user:isPassType?userVal:'',email:isPassType?emailVal:'',pass:isPassType?pass:'',url:isPassType?urlVal:'',note:_entryType==='note'?secureNoteVal:($('eNote')?.value||'').trim(),reminder:reminderData||null,tags:_getEntryTags(),icon:selectedEntryIcon||'',fav:_entryFav,updated:Date.now(),used:editId?(vault.find(x=>x.id===editId)?.used||0):0,passHistory:_newHistory};
   let i=vault.findIndex(x=>x.id===entry.id);
+  const _prevLegacyEntry=i>=0?vault[i]:null;
   if(i>=0)vault[i]=entry;else vault.unshift(entry);
   _catFilter='';_vaultTab='todas';document.querySelectorAll('.catChip').forEach(c=>c.classList.remove('active'));const _fc=document.querySelectorAll('.catChip')[0];if(_fc)_fc.classList.add('active');
-  await persist();closeModals();show('vault');render();try{driveAutoSync();}catch(e){}toast('Guardado \u2713');
+  try{
+    await persist();closeModals();show('vault');render();try{driveAutoSync();}catch(e){}toast('Guardado \u2713');
+  }catch(err){
+    if(_prevLegacyEntry){vault[i]=_prevLegacyEntry;}else{const _idx=vault.indexOf(entry);if(_idx!==-1)vault.splice(_idx,1);}
+    console.error('saveEntry legacy:',err);
+    toast('No se pudo guardar la entrada','err');
+  }
 }
 // Tab switcher para Recientes
 function switchVaultTab(tab, btn){
@@ -3094,13 +3108,20 @@ async function savePasswordEdit(){
   vault[index]=next;
   current=next;
 
-  await persist();
+  try{
+    await persist();
 
-  render();
-  show('passwords','left');
-  toast('Cambios guardados');
+    render();
+    show('passwords','left');
+    toast('Cambios guardados');
 
-  try{driveAutoSync();}catch(error){}
+    try{driveAutoSync();}catch(error){}
+  }catch(error){
+    vault[index]=previous;
+    current=previous;
+    console.error('savePasswordEdit:',error);
+    toast('No se pudo guardar la contraseña','err');
+  }
 }
 
 function openCreatePicker(){
@@ -3398,6 +3419,7 @@ async function savePasswordCreate(){
     }
   }
 
+  let entry;
   try{
     const data={
       title,
@@ -3411,7 +3433,7 @@ async function savePasswordCreate(){
       passHistory:[]
     };
 
-    const entry=vkModels.create('password',data);
+    entry=vkModels.create('password',data);
     vault.push(entry);
     await persist();
 
@@ -3421,6 +3443,10 @@ async function savePasswordCreate(){
 
     try{driveAutoSync();}catch(error){}
   }catch(error){
+    if(entry){
+      const _idx=vault.indexOf(entry);
+      if(_idx!==-1)vault.splice(_idx,1);
+    }
     console.error('savePasswordCreate',error);
     toast('No se pudo crear la contraseña.');
   }
@@ -3429,7 +3455,7 @@ function openPasswordDetail(id){
   const e=vault.find(x=>x.id===id);
   if(!e)return;
   e.used=Date.now();
-  persist();
+  persist().catch(err=>console.warn('openPasswordDetail persist:',err));
   current=e;
   renderPasswordDetail();
   show('passwordDetail','right');
@@ -3486,13 +3512,22 @@ async function deletePasswordFromDetail(){
   if(!current)return;
   const id=current.id;
   if(await vkConfirm('¿Eliminar contraseña?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'})){
-    vault=vault.filter(e=>e.id!==id);
-    await persist();
-    current=null;
-    render();
-    show('passwords','left');
-    toast('Contraseña eliminada');
-    try{driveAutoSync();}catch(e){}
+    const _delIdx=vault.findIndex(e=>e.id===id);
+    if(_delIdx===-1)return;
+    const _delEntry=vault[_delIdx];
+    vault.splice(_delIdx,1);
+    try{
+      await persist();
+      current=null;
+      render();
+      show('passwords','left');
+      toast('Contraseña eliminada');
+      try{driveAutoSync();}catch(e){}
+    }catch(err){
+      vault.splice(_delIdx,0,_delEntry);
+      console.error('deletePasswordFromDetail:',err);
+      toast('No se pudo eliminar la contraseña','err');
+    }
   }
 }
 
@@ -3774,7 +3809,7 @@ function renderFav(){
     grid.appendChild(row);
   });
 }
-function quick(id){let e=vault.find(x=>x.id===id);if(!e)return;e.used=Date.now();persist();current=e;let ic=iconForEntry(e);const u=userFromEntry(e);const em=legacyEmailFromEntry(e);
+function quick(id){let e=vault.find(x=>x.id===id);if(!e)return;e.used=Date.now();persist().catch(err=>console.warn('quick persist:',err));current=e;let ic=iconForEntry(e);const u=userFromEntry(e);const em=legacyEmailFromEntry(e);
 
 /* ── Top bar ── */
 let h='<div style="height:58px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 4px">';
