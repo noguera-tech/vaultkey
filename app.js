@@ -429,17 +429,21 @@ async function handlePin(){return window.handlePin?window.handlePin():undefined;
 async function unlockOk(p){return window.unlockOk?window.unlockOk(p):undefined;}
 async function persist(p=lastKey){
   // VK 2.0 bridge: cifrar en vk2_blob; return para no escribir LS_DATA
-  if(typeof vkSession!=='undefined'&&vkSession.isActive()&&typeof vkCrypto!=='undefined'){
-    const _dek=vkSession.getDEK();
-    if(_dek){
-      try{
-        const _ct=await vkCrypto.encryptVault(_dek,
-          JSON.stringify({app:'VaultKey',schemaVersion:2,entries:vault||[]}));
-        const _blob=vkStore.loadBlob();
-        if(_blob){_blob.vault=_ct;_blob.updatedAt=Date.now();vkStore.saveBlob(_blob);}
-      }catch(e){console.warn('VK2 persist:',e);}
-      return;
+  if(typeof vkSession!=='undefined'&&vkSession.isActive()){
+    try{
+      const _dek=vkSession.getDEK();
+      if(!_dek)throw new Error('No hay una DEK activa para persistir la bóveda VK2');
+      const _ct=await vkCrypto.encryptVault(_dek,
+        JSON.stringify({app:'VaultKey',schemaVersion:2,entries:vault||[]}));
+      const _blob=vkStore.loadBlob();
+      if(!_blob)throw new Error('vk2_blob no existe, no se puede persistir');
+      _blob.vault=_ct;_blob.updatedAt=Date.now();
+      vkStore.saveBlob(_blob);
+    }catch(e){
+      console.warn('VK2 persist:',e);
+      throw e;
     }
+    return;
   }
   if(!p)return;localStorage.setItem(LS_DATA,JSON.stringify(await encryptData(vault,p)));}
 const NAV_ORDER=['home','passwords','fav','settings'];
