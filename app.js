@@ -211,7 +211,68 @@ function lockRemaining(){
   return m.lockedUntil>now?Math.ceil((m.lockedUntil-now)/1000):0;
 }
 function toast(t,snd){const el=$('toast');if(!el)return;el.textContent=t;el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>{el.style.opacity='0'},2200);if(snd==='ok'||(!snd&&(t.startsWith('✓')||t.startsWith('✅')||t.includes('activad')||t.includes('guardad')||t.includes('importad')||t.includes('exportad')||t.includes('restaurad')||t.includes('desactivad')))){soundSuccess&&soundSuccess();}else if(snd==='err'||(!snd&&(t.includes('obligatorio')||t.includes('inválido')||t.includes('no tiene formato')||t.includes('no es válida')||t.includes('mínimo')||t.includes('No se pudo')||t.includes('no soporta')||t.includes('no reconocida')))){soundError&&soundError();}}
-function vibe(ms=40){try{if(localStorage.getItem('vk_vibe')==='0')return;navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+const VK_HAPTIC_PATTERNS=Object.freeze({
+  tap:18,
+  key:28,
+  backspace:18,
+  navigation:18,
+  success:[30,20,60],
+  error:[40,30,40],
+  delete:[40,20,40],
+  lock:30
+});
+let _vkPendingHapticTimer=null;
+let _vkLastHapticAt=0;
+function haptic(pattern='tap'){
+  try{
+    if(_vkPendingHapticTimer){clearTimeout(_vkPendingHapticTimer);_vkPendingHapticTimer=null;}
+    if(localStorage.getItem('vk_vibe')==='0')return false;
+    if(!navigator.vibrate)return false;
+    const now=Date.now();
+    if(now-_vkLastHapticAt<45)return false;
+    const value=Object.prototype.hasOwnProperty.call(VK_HAPTIC_PATTERNS,pattern)
+      ? VK_HAPTIC_PATTERNS[pattern]
+      : pattern;
+    if(typeof value!=='number'&&!Array.isArray(value))return false;
+    _vkLastHapticAt=now;
+    return navigator.vibrate(value);
+  }catch(e){return false;}
+}
+function queueHaptic(pattern='tap'){
+  try{
+    if(_vkPendingHapticTimer)clearTimeout(_vkPendingHapticTimer);
+    _vkPendingHapticTimer=setTimeout(()=>{
+      _vkPendingHapticTimer=null;
+      haptic(pattern);
+    },24);
+  }catch(e){}
+}
+function inferHapticPattern(el){
+  const declared=el?.dataset?.haptic;
+  if(declared&&Object.prototype.hasOwnProperty.call(VK_HAPTIC_PATTERNS,declared))return declared;
+  const signature=((el?.getAttribute?.('onclick')||'')+' '+(el?.id||'')+' '+(el?.className||'')+' '+(el?.textContent||'')).toLowerCase();
+  if(/delete|remove|eliminar|borrar|vaciar|wipe|reset/.test(signature))return 'delete';
+  if(/back|volver|cancel|cerrar|close/.test(signature))return 'navigation';
+  return 'tap';
+}
+window.vkHaptics=Object.freeze({
+  trigger:haptic,
+  queue:queueHaptic,
+  tap:()=>haptic('tap'),
+  key:()=>haptic('key'),
+  backspace:()=>haptic('backspace'),
+  navigation:()=>haptic('navigation'),
+  success:()=>haptic('success'),
+  error:()=>haptic('error'),
+  delete:()=>haptic('delete'),
+  lock:()=>haptic('lock')
+});
+function vibe(ms=40){return haptic(ms);}
+document.addEventListener('click',function(event){
+  const target=event.target?.closest?.('button,a[href],[role="button"],summary,select,input[type="checkbox"],input[type="radio"],[onclick]');
+  if(!target||target.disabled||target.getAttribute?.('aria-disabled')==='true'||target.dataset?.haptic==='none')return;
+  queueHaptic(inferHapticPattern(target));
+},true);
 
 // ── SISTEMA DE SONIDOS ──────────────────────────────────────
 let _actx=null;
