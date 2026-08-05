@@ -385,11 +385,150 @@
     });
   }
 
+  /* replace(): igual que save() en la validación/cifrado, pero sobre
+     una id EXISTENTE. Cifra antes de abrir la transacción; dentro de
+     la única transacción readwrite hace store.get(id) para comprobar
+     que existe y validar el registro previo, preserva id/entryId/
+     createdAt, actualiza el resto y hace store.put(). No borra y
+     vuelve a crear — un único put() sobre la misma clave. */
+  function replace(opts) {
+    opts = opts || {};
+    var id = opts.id;
+    var file = opts.file;
+    var dekKey = opts.dekKey;
+
+    if (!isNonEmptyString(id)) {
+      return Promise.reject(new Error('replace: id debe ser un string no vacío'));
+    }
+    if (typeof Blob === 'undefined' || !(file instanceof Blob)) {
+      return Promise.reject(new Error('replace: file debe ser un Blob o File'));
+    }
+    if (!isAllowedMime(file.type)) {
+      return Promise.reject(new Error('replace: tipo de archivo no permitido: ' + file.type));
+    }
+    if (!(file.size > 0)) {
+      return Promise.reject(new Error('replace: el archivo está vacío'));
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      return Promise.reject(new Error('replace: el archivo supera el tamaño máximo permitido'));
+    }
+    if (!dekKey) {
+      return Promise.reject(new Error('replace: dekKey es obligatoria'));
+    }
+    var vc = vkCryptoRef();
+    if (!vc || typeof vc.encryptVault !== 'function' || typeof vc.CRYPTO_VERSION === 'undefined') {
+      return Promise.reject(new Error('replace: vkCrypto no está disponible'));
+    }
+
+    return readBlobAsBase64(file).then(function (base64) {
+      return vc.encryptVault(dekKey, base64);
+    }).then(function (enc) {
+      if (!enc || !isNonEmptyString(enc.iv) || !isNonEmptyString(enc.ct)) {
+        throw new Error('replace: vkCrypto devolvió un cifrado inválido');
+      }
+      return _getDB().then(function (db) {
+        return new Promise(function (resolve, reject) {
+          var abortError = null;
+          var updatedRecord = null;
+          var tx = db.transaction(STORE_NAME, 'readwrite');
+          var store = tx.objectStore(STORE_NAME);
+
+          var getReq = store.get(id);
+          getReq.onsuccess = function () {
+            var existing = getReq.result;
+            if (!existing) {
+              abortError = new Error('Adjunto no encontrado: ' + id);
+              try { tx.abort(); } catch (e) { /* onabort se encarga del rechazo */ }
+              return;
+            }
+            if (!validateStoredRecord(existing, vc)) {
+              abortError = new Error('replace: el registro existente no tiene un formato válido');
+              try { tx.abort(); } catch (e) { /* onabort se encarga del rechazo */ }
+              return;
+            }
+            updatedRecord = {
+              id: existing.id,
+              entryId: existing.entryId,
+              createdAt: existing.createdAt,
+              mime: file.type,
+              size: file.size,
+              updatedAt: Date.now(),
+              formatVersion: FORMAT_VERSION,
+              cryptoVersion: vc.CRYPTO_VERSION,
+              enc: enc
+            };
+            store.put(updatedRecord);
+          };
+          getReq.onerror = function () {
+            abortError = getReq.error || new Error('replace: fallo al comprobar el adjunto existente');
+            try { tx.abort(); } catch (e) { /* onabort se encarga del rechazo */ }
+          };
+
+          tx.oncomplete = function () { resolve(toMeta(updatedRecord)); };
+          tx.onerror = function () { reject(abortError || tx.error || new Error('replace: fallo al guardar el adjunto')); };
+          tx.onabort = function () { reject(abortError || tx.error || new Error('replace: la transacción se abortó')); };
+        });
+      });
+    });
+  }
+
+  /* delete(): idempotente — borrar una id inexistente también
+     resuelve. Una única transacción readwrite; resuelve en
+     tx.oncomplete, rechaza en tx.onerror/tx.onabort. */
+  function del(opts) {
+    var id = opts && opts.id;
+    if (!isNonEmptyString(id)) {
+      return Promise.reject(new Error('delete: id debe ser un string no vacío'));
+    }
+    return _getDB().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction(STORE_NAME, 'readwrite');
+        var store = tx.objectStore(STORE_NAME);
+        store.delete(id);
+        tx.oncomplete = function () { resolve(); };
+        tx.onerror = function () { reject(tx.error || new Error('delete: fallo al borrar el adjunto')); };
+        tx.onabort = function () { reject(tx.error || new Error('delete: la transacción se abortó')); };
+      });
+    });
+  }
+
+  /* deleteAll(): cuenta los registros existentes dentro de la misma
+     transacción antes de clear(), y solo devuelve ese número tras
+     confirmarse el commit — no borra la base de datos, solo vacía
+     el object store. */
+  function deleteAll() {
+    return _getDB().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var countBefore = 0;
+        var abortError = null;
+        var tx = db.transaction(STORE_NAME, 'readwrite');
+        var store = tx.objectStore(STORE_NAME);
+
+        var countReq = store.count();
+        countReq.onsuccess = function () {
+          countBefore = countReq.result || 0;
+          store.clear();
+        };
+        countReq.onerror = function () {
+          abortError = countReq.error || new Error('deleteAll: fallo al contar los adjuntos');
+          try { tx.abort(); } catch (e) { /* onabort se encarga del rechazo */ }
+        };
+
+        tx.oncomplete = function () { resolve({ deleted: countBefore }); };
+        tx.onerror = function () { reject(abortError || tx.error || new Error('deleteAll: fallo al vaciar los adjuntos')); };
+        tx.onabort = function () { reject(abortError || tx.error || new Error('deleteAll: la transacción se abortó')); };
+      });
+    });
+  }
+
   return {
     init: init,
     has: has,
     list: list,
     save: save,
-    load: load
+    load: load,
+    replace: replace,
+    delete: del,
+    deleteAll: deleteAll
   };
 });
