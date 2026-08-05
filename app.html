@@ -1439,7 +1439,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
     <article class="vk-document-form-card"><span class="vk-document-preview-label">Vista previa</span><img id="documentCreateImage" class="vk-document-form-image" alt="Documento">
       <label class="vk-document-field"><span>Nombre</span><input id="documentCreateName" type="text" maxlength="150"></label>
       <button id="documentCreateMoreButton" type="button" class="vk-document-more-button" onclick="toggleDocumentMoreInfo('documentCreate')">+ Más información</button>
-      <label class="vk-document-field"><span>Caduca</span><input id="documentCreateExpiry" type="date"></label>
+      <label class="vk-document-field"><span>Caduca</span><input id="documentCreateExpiry" type="text" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" oninput="formatDocumentExpiry(this)"></label>
       <div id="documentCreateMore" class="vk-document-more-fields" hidden><label class="vk-document-field"><span>Emitido por</span><input id="documentCreateIssuedBy" type="text" maxlength="150"></label><label class="vk-document-field"><span>País</span><input id="documentCreateCountry" type="text" maxlength="100"></label></div>
     </article>
     <div class="vk-document-form-actions"><button type="button" class="vk-document-button-secondary" onclick="showDocuments('left')">Cancelar</button><button type="submit" class="vk-document-button-primary">Crear</button></div>
@@ -1460,7 +1460,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
     <h1 class="vk-document-screen-title">Editar documento</h1><div class="vk-document-category-line"><span id="documentEditCategoryIcon"></span><strong id="documentEditCategory"></strong></div>
     <article class="vk-document-form-card"><span class="vk-document-preview-label">Vista previa</span><img id="documentEditImage" class="vk-document-form-image" alt="Documento"><button type="button" class="vk-document-replace-button" onclick="openDocumentEditSource()">Repetir escaneo/importar</button>
       <label class="vk-document-field"><span>Nombre</span><input id="documentEditName" type="text" maxlength="150"></label>
-      <label class="vk-document-field"><span>Caduca</span><input id="documentEditExpiry" type="date"></label>
+      <label class="vk-document-field"><span>Caduca</span><input id="documentEditExpiry" type="text" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" oninput="formatDocumentExpiry(this)"></label>
       <button id="documentEditMoreButton" type="button" class="vk-document-more-button" onclick="toggleDocumentMoreInfo('documentEdit')">+ Más información</button>
       <div id="documentEditMore" class="vk-document-more-fields" hidden><label class="vk-document-field"><span>Emitido por</span><input id="documentEditIssuedBy" type="text" maxlength="150"></label><label class="vk-document-field"><span>País</span><input id="documentEditCountry" type="text" maxlength="100"></label></div>
     </article>
