@@ -6147,7 +6147,30 @@ try {
   var NOTES_KEY='vaultkey_notes';
   var notesSearchBound=false;
 
+  function notesUseVK2(){
+    return typeof vkStore!=='undefined'&&vkStore.hasVault()&&
+      typeof vkSession!=='undefined'&&vkSession.isActive();
+  }
+
+  function noteFromVK2(entry){
+    return {
+      id:entry.id,
+      title:entry.title||'',
+      content:entry.body||'',
+      createdAt:entry.createdAt,
+      updatedAt:entry.updatedAt
+    };
+  }
+
   function notesRead(){
+    if(notesUseVK2()){
+      return (vault||[])
+        .filter(function(entry){
+          return entry&&entry.type==='note'&&typeof entry.id==='string';
+        })
+        .map(noteFromVK2);
+    }
+
     try{
       var parsed=JSON.parse(localStorage.getItem(NOTES_KEY)||'[]');
       return Array.isArray(parsed)?parsed.filter(function(note){
@@ -6293,18 +6316,31 @@ try {
       return false;
     }
 
-    // VK 2.0 bridge: las notas nuevas pasan a la bóveda cifrada.
-    if(typeof vkStore!=='undefined'&&vkStore.hasVault()&&
-       typeof vkModels!=='undefined'){
+    // VK 2.0: crear o actualizar la nota en la bóveda cifrada.
+    if(notesUseVK2()&&typeof vkModels!=='undefined'){
       try{
-        var entry=vkModels.create('note',{
-          title:title,
-          body:content
-        });
-        vault.push(entry);
+        var entry;
+        if(id){
+          var vaultIndex=(vault||[]).findIndex(function(item){
+            return item&&item.type==='note'&&item.id===id;
+          });
+          if(vaultIndex===-1)return false;
+          entry=Object.assign({},vault[vaultIndex],{
+            title:title,
+            body:content,
+            updatedAt:Date.now()
+          });
+          vault[vaultIndex]=entry;
+        }else{
+          entry=vkModels.create('note',{
+            title:title,
+            body:content
+          });
+          vault.push(entry);
+        }
         await persist();
         if(typeof render==='function')render();
-        if(typeof window.toast==='function')window.toast('Nota guardada','ok');
+        if(typeof window.toast==='function')window.toast(id?'Nota guardada':'Nota creada','ok');
         window.showNotes('left');
         return true;
       }catch(error){
@@ -6349,7 +6385,17 @@ try {
 
     if(!await vkConfirm('¿Eliminar nota?','Se eliminará de la bóveda y no podrás recuperarla.',{variant:'delete-password',confirmText:'Eliminar'}))return;
 
-    notesWrite(notesRead().filter(function(item){return item.id!==id;}));
+    if(notesUseVK2()){
+      var vaultIndex=(vault||[]).findIndex(function(item){
+        return item&&item.type==='note'&&item.id===id;
+      });
+      if(vaultIndex===-1)return;
+      vault.splice(vaultIndex,1);
+      await persist();
+      if(typeof render==='function')render();
+    }else{
+      notesWrite(notesRead().filter(function(item){return item.id!==id;}));
+    }
     window.__vkCurrentNoteId=null;
     updateNotesCount();
     if(typeof window.toast==='function')window.toast('Nota eliminada','ok');
