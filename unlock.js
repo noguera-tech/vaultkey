@@ -194,6 +194,40 @@
     } catch (e) { /* hápticos opcionales: nunca bloquear el desbloqueo */ }
   }
 
+  /* ---- Borrado de almacenes fragmentados (auto-wipe) ----
+     Duplicado deliberadamente en vez de depender de app.js (regla de
+     aislamiento del módulo, ver cabecera). Cada clave se intenta de
+     forma independiente y nunca lanza; el resultado se recopila para
+     que el llamador decida si el borrado quedó completo. */
+  function autoWipeFragmentedStores() {
+    var results = {};
+    ['vaultkey_notes', 'vaultkey_cards', 'vaultkey_documents'].forEach(function (key) {
+      try { root.localStorage.removeItem(key); results[key] = { ok: true }; }
+      catch (err) { results[key] = { ok: false, error: err }; }
+    });
+    try { root.sessionStorage.removeItem('vk_entry_draft'); results.sessionDraft = { ok: true }; }
+    catch (err) { results.sessionDraft = { ok: false, error: err }; }
+    return results;
+  }
+
+  /* Verificación posterior al auto-wipe: qué queda realmente en localStorage/
+     sessionStorage tras intentar borrarlo todo. Equivalente a
+     wipeCheckRemaining() en app.js — no asumir éxito solo porque
+     vkStore.wipeLocal() haya terminado. */
+  function autoWipeCheckRemaining() {
+    var remaining = [];
+    var keys = ['vk2_blob', 'vk2_pinwrap', 'vk2_meta',
+      'vaultkey_notes', 'vaultkey_cards', 'vaultkey_documents'];
+    keys.forEach(function (k) {
+      try { if (root.localStorage.getItem(k) !== null) remaining.push(k); }
+      catch (e) { remaining.push(k + ' (no verificable)'); }
+    });
+    try {
+      if (root.sessionStorage.getItem('vk_entry_draft') !== null) remaining.push('sessionStorage:vk_entry_draft');
+    } catch (e) { remaining.push('sessionStorage:vk_entry_draft (no verificable)'); }
+    return remaining;
+  }
+
   function handleAction(action, ctx) {
     if (ui.busy) { return; }
 
@@ -301,42 +335,66 @@
             ui.message = 'Décimo intento fallido. Borrando datos locales…';
             rerender(ctx);
 
-            function failAutoWipe(message, err) {
-              console.error(message, err);
-              ui.busy = false;
-              ui.pinState = 'error';
-              ui.message = 'No se pudo completar el borrado. Inténtalo de nuevo.';
-              rerender(ctx);
-            }
-
+            /* Auto-wipe resiliente: se intentan TODOS los pasos aunque
+               alguno falle, y solo entonces se decide si el borrado
+               quedó completo. No se aborta al primer error (antes,
+               un fallo en vkAttachments.deleteAll() dejaba vkStore.wipeLocal()
+               sin intentar, y viceversa). */
             var attachments = typeof globalThis !== 'undefined'
               ? globalThis.vkAttachments
               : null;
+            var wipeResults = {};
 
-            if (!attachments || typeof attachments.deleteAll !== 'function') {
-              failAutoWipe(
-                '[VK2] auto-wipe: vkAttachments no disponible, borrado abortado',
-                new Error('vkAttachments.deleteAll no está disponible')
-              );
-              return;
-            }
-
-            attachments.deleteAll().then(function () {
-              return ctx.store.wipeLocal().then(function (result) {
-                /* La bóveda principal ya se eliminó de forma síncrona dentro de
-                   wipeLocal() antes de intentar el pepper (ver vault-store.js) --
-                   este resultado nunca puede dejarnos con una bóveda a medias. */
-                if (result && result.pepperDeleted === false) {
-                  console.error('[VK2] wipeLocal: el pepper del dispositivo no se pudo borrar', result.pepperError);
+            Promise.resolve()
+              .then(function () {
+                if (!attachments || typeof attachments.deleteAll !== 'function') {
+                  wipeResults.attachments = { ok: false, error: 'vkAttachments no disponible' };
+                  return;
                 }
+                return attachments.deleteAll().then(function () {
+                  wipeResults.attachments = { ok: true };
+                }, function (err) {
+                  console.error('[VK2] auto-wipe: fallo al borrar adjuntos IndexedDB', err);
+                  wipeResults.attachments = { ok: false, error: err };
+                });
+              })
+              .then(function () {
+                return ctx.store.wipeLocal().then(function (result) {
+                  wipeResults.vk2Store = { ok: true, pepperDeleted: !!(result && result.pepperDeleted) };
+                  if (result && result.pepperDeleted === false) {
+                    console.error('[VK2] wipeLocal: el pepper del dispositivo no se pudo borrar', result.pepperError);
+                  }
+                }, function (err) {
+                  console.error('[VK2] auto-wipe: fallo al borrar la bóveda local', err);
+                  wipeResults.vk2Store = { ok: false, error: err };
+                });
+              })
+              .then(function () {
+                var fragResults = autoWipeFragmentedStores();
+                for (var k in fragResults) { wipeResults[k] = fragResults[k]; }
+
+                var remaining = autoWipeCheckRemaining();
+                var coreOk = wipeResults.vk2Store && wipeResults.vk2Store.ok !== false; // solo diagnóstico — NUNCA autoriza navegación
+                var fullyClean = remaining.length === 0 && Object.keys(wipeResults).every(function (k) {
+                  return wipeResults[k].ok !== false;
+                });
+
+                if (!fullyClean) {
+                  console.error('[VK2] auto-wipe: borrado incompleto', { results: wipeResults, remaining: remaining, coreOk: coreOk });
+                  ui.busy = false;
+                  ui.pinState = 'error';
+                  ui.message = 'No se pudo completar el borrado. Inténtalo de nuevo.';
+                  rerender(ctx);
+                  return;
+                }
+
+                /* Solo se navega a /welcome cuando el borrado quedó completo de
+                   verdad: ningún almacén sensible —ni el modelo central ni los
+                   fragmentados ni el borrador de sessionStorage— puede sobrevivir
+                   al auto-wipe. coreOk se conserva arriba solo para depurar. */
                 resetUi();
                 ctx.router.replace('/welcome');
-              }, function (err) {
-                failAutoWipe('[VK2] auto-wipe: fallo al borrar la bóveda local', err);
               });
-            }, function (err) {
-              failAutoWipe('[VK2] auto-wipe: fallo al borrar adjuntos IndexedDB', err);
-            });
           } else {
             ui.busy = false;
             ui.pinState = 'error';

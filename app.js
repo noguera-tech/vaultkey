@@ -673,21 +673,106 @@ function show(id,dir){
 
 })();
 function lock(){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();vibe(30);soundLock();unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay()}
-async function wipe(){if(await vkConfirm('Borrar todos los datos','Se eliminará la bóveda de este dispositivo. Esta acción no se puede deshacer.',{variant:'wipe',confirmText:'Borrar'})){soundError();vibe([60,30,60,30,100]);const isVk2=typeof vkStore!=='undefined'&&vkStore.hasVault();if(isVk2){
-      if(typeof vkAttachments==='undefined'||typeof vkAttachments.deleteAll!=='function'){
-        console.error('wipe: vkAttachments no disponible, borrado abortado');
-        toast('No se pudo completar el borrado. Inténtalo de nuevo.','err');
-        return;
+/* ============================================================
+   Borrado total — almacenes fragmentados (notas/tarjetas/documentos
+   legacy) y borradores sensibles de sessionStorage.
+   Se usa desde wipe(). unlock.js mantiene su propia copia (aislamiento
+   de módulo, ver cabecera de unlock.js). Cada clave se intenta de
+   forma independiente y nunca lanza: el resultado se recopila para
+   que el llamador decida si el borrado quedó completo. */
+function wipeFragmentedLocalStores(){
+  var results={};
+  [['notes','vaultkey_notes'],['cards','vaultkey_cards'],['documents','vaultkey_documents']].forEach(function(pair){
+    try{ localStorage.removeItem(pair[1]); results[pair[0]]={ok:true}; }
+    catch(err){ results[pair[0]]={ok:false,error:err}; }
+  });
+  try{ sessionStorage.removeItem('vk_entry_draft'); results.sessionDraft={ok:true}; }
+  catch(err){ results.sessionDraft={ok:false,error:err}; }
+  return results;
+}
+
+/* Verificación posterior al borrado: qué queda realmente en localStorage/
+   sessionStorage tras intentar borrarlo todo. No asumir éxito solo porque
+   las claves centrales VK2 ya se intentaron borrar. */
+function wipeCheckRemaining(){
+  var remaining=[];
+  var keys=['vk2_blob','vk2_pinwrap','vk2_meta',LS_META,LS_DATA,LS_REC,
+    'vaultkey_notes','vaultkey_cards','vaultkey_documents'];
+  keys.forEach(function(k){
+    try{ if(localStorage.getItem(k)!==null) remaining.push(k); }
+    catch(e){ remaining.push(k+' (no verificable)'); }
+  });
+  try{ if(sessionStorage.getItem('vk_entry_draft')!==null) remaining.push('sessionStorage:vk_entry_draft'); }
+  catch(e){ remaining.push('sessionStorage:vk_entry_draft (no verificable)'); }
+  return remaining;
+}
+
+async function wipe(){
+  if(!(await vkConfirm('Borrar todos los datos','Se eliminará la bóveda de este dispositivo. Esta acción no se puede deshacer.',{variant:'wipe',confirmText:'Borrar'})))return;
+
+  soundError();vibe([60,30,60,30,100]);
+  const isVk2=typeof vkStore!=='undefined'&&vkStore.hasVault();
+  const results={};
+
+  /* Paso 1 — adjuntos IndexedDB. Independiente de VK2: pueden existir
+     adjuntos aunque la bóveda actual sea legacy o ya no exista. */
+  if(typeof vkAttachments!=='undefined'&&typeof vkAttachments.deleteAll==='function'){
+    try{ await vkAttachments.deleteAll(); results.attachments={ok:true}; }
+    catch(err){ console.error('wipe: fallo al borrar adjuntos IndexedDB',err); results.attachments={ok:false,error:err}; }
+  }else{
+    results.attachments={ok:false,error:'vkAttachments no disponible'};
+  }
+
+  /* Paso 2 — modelo central VK2 (vk2_blob, vk2_pinwrap, vk2_meta, pepper) */
+  if(isVk2){
+    try{
+      const r=await vkStore.wipeLocal();
+      results.vk2Store={ok:true,pepperDeleted:!!(r&&r.pepperDeleted)};
+      if(r&&r.pepperDeleted===false){
+        console.error('wipe: el pepper del dispositivo no se pudo borrar',r.pepperError);
       }
-      try{
-        await vkAttachments.deleteAll();
-      }catch(err){
-        console.error('wipe: fallo al borrar adjuntos IndexedDB',err);
-        toast('No se pudo completar el borrado. Inténtalo de nuevo.','err');
-        return;
-      }
-      if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();try{await vkStore.wipeLocal();}catch(err){console.error('wipe: fallo al borrar la bóveda VK2',err);toast('No se pudo completar el borrado. Inténtalo de nuevo.','err');return;}localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);localStorage.removeItem('vaultkey_onboarding_v130');openOnboardingHard();return;
-    }localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];lock()}}
+    }catch(err){
+      console.error('wipe: fallo al borrar la bóveda VK2',err);
+      results.vk2Store={ok:false,error:err};
+    }
+  }
+
+  /* Paso 3 — claves legacy 1.x, independientes de si hay bóveda VK2 */
+  [['legacyMeta',LS_META],['legacyData',LS_DATA],['legacyRecovery',LS_REC]].forEach(function(pair){
+    try{ localStorage.removeItem(pair[1]); results[pair[0]]={ok:true}; }
+    catch(err){ results[pair[0]]={ok:false,error:err}; }
+  });
+
+  /* Paso 4 — almacenes fragmentados (notas/tarjetas/documentos) y
+     borrador de sessionStorage — SIEMPRE, con o sin VK2 activo */
+  Object.assign(results,wipeFragmentedLocalStores());
+
+  /* Paso 5 — estado en memoria: se limpia siempre, se haya podido
+     borrar o no todo lo anterior, para no dejar la sesión actual viva */
+  if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();
+  unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();
+
+  /* Paso 6 — verificación final: qué queda realmente tras intentar todo */
+  const remaining=wipeCheckRemaining();
+  const coreOk=!isVk2||(results.vk2Store&&results.vk2Store.ok!==false); // solo diagnóstico — NUNCA autoriza navegación
+  const fullyClean=remaining.length===0&&Object.keys(results).every(function(k){return results[k].ok!==false;});
+
+  if(!fullyClean){
+    console.error('wipe: borrado incompleto',{results:results,remaining:remaining,coreOk:coreOk});
+    toast('El borrado no se completó del todo. Revisa la consola y vuelve a intentarlo.','err');
+    lock();
+    return;
+  }
+
+  /* Solo se avanza a onboarding (o se cierra sesión en modo legacy) cuando el
+     borrado quedó completo de verdad: ningún almacén sensible —ni el modelo
+     central ni los fragmentados (notas/tarjetas/documentos) ni el borrador de
+     sessionStorage— puede sobrevivir a "Borrar todos los datos". coreOk se
+     conserva arriba solo para depurar, nunca decide si se avanza. */
+  localStorage.removeItem('vaultkey_onboarding_v130');
+  if(isVk2){ openOnboardingHard(); }
+  else{ lock(); }
+}
 
 /* ============================================================
    Zona de peligro — /settings/danger (pantalla dangerZoneSettings)
