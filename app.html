@@ -269,6 +269,13 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 .vk-drive-busy .vk-drive-card[data-drive-action]{pointer-events:none;opacity:.62}
 .vk-drive-spin{animation:vkDriveSpin 1s linear infinite}@keyframes vkDriveSpin{to{transform:rotate(360deg)}}
 @media(max-height:820px){.vk-drive-title{margin-bottom:56px}.vk-drive-list{gap:12px}.vk-drive-version{padding-top:24px}}
+.vk-backup-local-title{margin-bottom:8px}
+.vk-backup-local-desc{margin:0 0 24px;color:#9ca3af;font-size:14px;line-height:1.4;text-align:center}
+.vk-backup-local-check{width:20px;height:20px;color:#22c55e;display:flex;align-items:center;justify-content:center;justify-self:end}
+.vk-backup-local-check svg{width:20px;height:20px}
+.vk-backup-local-info{margin-top:22px;color:#9ca3af;font-size:14px;line-height:1.85}
+.vk-backup-local-info p{margin:0}
+
 
 
 /* Confirmaciones VaultKey — Figma 498:2 y 533:4 */
@@ -380,6 +387,72 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
   transform:scale(.97)
 }
 #confirmModal.vk-confirm--reset #confirmCancel:active,#confirmModal.vk-confirm--reset #confirmOk:active,#confirmModal.vk-confirm--wipe #confirmCancel:active,#confirmModal.vk-confirm--wipe #confirmOk:active,#confirmModal.vk-confirm--drive-disconnect #confirmCancel:active,#confirmModal.vk-confirm--drive-disconnect #confirmOk:active,#confirmModal.vk-confirm--drive-restore #confirmCancel:active,#confirmModal.vk-confirm--drive-restore #confirmOk:active,#confirmModal.vk-confirm--delete-password #confirmCancel:active,#confirmModal.vk-confirm--delete-password #confirmOk:active{opacity:.84;transform:scale(.97)}
+#confirmModal.vk-confirm--backup-create,#confirmModal.vk-confirm--backup-restore{inset:0;padding:16px;align-items:center;justify-content:center;background:rgba(0,7,18,.85)}
+#confirmModal.vk-confirm--backup-create .sheet,#confirmModal.vk-confirm--backup-restore .sheet{box-sizing:border-box;position:relative;width:300px;max-width:calc(100vw - 32px);height:240px;max-height:none;overflow:hidden;padding:20px 24px;border:1px solid #030508;border-radius:16px;background:#243246;box-shadow:none}
+#confirmModal.vk-confirm--backup-create .sheetHead,#confirmModal.vk-confirm--backup-restore .sheetHead{display:block;margin:0;position:relative;min-height:32px;padding-left:38px}
+#confirmModal.vk-confirm--backup-create .sheetTitle,#confirmModal.vk-confirm--backup-restore .sheetTitle{margin:0;color:#fff;font-family:Inter,system-ui,sans-serif;font-size:24px;line-height:1.15;font-weight:700;text-align:left;text-shadow:none}
+#confirmModal.vk-confirm--backup-create .spacer,#confirmModal.vk-confirm--backup-create #confirmClose,#confirmModal.vk-confirm--backup-restore .spacer,#confirmModal.vk-confirm--backup-restore #confirmClose{display:none}
+#confirmModal.vk-confirm--backup-create #confirmMsg,#confirmModal.vk-confirm--backup-restore #confirmMsg{margin:24px 0 0;color:rgba(167,182,201,.8);font-family:Inter,system-ui,sans-serif;font-size:12px;line-height:1.4;font-weight:500;text-align:left}
+#confirmModal.vk-confirm--backup-create #confirmMsg2,#confirmModal.vk-confirm--backup-restore #confirmMsg2{margin:14px 0 0;color:rgba(167,182,201,.8);font-family:Inter,system-ui,sans-serif;font-size:12px;line-height:1.4;font-weight:500;text-align:left}
+#confirmModal.vk-confirm--backup-create .rowBtns,#confirmModal.vk-confirm--backup-restore .rowBtns{position:absolute;left:24px;right:24px;bottom:20px;display:grid;grid-template-columns:85px 85px;justify-content:space-between;gap:0}
+#confirmModal.vk-confirm--backup-create .rowBtns>button,#confirmModal.vk-confirm--backup-restore .rowBtns>button{box-sizing:border-box;width:85px;height:43px;min-width:0;padding:0;border:1px solid #3a4a60;border-radius:16px;font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:400;color:#fff;box-shadow:none}
+#confirmModal.vk-confirm--backup-create #confirmCancel,#confirmModal.vk-confirm--backup-restore #confirmCancel{background:transparent}
+#confirmModal.vk-confirm--backup-create #confirmOk,#confirmModal.vk-confirm--backup-restore #confirmOk{border-color:#3a4a60;background:#f59e0b;color:#fff}
+#confirmModal.vk-confirm--backup-create #confirmCancel:active,#confirmModal.vk-confirm--backup-create #confirmOk:active,#confirmModal.vk-confirm--backup-restore #confirmCancel:active,#confirmModal.vk-confirm--backup-restore #confirmOk:active{opacity:.84;transform:scale(.97)}
+#confirmModal .vk-confirm-icon--backup-create,#confirmModal .vk-confirm-icon--backup-restore{display:none}
+#confirmModal.vk-confirm--backup-create .vk-confirm-icon--backup-create,#confirmModal.vk-confirm--backup-restore .vk-confirm-icon--backup-restore{display:block;position:absolute;left:24px;top:20px;width:24px;height:24px;color:#3b82f6}
+#confirmModal.vk-confirm--backup-create .vk-confirm-icon--backup-create svg,#confirmModal.vk-confirm--backup-restore .vk-confirm-icon--backup-restore svg{display:block;width:100%;height:100%}
+
+#backupLocalSettings{box-sizing:border-box;width:100%;height:100dvh;min-height:0;overflow:hidden;border:1px solid #030508;background:linear-gradient(149.3508256958964deg,#111827 15.964%,#182f4e 63.204%);color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#backupSheet{
+  position:fixed;
+  top:0;
+  bottom:0;
+  left:50%;
+  right:auto;
+  width:min(100%,450px);
+  z-index:1200;
+  align-items:flex-end;
+  justify-content:center;
+  transform:translateX(-50%);
+  background:#020817;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+#backupSheet .sheet.vk-backup-sheet{
+  position:relative;
+  box-sizing:border-box;
+  width:min(100%,412px);
+  max-height:none;
+  overflow:visible;
+  margin:0;
+  padding:12px 24px calc(29px + env(safe-area-inset-bottom,0px));
+  border:0;
+  border-radius:24px 24px 0 0;
+  background:#182F4E;
+  box-shadow:none;
+}
+#backupSheet .sheet.vk-backup-sheet::before,
+#backupSheet .sheet.vk-backup-sheet::after{
+  display:none!important;
+  content:none!important;
+}
+.vk-backup-sheet__handle{width:40px;height:5px;margin:0 auto 22px;border-radius:3px;background:#6b7280}
+.vk-backup-sheet__body{display:flex;flex-direction:column;gap:18px}
+.vk-backup-sheet__title{margin:0;color:#a7b6c9;font-size:14px;font-weight:500;text-align:center}
+.vk-backup-sheet__row{box-sizing:border-box;width:100%;height:65px;padding:0 16px;border:1px solid rgba(58,74,96,.6);border-radius:16px;background:#243246;color:#fff;font:inherit;font-size:16px;font-weight:600;text-align:center;cursor:pointer;-webkit-appearance:none;appearance:none;display:flex;align-items:center;justify-content:center}
+.vk-backup-sheet__row:active{opacity:.86;transform:scale(.985)}
+.vk-backup-sheet__row--soon{flex-direction:column;gap:2px;cursor:default}
+.vk-backup-sheet__row--soon:active{opacity:1;transform:none}
+.vk-backup-sheet__row--soon span{font-size:16px;font-weight:600;color:#fff}
+.vk-backup-sheet__row--soon small{font-size:14px;font-weight:400;color:#9ca3af}
+.vk-backup-sheet__divider{height:1px;width:82%;margin:4px auto;background:rgba(58,74,96,.8)}
+.vk-backup-sheet__actions{display:flex;gap:20px;height:48px}
+.vk-backup-sheet__actions button{flex:1;height:48px;border-radius:16px;font:inherit;font-size:14px;color:#fff;cursor:pointer;-webkit-appearance:none;appearance:none}
+.vk-backup-sheet__cancel{border:1px solid #3a4a60;background:transparent}
+.vk-backup-sheet__create{border:none;background:#3b82f6}
+.vk-backup-sheet__cancel:active,.vk-backup-sheet__create:active{opacity:.86;transform:scale(.985)}
+
 .vk-auto-header{box-sizing:border-box;height:64px;background:#243246;border-bottom:1px solid #000;display:flex;align-items:center;padding:0 24px}
 .vk-auto-back{width:32px;height:32px;padding:0;border:0;background:transparent;color:#a7b6c9;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .vk-auto-back svg{width:24px;height:24px}
@@ -1672,6 +1745,22 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
         <span class="vk-settings-card__arrow vk-r1-row__chevron" aria-hidden="true">›</span>
       </button>
 
+      <button type="button" class="vk-settings-card vk-r1-row" data-settings-target="backup" onclick="openBackupSheet()">
+        <span class="vk-settings-card__icon vk-r1-row__icon" aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3v12"/>
+    <path d="m7 10 5 5 5-5"/>
+    <path d="M5 21h14a2 2 0 0 0 2-2v-3"/>
+    <path d="M3 16v3a2 2 0 0 0 2 2"/>
+  </svg>
+</span>
+        <span class="vk-settings-card__text vk-r1-row__body">
+          <strong class="vk-r1-row__title">Copias de seguridad</strong>
+          <small class="vk-r1-row__subtitle">Google Drive/Local</small>
+        </span>
+        <span class="vk-settings-card__arrow vk-r1-row__chevron" aria-hidden="true">›</span>
+      </button>
+
       <button type="button" class="vk-settings-card vk-settings-card--danger vk-r1-row" data-settings-target="danger" onclick="openDangerZoneSettings()">
         <span class="vk-settings-card__icon vk-r1-row__icon vk-r1-row__icon--warning" aria-hidden="true">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2406,6 +2495,44 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
     </div>
     <p class="vk-drive-version">VaultKey 2.0</p>
   </main>
+</section>
+
+<section id="backupLocalSettings" class="screen vk-drive-screen" aria-labelledby="backupLocalTitle" hidden>
+  <header class="vk-drive-header">
+    <button type="button" class="vk-drive-back" aria-label="Volver a Ajustes" onclick="show('settings','left')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <span></span><span class="vk-drive-header-spacer" aria-hidden="true"></span>
+  </header>
+  <main class="vk-drive-content">
+    <h1 id="backupLocalTitle" class="vk-drive-title vk-backup-local-title">Copia local</h1>
+    <p class="vk-backup-local-desc">Protege tu bóveda con un archivo cifrado que solo podrás restaurar con tu PIN.</p>
+    <div class="vk-drive-list">
+      <div id="backupLocalLastCard" class="vk-drive-card vk-drive-card--flat">
+        <span class="vk-drive-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+        <span class="vk-drive-copy"><strong>Última copia</strong><small id="backupLocalLastText">Todavía no has creado ninguna copia</small></span>
+        <span id="backupLocalLastCheck" class="vk-backup-local-check" aria-hidden="true" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12 5 5 11-14"/></svg></span>
+      </div>
+      <button type="button" class="vk-drive-card" onclick="openBackupCreateModal()">
+        <span class="vk-drive-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14a2 2 0 0 0 2-2v-3"/><path d="M3 15v3a2 2 0 0 0 2 2"/></svg></span>
+        <span class="vk-drive-copy"><strong>Crear copia de seguridad</strong><small>Descarga un archivo .vkbak cifrado</small></span>
+        <span class="vk-drive-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+      </button>
+      <button type="button" class="vk-drive-card" onclick="openBackupRestoreModal()">
+        <span class="vk-drive-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/></svg></span>
+        <span class="vk-drive-copy"><strong>Restaurar copia</strong><small>Copia local</small></span>
+        <span class="vk-drive-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+      </button>
+    </div>
+    <div class="vk-backup-local-info">
+      <p>Información:</p>
+      <p>• El archivo está cifrado</p>
+      <p>• VaultKey no puede leerlo</p>
+      <p>• Guarda el archivo en un lugar seguro</p>
+    </div>
+    <p class="vk-drive-version">VaultKey 2.0</p>
+  </main>
+  <input id="backupRestoreInput" type="file" accept=".vkbak,application/json" hidden onchange="handleBackupRestoreFile(event)">
 </section>
 
 
@@ -3411,18 +3538,37 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 <div class="modal" id="confirmModal">
   <div class="sheet">
     <span class="vk-confirm-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14a2 2 0 0 0 2-2v-3"/><path d="M3 16v3a2 2 0 0 0 2 2"/></svg></span>
+    <span class="vk-confirm-icon vk-confirm-icon--backup-create" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14a2 2 0 0 0 2-2v-3"/><path d="M3 15v3a2 2 0 0 0 2 2"/></svg></span>
+    <span class="vk-confirm-icon vk-confirm-icon--backup-restore" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/></svg></span>
     <div class="sheetHead">
       <div class="sheetTitle" id="confirmTitle">Confirmar acción</div>
       <div class="spacer"></div>
       <button type="button" class="iconBtn" id="confirmClose" aria-label="Cerrar" onclick="resolveConfirm(false)">✕</button>
     </div>
     <p class="sub" id="confirmMsg">¿Confirmas esta acción?</p>
+    <p class="sub" id="confirmMsg2" hidden></p>
     <div class="rowBtns">
       <button type="button" class="ghost" id="confirmCancel" onclick="resolveConfirm(false)">Cancelar</button>
       <button type="button" class="ghost danger" id="confirmOk" onclick="resolveConfirm(true)">Aceptar</button>
     </div>
   </div>
 </div>
+
+<div class="modal" id="backupSheet"><div class="sheet vk-backup-sheet">
+  <div class="vk-backup-sheet__handle" aria-hidden="true"></div>
+  <div class="vk-backup-sheet__body">
+    <p class="vk-backup-sheet__title">Copias de seguridad</p>
+    <button type="button" class="vk-backup-sheet__row" onclick="openBackupLocalSettings()">Copia local</button>
+    <button type="button" class="vk-backup-sheet__row" onclick="closeModals();openDriveSettings()">Google Drive</button>
+    <div class="vk-backup-sheet__row vk-backup-sheet__row--soon" aria-disabled="true"><span>Dropbox</span><small>Próximamente</small></div>
+    <div class="vk-backup-sheet__row vk-backup-sheet__row--soon" aria-disabled="true"><span>OneDrive</span><small>Próximamente</small></div>
+    <div class="vk-backup-sheet__divider"></div>
+    <div class="vk-backup-sheet__actions">
+      <button type="button" class="vk-backup-sheet__cancel" onclick="closeModals()">Cancelar</button>
+      <button type="button" class="vk-backup-sheet__create" onclick="closeModals()">Crear</button>
+    </div>
+  </div>
+</div></div>
 <div class="modal" id="drivePinModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle">PIN del respaldo</div><div class="spacer"></div><button class="iconBtn" onclick="resolveDrivePin(null)">✕</button></div><p class="sub">Introduce el PIN con el que se cifró este respaldo de Drive.</p><div class="field"><input class="inp" id="drivePinInput" type="password" inputmode="numeric" maxlength="8" placeholder="••••••" autocomplete="off" onkeydown="if(event.key==='Enter')resolveDrivePin(this.value)"></div><div class="rowBtns"><button class="ghost" onclick="resolveDrivePin(null)">Cancelar</button><button class="btn" onclick="resolveDrivePin(document.getElementById('drivePinInput').value)">Restaurar</button></div></div></div>
 <div id="toast" style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(10,30,60,.97);color:#f5f9ff;padding:11px 22px;border-radius:12px;font-size:14px;font-weight:600;pointer-events:none;opacity:0;transition:opacity .25s;z-index:9999;max-width:88vw;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.4);border:1px solid rgba(0,210,255,.2)"></div>
 
