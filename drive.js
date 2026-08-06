@@ -103,14 +103,14 @@ function driveToast(message, sound) {
   if (typeof toast === 'function') toast(message, sound);
 }
 
-async function driveShowError(title, error) {
+async function driveShowError(title, error, options = {}) {
   const message = error && error.message ? error.message : String(error || 'Error desconocido');
   console.error(`Drive: ${title}`, error);
   driveToast(`❌ ${title}: ${message}`, 'err');
 
   if (typeof vkConfirm === 'function') {
     try {
-      await vkConfirm(title, message, { okText: 'Entendido', cancelText: null });
+      await vkConfirm(title, message, options);
     } catch (_) {
       // El toast ya informa del error; el diálogo es un apoyo visual.
     }
@@ -399,6 +399,11 @@ async function driveSyncNow(silent = false) {
   } catch (error) {
     if (error && error.status === 401) {
       localStorage.removeItem(DRIVE_TOKEN_KEY);
+      driveSyncUI();
+      const expiredError = new Error('Vuelve a conectar Google Drive para continuar.');
+      if (!silent) await driveShowError('La sesión de Google Drive ha caducado', expiredError, { variant: 'drive-connect-error', confirmText: 'Entendido' });
+      else console.error('Drive auto-sync token expired', error);
+      return false;
     }
     driveSyncUI();
 
