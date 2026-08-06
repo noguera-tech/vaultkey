@@ -7169,7 +7169,23 @@ try {
     }
 
     // VK 2.0: crear o actualizar la tarjeta en la bóveda cifrada.
-    if(cardsUseVK2()&&typeof vkModels!=='undefined'){
+    // Seguridad: nunca escribir tarjetas nuevas o editadas fuera de la boveda cifrada VK2.
+    if(!cardsUseVK2()){
+      if(typeof window.toast==='function'){
+        window.toast('Desbloquea una boveda VaultKey 2.0 para guardar tarjetas cifradas.','err');
+      }
+      return false;
+    }
+
+    if(typeof vkModels==='undefined'){
+      console.error('saveCard: vkModels no esta disponible');
+      if(typeof window.toast==='function'){
+        window.toast('No se pudo preparar el guardado cifrado de la tarjeta.','err');
+      }
+      return false;
+    }
+
+    {
       var _prevCardEntry=null,_prevCardIndex=-1,_pushedCardEntry=null;
       try{
         var entry;
