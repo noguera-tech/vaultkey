@@ -50,11 +50,13 @@
   function saveBlob(blob) { writeJSON(K_BLOB, blob); }
   function loadBlob() { return readJSON(K_BLOB); }
   function hasVault() { return loadBlob() !== null; }
+  function removeBlob() { ls().removeItem(K_BLOB); }
 
   /* ---- Pin-wrap (local; JAMÁS dentro del blob) ---- */
   function savePinWrap(pw) { writeJSON(K_PINWRAP, pw); }
   function loadPinWrap() { return readJSON(K_PINWRAP); }
   function hasPinWrap() { return loadPinWrap() !== null; }
+  function removePinWrap() { ls().removeItem(K_PINWRAP); }
 
   /* ---- Meta ---- */
   function getMeta() {
@@ -144,8 +146,8 @@
     MAX_ATTEMPTS: MAX_ATTEMPTS,
     AUTOLOCK_OPTIONS: AUTOLOCK_OPTIONS.slice(),
     CLOSED_LIST: CLOSED_LIST.slice(),
-    saveBlob: saveBlob, loadBlob: loadBlob, hasVault: hasVault,
-    savePinWrap: savePinWrap, loadPinWrap: loadPinWrap, hasPinWrap: hasPinWrap,
+    saveBlob: saveBlob, loadBlob: loadBlob, hasVault: hasVault, removeBlob: removeBlob,
+    savePinWrap: savePinWrap, loadPinWrap: loadPinWrap, hasPinWrap: hasPinWrap, removePinWrap: removePinWrap,
     getMeta: getMeta, setMeta: setMeta,
     recordFailedAttempt: recordFailedAttempt, resetAttempts: resetAttempts,
     wipeLocal: wipeLocal
