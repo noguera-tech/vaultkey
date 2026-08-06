@@ -389,13 +389,17 @@ function vkConfirm(title,msg,options){
     confirmResolver=resolve;
     $('confirmTitle').textContent=title;
     $('confirmMsg').textContent=msg;
-    modal.classList.remove('vk-confirm--reset','vk-confirm--wipe','vk-confirm--drive-disconnect','vk-confirm--drive-restore','vk-confirm--drive-connect-error','vk-confirm--delete-password');
+    const msg2El=$('confirmMsg2');
+    if(msg2El){msg2El.textContent=options.msg2||'';msg2El.hidden=!options.msg2;}
+    modal.classList.remove('vk-confirm--reset','vk-confirm--wipe','vk-confirm--drive-disconnect','vk-confirm--drive-restore','vk-confirm--drive-connect-error','vk-confirm--delete-password','vk-confirm--backup-create','vk-confirm--backup-restore');
     if(options.variant==='reset')modal.classList.add('vk-confirm--reset');
     if(options.variant==='wipe')modal.classList.add('vk-confirm--wipe');
     if(options.variant==='drive-disconnect')modal.classList.add('vk-confirm--drive-disconnect');
     if(options.variant==='drive-restore')modal.classList.add('vk-confirm--drive-restore');
     if(options.variant==='drive-connect-error')modal.classList.add('vk-confirm--drive-connect-error');
     if(options.variant==='delete-password')modal.classList.add('vk-confirm--delete-password');
+    if(options.variant==='backup-create')modal.classList.add('vk-confirm--backup-create');
+    if(options.variant==='backup-restore')modal.classList.add('vk-confirm--backup-restore');
     if(okButton)okButton.textContent=options.confirmText||'Aceptar';
     modal.classList.add('open');
   });
@@ -403,7 +407,9 @@ function vkConfirm(title,msg,options){
 function resolveConfirm(ok){
   const modal=$('confirmModal');
   const okButton=$('confirmOk');
-  modal.classList.remove('open','vk-confirm--reset','vk-confirm--wipe','vk-confirm--drive-disconnect','vk-confirm--drive-restore','vk-confirm--drive-connect-error','vk-confirm--delete-password');
+  const msg2El=$('confirmMsg2');
+  if(msg2El){msg2El.hidden=true;msg2El.textContent='';}
+  modal.classList.remove('open','vk-confirm--reset','vk-confirm--wipe','vk-confirm--drive-disconnect','vk-confirm--drive-restore','vk-confirm--drive-connect-error','vk-confirm--delete-password','vk-confirm--backup-create','vk-confirm--backup-restore');
   if(okButton)okButton.textContent='Aceptar';
   if(confirmResolver){confirmResolver(!!ok);confirmResolver=null;}
 }
@@ -2411,6 +2417,75 @@ async function importBackup(file) {
     toast('No se pudo importar el respaldo','err');
   }
 }
+
+/* ============================================================
+   Copias de seguridad — conecta la interfaz (Figma node-id
+   578:533, 596:51, 596:74, 596:129, 596:145) con exportBackup()/
+   importBackup()/openDriveSettings() ya existentes. No se ha
+   tocado ninguna de esas tres funciones ni drive.js.
+   ============================================================ */
+window.openBackupSheet=function(){
+  const modal=$('backupSheet');
+  if(modal)modal.classList.add('open');
+};
+
+function renderBackupLocalStatus(){
+  const text=$('backupLocalLastText');
+  const check=$('backupLocalLastCheck');
+  if(!text)return;
+  const ts=Number(localStorage.getItem('vk_local_backup_last')||0);
+  if(ts){
+    text.textContent='Última copia: '+new Date(ts).toLocaleString('es-ES');
+    if(check)check.hidden=false;
+  }else{
+    text.textContent='Todavía no has creado ninguna copia';
+    if(check)check.hidden=true;
+  }
+}
+
+window.openBackupLocalSettings=function(){
+  closeModals();
+  renderBackupLocalStatus();
+  show('backupLocalSettings','right');
+};
+
+window.openBackupCreateModal=async function(){
+  const ok=await vkConfirm(
+    'Crear copia de seguridad',
+    'Se creará una copia cifrada de tu bóveda.',
+    {
+      variant:'backup-create',
+      confirmText:'Crear copia',
+      msg2:'Guarda este archivo en un lugar seguro. Solo podrás restaurarlo con tu PIN.'
+    }
+  );
+  if(!ok)return;
+  await exportBackup();
+  localStorage.setItem('vk_local_backup_last',String(Date.now()));
+  renderBackupLocalStatus();
+};
+
+window.openBackupRestoreModal=async function(){
+  const ok=await vkConfirm(
+    'Restaurar copia',
+    'La restauración reemplazará los datos actuales de VaultKey.',
+    {
+      variant:'backup-restore',
+      confirmText:'Restaurar',
+      msg2:'Asegúrate de tener una copia reciente antes de continuar.'
+    }
+  );
+  if(!ok)return;
+  const input=$('backupRestoreInput');
+  if(input)input.click();
+};
+
+window.handleBackupRestoreFile=function(ev){
+  const input=ev&&ev.target,file=input&&input.files&&input.files[0];
+  if(!file)return;
+  importBackup(file);
+  input.value='';
+};
 
 
 function makeRecoveryCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let out='VK';for(let block=0;block<4;block++){out+='-';for(let i=0;i<4;i++){let a=new Uint32Array(1);crypto.getRandomValues(a);out+=chars[a[0]%chars.length]}}return out}
