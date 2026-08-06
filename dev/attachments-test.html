@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>VaultKey ? Attachments Test</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #0F172A; color: #fff; padding: 16px; }
+  .ok { color: #22C55E; } .bad { color: #EF4444; }
+  pre { background: #1e293b; padding: 12px; border-radius: 8px; white-space: pre-wrap; }
+  button { background: #3B82F6; color: #fff; border: 0; border-radius: 8px; padding: 10px 16px; font-size: 15px; }
+</style>
+</head>
+<body>
+<h2>VaultKey ? Attachments Test</h2>
+<p><strong>Ejecutar solo en un perfil de navegador de prueba.</strong> Vac?a el almac?n local de adjuntos al comenzar y terminar.</p>
+<button id="run">Ejecutar prueba</button>
+<pre id="out">Pulsa ?Ejecutar prueba?.</pre>
+
+<script src="../vault-crypto.js"></script>
+<script src="../vault-attachments.js"></script>
+<script>
+(function () {
+  'use strict';
+  var out = document.getElementById('out');
+  var pass = 0, fail = 0, lines = [];
+
+  function t(name, cond) {
+    if (cond) { pass++; lines.push('<span class="ok">?</span> ' + name); }
+    else { fail++; lines.push('<span class="bad">? FALLO:</span> ' + name); }
+    out.innerHTML = lines.join('\n');
+  }
+
+  document.getElementById('run').addEventListener('click', async function () {
+    lines = []; pass = 0; fail = 0;
+    try {
+      await vkAttachments.init();
+      await vkAttachments.deleteAll();
+
+      var dekRaw = vkCrypto.generateDEKBytes();
+      var dekKey = await vkCrypto.importDEK(dekRaw);
+      dekRaw.fill(0);
+
+      await vkAttachments.save({
+        id: 'old-a',
+        entryId: 'entry-old',
+        file: new Blob(['old-a'], { type: 'image/png' }),
+        dekKey: dekKey
+      });
+      await vkAttachments.save({
+        id: 'old-b',
+        entryId: 'entry-old',
+        file: new Blob(['old-b'], { type: 'image/png' }),
+        dekKey: dekKey
+      });
+
+      var source = await vkAttachments.exportAll();
+      source.records = source.records.filter(function (r) { return r.id === 'old-a'; });
+      source.records[0].id = 'new-a';
+      source.records[0].entryId = 'entry-new';
+
+      var result = await vkAttachments.replaceAll(source);
+      var after = await vkAttachments.exportAll();
+      var ids = after.records.map(function (r) { return r.id; });
+
+      t('replaceAll informa el total importado', result && result.imported === 1);
+      t('replaceAll elimina registros ausentes del backup', ids.length === 1 && ids[0] === 'new-a');
+
+      var invalid = JSON.parse(JSON.stringify(source));
+      invalid.records[0].mime = 'application/octet-stream';
+      var rejected = false;
+      try { await vkAttachments.replaceAll(invalid); }
+      catch (e) { rejected = true; }
+
+      var afterInvalid = await vkAttachments.exportAll();
+      t('payload inv?lido se rechaza antes de escribir', rejected === true);
+      t('un fallo conserva el conjunto anterior', afterInvalid.records.length === 1 && afterInvalid.records[0].id === 'new-a');
+
+      await vkAttachments.deleteAll();
+
+      lines.push('');
+      lines.push('<b>Resultado: ' + pass + ' correctas, ' + fail + ' fallos</b>');
+      out.innerHTML = lines.join('\n');
+    } catch (e) {
+      out.innerHTML += '\n<span class="bad">ERROR FATAL: ' + (e && e.message) + '</span>';
+    }
+  });
+})();
+</script>
+</body>
+</html>

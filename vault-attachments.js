@@ -597,13 +597,112 @@
     });
   }
 
-  /* importAll(): valida el payload completo y construye copias
-     normalizadas de todos los registros ANTES de abrir la
-     transacción. Después procesa los registros secuencialmente
-     dentro de una única transacción readwrite, comprobando cada id
-     con store.get() (nunca has(), nunca una transacción por
-     registro). Resuelve solo en tx.oncomplete; cualquier fallo
-     aborta la transacción entera (sin resolución parcial). */
+  /* replaceAll(): valida y normaliza el payload completo antes de
+     escribir. Dentro de una unica transaccion readwrite cuenta los
+     registros existentes, vacia el store e inserta secuencialmente
+     el conjunto del backup. Cualquier fallo aborta y revierte tambien
+     el clear(), evitando estados parciales. */
+  function replaceAll(payload) {
+    if (!payload || typeof payload !== 'object') {
+      return Promise.reject(new Error('replaceAll: payload debe ser un objeto'));
+    }
+    if (payload.format !== 'VaultKeyAttachments') {
+      return Promise.reject(new Error('replaceAll: payload.format invalido'));
+    }
+    if (payload.formatVersion !== FORMAT_VERSION) {
+      return Promise.reject(new Error('replaceAll: payload.formatVersion no soportada'));
+    }
+    if (!Array.isArray(payload.records)) {
+      return Promise.reject(new Error('replaceAll: payload.records debe ser un array'));
+    }
+
+    var vc = vkCryptoRef();
+    if (!vc || typeof vc.CRYPTO_VERSION === 'undefined') {
+      return Promise.reject(new Error('replaceAll: vkCrypto no esta disponible'));
+    }
+
+    var seenIds = Object.create(null);
+    var normalized = [];
+
+    for (var i = 0; i < payload.records.length; i++) {
+      var raw = payload.records[i];
+      if (!validateStoredRecord(raw, vc)) {
+        var label = raw && isNonEmptyString(raw.id) ? raw.id : '(sin id)';
+        return Promise.reject(new Error('replaceAll: registro invalido: ' + label));
+      }
+      if (Object.prototype.hasOwnProperty.call(seenIds, raw.id)) {
+        return Promise.reject(new Error('replaceAll: id duplicada en payload: ' + raw.id));
+      }
+
+      seenIds[raw.id] = true;
+      normalized.push({
+        id: raw.id,
+        entryId: raw.entryId,
+        mime: raw.mime,
+        size: raw.size,
+        createdAt: raw.createdAt,
+        updatedAt: raw.updatedAt,
+        formatVersion: raw.formatVersion,
+        cryptoVersion: raw.cryptoVersion,
+        enc: { iv: raw.enc.iv, ct: raw.enc.ct }
+      });
+    }
+
+    return _getDB().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var abortError = null;
+        var deleted = 0;
+        var imported = 0;
+        var tx = db.transaction(STORE_NAME, 'readwrite');
+        var store = tx.objectStore(STORE_NAME);
+
+        function fail(err) {
+          abortError = err;
+          try { tx.abort(); } catch (e) { /* onabort se encarga del rechazo */ }
+        }
+
+        function addIndex(idx) {
+          if (abortError || idx >= normalized.length) { return; }
+
+          var addReq = store.add(normalized[idx]);
+          addReq.onsuccess = function () {
+            imported++;
+            addIndex(idx + 1);
+          };
+          addReq.onerror = function () {
+            fail(addReq.error || new Error('replaceAll: fallo al insertar ' + normalized[idx].id));
+          };
+        }
+
+        var countReq = store.count();
+        countReq.onsuccess = function () {
+          deleted = countReq.result || 0;
+
+          var clearReq = store.clear();
+          clearReq.onsuccess = function () {
+            addIndex(0);
+          };
+          clearReq.onerror = function () {
+            fail(clearReq.error || new Error('replaceAll: fallo al vaciar los adjuntos'));
+          };
+        };
+        countReq.onerror = function () {
+          fail(countReq.error || new Error('replaceAll: fallo al contar los adjuntos'));
+        };
+
+        tx.oncomplete = function () {
+          resolve({ deleted: deleted, imported: imported, total: normalized.length });
+        };
+        tx.onerror = function () {
+          reject(abortError || tx.error || new Error('replaceAll: fallo al sustituir los adjuntos'));
+        };
+        tx.onabort = function () {
+          reject(abortError || tx.error || new Error('replaceAll: la transaccion se aborto'));
+        };
+      });
+    });
+  }
+
   function importAll(payload, opts) {
     opts = opts || {};
     var mode = opts.mode || 'merge';
@@ -717,6 +816,7 @@
     delete: del,
     deleteAll: deleteAll,
     exportAll: exportAll,
-    importAll: importAll
+    importAll: importAll,
+    replaceAll: replaceAll
   };
 });
