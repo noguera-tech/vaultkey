@@ -278,11 +278,38 @@ async function driveFindLatestBackup(accessToken) {
   return result && Array.isArray(result.files) ? result.files[0] || null : null;
 }
 
+// Valida la forma mínima del vk2_blob antes de subirlo — mismas condiciones
+// esenciales que ya usa exportBackup() en app.js (no se reutiliza esa función
+// para mantener drive.js aislado, solo se replica la comprobación).
+function driveIsValidVk2Blob(blob) {
+  return Boolean(
+    blob && typeof blob === 'object' && !Array.isArray(blob)
+    && blob.app === 'VaultKey'
+    && Number(blob.schemaVersion) === 2
+    && typeof blob.cryptoVersion === 'number'
+    && blob.kdf && typeof blob.kdf === 'object'
+    && blob.wraps && typeof blob.wraps === 'object'
+    && blob.wraps.master
+    && blob.wraps.kit
+    && blob.vault && typeof blob.vault === 'object'
+  );
+}
+
 // Lee la bóveda cifrada actual, sea cual sea el sistema de guardado activo:
 // VaultKey 2.0 usa vkStore (localStorage 'vk2_blob'); el legacy usa 'vk_data_v1'.
-function driveReadVaultPayload() {
+// Para vk2_blob valida su estructura y adjunta los adjuntos cifrados
+// (vkAttachments.exportAll()) antes de que el backup se suba a Drive.
+async function driveReadVaultPayload() {
   if (typeof window.vkStore !== 'undefined' && window.vkStore.hasVault()) {
-    return { format: 'vk2_blob', data: window.vkStore.loadBlob() };
+    const blob = window.vkStore.loadBlob();
+    if (!driveIsValidVk2Blob(blob)) {
+      throw new Error('La bóveda VaultKey 2.0 no tiene un formato válido');
+    }
+    if (typeof window.vkAttachments === 'undefined' || typeof window.vkAttachments.exportAll !== 'function') {
+      throw new Error('vkAttachments.exportAll no está disponible');
+    }
+    const attachments = await window.vkAttachments.exportAll();
+    return { format: 'vk2_blob', data: blob, attachments: attachments };
   }
   const legacy = localStorage.getItem('vk_data_v1');
   if (legacy) return { format: 'legacy', data: legacy };
@@ -291,7 +318,15 @@ function driveReadVaultPayload() {
 
 async function driveUploadBackup(accessToken, fileName, payload) {
   const timestamp = Date.now();
-  const backup = JSON.stringify({
+  const backup = JSON.stringify(payload.format === 'vk2_blob' ? {
+    app: 'VaultKey',
+    format: 'vkbak',
+    version: 3,
+    vaultFormat: 'vk2_blob',
+    createdAt: new Date(timestamp).toISOString(),
+    vk2_blob: payload.data,
+    attachments: payload.attachments
+  } : {
     app: 'VaultKey',
     format: 'vkbak',
     version: 2,
@@ -326,7 +361,15 @@ async function driveSyncNow(silent = false) {
     return false;
   }
 
-  const payload = driveReadVaultPayload();
+  let payload;
+  try {
+    payload = await driveReadVaultPayload();
+  } catch (error) {
+    driveSyncUI();
+    if (!silent) await driveShowError('No se pudo preparar el respaldo', error);
+    else console.error('Drive auto-sync error', error);
+    return false;
+  }
   if (!payload) {
     if (!silent) driveToast('❌ No hay una bóveda cifrada para sincronizar', 'err');
     return false;
@@ -428,6 +471,20 @@ async function driveRestore() {
           && blob.wraps.master && blob.wraps.kit
           && blob.vault && typeof blob.vault === 'object';
         if (!validBlob) throw new Error('La copia está dañada o no pertenece a VaultKey 2.0');
+
+        if (raw.attachments) {
+          if (typeof window.vkAttachments === 'undefined' || typeof window.vkAttachments.importAll !== 'function') {
+            throw new Error('vkAttachments.importAll no está disponible');
+          }
+          await window.vkAttachments.importAll(raw.attachments, { mode: 'replace' });
+        } else {
+          const confirmedOldCopy = await vkConfirm(
+            'Copia antigua sin adjuntos',
+            'Esta copia es de una versión anterior y no incluye los archivos adjuntos de los documentos. Se restaurarán los datos disponibles, pero algunas imágenes o archivos podrían no recuperarse.',
+            { variant: 'drive-restore-legacy-attachments', confirmText: 'Continuar' }
+          );
+          if (!confirmedOldCopy) { driveSyncUI(); return false; }
+        }
 
         if (typeof window.vkStore !== 'undefined') window.vkStore.saveBlob(blob);
         else localStorage.setItem('vk2_blob', JSON.stringify(blob));
