@@ -6778,7 +6778,23 @@ try {
     }
 
     // VK 2.0: crear o actualizar la nota en la bóveda cifrada.
-    if(notesUseVK2()&&typeof vkModels!=='undefined'){
+    // Seguridad: nunca escribir notas nuevas o editadas fuera de la bóveda cifrada VK2.
+    if(!notesUseVK2()){
+      if(typeof window.toast==='function'){
+        window.toast('Desbloquea una bóveda VaultKey 2.0 para guardar notas cifradas.','err');
+      }
+      return false;
+    }
+
+    if(typeof vkModels==='undefined'){
+      console.error('saveNote: vkModels no esta disponible');
+      if(typeof window.toast==='function'){
+        window.toast('No se pudo preparar el guardado cifrado de la nota.','err');
+      }
+      return false;
+    }
+
+    {
       var _prevNoteEntry=null,_prevNoteIndex=-1,_pushedNoteEntry=null;
       try{
         var entry;
