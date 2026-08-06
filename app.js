@@ -7570,6 +7570,18 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country){
     toast('No hay una clave activa. Desbloquea la bóveda para guardar el documento.','err');
     return false;
   }
+  // Seguridad: nunca crear o editar documentos fuera de la boveda cifrada VK2.
+  if(!vk2DocsActive()){
+    toast('Desbloquea una boveda VaultKey 2.0 para guardar documentos cifrados.','err');
+    return false;
+  }
+
+  if(typeof vkModels==='undefined'){
+    console.error('saveDocument: vkModels no esta disponible');
+    toast('No se pudo preparar el guardado cifrado del documento.','err');
+    return false;
+  }
+
   var items=read(),now=Date.now();
   try{
     var isEdit=!!docId;
