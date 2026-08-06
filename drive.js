@@ -14,6 +14,7 @@ const DRIVE_TOKEN_SAFETY_MS = 60 * 1000;
 
 let driveTokenClient = null;
 let driveUiState = 'disconnected';
+let driveNetworkListenersBound = false;
 
 // ---------- Estado visual (conectando/sincronizando/conectado/offline) ----------
 function driveSetUiState(state) {
@@ -144,6 +145,11 @@ function driveSyncUI() {
 }
 
 function driveInit() {
+  if (!driveNetworkListenersBound) {
+    window.addEventListener('online', driveSyncUI);
+    window.addEventListener('offline', driveSyncUI);
+    driveNetworkListenersBound = true;
+  }
   if (localStorage.getItem(DRIVE_AUTO_KEY) === null) {
     localStorage.setItem(DRIVE_AUTO_KEY, '1'); // Auto-sync activado por defecto
   }
