@@ -32,7 +32,7 @@
 
   var TYPES = ['password', 'note', 'card', 'document'];
   var PASSWORD_SUBTYPES = ['web', 'wifi', 'pin', 'recovery'];
-  var DOC_TYPES = ['dni', 'pasaporte', 'permiso', 'sanitaria', 'vacunas', 'seguro', 'otro'];
+  var DOC_TYPES = ['dni', 'passport', 'license', 'health', 'vaccine', 'insurance', 'other'];
 
   /* Campos comunes a toda entrada */
   var COMMON_FIELDS = ['id', 'type', 'title', 'fav', 'tags', 'createdAt', 'updatedAt'];
