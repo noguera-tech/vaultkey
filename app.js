@@ -2217,6 +2217,168 @@ async function exportBackup(){
 // ============================================================
 // IMPORTACIÓN CON PANTALLA PROPIA
 // ============================================================
+
+let _restoreCredentialResolver = null;
+let _restorePinResolver = null;
+
+function normalizeRestoreCredentialInput(value) {
+  const text = String(value || '').trim();
+  const compact = text.replace(/[\s-]/g, '').toUpperCase();
+  if (/^VK2[A-Z0-9]{26}$/.test(compact)) {
+    return { kitCode: text };
+  }
+  return { master: text };
+}
+
+function closeRestoreCredentialModal(value) {
+  const modal = $('restoreCredentialModal');
+  if (modal) modal.classList.remove('open');
+  const input = $('restoreCredentialInput');
+  if (input) input.value = '';
+  if (_restoreCredentialResolver) {
+    const resolver = _restoreCredentialResolver;
+    _restoreCredentialResolver = null;
+    resolver(value);
+  }
+}
+
+function openRestoreCredentialModal(options = {}) {
+  return new Promise((resolve) => {
+    _restoreCredentialResolver = resolve;
+    const modal = $('restoreCredentialModal');
+    const title = $('restoreCredentialTitle');
+    const label = $('restoreCredentialLabel');
+    const helper = $('restoreCredentialHelper');
+    const input = $('restoreCredentialInput');
+    const ok = $('restoreCredentialOk');
+    const cancel = $('restoreCredentialCancel');
+
+    if (title) title.textContent = options.title || 'Restaurar copia';
+    if (label) label.textContent = options.label || 'Contraseña maestra o kit';
+    if (helper) helper.textContent = options.helper || 'Introduce tu contraseña maestra o kit de emergencia.';
+    if (input) {
+      if (input.tagName === 'TEXTAREA') {
+        input.removeAttribute('type');
+        input.rows = 2;
+      } else {
+        input.type = 'password';
+      }
+      input.setAttribute('value', '');
+      input.value = '';
+      input.placeholder = options.placeholder || 'Introduce tu contraseña maestra o kit...';
+      input.autocomplete = 'new-password';
+      input.oninput = () => {
+        if (input.tagName === 'TEXTAREA') {
+          input.value = input.value.replace(/\n/g, ' ');
+        }
+      };
+      input.onkeydown = (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          if (ok) ok.click();
+        } else if (event.key === 'Escape') {
+          event.preventDefault();
+          if (cancel) cancel.click();
+        }
+      };
+    }
+
+    if (ok) ok.textContent = options.confirmText || 'Restaurar';
+    if (cancel) cancel.textContent = options.cancelText || 'Cancelar';
+
+    if (ok) ok.onclick = () => {
+      const raw = String(input && input.value || '').trim();
+      if (!raw) {
+        if (typeof toast === 'function') toast('Introduce tu contraseña maestra o kit de emergencia', 'err');
+        if (input) input.focus();
+        return;
+      }
+      closeRestoreCredentialModal(raw);
+    };
+
+    if (cancel) cancel.onclick = () => closeRestoreCredentialModal(null);
+
+    if (modal) {
+      modal.classList.add('open');
+      setTimeout(() => { if (input) input.focus(); }, 150);
+    }
+  });
+}
+
+function closeRestorePinModal(value) {
+  const modal = $('restorePinModal');
+  if (modal) modal.classList.remove('open');
+  const input = $('restorePinInput');
+  if (input) input.value = '';
+  if (_restorePinResolver) {
+    const resolver = _restorePinResolver;
+    _restorePinResolver = null;
+    resolver(value);
+  }
+}
+
+function openRestorePinModal(options = {}) {
+  return new Promise((resolve) => {
+    _restorePinResolver = resolve;
+    const modal = $('restorePinModal');
+    const title = $('restorePinTitle');
+    const label = $('restorePinLabel');
+    const helper = $('restorePinHelper');
+    const input = $('restorePinInput');
+    const ok = $('restorePinOk');
+    const cancel = $('restorePinCancel');
+
+    if (title) title.textContent = options.title || 'PIN de restauración';
+    if (label) label.textContent = options.label || 'PIN';
+    if (helper) helper.textContent = options.helper || 'Debe tener 6 dígitos.';
+    if (input) {
+      input.type = 'password';
+      input.setAttribute('value', '');
+      input.value = '';
+      input.placeholder = options.placeholder || 'Introduce 6 dígitos';
+      input.autocomplete = 'new-password';
+      input.oninput = () => {
+        input.value = input.value.replace(/\D/g, '').slice(0, 6);
+      };
+      input.onkeydown = (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          if (ok) ok.click();
+        } else if (event.key === 'Escape') {
+          event.preventDefault();
+          if (cancel) cancel.click();
+        }
+      };
+    }
+
+    if (ok) ok.textContent = options.confirmText || 'Restaurar';
+    if (cancel) cancel.textContent = options.cancelText || 'Atrás';
+
+    if (ok) ok.onclick = () => {
+      const pin = String(input && input.value || '').replace(/\D/g, '').slice(0, 6);
+      if (!/^\d{6}$/.test(pin)) {
+        if (typeof toast === 'function') toast('Introduce un PIN de 6 dígitos', 'err');
+        if (input) input.focus();
+        return;
+      }
+      closeRestorePinModal(pin);
+    };
+
+    if (cancel) cancel.onclick = () => closeRestorePinModal(null);
+
+    if (modal) {
+      modal.classList.add('open');
+      setTimeout(() => { if (input) input.focus(); }, 150);
+    }
+  });
+}
+
+window.normalizeRestoreCredentialInput = normalizeRestoreCredentialInput;
+window.openRestoreCredentialModal = openRestoreCredentialModal;
+window.openRestorePinModal = openRestorePinModal;
+window.closeRestoreCredentialModal = closeRestoreCredentialModal;
+window.closeRestorePinModal = closeRestorePinModal;
+
 let _importFile = null;
 let _importDecrypted = null;
 
@@ -2374,28 +2536,49 @@ async function importBackup(file) {
 
       if(typeof vkStore.hasVault==='function' && vkStore.hasVault()){
         const ok = await vkConfirm(
-          'Restaurar bóveda VaultKey 2.0',
-          'Se reemplazará la bóveda local actual por el respaldo seleccionado.',
+          'Restaurar Boveda Vaultkey',
+          'Se sustituirá la bóveda local actual por el respaldo elegido.',
           {variant:'drive-restore',confirmText:'Restaurar'}
         );
         if(!ok) return;
       }
 
-      const useMaster = await vkConfirm(
-        'Credencial de restauración',
-        'Pulsa Aceptar para usar tu contraseña maestra. Pulsa Cancelar para usar el kit de emergencia.',
-        {variant:'backup-restore',confirmText:'Contraseña maestra'}
-      );
+      const credentialText = await (typeof window.openRestoreCredentialModal === 'function'
+        ? window.openRestoreCredentialModal({
+            title: 'Restaurar copia',
+            label: 'Contraseña maestra o kit',
+            helper: 'Introduce tu contraseña maestra o kit de emergencia.',
+            placeholder: 'Introduce tu contraseña maestra o kit...',
+            confirmText: 'Restaurar',
+            cancelText: 'Cancelar'
+          })
+        : Promise.resolve(prompt('Introduce tu contraseña maestra o kit de emergencia:')));
 
-      const credential = useMaster
-        ? {master: prompt('Introduce tu contraseña maestra:') || ''}
-        : {kitCode: prompt('Introduce el kit de emergencia:') || ''};
-
-      if((useMaster && !credential.master) || (!useMaster && !credential.kitCode)){
-        throw new Error('Credencial de restauración requerida');
+      if (credentialText === null) {
+        return;
       }
 
-      const pin = prompt('Introduce el PIN de 6 dígitos para este dispositivo:') || '';
+      const credential = typeof window.normalizeRestoreCredentialInput === 'function'
+        ? window.normalizeRestoreCredentialInput(credentialText)
+        : (/^VK2/i.test(String(credentialText).trim())
+            ? { kitCode: String(credentialText).trim() }
+            : { master: String(credentialText).trim() });
+
+      const pin = await (typeof window.openRestorePinModal === 'function'
+        ? window.openRestorePinModal({
+            title: 'PIN de restauración',
+            label: 'PIN',
+            helper: 'Debe tener 6 dígitos.',
+            placeholder: 'Introduce 6 dígitos',
+            confirmText: 'Restaurar',
+            cancelText: 'Atrás'
+          })
+        : Promise.resolve(prompt('Introduce el PIN de 6 dígitos para este dispositivo:')));
+
+      if (pin === null) {
+        return;
+      }
+
       if(!/^[0-9]{6}$/.test(pin)){
         throw new Error('El PIN de restauración debe tener 6 dígitos');
       }
@@ -3411,22 +3594,6 @@ function togglePasswordEditSecret(){
 function setFavoriteSwitch(button,value){
   if(!button)return;
   button.setAttribute('aria-checked',value?'true':'false');
-}
-
-function favoriteSwitchIsOn(buttonId){
-  return $(buttonId)?.getAttribute('aria-checked')==='true';
-}
-
-function setFavoriteSwitchOff(buttonId){
-  setFavoriteSwitch($(buttonId),false);
-}
-
-function toggleFavoriteSwitch(buttonId){
-  const button=$(buttonId);
-  if(!button)return false;
-  const next=button.getAttribute('aria-checked')!=='true';
-  setFavoriteSwitch(button,next);
-  return next;
 }
 
 function togglePasswordCreateFavorite(){
@@ -6646,7 +6813,6 @@ try {
       id:entry.id,
       title:entry.title||'',
       content:entry.body||'',
-      fav:entry.fav===true,
       createdAt:entry.createdAt,
       updatedAt:entry.updatedAt
     };
@@ -6776,7 +6942,6 @@ try {
   window.openCreateNote=function(){
     var form=document.getElementById('noteCreateForm');
     if(form)form.reset();
-    setFavoriteSwitchOff('noteCreateFavorite');
     window.__vkCurrentNoteId=null;
     if(typeof window.show==='function')window.show('noteCreate','right');
     setTimeout(function(){
@@ -6792,7 +6957,6 @@ try {
     window.__vkCurrentNoteId=note.id;
     document.getElementById('noteEditTitleInput').value=note.title||'';
     document.getElementById('noteEditContentInput').value=note.content||'';
-    setFavoriteSwitch(document.getElementById('noteEditFavorite'),note.fav===true);
     if(typeof window.show==='function')window.show('noteEdit','right');
   };
 
@@ -6829,7 +6993,6 @@ try {
       var _prevNoteEntry=null,_prevNoteIndex=-1,_pushedNoteEntry=null;
       try{
         var entry;
-        var fav=favoriteSwitchIsOn(id?'noteEditFavorite':'noteCreateFavorite');
         if(id){
           var vaultIndex=(vault||[]).findIndex(function(item){
             return item&&item.type==='note'&&item.id===id;
@@ -6840,15 +7003,13 @@ try {
           entry=Object.assign({},vault[vaultIndex],{
             title:title,
             body:content,
-            fav:fav,
             updatedAt:Date.now()
           });
           vault[vaultIndex]=entry;
         }else{
           entry=vkModels.create('note',{
             title:title,
-            body:content,
-            fav:fav
+            body:content
           });
           vault.push(entry);
           _pushedNoteEntry=entry;
@@ -6874,14 +7035,12 @@ try {
     var notes=notesRead();
     var now=Date.now();
 
-    var fav=favoriteSwitchIsOn(id?'noteEditFavorite':'noteCreateFavorite');
     if(id){
       var index=notes.findIndex(function(note){return note.id===id;});
       if(index===-1)return false;
       notes[index]=Object.assign({},notes[index],{
         title:title,
         content:content,
-        fav:fav,
         updatedAt:now
       });
     }else{
@@ -6890,7 +7049,6 @@ try {
         id:id,
         title:title,
         content:content,
-        fav:fav,
         createdAt:now,
         updatedAt:now
       });
@@ -6980,7 +7138,6 @@ try {
       expiry:entry.expiry||'',
       cvv:entry.cvv||'',
       note:entry.notes||'',
-      fav:entry.fav===true,
       createdAt:entry.createdAt,
       updatedAt:entry.updatedAt
     };
@@ -7142,7 +7299,6 @@ try {
     var noteButton=document.getElementById('cardCreateAddNote');
     if(noteField)noteField.hidden=true;
     if(noteButton)noteButton.textContent='+ Añadir nota';
-    setFavoriteSwitchOff('cardCreateFavorite');
 
     if(typeof window.show==='function')window.show('cardCreate','right');
     setTimeout(function(){
@@ -7161,7 +7317,6 @@ try {
     document.getElementById('cardEditCvv').value=String(card.cvv||'');
     document.getElementById('cardEditCvv').type='password';
     document.getElementById('cardEditNote').value=card.note||'';
-    setFavoriteSwitch(document.getElementById('cardEditFavorite'),card.fav===true);
 
     var noteField=document.getElementById('cardEditNoteField');
     var noteButton=document.getElementById('cardEditAddNote');
@@ -7229,7 +7384,6 @@ try {
       var _prevCardEntry=null,_prevCardIndex=-1,_pushedCardEntry=null;
       try{
         var entry;
-        var fav=favoriteSwitchIsOn(id?'cardEditFavorite':'cardCreateFavorite');
         if(id){
           var vaultIndex=(vault||[]).findIndex(function(item){
             return item&&item.type==='card'&&item.id===id;
@@ -7243,7 +7397,6 @@ try {
             expiry:expiry,
             cvv:cvv,
             notes:note,
-            fav:fav,
             updatedAt:Date.now()
           });
           vault[vaultIndex]=entry;
@@ -7253,8 +7406,7 @@ try {
             number:number,
             expiry:expiry,
             cvv:cvv,
-            notes:note,
-            fav:fav
+            notes:note
           });
           vault.push(entry);
           _pushedCardEntry=entry;
@@ -7280,7 +7432,6 @@ try {
     var cards=cardsRead();
     var now=Date.now();
 
-    var fav=favoriteSwitchIsOn(id?'cardEditFavorite':'cardCreateFavorite');
     if(id){
       var index=cards.findIndex(function(card){return card.id===id;});
       if(index===-1){
@@ -7293,7 +7444,6 @@ try {
         expiry:expiry,
         cvv:cvv,
         note:note,
-        fav:fav,
         updatedAt:now
       });
     }else{
@@ -7305,7 +7455,6 @@ try {
         expiry:expiry,
         cvv:cvv,
         note:note,
-        fav:fav,
         createdAt:now,
         updatedAt:now
       });
@@ -7484,7 +7633,6 @@ function vk2EntryToDocument(e){
     country:e.country||'',
     attachmentRef:e.attachmentRef||'',
     image:'',
-    fav:e.fav===true,
     createdAt:e.createdAt||0,
     updatedAt:e.updatedAt||0
   };
@@ -7565,8 +7713,8 @@ window.openDocumentSource=function(m){
 };
 window.handleDocumentFile=function(ev){var input=ev&&ev.target,file=input&&input.files&&input.files[0];if(!file)return;if(!file.type||!file.type.startsWith('image/')){toast('Selecciona un archivo de imagen válido','err');input.value='';return;}var r=new FileReader();r.onerror=function(){toast('No se pudo leer la imagen seleccionada','err');input.value='';};r.onload=function(){if(typeof r.result!=='string'||!r.result.startsWith('data:image/')){toast('La imagen seleccionada no es válida','err');input.value='';return;}image=r.result;modal('documentSourceSheet',false);if(editingId){document.getElementById('documentEditImage').src=image;show('documentEdit','right');}else{document.getElementById('documentPreviewImage').src=image;show('documentPreview','right');}input.value='';};r.readAsDataURL(file);};
 window.repeatDocumentSelection=function(){modal('documentSourceSheet',true);};
-window.openCreateDocumentForm=function(){if(!image||!category){toast('Selecciona primero una imagen','err');openTypePicker();return;}document.getElementById('documentCreateForm').reset();document.getElementById('documentCreateImage').src=image;document.getElementById('documentCreateName').value=label(category);document.getElementById('documentCreateMore').hidden=true;document.getElementById('documentCreateMoreButton').textContent='+ Más información';setFavoriteSwitchOff('documentCreateFavorite');visual('documentCreate',category);show('documentCreate','right');};
-window.openEditDocument=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;editingId=d.id;category=d.category;image=await documentImageUrl(d);window.__vkCurrentDocumentId=d.id;document.getElementById('documentEditImage').src=image;document.getElementById('documentEditName').value=d.name||'';document.getElementById('documentEditExpiry').value=date(d.expiry);document.getElementById('documentEditIssuedBy').value=d.issuedBy||'';document.getElementById('documentEditCountry').value=d.country||'';setFavoriteSwitch(document.getElementById('documentEditFavorite'),d.fav===true);visual('documentEdit',d.category);var more=!!(d.issuedBy||d.country);document.getElementById('documentEditMore').hidden=!more;document.getElementById('documentEditMoreButton').textContent=more?'− Menos información':'+ Más información';show('documentEdit','right');};
+window.openCreateDocumentForm=function(){if(!image||!category){toast('Selecciona primero una imagen','err');openTypePicker();return;}document.getElementById('documentCreateForm').reset();document.getElementById('documentCreateImage').src=image;document.getElementById('documentCreateName').value=label(category);document.getElementById('documentCreateMore').hidden=true;document.getElementById('documentCreateMoreButton').textContent='+ Más información';visual('documentCreate',category);show('documentCreate','right');};
+window.openEditDocument=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;editingId=d.id;category=d.category;image=await documentImageUrl(d);window.__vkCurrentDocumentId=d.id;document.getElementById('documentEditImage').src=image;document.getElementById('documentEditName').value=d.name||'';document.getElementById('documentEditExpiry').value=date(d.expiry);document.getElementById('documentEditIssuedBy').value=d.issuedBy||'';document.getElementById('documentEditCountry').value=d.country||'';visual('documentEdit',d.category);var more=!!(d.issuedBy||d.country);document.getElementById('documentEditMore').hidden=!more;document.getElementById('documentEditMoreButton').textContent=more?'− Menos información':'+ Más información';show('documentEdit','right');};
 window.openDocumentEditSource=function(){if(editingId)modal('documentSourceSheet',true);};
 window.formatDocumentExpiry=function(el){
   var v=String(el.value||'').replace(/\D/g,'').slice(0,8);
@@ -7629,7 +7777,6 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country){
     return false;
   }
 
-  var fav=favoriteSwitchIsOn(docId?'documentEditFavorite':'documentCreateFavorite');
   var items=read(),now=Date.now();
   try{
     var isEdit=!!docId;
@@ -7663,7 +7810,6 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country){
           issuer:issuedBy,
           country:country,
           attachmentRef:attachmentRef,
-          fav:fav,
           updatedAt:now
         });
       }else{
@@ -7673,8 +7819,7 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country){
           expiry:expiry,
           issuer:issuedBy,
           country:country,
-          attachmentRef:attachmentRef,
-          fav:fav
+          attachmentRef:attachmentRef
         });
         vkEntry.type='document';
         vkEntry.entryType='document';
@@ -7689,9 +7834,9 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country){
       if(isEdit){
         var i=items.findIndex(function(x){return x.id===docId;});
         if(i<0){showDocuments('left');return false;}
-        items[i]=Object.assign({},items[i],{category:category||items[i].category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:'',fav:fav,updatedAt:now});
+        items[i]=Object.assign({},items[i],{category:category||items[i].category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:'',updatedAt:now});
       }else{
-        items.push({id:docId,category:category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:'',fav:fav,createdAt:now,updatedAt:now});
+        items.push({id:docId,category:category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:'',createdAt:now,updatedAt:now});
       }
       write(items);
     }
