@@ -2265,7 +2265,7 @@ function openRestoreCredentialModal(options = {}) {
       }
       input.setAttribute('value', '');
       input.value = '';
-      input.placeholder = options.placeholder || 'Introduce tu contraseña maestra o kit...';
+      input.placeholder = ' '; // el texto real lo muestra el <span> superpuesto en app.html, no el placeholder nativo
       input.autocomplete = 'new-password';
       input.oninput = () => {
         if (input.tagName === 'TEXTAREA') {
