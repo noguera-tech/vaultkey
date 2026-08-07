@@ -467,11 +467,43 @@ async function driveRestore() {
         if (!confirmed) { driveSyncUI(); return false; }
       }
 
-      const credential = await window.askRestoreCredential();
-      if (!credential) { driveSyncUI(); return false; }
+      const credentialText = await (typeof window.openRestoreCredentialModal === 'function'
+        ? window.openRestoreCredentialModal({
+            title: 'Restaurar copia',
+            label: 'Contraseña maestra o kit',
+            helper: 'Introduce tu contraseña maestra o kit de emergencia.',
+            placeholder: 'Introduce tu contraseña maestra o kit...',
+            confirmText: 'Restaurar',
+            cancelText: 'Cancelar'
+          })
+        : Promise.resolve(prompt('Introduce tu contraseña maestra o kit de emergencia:')));
 
-      const pin = await window.askRestorePin();
-      if (!pin) { driveSyncUI(); return false; }
+      if (credentialText === null || credentialText === undefined) {
+        driveSyncUI();
+        return false;
+      }
+
+      const credential = typeof window.normalizeRestoreCredentialInput === 'function'
+        ? window.normalizeRestoreCredentialInput(credentialText)
+        : (/^VK2/i.test(String(credentialText).trim())
+            ? { kitCode: String(credentialText).trim() }
+            : { master: String(credentialText).trim() });
+
+      const pin = await (typeof window.openRestorePinModal === 'function'
+        ? window.openRestorePinModal({
+            title: 'PIN de restauración',
+            label: 'PIN',
+            helper: 'Debe tener 6 dígitos.',
+            placeholder: 'Introduce 6 dígitos',
+            confirmText: 'Restaurar',
+            cancelText: 'Atrás'
+          })
+        : Promise.resolve(prompt('Introduce el PIN de 6 dígitos para este dispositivo:')));
+
+      if (pin === null || pin === undefined) {
+        driveSyncUI();
+        return false;
+      }
 
       await window.vkBackup.restore(raw, {
         credential,
