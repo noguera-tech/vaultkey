@@ -284,39 +284,23 @@ async function driveFindLatestBackup(accessToken) {
   return result && Array.isArray(result.files) ? result.files[0] || null : null;
 }
 
-// Valida la forma mínima del vk2_blob antes de subirlo — mismas condiciones
-// esenciales que ya usa exportBackup() en app.js (no se reutiliza esa función
-// para mantener drive.js aislado, solo se replica la comprobación).
-function driveIsValidVk2Blob(blob) {
-  return Boolean(
-    blob && typeof blob === 'object' && !Array.isArray(blob)
-    && blob.app === 'VaultKey'
-    && Number(blob.schemaVersion) === 2
-    && typeof blob.cryptoVersion === 'number'
-    && blob.kdf && typeof blob.kdf === 'object'
-    && blob.wraps && typeof blob.wraps === 'object'
-    && blob.wraps.master
-    && blob.wraps.kit
-    && blob.vault && typeof blob.vault === 'object'
-  );
-}
-
-// Lee la bóveda cifrada actual, sea cual sea el sistema de guardado activo:
-// VaultKey 2.0 usa vkStore (localStorage 'vk2_blob'); el legacy usa 'vk_data_v1'.
-// Para vk2_blob valida su estructura y adjunta los adjuntos cifrados
-// (vkAttachments.exportAll()) antes de que el backup se suba a Drive.
+// Lee la boveda cifrada actual, sea cual sea el sistema de guardado activo.
 async function driveReadVaultPayload() {
   if (typeof window.vkStore !== 'undefined' && window.vkStore.hasVault()) {
-    const blob = window.vkStore.loadBlob();
-    if (!driveIsValidVk2Blob(blob)) {
-      throw new Error('La bóveda VaultKey 2.0 no tiene un formato válido');
+    if (typeof window.vkBackup === 'undefined' || typeof window.vkBackup.validateBlob !== 'function') {
+      throw new Error('vkBackup.validateBlob no esta disponible');
     }
     if (typeof window.vkAttachments === 'undefined' || typeof window.vkAttachments.exportAll !== 'function') {
-      throw new Error('vkAttachments.exportAll no está disponible');
+      throw new Error('vkAttachments.exportAll no esta disponible');
     }
+
+    const blob = window.vkStore.loadBlob();
+    window.vkBackup.validateBlob(blob);
     const attachments = await window.vkAttachments.exportAll();
+
     return { format: 'vk2_blob', data: blob, attachments: attachments };
   }
+
   const legacy = localStorage.getItem('vk_data_v1');
   if (legacy) return { format: 'legacy', data: legacy };
   return null;
@@ -324,23 +308,21 @@ async function driveReadVaultPayload() {
 
 async function driveUploadBackup(accessToken, fileName, payload) {
   const timestamp = Date.now();
-  const backup = JSON.stringify(payload.format === 'vk2_blob' ? {
-    app: 'VaultKey',
-    format: 'vkbak',
-    version: 3,
-    vaultFormat: 'vk2_blob',
-    createdAt: new Date(timestamp).toISOString(),
-    vk2_blob: payload.data,
-    attachments: payload.attachments
-  } : {
-    app: 'VaultKey',
-    format: 'vkbak',
-    version: 2,
-    vaultFormat: payload.format,
-    createdAt: new Date(timestamp).toISOString(),
-    vk_data_v1: payload.format === 'legacy' ? payload.data : undefined,
-    vk2_blob: payload.format === 'vk2_blob' ? payload.data : undefined
-  });
+  const backupData = payload.format === 'vk2_blob'
+    ? window.vkBackup.createEnvelope({
+        blob: payload.data,
+        attachments: payload.attachments,
+        createdAt: new Date(timestamp).toISOString()
+      })
+    : {
+        app: 'VaultKey',
+        format: 'vkbak',
+        version: 2,
+        vaultFormat: payload.format,
+        createdAt: new Date(timestamp).toISOString(),
+        vk_data_v1: payload.format === 'legacy' ? payload.data : undefined
+      };
+  const backup = JSON.stringify(backupData);
 
   const existing = await driveFindBackup(accessToken, fileName);
   const metadata = { name: fileName, mimeType: 'application/octet-stream' };
@@ -467,53 +449,54 @@ async function driveRestore() {
     if (!download.ok) throw new Error(`No se pudo descargar el respaldo (HTTP ${download.status})`);
 
     const raw = await download.json();
-    const currentVk2 = localStorage.getItem('vk2_blob');
-    const currentLegacy = localStorage.getItem('vk_data_v1');
-    let restoredKey = null;
 
-    try {
-      if (raw && raw.app === 'VaultKey' && raw.format === 'vkbak' && Number(raw.version) >= 2 && raw.vaultFormat === 'vk2_blob') {
-        const blob = raw.vk2_blob;
-        const validBlob = blob && typeof blob === 'object' && !Array.isArray(blob)
-          && blob.app === 'VaultKey' && Number(blob.schemaVersion) === 2
-          && typeof blob.cryptoVersion === 'number'
-          && blob.kdf && typeof blob.kdf === 'object'
-          && blob.wraps && typeof blob.wraps === 'object'
-          && blob.wraps.master && blob.wraps.kit
-          && blob.vault && typeof blob.vault === 'object';
-        if (!validBlob) throw new Error('La copia está dañada o no pertenece a VaultKey 2.0');
-
-        if (raw.attachments) {
-          if (typeof window.vkAttachments === 'undefined' || typeof window.vkAttachments.importAll !== 'function') {
-            throw new Error('vkAttachments.importAll no está disponible');
-          }
-          await window.vkAttachments.importAll(raw.attachments, { mode: 'replace' });
-        } else {
-          const confirmedOldCopy = await vkConfirm(
-            'Copia antigua sin adjuntos',
-            'Esta copia es de una versión anterior y no incluye los archivos adjuntos de los documentos. Se restaurarán los datos disponibles, pero algunas imágenes o archivos podrían no recuperarse.',
-            { variant: 'drive-restore-legacy-attachments', confirmText: 'Continuar' }
-          );
-          if (!confirmedOldCopy) { driveSyncUI(); return false; }
-        }
-
-        if (typeof window.vkStore !== 'undefined') window.vkStore.saveBlob(blob);
-        else localStorage.setItem('vk2_blob', JSON.stringify(blob));
-        restoredKey = 'vk2_blob';
-      } else if (raw && raw.app === 'VaultKey' && typeof raw.vk_data_v1 === 'string' && raw.vk_data_v1.length > 20) {
-        localStorage.setItem('vk_data_v1', raw.vk_data_v1);
-        restoredKey = 'vk_data_v1';
-      } else {
-        throw new Error('La copia no tiene un formato válido de VaultKey');
+    if (raw && raw.app === 'VaultKey' && raw.format === 'vkbak' && Number(raw.version) >= 2 && raw.vaultFormat === 'vk2_blob') {
+      if (typeof window.vkBackup === 'undefined' || typeof window.vkBackup.restore !== 'function') {
+        throw new Error('vkBackup.restore no está disponible');
+      }
+      if (typeof window.vkStore === 'undefined' || typeof window.vkAttachments === 'undefined') {
+        throw new Error('vkStore o vkAttachments no están disponibles');
       }
 
-      if (!localStorage.getItem(restoredKey)) throw new Error('No se pudo guardar la copia restaurada');
-    } catch (restoreError) {
-      if (currentVk2 === null) localStorage.removeItem('vk2_blob');
-      else localStorage.setItem('vk2_blob', currentVk2);
-      if (currentLegacy === null) localStorage.removeItem('vk_data_v1');
-      else localStorage.setItem('vk_data_v1', currentLegacy);
-      throw restoreError;
+      if (typeof window.vkStore.hasVault === 'function' && window.vkStore.hasVault()) {
+        const confirmed = await vkConfirm(
+          'Restaurar bóveda VaultKey 2.0',
+          'Se reemplazará la bóveda local actual por el respaldo seleccionado.',
+          { variant: 'drive-restore', confirmText: 'Restaurar' }
+        );
+        if (!confirmed) { driveSyncUI(); return false; }
+      }
+
+      const useMaster = await vkConfirm(
+        'Credencial de restauración',
+        'Pulsa Aceptar para usar tu contraseña maestra. Pulsa Cancelar para usar el kit de emergencia.',
+        { variant: 'backup-restore', confirmText: 'Contraseña maestra' }
+      );
+
+      const credential = useMaster
+        ? { master: prompt('Introduce tu contraseña maestra:') || '' }
+        : { kitCode: prompt('Introduce el kit de emergencia:') || '' };
+
+      if ((useMaster && !credential.master) || (!useMaster && !credential.kitCode)) {
+        throw new Error('Credencial de restauración requerida');
+      }
+
+      const pin = prompt('Introduce el PIN de 6 dígitos para este dispositivo:') || '';
+      if (!/^[0-9]{6}$/.test(pin)) {
+        throw new Error('El PIN de restauración debe tener 6 dígitos');
+      }
+
+      await window.vkBackup.restore(raw, {
+        credential,
+        pin,
+        store: window.vkStore,
+        attachments: window.vkAttachments,
+        crypto: window.vkCrypto
+      });
+    } else if (raw && raw.app === 'VaultKey' && typeof raw.vk_data_v1 === 'string' && raw.vk_data_v1.length > 20) {
+      localStorage.setItem('vk_data_v1', raw.vk_data_v1);
+    } else {
+      throw new Error('La copia no tiene un formato válido de VaultKey');
     }
 
     driveSyncUI();

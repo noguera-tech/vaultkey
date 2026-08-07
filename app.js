@@ -2143,25 +2143,14 @@ function useGen(){
 async function exportBackup(){
   if(typeof vkStore!=='undefined'&&vkStore.hasVault()){
     try{
+      if(typeof vkBackup==='undefined'||typeof vkBackup.createEnvelope!=='function'){
+        throw new Error('vkBackup.createEnvelope no esta disponible');
+      }
       if(typeof vkAttachments==='undefined'||typeof vkAttachments.exportAll!=='function'){
-        throw new Error('vkAttachments.exportAll no está disponible');
+        throw new Error('vkAttachments.exportAll no esta disponible');
       }
 
       const vk2Blob=vkStore.loadBlob();
-      const validBlob=vk2Blob&&typeof vk2Blob==='object'&&!Array.isArray(vk2Blob)
-        &&vk2Blob.app==='VaultKey'
-        &&Number(vk2Blob.schemaVersion)===2
-        &&typeof vk2Blob.cryptoVersion==='number'
-        &&vk2Blob.kdf&&typeof vk2Blob.kdf==='object'
-        &&vk2Blob.wraps&&typeof vk2Blob.wraps==='object'
-        &&vk2Blob.wraps.master
-        &&vk2Blob.wraps.kit
-        &&vk2Blob.vault&&typeof vk2Blob.vault==='object';
-
-      if(!validBlob){
-        throw new Error('La bóveda VaultKey 2.0 no tiene un formato válido');
-      }
-
       const attachments=await vkAttachments.exportAll();
       const now=Date.now();
       const date=new Date(now);
@@ -2169,15 +2158,11 @@ async function exportBackup(){
       const mm=String(date.getMonth()+1).padStart(2,'0');
       const yyyy=date.getFullYear();
 
-      const data={
-        app:'VaultKey',
-        format:'vkbak',
-        version:3,
-        vaultFormat:'vk2_blob',
-        createdAt:new Date(now).toISOString(),
-        vk2_blob:vk2Blob,
-        attachments:attachments
-      };
+      const data=vkBackup.createEnvelope({
+        blob:vk2Blob,
+        attachments:attachments,
+        createdAt:new Date(now).toISOString()
+      });
 
       const fileBlob=new Blob(
         [JSON.stringify(data,null,2)],
@@ -2194,12 +2179,13 @@ async function exportBackup(){
 
       soundSuccess();
       toast('Respaldo local cifrado exportado correctamente','ok');
+      return true;
     }catch(err){
       console.error('exportBackup VK2:',err);
       soundError();
       toast('No se pudo exportar el respaldo local','err');
+      return false;
     }
-    return;
   }
 
   let pack=localStorage.getItem(LS_DATA);
@@ -2382,8 +2368,8 @@ async function importBackup(file) {
       data.vk2_blob &&
       typeof vkStore!=='undefined'
     ){
-      if(typeof vkAttachments==='undefined'||typeof vkAttachments.importAll!=='function'){
-        throw new Error('vkAttachments.importAll no está disponible');
+      if(typeof vkBackup==='undefined' || typeof vkBackup.restore!=='function'){
+        throw new Error('vkBackup.restore no está disponible');
       }
 
       if(typeof vkStore.hasVault==='function' && vkStore.hasVault()){
@@ -2392,16 +2378,39 @@ async function importBackup(file) {
           'Se reemplazará la bóveda local actual por el respaldo seleccionado.',
           {variant:'drive-restore',confirmText:'Restaurar'}
         );
-        if(!ok)return;
+        if(!ok) return;
       }
 
-      if(data.attachments){
-        await vkAttachments.importAll(data.attachments,{mode:'replace'});
+      const useMaster = await vkConfirm(
+        'Credencial de restauración',
+        'Pulsa Aceptar para usar tu contraseña maestra. Pulsa Cancelar para usar el kit de emergencia.',
+        {variant:'backup-restore',confirmText:'Contraseña maestra'}
+      );
+
+      const credential = useMaster
+        ? {master: prompt('Introduce tu contraseña maestra:') || ''}
+        : {kitCode: prompt('Introduce el kit de emergencia:') || ''};
+
+      if((useMaster && !credential.master) || (!useMaster && !credential.kitCode)){
+        throw new Error('Credencial de restauración requerida');
       }
 
-      vkStore.saveBlob(data.vk2_blob);
+      const pin = prompt('Introduce el PIN de 6 dígitos para este dispositivo:') || '';
+      if(!/^[0-9]{6}$/.test(pin)){
+        throw new Error('El PIN de restauración debe tener 6 dígitos');
+      }
+
+      await vkBackup.restore(data, {
+        credential,
+        pin,
+        store: vkStore,
+        attachments: vkAttachments,
+        crypto: vkCrypto
+      });
 
       toast('✓ Respaldo VaultKey 2.0 restaurado','ok');
+      try{ driveAutoSync(); }catch(e){}
+      if(typeof lock==='function') lock();
       return;
     }
 
@@ -2417,6 +2426,7 @@ async function importBackup(file) {
     toast('No se pudo importar el respaldo','err');
   }
 }
+
 
 /* ============================================================
    Copias de seguridad — conecta la interfaz (Figma node-id
@@ -2460,9 +2470,11 @@ window.openBackupCreateModal=async function(){
     }
   );
   if(!ok)return;
-  await exportBackup();
-  localStorage.setItem('vk_local_backup_last',String(Date.now()));
-  renderBackupLocalStatus();
+  const exported=await exportBackup();
+  if(exported){
+    localStorage.setItem('vk_local_backup_last',String(Date.now()));
+    renderBackupLocalStatus();
+  }
 };
 
 window.openBackupRestoreModal=async function(){
