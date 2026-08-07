@@ -460,31 +460,18 @@ async function driveRestore() {
 
       if (typeof window.vkStore.hasVault === 'function' && window.vkStore.hasVault()) {
         const confirmed = await vkConfirm(
-          'Restaurar bóveda VaultKey 2.0',
-          'Se reemplazará la bóveda local actual por el respaldo seleccionado.',
+          'Restaurar Boveda Vaultkey',
+          'Se sustituirá la bóveda local actual por el respaldo elegido.',
           { variant: 'drive-restore', confirmText: 'Restaurar' }
         );
         if (!confirmed) { driveSyncUI(); return false; }
       }
 
-      const useMaster = await vkConfirm(
-        'Credencial de restauración',
-        'Pulsa Aceptar para usar tu contraseña maestra. Pulsa Cancelar para usar el kit de emergencia.',
-        { variant: 'backup-restore', confirmText: 'Contraseña maestra' }
-      );
+      const credential = await window.askRestoreCredential();
+      if (!credential) { driveSyncUI(); return false; }
 
-      const credential = useMaster
-        ? { master: prompt('Introduce tu contraseña maestra:') || '' }
-        : { kitCode: prompt('Introduce el kit de emergencia:') || '' };
-
-      if ((useMaster && !credential.master) || (!useMaster && !credential.kitCode)) {
-        throw new Error('Credencial de restauración requerida');
-      }
-
-      const pin = prompt('Introduce el PIN de 6 dígitos para este dispositivo:') || '';
-      if (!/^[0-9]{6}$/.test(pin)) {
-        throw new Error('El PIN de restauración debe tener 6 dígitos');
-      }
+      const pin = await window.askRestorePin();
+      if (!pin) { driveSyncUI(); return false; }
 
       await window.vkBackup.restore(raw, {
         credential,
