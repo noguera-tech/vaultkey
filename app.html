@@ -296,6 +296,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 #confirmModal.vk-confirm--drive-restore .sheetHead{position:relative;min-height:32px;padding-left:38px}
 #confirmModal.vk-confirm--drive-restore .sheetTitle{text-align:left}
 #confirmModal.vk-confirm--drive-restore .vk-confirm-icon{display:none}
+#confirmDriveRestoreIcon{display:none}
 #confirmModal.vk-confirm--drive-restore #confirmDriveRestoreIcon{display:block}
 #confirmModal.vk-confirm--drive-restore .vk-confirm-icon svg{display:block;width:100%;height:100%}
 #confirmModal.vk-confirm--drive-restore #confirmMsg{margin:36px auto 0;max-width:249px;font-size:12px;line-height:1.25}
@@ -3642,7 +3643,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 
 <div class="modal" id="confirmModal">
   <div class="sheet">
-    <div id="confirmDriveRestoreIcon" aria-hidden="true" style="display:none;position:absolute;left:28px;top:24px;width:24px;height:24px;color:#3b82f6"><svg viewBox="0 0 22 22" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;width:100%;height:100%"><path d="M11 14.3333V1M21 14.3333V18.7778C21 19.3671 20.7659 19.9324 20.3491 20.3491C19.9324 20.7659 19.3671 21 18.7778 21H3.22222C2.63285 21 2.06762 20.7659 1.65087 20.3491C1.23413 19.9324 1 19.3671 1 18.7778V14.3333"></path><path d="M5.44434 8.77783L10.9999 14.3334L16.5554 8.77783"></path></svg></div>
+    <div id="confirmDriveRestoreIcon" aria-hidden="true" style="position:absolute;left:28px;top:24px;width:24px;height:24px;color:#3b82f6"><svg viewBox="0 0 22 22" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;width:100%;height:100%"><path d="M11 14.3333V1M21 14.3333V18.7778C21 19.3671 20.7659 19.9324 20.3491 20.3491C19.9324 20.7659 19.3671 21 18.7778 21H3.22222C2.63285 21 2.06762 20.7659 1.65087 20.3491C1.23413 19.9324 1 19.3671 1 18.7778V14.3333"></path><path d="M5.44434 8.77783L10.9999 14.3334L16.5554 8.77783"></path></svg></div>
     <span class="vk-confirm-icon vk-confirm-icon--backup-create" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14a2 2 0 0 0 2-2v-3"/><path d="M3 15v3a2 2 0 0 0 2 2"/></svg></span>
     <span class="vk-confirm-icon vk-confirm-icon--backup-restore" aria-hidden="true"><img alt="" src="https://www.figma.com/api/mcp/asset/e2ce0c0a-0c6a-4eb8-bf14-c0b0d7b6bdde.svg" style="display:block;width:100%;height:100%"></span>
     <div class="sheetHead">
