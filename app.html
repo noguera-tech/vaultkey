@@ -1240,7 +1240,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
     </button>
   </header>
 
-  <form id="noteCreateForm" class="vk-note-form" onsubmit="event.preventDefault();saveNote(null,document.getElementById('noteCreateTitleInput').value,document.getElementById('noteCreateContentInput').value)">
+  <form id="noteCreateForm" class="vk-note-form" onsubmit="event.preventDefault();saveNote(null,document.getElementById('noteCreateTitleInput').value,document.getElementById('noteCreateContentInput').value,document.getElementById('noteCreateFavorite')?.getAttribute('aria-checked')==='true')">
     <h1 id="noteCreateTitle" class="vk-note-screen-title">Añadir nota</h1>
 
     <label class="vk-note-field">
@@ -1252,6 +1252,19 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       <span>Descripción</span>
       <textarea id="noteCreateContentInput" maxlength="10000" placeholder="Escribe una nota..."></textarea>
     </label>
+
+    <div class="vk-note-favorite">
+      <span>Añadir a favoritos</span>
+      <button id="noteCreateFavorite"
+              class="vk-note-favorite-switch"
+              type="button"
+              role="switch"
+              aria-checked="false"
+              aria-label="Añadir a favoritos"
+              onclick="toggleNoteCreateFavorite()">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
 
     <div class="vk-note-form-actions">
       <button type="button" class="vk-note-form-cancel" onclick="showNotes('left')">Cancelar</button>
@@ -1269,7 +1282,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
     </button>
   </header>
 
-  <form id="noteEditForm" class="vk-note-form" onsubmit="event.preventDefault();saveNote(window.__vkCurrentNoteId,document.getElementById('noteEditTitleInput').value,document.getElementById('noteEditContentInput').value)">
+  <form id="noteEditForm" class="vk-note-form" onsubmit="event.preventDefault();saveNote(window.__vkCurrentNoteId,document.getElementById('noteEditTitleInput').value,document.getElementById('noteEditContentInput').value,document.getElementById('noteEditFavorite')?.getAttribute('aria-checked')==='true')">
     <h1 id="noteEditTitle" class="vk-note-screen-title">Editar nota</h1>
 
     <label class="vk-note-field">
@@ -1281,6 +1294,19 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       <span>Descripción</span>
       <textarea id="noteEditContentInput" maxlength="10000"></textarea>
     </label>
+
+    <div class="vk-note-favorite">
+      <span>Añadir a favoritos</span>
+      <button id="noteEditFavorite"
+              class="vk-note-favorite-switch"
+              type="button"
+              role="switch"
+              aria-checked="false"
+              aria-label="Añadir a favoritos"
+              onclick="toggleNoteEditFavorite()">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
 
     <div class="vk-note-form-actions">
       <button type="button" class="vk-note-form-cancel" onclick="showNoteDetail(window.__vkCurrentNoteId)">Cancelar</button>
@@ -1443,7 +1469,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
     </button>
   </header>
 
-  <form id="cardCreateForm" class="vk-card-form" onsubmit="event.preventDefault();saveCard(null,document.getElementById('cardCreateHolder').value,document.getElementById('cardCreateNumber').value,document.getElementById('cardCreateExpiry').value,document.getElementById('cardCreateCvv').value,document.getElementById('cardCreateNote').value)">
+  <form id="cardCreateForm" class="vk-card-form" onsubmit="event.preventDefault();saveCard(null,document.getElementById('cardCreateHolder').value,document.getElementById('cardCreateNumber').value,document.getElementById('cardCreateExpiry').value,document.getElementById('cardCreateCvv').value,document.getElementById('cardCreateNote').value,document.getElementById('cardCreateFavorite')?.getAttribute('aria-checked')==='true')">
     <h1 id="cardCreateTitle" class="vk-card-screen-title">Añadir tarjeta</h1>
 
     <label class="vk-card-field">
@@ -1482,6 +1508,19 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       </div>
     </label>
 
+    <div class="vk-note-favorite">
+      <span>Añadir a favoritos</span>
+      <button id="cardCreateFavorite"
+              class="vk-note-favorite-switch"
+              type="button"
+              role="switch"
+              aria-checked="false"
+              aria-label="Añadir a favoritos"
+              onclick="toggleCardCreateFavorite()">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
+
     <button id="cardCreateAddNote" type="button" class="vk-card-add-note" onclick="toggleCardNoteField('cardCreate')">+ Añadir nota</button>
 
     <label id="cardCreateNoteField" class="vk-card-field vk-card-note-field" hidden>
@@ -1505,7 +1544,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
     </button>
   </header>
 
-  <form id="cardEditForm" class="vk-card-form" onsubmit="event.preventDefault();saveCard(window.__vkCurrentCardId,document.getElementById('cardEditHolder').value,document.getElementById('cardEditNumber').value,document.getElementById('cardEditExpiry').value,document.getElementById('cardEditCvv').value,document.getElementById('cardEditNote').value)">
+  <form id="cardEditForm" class="vk-card-form" onsubmit="event.preventDefault();saveCard(window.__vkCurrentCardId,document.getElementById('cardEditHolder').value,document.getElementById('cardEditNumber').value,document.getElementById('cardEditExpiry').value,document.getElementById('cardEditCvv').value,document.getElementById('cardEditNote').value,document.getElementById('cardEditFavorite')?.getAttribute('aria-checked')==='true')">
     <h1 id="cardEditTitle" class="vk-card-screen-title">Editar tarjeta</h1>
 
     <label class="vk-card-field">
@@ -1543,6 +1582,19 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
         </button>
       </div>
     </label>
+
+    <div class="vk-note-favorite">
+      <span>Añadir a favoritos</span>
+      <button id="cardEditFavorite"
+              class="vk-note-favorite-switch"
+              type="button"
+              role="switch"
+              aria-checked="false"
+              aria-label="Añadir a favoritos"
+              onclick="toggleCardEditFavorite()">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
 
     <button id="cardEditAddNote" type="button" class="vk-card-add-note" onclick="toggleCardNoteField('cardEdit')">+ Añadir nota</button>
 
@@ -1613,7 +1665,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 
 <section id="documentCreate" class="screen vk-document-form-screen">
   <header class="vk-document-editor-topbar"><button type="button" class="vk-note-back" aria-label="Volver" onclick="show('documentPreview','left')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button></header>
-  <form id="documentCreateForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(null,documentCreateName.value,documentCreateExpiry.value,documentCreateIssuedBy.value,documentCreateCountry.value)">
+  <form id="documentCreateForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(null,documentCreateName.value,documentCreateExpiry.value,documentCreateIssuedBy.value,documentCreateCountry.value,document.getElementById('documentCreateFavorite')?.getAttribute('aria-checked')==='true')">
     <h1 class="vk-document-screen-title">Añadir documento</h1><div class="vk-document-category-line"><span id="documentCreateCategoryIcon"></span><strong id="documentCreateCategory"></strong></div>
     <article class="vk-document-form-card"><span class="vk-document-preview-label">Vista previa</span><img id="documentCreateImage" class="vk-document-form-image" alt="Documento">
       <label class="vk-document-field"><span>Nombre</span><input id="documentCreateName" type="text" maxlength="150"></label>
@@ -1621,6 +1673,18 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       <label class="vk-document-field"><span>Caduca</span><input id="documentCreateExpiry" type="text" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" oninput="formatDocumentExpiry(this)"></label>
       <div id="documentCreateMore" class="vk-document-more-fields" hidden><label class="vk-document-field"><span>Emitido por</span><input id="documentCreateIssuedBy" type="text" maxlength="150"></label><label class="vk-document-field"><span>País</span><input id="documentCreateCountry" type="text" maxlength="100"></label></div>
     </article>
+    <div class="vk-note-favorite">
+      <span>Añadir a favoritos</span>
+      <button id="documentCreateFavorite"
+              class="vk-note-favorite-switch"
+              type="button"
+              role="switch"
+              aria-checked="false"
+              aria-label="Añadir a favoritos"
+              onclick="toggleDocumentCreateFavorite()">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
     <div class="vk-document-form-actions"><button type="button" class="vk-document-button-secondary" onclick="showDocuments('left')">Cancelar</button><button type="submit" class="vk-document-button-primary">Crear</button></div>
   </form>
 </section>
@@ -1635,7 +1699,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 
 <section id="documentEdit" class="screen vk-document-form-screen">
   <header class="vk-document-editor-topbar"><button type="button" class="vk-note-back" aria-label="Volver al detalle" onclick="showDocumentDetail(window.__vkCurrentDocumentId)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button></header>
-  <form id="documentEditForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(window.__vkCurrentDocumentId,documentEditName.value,documentEditExpiry.value,documentEditIssuedBy.value,documentEditCountry.value)">
+  <form id="documentEditForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(window.__vkCurrentDocumentId,documentEditName.value,documentEditExpiry.value,documentEditIssuedBy.value,documentEditCountry.value,document.getElementById('documentEditFavorite')?.getAttribute('aria-checked')==='true')">
     <h1 class="vk-document-screen-title">Editar documento</h1><div class="vk-document-category-line"><span id="documentEditCategoryIcon"></span><strong id="documentEditCategory"></strong></div>
     <article class="vk-document-form-card"><span class="vk-document-preview-label">Vista previa</span><img id="documentEditImage" class="vk-document-form-image" alt="Documento"><button type="button" class="vk-document-replace-button" onclick="openDocumentEditSource()">Repetir escaneo/importar</button>
       <label class="vk-document-field"><span>Nombre</span><input id="documentEditName" type="text" maxlength="150"></label>
@@ -1643,6 +1707,18 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       <button id="documentEditMoreButton" type="button" class="vk-document-more-button" onclick="toggleDocumentMoreInfo('documentEdit')">+ Más información</button>
       <div id="documentEditMore" class="vk-document-more-fields" hidden><label class="vk-document-field"><span>Emitido por</span><input id="documentEditIssuedBy" type="text" maxlength="150"></label><label class="vk-document-field"><span>País</span><input id="documentEditCountry" type="text" maxlength="100"></label></div>
     </article>
+    <div class="vk-note-favorite">
+      <span>Añadir a favoritos</span>
+      <button id="documentEditFavorite"
+              class="vk-note-favorite-switch"
+              type="button"
+              role="switch"
+              aria-checked="false"
+              aria-label="Añadir a favoritos"
+              onclick="toggleDocumentEditFavorite()">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
     <div class="vk-document-form-actions"><button type="button" class="vk-document-button-secondary" onclick="showDocumentDetail(window.__vkCurrentDocumentId)">Cancelar</button><button type="submit" class="vk-document-button-primary">Guardar</button></div>
   </form>
 </section>
