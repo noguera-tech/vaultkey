@@ -526,9 +526,36 @@ async function driveRestore() {
     return true;
   } catch (error) {
     driveSyncUI();
-    await driveShowError('No se pudo restaurar el respaldo', error);
+    console.error('Drive: No se pudo restaurar el respaldo', error);
+    const retry = await driveShowRestoreErrorModal();
+    if (retry) return driveRestore();
     return false;
   }
+}
+
+let _driveRestoreErrorResolver = null;
+
+function driveShowRestoreErrorModal() {
+  return new Promise((resolve) => {
+    _driveRestoreErrorResolver = resolve;
+    const modal = document.getElementById('driveRestoreErrorModal');
+    const cancelBtn = document.getElementById('driveRestoreErrorCancel');
+    const retryBtn = document.getElementById('driveRestoreErrorRetry');
+    if (!modal || !cancelBtn || !retryBtn) { resolve(false); return; }
+
+    function close(result) {
+      modal.classList.remove('open');
+      cancelBtn.removeEventListener('click', onCancel);
+      retryBtn.removeEventListener('click', onRetry);
+      if (_driveRestoreErrorResolver) { _driveRestoreErrorResolver(result); _driveRestoreErrorResolver = null; }
+    }
+    function onCancel() { close(false); }
+    function onRetry() { close(true); }
+
+    cancelBtn.addEventListener('click', onCancel);
+    retryBtn.addEventListener('click', onRetry);
+    modal.classList.add('open');
+  });
 }
 
 // ---------- Desconectar ----------
