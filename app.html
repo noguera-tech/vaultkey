@@ -1142,6 +1142,13 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       <input id="noteCreateTitleInput" type="text" maxlength="120" placeholder="Introduce un título" autocomplete="off">
     </label>
 
+    <div class="vk-password-create-favorite">
+      <span class="vk-password-create-favorite__label">Favorito</span>
+      <button id="noteCreateFavorite" type="button" class="vk-favorite-switch" aria-checked="false" aria-label="Marcar nota como favorita" onclick="toggleFavoriteSwitch('noteCreateFavorite')">
+        <span aria-hidden="true">⭐</span>
+      </button>
+    </div>
+
     <label class="vk-note-field">
       <span>Descripción</span>
       <textarea id="noteCreateContentInput" maxlength="10000" placeholder="Escribe una nota..."></textarea>
@@ -1170,6 +1177,13 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       <span>Título</span>
       <input id="noteEditTitleInput" type="text" maxlength="120" autocomplete="off">
     </label>
+
+    <div class="vk-password-edit-favorite">
+      <span class="vk-password-edit-favorite__label">Favorito</span>
+      <button id="noteEditFavorite" type="button" class="vk-favorite-switch" aria-checked="false" aria-label="Marcar nota como favorita" onclick="toggleFavoriteSwitch('noteEditFavorite')">
+        <span aria-hidden="true">⭐</span>
+      </button>
+    </div>
 
     <label class="vk-note-field">
       <span>Descripción</span>
@@ -1376,6 +1390,13 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       </div>
     </label>
 
+    <div class="vk-password-create-favorite">
+      <span class="vk-password-create-favorite__label">Favorito</span>
+      <button id="cardCreateFavorite" type="button" class="vk-favorite-switch" aria-checked="false" aria-label="Marcar tarjeta como favorita" onclick="toggleFavoriteSwitch('cardCreateFavorite')">
+        <span aria-hidden="true">⭐</span>
+      </button>
+    </div>
+
     <button id="cardCreateAddNote" type="button" class="vk-card-add-note" onclick="toggleCardNoteField('cardCreate')">+ Añadir nota</button>
 
     <label id="cardCreateNoteField" class="vk-card-field vk-card-note-field" hidden>
@@ -1437,6 +1458,13 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
         </button>
       </div>
     </label>
+
+    <div class="vk-password-edit-favorite">
+      <span class="vk-password-edit-favorite__label">Favorito</span>
+      <button id="cardEditFavorite" type="button" class="vk-favorite-switch" aria-checked="false" aria-label="Marcar tarjeta como favorita" onclick="toggleFavoriteSwitch('cardEditFavorite')">
+        <span aria-hidden="true">⭐</span>
+      </button>
+    </div>
 
     <button id="cardEditAddNote" type="button" class="vk-card-add-note" onclick="toggleCardNoteField('cardEdit')">+ Añadir nota</button>
 
@@ -1515,6 +1543,12 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       <label class="vk-document-field"><span>Caduca</span><input id="documentCreateExpiry" type="text" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" oninput="formatDocumentExpiry(this)"></label>
       <div id="documentCreateMore" class="vk-document-more-fields" hidden><label class="vk-document-field"><span>Emitido por</span><input id="documentCreateIssuedBy" type="text" maxlength="150"></label><label class="vk-document-field"><span>País</span><input id="documentCreateCountry" type="text" maxlength="100"></label></div>
     </article>
+    <div class="vk-password-create-favorite">
+      <span class="vk-password-create-favorite__label">Favorito</span>
+      <button id="documentCreateFavorite" type="button" class="vk-favorite-switch" aria-checked="false" aria-label="Marcar documento como favorito" onclick="toggleFavoriteSwitch('documentCreateFavorite')">
+        <span aria-hidden="true">⭐</span>
+      </button>
+    </div>
     <div class="vk-document-form-actions"><button type="button" class="vk-document-button-secondary" onclick="showDocuments('left')">Cancelar</button><button type="submit" class="vk-document-button-primary">Crear</button></div>
   </form>
 </section>
@@ -1537,6 +1571,12 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       <button id="documentEditMoreButton" type="button" class="vk-document-more-button" onclick="toggleDocumentMoreInfo('documentEdit')">+ Más información</button>
       <div id="documentEditMore" class="vk-document-more-fields" hidden><label class="vk-document-field"><span>Emitido por</span><input id="documentEditIssuedBy" type="text" maxlength="150"></label><label class="vk-document-field"><span>País</span><input id="documentEditCountry" type="text" maxlength="100"></label></div>
     </article>
+    <div class="vk-password-edit-favorite">
+      <span class="vk-password-edit-favorite__label">Favorito</span>
+      <button id="documentEditFavorite" type="button" class="vk-favorite-switch" aria-checked="false" aria-label="Marcar documento como favorito" onclick="toggleFavoriteSwitch('documentEditFavorite')">
+        <span aria-hidden="true">⭐</span>
+      </button>
+    </div>
     <div class="vk-document-form-actions"><button type="button" class="vk-document-button-secondary" onclick="showDocumentDetail(window.__vkCurrentDocumentId)">Cancelar</button><button type="submit" class="vk-document-button-primary">Guardar</button></div>
   </form>
 </section>
@@ -4116,9 +4156,9 @@ document.addEventListener("DOMContentLoaded",function(){
 <script src="kit-manager.js"></script>
 <script src="credentials.js"></script>
 <script src="models.js"></script>
-<script src="vault-backup.js"></script>
 
 <!-- fin núcleo 2.0 -->
+<script src="vault-backup.js"></script>
 <script src="drive.js"></script>
 <script src="app.js"></script>
 

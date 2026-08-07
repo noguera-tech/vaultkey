@@ -3413,6 +3413,22 @@ function setFavoriteSwitch(button,value){
   button.setAttribute('aria-checked',value?'true':'false');
 }
 
+function favoriteSwitchIsOn(buttonId){
+  return $(buttonId)?.getAttribute('aria-checked')==='true';
+}
+
+function setFavoriteSwitchOff(buttonId){
+  setFavoriteSwitch($(buttonId),false);
+}
+
+function toggleFavoriteSwitch(buttonId){
+  const button=$(buttonId);
+  if(!button)return false;
+  const next=button.getAttribute('aria-checked')!=='true';
+  setFavoriteSwitch(button,next);
+  return next;
+}
+
 function togglePasswordCreateFavorite(){
   const button=$('vkPasswordCreateFavorite');
   if(!button)return;
@@ -4028,7 +4044,7 @@ function render(){
   if(_ves)_ves.style.display=vault.length===0?'block':'none';
   const _fes=$('favEmptyState');
   if(_fes)_fes.style.display=vault.filter(e=>e.fav).length===0?'block':'none';$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length);
-  const _dashPasswords=vault.filter(e=>!e.entryType||e.entryType==='password'||e.entryType==='wifi').length;
+  const _dashPasswords=vault.filter(isPasswordFamilyEntry).length;
   const _dashNotes=(typeof window.vkNotes!=='undefined'&&window.vkNotes.read)?window.vkNotes.read().length:vault.filter(e=>e.entryType==='note').length;
   const _dashCards=(typeof window.vkCards!=='undefined'&&window.vkCards.read)?window.vkCards.read().length:vault.filter(e=>e.entryType==='card').length;
   const _dashDocuments=(typeof window.vkDocuments!=='undefined'&&window.vkDocuments.read)?window.vkDocuments.read().length:vault.filter(e=>['id','license','medical'].includes(e.entryType)).length;
@@ -6630,6 +6646,7 @@ try {
       id:entry.id,
       title:entry.title||'',
       content:entry.body||'',
+      fav:entry.fav===true,
       createdAt:entry.createdAt,
       updatedAt:entry.updatedAt
     };
@@ -6759,6 +6776,7 @@ try {
   window.openCreateNote=function(){
     var form=document.getElementById('noteCreateForm');
     if(form)form.reset();
+    setFavoriteSwitchOff('noteCreateFavorite');
     window.__vkCurrentNoteId=null;
     if(typeof window.show==='function')window.show('noteCreate','right');
     setTimeout(function(){
@@ -6774,6 +6792,7 @@ try {
     window.__vkCurrentNoteId=note.id;
     document.getElementById('noteEditTitleInput').value=note.title||'';
     document.getElementById('noteEditContentInput').value=note.content||'';
+    setFavoriteSwitch(document.getElementById('noteEditFavorite'),note.fav===true);
     if(typeof window.show==='function')window.show('noteEdit','right');
   };
 
@@ -6810,6 +6829,7 @@ try {
       var _prevNoteEntry=null,_prevNoteIndex=-1,_pushedNoteEntry=null;
       try{
         var entry;
+        var fav=favoriteSwitchIsOn(id?'noteEditFavorite':'noteCreateFavorite');
         if(id){
           var vaultIndex=(vault||[]).findIndex(function(item){
             return item&&item.type==='note'&&item.id===id;
@@ -6820,13 +6840,15 @@ try {
           entry=Object.assign({},vault[vaultIndex],{
             title:title,
             body:content,
+            fav:fav,
             updatedAt:Date.now()
           });
           vault[vaultIndex]=entry;
         }else{
           entry=vkModels.create('note',{
             title:title,
-            body:content
+            body:content,
+            fav:fav
           });
           vault.push(entry);
           _pushedNoteEntry=entry;
@@ -6852,12 +6874,14 @@ try {
     var notes=notesRead();
     var now=Date.now();
 
+    var fav=favoriteSwitchIsOn(id?'noteEditFavorite':'noteCreateFavorite');
     if(id){
       var index=notes.findIndex(function(note){return note.id===id;});
       if(index===-1)return false;
       notes[index]=Object.assign({},notes[index],{
         title:title,
         content:content,
+        fav:fav,
         updatedAt:now
       });
     }else{
@@ -6866,6 +6890,7 @@ try {
         id:id,
         title:title,
         content:content,
+        fav:fav,
         createdAt:now,
         updatedAt:now
       });
@@ -6955,6 +6980,7 @@ try {
       expiry:entry.expiry||'',
       cvv:entry.cvv||'',
       note:entry.notes||'',
+      fav:entry.fav===true,
       createdAt:entry.createdAt,
       updatedAt:entry.updatedAt
     };
@@ -7116,6 +7142,7 @@ try {
     var noteButton=document.getElementById('cardCreateAddNote');
     if(noteField)noteField.hidden=true;
     if(noteButton)noteButton.textContent='+ Añadir nota';
+    setFavoriteSwitchOff('cardCreateFavorite');
 
     if(typeof window.show==='function')window.show('cardCreate','right');
     setTimeout(function(){
@@ -7134,6 +7161,7 @@ try {
     document.getElementById('cardEditCvv').value=String(card.cvv||'');
     document.getElementById('cardEditCvv').type='password';
     document.getElementById('cardEditNote').value=card.note||'';
+    setFavoriteSwitch(document.getElementById('cardEditFavorite'),card.fav===true);
 
     var noteField=document.getElementById('cardEditNoteField');
     var noteButton=document.getElementById('cardEditAddNote');
@@ -7201,6 +7229,7 @@ try {
       var _prevCardEntry=null,_prevCardIndex=-1,_pushedCardEntry=null;
       try{
         var entry;
+        var fav=favoriteSwitchIsOn(id?'cardEditFavorite':'cardCreateFavorite');
         if(id){
           var vaultIndex=(vault||[]).findIndex(function(item){
             return item&&item.type==='card'&&item.id===id;
@@ -7214,6 +7243,7 @@ try {
             expiry:expiry,
             cvv:cvv,
             notes:note,
+            fav:fav,
             updatedAt:Date.now()
           });
           vault[vaultIndex]=entry;
@@ -7223,7 +7253,8 @@ try {
             number:number,
             expiry:expiry,
             cvv:cvv,
-            notes:note
+            notes:note,
+            fav:fav
           });
           vault.push(entry);
           _pushedCardEntry=entry;
@@ -7249,6 +7280,7 @@ try {
     var cards=cardsRead();
     var now=Date.now();
 
+    var fav=favoriteSwitchIsOn(id?'cardEditFavorite':'cardCreateFavorite');
     if(id){
       var index=cards.findIndex(function(card){return card.id===id;});
       if(index===-1){
@@ -7261,6 +7293,7 @@ try {
         expiry:expiry,
         cvv:cvv,
         note:note,
+        fav:fav,
         updatedAt:now
       });
     }else{
@@ -7272,6 +7305,7 @@ try {
         expiry:expiry,
         cvv:cvv,
         note:note,
+        fav:fav,
         createdAt:now,
         updatedAt:now
       });
@@ -7450,6 +7484,7 @@ function vk2EntryToDocument(e){
     country:e.country||'',
     attachmentRef:e.attachmentRef||'',
     image:'',
+    fav:e.fav===true,
     createdAt:e.createdAt||0,
     updatedAt:e.updatedAt||0
   };
@@ -7530,8 +7565,8 @@ window.openDocumentSource=function(m){
 };
 window.handleDocumentFile=function(ev){var input=ev&&ev.target,file=input&&input.files&&input.files[0];if(!file)return;if(!file.type||!file.type.startsWith('image/')){toast('Selecciona un archivo de imagen válido','err');input.value='';return;}var r=new FileReader();r.onerror=function(){toast('No se pudo leer la imagen seleccionada','err');input.value='';};r.onload=function(){if(typeof r.result!=='string'||!r.result.startsWith('data:image/')){toast('La imagen seleccionada no es válida','err');input.value='';return;}image=r.result;modal('documentSourceSheet',false);if(editingId){document.getElementById('documentEditImage').src=image;show('documentEdit','right');}else{document.getElementById('documentPreviewImage').src=image;show('documentPreview','right');}input.value='';};r.readAsDataURL(file);};
 window.repeatDocumentSelection=function(){modal('documentSourceSheet',true);};
-window.openCreateDocumentForm=function(){if(!image||!category){toast('Selecciona primero una imagen','err');openTypePicker();return;}document.getElementById('documentCreateForm').reset();document.getElementById('documentCreateImage').src=image;document.getElementById('documentCreateName').value=label(category);document.getElementById('documentCreateMore').hidden=true;document.getElementById('documentCreateMoreButton').textContent='+ Más información';visual('documentCreate',category);show('documentCreate','right');};
-window.openEditDocument=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;editingId=d.id;category=d.category;image=await documentImageUrl(d);window.__vkCurrentDocumentId=d.id;document.getElementById('documentEditImage').src=image;document.getElementById('documentEditName').value=d.name||'';document.getElementById('documentEditExpiry').value=date(d.expiry);document.getElementById('documentEditIssuedBy').value=d.issuedBy||'';document.getElementById('documentEditCountry').value=d.country||'';visual('documentEdit',d.category);var more=!!(d.issuedBy||d.country);document.getElementById('documentEditMore').hidden=!more;document.getElementById('documentEditMoreButton').textContent=more?'− Menos información':'+ Más información';show('documentEdit','right');};
+window.openCreateDocumentForm=function(){if(!image||!category){toast('Selecciona primero una imagen','err');openTypePicker();return;}document.getElementById('documentCreateForm').reset();document.getElementById('documentCreateImage').src=image;document.getElementById('documentCreateName').value=label(category);document.getElementById('documentCreateMore').hidden=true;document.getElementById('documentCreateMoreButton').textContent='+ Más información';setFavoriteSwitchOff('documentCreateFavorite');visual('documentCreate',category);show('documentCreate','right');};
+window.openEditDocument=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;editingId=d.id;category=d.category;image=await documentImageUrl(d);window.__vkCurrentDocumentId=d.id;document.getElementById('documentEditImage').src=image;document.getElementById('documentEditName').value=d.name||'';document.getElementById('documentEditExpiry').value=date(d.expiry);document.getElementById('documentEditIssuedBy').value=d.issuedBy||'';document.getElementById('documentEditCountry').value=d.country||'';setFavoriteSwitch(document.getElementById('documentEditFavorite'),d.fav===true);visual('documentEdit',d.category);var more=!!(d.issuedBy||d.country);document.getElementById('documentEditMore').hidden=!more;document.getElementById('documentEditMoreButton').textContent=more?'− Menos información':'+ Más información';show('documentEdit','right');};
 window.openDocumentEditSource=function(){if(editingId)modal('documentSourceSheet',true);};
 window.formatDocumentExpiry=function(el){
   var v=String(el.value||'').replace(/\D/g,'').slice(0,8);
@@ -7594,6 +7629,7 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country){
     return false;
   }
 
+  var fav=favoriteSwitchIsOn(docId?'documentEditFavorite':'documentCreateFavorite');
   var items=read(),now=Date.now();
   try{
     var isEdit=!!docId;
@@ -7627,6 +7663,7 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country){
           issuer:issuedBy,
           country:country,
           attachmentRef:attachmentRef,
+          fav:fav,
           updatedAt:now
         });
       }else{
@@ -7636,7 +7673,8 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country){
           expiry:expiry,
           issuer:issuedBy,
           country:country,
-          attachmentRef:attachmentRef
+          attachmentRef:attachmentRef,
+          fav:fav
         });
         vkEntry.type='document';
         vkEntry.entryType='document';
@@ -7651,9 +7689,9 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country){
       if(isEdit){
         var i=items.findIndex(function(x){return x.id===docId;});
         if(i<0){showDocuments('left');return false;}
-        items[i]=Object.assign({},items[i],{category:category||items[i].category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:'',updatedAt:now});
+        items[i]=Object.assign({},items[i],{category:category||items[i].category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:'',fav:fav,updatedAt:now});
       }else{
-        items.push({id:docId,category:category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:'',createdAt:now,updatedAt:now});
+        items.push({id:docId,category:category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:'',fav:fav,createdAt:now,updatedAt:now});
       }
       write(items);
     }
