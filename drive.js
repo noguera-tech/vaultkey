@@ -11,7 +11,7 @@ const DRIVE_TOKEN_KEY = 'vk_drive_token';
 const DRIVE_LAST_SYNC_KEY = 'vk_drive_last_sync';
 const DRIVE_AUTO_KEY = 'vk_drive_auto';
 const DRIVE_TOKEN_SAFETY_MS = 60 * 1000;
-const DRIVE_KEEP_BACKUPS = 2; // TEMPORAL — prueba de limpieza. Revertir a 10 cuando el usuario confirme.
+const DRIVE_KEEP_BACKUPS = 10;
 
 let driveTokenClient = null;
 let driveUiState = 'disconnected';
@@ -97,11 +97,7 @@ function driveBackupFileName(timestamp) {
   const dd = String(date.getDate()).padStart(2, '0');
   const mm = String(date.getMonth() + 1).padStart(2, '0');
   const yyyy = date.getFullYear();
-  const hh = String(date.getHours()).padStart(2, '0');
-  const min = String(date.getMinutes()).padStart(2, '0');
-  // TEMPORAL — prueba de limpieza: nombre único por hora/minuto en vez de por día.
-  // Revertir a `VaultKey_Backup_${dd}${mm}${yyyy}.vkbak` cuando el usuario confirme.
-  return `VaultKey_Backup_${dd}${mm}${yyyy}_${hh}${min}.vkbak`;
+  return `VaultKey_Backup_${dd}${mm}${yyyy}.vkbak`;
 }
 
 function driveToast(message, sound) {
