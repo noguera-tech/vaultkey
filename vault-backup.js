@@ -257,12 +257,53 @@
       });
   }
 
+  // Traduce un error real de restore()/validateEnvelope() a un mensaje breve
+  // y comprensible para el usuario. No cambia el comportamiento de restore(),
+  // solo interpreta el error ya lanzado. Punto único de traducción para que
+  // importBackup() (app.js) y driveRestore() (drive.js) muestren el mismo
+  // criterio sin duplicar la lista de causas en dos sitios.
+  function normalizeText(value) {
+    var text = String(value || '');
+    return (text.normalize ? text.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : text).toLowerCase();
+  }
+
+  function restoreErrorMessage(error) {
+    // Credencial incorrecta: el propio WebCrypto del navegador lanza un
+    // OperationError nativo al desenvolver la clave con una contraseña o
+    // kit equivocados — no llega con un mensaje propio legible.
+    if (error && error.name === 'OperationError') {
+      return 'Contraseña o kit incorrectos.';
+    }
+
+    var msg = normalizeText(error && error.message);
+
+    if (msg.indexOf('rollback no pudo completarse') !== -1) {
+      return 'Restauración fallida sin poder revertir. No cierres la app.';
+    }
+    if (
+      msg.indexOf('formato valido') !== -1 ||
+      msg.indexOf('version de respaldo no soportada') !== -1 ||
+      msg.indexOf('politica de restauracion no soportada') !== -1
+    ) {
+      return 'El archivo no es un respaldo válido de VaultKey.';
+    }
+    if (msg.indexOf('debe tener 6') !== -1) {
+      return 'El PIN debe tener 6 dígitos.';
+    }
+    if (msg.indexOf('no se pudo verificar') !== -1) {
+      return 'No se pudo guardar la restauración. Inténtalo de nuevo.';
+    }
+
+    return 'No se pudo restaurar el respaldo. Inténtalo de nuevo.';
+  }
+
   return {
     BACKUP_VERSION: BACKUP_VERSION,
     createEnvelope: createEnvelope,
     validateEnvelope: validateEnvelope,
     validateBlob: validateBlob,
     validateAttachments: validateAttachments,
-    restore: restore
+    restore: restore,
+    restoreErrorMessage: restoreErrorMessage
   };
 });
