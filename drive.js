@@ -523,6 +523,7 @@ async function driveRestore() {
         if (!confirmed) { driveSyncUI(); return false; }
       }
 
+      let credential = null;
       const credentialText = await (typeof window.openRestoreCredentialModal === 'function'
         ? window.openRestoreCredentialModal({
             title: 'Restaurar copia',
@@ -530,7 +531,16 @@ async function driveRestore() {
             helper: 'Introduce tu contraseña maestra o kit de emergencia.',
             placeholder: 'Introduce tu contraseña maestra o kit...',
             confirmText: 'Restaurar',
-            cancelText: 'Cancelar'
+            cancelText: 'Cancelar',
+            onValidate: async (text) => {
+              const cred = typeof window.normalizeRestoreCredentialInput === 'function'
+                ? window.normalizeRestoreCredentialInput(text)
+                : (/^VK2/i.test(String(text).trim())
+                    ? { kitCode: String(text).trim() }
+                    : { master: String(text).trim() });
+              await window.vkCrypto.openVaultBlob(raw.vk2_blob, cred);
+              credential = cred;
+            }
           })
         : Promise.resolve(prompt('Introduce tu contraseña maestra o kit de emergencia:')));
 
@@ -539,11 +549,13 @@ async function driveRestore() {
         return false;
       }
 
-      const credential = typeof window.normalizeRestoreCredentialInput === 'function'
-        ? window.normalizeRestoreCredentialInput(credentialText)
-        : (/^VK2/i.test(String(credentialText).trim())
-            ? { kitCode: String(credentialText).trim() }
-            : { master: String(credentialText).trim() });
+      if (!credential) {
+        credential = typeof window.normalizeRestoreCredentialInput === 'function'
+          ? window.normalizeRestoreCredentialInput(credentialText)
+          : (/^VK2/i.test(String(credentialText).trim())
+              ? { kitCode: String(credentialText).trim() }
+              : { master: String(credentialText).trim() });
+      }
 
       const pin = await (typeof window.openRestorePinModal === 'function'
         ? window.openRestorePinModal({
@@ -583,7 +595,10 @@ async function driveRestore() {
   } catch (error) {
     driveSyncUI();
     console.error('Drive: No se pudo restaurar el respaldo', error);
-    const retry = await driveShowRestoreErrorModal();
+    const message = (typeof window.vkBackup !== 'undefined' && typeof window.vkBackup.restoreErrorMessage === 'function')
+      ? window.vkBackup.restoreErrorMessage(error)
+      : null;
+    const retry = await driveShowRestoreErrorModal(message);
     if (retry) return driveRestore();
     return false;
   }
@@ -591,13 +606,18 @@ async function driveRestore() {
 
 let _driveRestoreErrorResolver = null;
 
-function driveShowRestoreErrorModal() {
+function driveShowRestoreErrorModal(message) {
   return new Promise((resolve) => {
     _driveRestoreErrorResolver = resolve;
     const modal = document.getElementById('driveRestoreErrorModal');
     const cancelBtn = document.getElementById('driveRestoreErrorCancel');
     const retryBtn = document.getElementById('driveRestoreErrorRetry');
+    const bodyEl = document.getElementById('driveRestoreErrorBody');
     if (!modal || !cancelBtn || !retryBtn) { resolve(false); return; }
+
+    if (bodyEl && message) {
+      bodyEl.textContent = message;
+    }
 
     function close(result) {
       modal.classList.remove('open');

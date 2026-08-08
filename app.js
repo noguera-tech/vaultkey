@@ -2290,20 +2290,49 @@ function openRestoreCredentialModal(options = {}) {
       };
     }
 
-    if (ok) ok.textContent = options.confirmText || 'Restaurar';
+    const okDefaultText = options.confirmText || 'Restaurar';
+    if (ok) ok.textContent = okDefaultText;
     if (cancel) cancel.textContent = options.cancelText || 'Cancelar';
 
-    if (ok) ok.onclick = () => {
+    if (ok) ok.onclick = async () => {
       const raw = String(input && input.value || '').trim();
       if (!raw) {
         if (typeof toast === 'function') toast('Introduce tu contraseña maestra o kit de emergencia', 'err');
         if (input) input.focus();
         return;
       }
+
+      // Si el llamador pide verificación (options.onValidate), se intenta
+      // descifrar con la credencial antes de cerrar el modal. Si falla, el
+      // modal se queda abierto con el error, sin llegar a pedir el PIN.
+      if (typeof options.onValidate === 'function') {
+        ok.disabled = true;
+        ok.textContent = 'Verificando...';
+        if (cancel) cancel.disabled = true;
+        if (input) input.disabled = true;
+        try {
+          await options.onValidate(raw);
+        } catch (err) {
+          ok.disabled = false;
+          ok.textContent = okDefaultText;
+          if (cancel) cancel.disabled = false;
+          if (input) { input.disabled = false; input.focus(); }
+          const msg = (typeof vkBackup !== 'undefined' && typeof vkBackup.restoreErrorMessage === 'function')
+            ? vkBackup.restoreErrorMessage(err)
+            : 'Contraseña o kit incorrectos.';
+          if (typeof toast === 'function') toast(msg, 'err');
+          return;
+        }
+        ok.disabled = false;
+        ok.textContent = okDefaultText;
+        if (cancel) cancel.disabled = false;
+        if (input) input.disabled = false;
+      }
+
       closeRestoreCredentialModal(raw);
     };
 
-    if (cancel) cancel.onclick = () => closeRestoreCredentialModal(null);
+    if (cancel) cancel.onclick = () => { if (!cancel.disabled) closeRestoreCredentialModal(null); };
 
     if (modal) {
       modal.classList.add('open');
@@ -2550,6 +2579,7 @@ async function importBackup(file) {
         if(!ok) return;
       }
 
+      let credential = null;
       const credentialText = await (typeof window.openRestoreCredentialModal === 'function'
         ? window.openRestoreCredentialModal({
             title: 'Restaurar copia',
@@ -2557,7 +2587,16 @@ async function importBackup(file) {
             helper: 'Introduce tu contraseña maestra o kit de emergencia.',
             placeholder: 'Introduce tu contraseña maestra o kit...',
             confirmText: 'Restaurar',
-            cancelText: 'Cancelar'
+            cancelText: 'Cancelar',
+            onValidate: async (text) => {
+              const cred = typeof window.normalizeRestoreCredentialInput === 'function'
+                ? window.normalizeRestoreCredentialInput(text)
+                : (/^VK2/i.test(String(text).trim())
+                    ? { kitCode: String(text).trim() }
+                    : { master: String(text).trim() });
+              await vkCrypto.openVaultBlob(data.vk2_blob, cred);
+              credential = cred;
+            }
           })
         : Promise.resolve(prompt('Introduce tu contraseña maestra o kit de emergencia:')));
 
@@ -2565,11 +2604,13 @@ async function importBackup(file) {
         return;
       }
 
-      const credential = typeof window.normalizeRestoreCredentialInput === 'function'
-        ? window.normalizeRestoreCredentialInput(credentialText)
-        : (/^VK2/i.test(String(credentialText).trim())
-            ? { kitCode: String(credentialText).trim() }
-            : { master: String(credentialText).trim() });
+      if (!credential) {
+        credential = typeof window.normalizeRestoreCredentialInput === 'function'
+          ? window.normalizeRestoreCredentialInput(credentialText)
+          : (/^VK2/i.test(String(credentialText).trim())
+              ? { kitCode: String(credentialText).trim() }
+              : { master: String(credentialText).trim() });
+      }
 
       const pin = await (typeof window.openRestorePinModal === 'function'
         ? window.openRestorePinModal({
@@ -2613,7 +2654,10 @@ async function importBackup(file) {
     openImportModal(file);
   }catch(err){
     console.error('importBackup:',err);
-    toast('No se pudo importar el respaldo','err');
+    const msg=(typeof vkBackup!=='undefined'&&typeof vkBackup.restoreErrorMessage==='function')
+      ?vkBackup.restoreErrorMessage(err)
+      :'No se pudo importar el respaldo';
+    toast(msg,'err');
   }
 }
 
