@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#020b18">
 <meta name="google-site-verification" content="_8meo7ShNT42Ti3V1tBcEr4MHRVlIMoDhp6uBMfpl_s" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.googleusercontent.com; connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com https://www.google.com; frame-src 'none'; object-src 'none'; base-uri 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.googleusercontent.com https://www.figma.com; connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com https://www.google.com; frame-src 'none'; object-src 'none'; base-uri 'self';">
 <title>VaultKey</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -40,7 +40,7 @@ html,body{margin:0;background:#070B14}
 .vk-danger-header-spacer{width:32px;height:32px}
 .vk-danger-content{box-sizing:border-box;position:relative;width:min(365px,calc(100% - 40px));height:calc(100dvh - 64px);min-height:0;margin:0 auto;padding:101px 0 max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;overflow:hidden}
 .vk-danger-actions{width:100%;display:flex;flex-direction:column;gap:15px}
-.vk-danger-card{box-sizing:border-box;position:relative;width:100%;height:72px;min-height:72px;padding:0 18px 0 22px;border:1px solid rgba(58,74,96,.6);border-radius:16px;background:#243246;color:#fff;display:grid;grid-template-columns:46px minmax(0,1fr) 24px;align-items:center;text-align:left;cursor:pointer;appearance:none;-webkit-appearance:none;transition:border-color 300ms ease-in-out,background-color 300ms ease-in-out,opacity 300ms ease-in-out,transform 300ms ease-in-out}
+.vk-danger-card{box-sizing:border-box;position:relative;width:100%;height:72px;min-height:72px;padding:0 18px 0 22px;border:1px solid rgba(58,74,96,.6);border-radius:16px;background:#243246;color:#fff;display:grid;grid-template-columns:46px minmax(0,1fr) 24px;align-items:center;text-align:center !important;cursor:pointer;appearance:none;-webkit-appearance:none;transition:border-color 300ms ease-in-out,background-color 300ms ease-in-out,opacity 300ms ease-in-out,transform 300ms ease-in-out}
 .vk-danger-card:hover{border-color:rgba(90,112,142,.78)}
 .vk-danger-card:active{opacity:.82;transform:scale(.985)}
 .vk-danger-card:focus-visible{outline:2px solid rgba(0,217,255,.45);outline-offset:2px}
@@ -295,7 +295,9 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 #confirmModal.vk-confirm--drive-restore .sheet{padding-top:15px}
 #confirmModal.vk-confirm--drive-restore .sheetHead{position:relative;min-height:32px;padding-left:38px}
 #confirmModal.vk-confirm--drive-restore .sheetTitle{text-align:left}
-#confirmModal.vk-confirm--drive-restore .vk-confirm-icon{display:block;position:absolute;left:24px;top:20px;width:24px;height:24px;color:#3b82f6}
+#confirmModal.vk-confirm--drive-restore .vk-confirm-icon{display:none}
+#confirmDriveRestoreIcon{display:none}
+#confirmModal.vk-confirm--drive-restore #confirmDriveRestoreIcon{display:block}
 #confirmModal.vk-confirm--drive-restore .vk-confirm-icon svg{display:block;width:100%;height:100%}
 #confirmModal.vk-confirm--drive-restore #confirmMsg{margin:36px auto 0;max-width:249px;font-size:12px;line-height:1.25}
 
@@ -381,6 +383,110 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
   background:#f59e0b;
   color:#fff
 }
+
+#restoreCredentialModal,#restorePinModal,#driveRestoreErrorModal{
+  inset:0;
+  padding:16px;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,7,18,.85);
+  z-index:1201
+}
+#restoreCredentialModal .sheet,#restorePinModal .sheet{
+  box-sizing:border-box;
+  position:relative;
+  width:300px;
+  max-width:calc(100vw - 32px);
+  height:240px;
+  max-height:none;
+  overflow:hidden;
+  border:1px solid #030508;
+  border-radius:16px;
+  background:#243246;
+  box-shadow:none
+}
+#restoreCredentialModal .sheet{
+  padding:20px 24px
+}
+#restorePinModal .sheet{
+  padding:15px 24px 20px
+}
+#restoreCredentialModal .sheetHead,#restorePinModal .sheetHead{
+  display:block;
+  margin:0;
+  position:relative;
+  min-height:32px;
+  padding-left:38px
+}
+#restoreCredentialModal .sheetTitle,#restorePinModal .sheetTitle{
+  margin:0;
+  color:#fff;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:24px;
+  line-height:1.15;
+  font-weight:700;
+  text-align:left;
+  text-shadow:none
+}
+#restoreCredentialModal .vk-confirm-icon,#restorePinModal .vk-confirm-icon{
+  display:block;
+  position:absolute;
+  left:24px;
+  top:28px;
+  width:20px;
+  height:20px;
+  color:#3b82f6
+}
+#restoreCredentialModal .vk-confirm-icon svg,#restorePinModal .vk-confirm-icon svg{
+  display:block;
+  width:100%;
+  height:100%
+}
+#restoreCredentialModal .rowBtns,#restorePinModal .rowBtns{
+  position:absolute;
+  left:24px;
+  right:24px;
+  bottom:20px;
+  display:grid;
+  grid-template-columns:85px 85px;
+  justify-content:space-between;
+  gap:0
+}
+#restoreCredentialModal .rowBtns>button,#restorePinModal .rowBtns>button{
+  box-sizing:border-box;
+  width:85px;
+  height:43px;
+  min-width:0;
+  padding:0;
+  border:1px solid #3a4a60;
+  border-radius:16px;
+  font-family:Inter,system-ui,sans-serif;
+  font-size:14px;
+  line-height:normal;
+  font-weight:400;
+  color:#fff;
+  box-shadow:none;
+  cursor:pointer
+}
+#restoreCredentialModal .rowBtns>button:first-child,#restorePinModal .rowBtns>button:first-child{
+  background:transparent
+}
+#restoreCredentialModal .rowBtns>button:last-child,#restorePinModal .rowBtns>button:last-child{
+  border-color:#3a4a60;
+  background:#f59e0b;
+  color:#fff
+}
+#restoreCredentialModal .sub,#restorePinModal .sub{
+  color:rgba(167,182,201,.8)
+}
+#restoreCredentialModal #restoreCredentialInput,#restorePinModal #restorePinInput{
+  width:100%;
+  box-sizing:border-box;
+  background:#182F4E;
+  border:1px solid rgba(58,74,96,.6);
+  color:#fff
+}
+
 #confirmModal.vk-confirm--drive-connect-error #confirmCancel:active,
 #confirmModal.vk-confirm--drive-connect-error #confirmOk:active{
   opacity:.84;
@@ -1134,7 +1240,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
     </button>
   </header>
 
-  <form id="noteCreateForm" class="vk-note-form" onsubmit="event.preventDefault();saveNote(null,document.getElementById('noteCreateTitleInput').value,document.getElementById('noteCreateContentInput').value)">
+  <form id="noteCreateForm" class="vk-note-form" onsubmit="event.preventDefault();saveNote(null,document.getElementById('noteCreateTitleInput').value,document.getElementById('noteCreateContentInput').value,document.getElementById('noteCreateFavorite')?.getAttribute('aria-checked')==='true')">
     <h1 id="noteCreateTitle" class="vk-note-screen-title">Añadir nota</h1>
 
     <label class="vk-note-field">
@@ -1146,6 +1252,19 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       <span>Descripción</span>
       <textarea id="noteCreateContentInput" maxlength="10000" placeholder="Escribe una nota..."></textarea>
     </label>
+
+    <div class="vk-note-favorite">
+      <span>Añadir a favoritos</span>
+      <button id="noteCreateFavorite"
+              class="vk-note-favorite-switch"
+              type="button"
+              role="switch"
+              aria-checked="false"
+              aria-label="Añadir a favoritos"
+              onclick="toggleNoteCreateFavorite()">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
 
     <div class="vk-note-form-actions">
       <button type="button" class="vk-note-form-cancel" onclick="showNotes('left')">Cancelar</button>
@@ -1163,7 +1282,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
     </button>
   </header>
 
-  <form id="noteEditForm" class="vk-note-form" onsubmit="event.preventDefault();saveNote(window.__vkCurrentNoteId,document.getElementById('noteEditTitleInput').value,document.getElementById('noteEditContentInput').value)">
+  <form id="noteEditForm" class="vk-note-form" onsubmit="event.preventDefault();saveNote(window.__vkCurrentNoteId,document.getElementById('noteEditTitleInput').value,document.getElementById('noteEditContentInput').value,document.getElementById('noteEditFavorite')?.getAttribute('aria-checked')==='true')">
     <h1 id="noteEditTitle" class="vk-note-screen-title">Editar nota</h1>
 
     <label class="vk-note-field">
@@ -1175,6 +1294,19 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       <span>Descripción</span>
       <textarea id="noteEditContentInput" maxlength="10000"></textarea>
     </label>
+
+    <div class="vk-note-favorite">
+      <span>Añadir a favoritos</span>
+      <button id="noteEditFavorite"
+              class="vk-note-favorite-switch"
+              type="button"
+              role="switch"
+              aria-checked="false"
+              aria-label="Añadir a favoritos"
+              onclick="toggleNoteEditFavorite()">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
 
     <div class="vk-note-form-actions">
       <button type="button" class="vk-note-form-cancel" onclick="showNoteDetail(window.__vkCurrentNoteId)">Cancelar</button>
@@ -1337,7 +1469,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
     </button>
   </header>
 
-  <form id="cardCreateForm" class="vk-card-form" onsubmit="event.preventDefault();saveCard(null,document.getElementById('cardCreateHolder').value,document.getElementById('cardCreateNumber').value,document.getElementById('cardCreateExpiry').value,document.getElementById('cardCreateCvv').value,document.getElementById('cardCreateNote').value)">
+  <form id="cardCreateForm" class="vk-card-form" onsubmit="event.preventDefault();saveCard(null,document.getElementById('cardCreateHolder').value,document.getElementById('cardCreateNumber').value,document.getElementById('cardCreateExpiry').value,document.getElementById('cardCreateCvv').value,document.getElementById('cardCreateNote').value,document.getElementById('cardCreateFavorite')?.getAttribute('aria-checked')==='true')">
     <h1 id="cardCreateTitle" class="vk-card-screen-title">Añadir tarjeta</h1>
 
     <label class="vk-card-field">
@@ -1376,6 +1508,19 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       </div>
     </label>
 
+    <div class="vk-note-favorite">
+      <span>Añadir a favoritos</span>
+      <button id="cardCreateFavorite"
+              class="vk-note-favorite-switch"
+              type="button"
+              role="switch"
+              aria-checked="false"
+              aria-label="Añadir a favoritos"
+              onclick="toggleCardCreateFavorite()">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
+
     <button id="cardCreateAddNote" type="button" class="vk-card-add-note" onclick="toggleCardNoteField('cardCreate')">+ Añadir nota</button>
 
     <label id="cardCreateNoteField" class="vk-card-field vk-card-note-field" hidden>
@@ -1399,7 +1544,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
     </button>
   </header>
 
-  <form id="cardEditForm" class="vk-card-form" onsubmit="event.preventDefault();saveCard(window.__vkCurrentCardId,document.getElementById('cardEditHolder').value,document.getElementById('cardEditNumber').value,document.getElementById('cardEditExpiry').value,document.getElementById('cardEditCvv').value,document.getElementById('cardEditNote').value)">
+  <form id="cardEditForm" class="vk-card-form" onsubmit="event.preventDefault();saveCard(window.__vkCurrentCardId,document.getElementById('cardEditHolder').value,document.getElementById('cardEditNumber').value,document.getElementById('cardEditExpiry').value,document.getElementById('cardEditCvv').value,document.getElementById('cardEditNote').value,document.getElementById('cardEditFavorite')?.getAttribute('aria-checked')==='true')">
     <h1 id="cardEditTitle" class="vk-card-screen-title">Editar tarjeta</h1>
 
     <label class="vk-card-field">
@@ -1437,6 +1582,19 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
         </button>
       </div>
     </label>
+
+    <div class="vk-note-favorite">
+      <span>Añadir a favoritos</span>
+      <button id="cardEditFavorite"
+              class="vk-note-favorite-switch"
+              type="button"
+              role="switch"
+              aria-checked="false"
+              aria-label="Añadir a favoritos"
+              onclick="toggleCardEditFavorite()">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
 
     <button id="cardEditAddNote" type="button" class="vk-card-add-note" onclick="toggleCardNoteField('cardEdit')">+ Añadir nota</button>
 
@@ -1507,7 +1665,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 
 <section id="documentCreate" class="screen vk-document-form-screen">
   <header class="vk-document-editor-topbar"><button type="button" class="vk-note-back" aria-label="Volver" onclick="show('documentPreview','left')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button></header>
-  <form id="documentCreateForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(null,documentCreateName.value,documentCreateExpiry.value,documentCreateIssuedBy.value,documentCreateCountry.value)">
+  <form id="documentCreateForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(null,documentCreateName.value,documentCreateExpiry.value,documentCreateIssuedBy.value,documentCreateCountry.value,document.getElementById('documentCreateFavorite')?.getAttribute('aria-checked')==='true')">
     <h1 class="vk-document-screen-title">Añadir documento</h1><div class="vk-document-category-line"><span id="documentCreateCategoryIcon"></span><strong id="documentCreateCategory"></strong></div>
     <article class="vk-document-form-card"><span class="vk-document-preview-label">Vista previa</span><img id="documentCreateImage" class="vk-document-form-image" alt="Documento">
       <label class="vk-document-field"><span>Nombre</span><input id="documentCreateName" type="text" maxlength="150"></label>
@@ -1515,6 +1673,18 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       <label class="vk-document-field"><span>Caduca</span><input id="documentCreateExpiry" type="text" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" oninput="formatDocumentExpiry(this)"></label>
       <div id="documentCreateMore" class="vk-document-more-fields" hidden><label class="vk-document-field"><span>Emitido por</span><input id="documentCreateIssuedBy" type="text" maxlength="150"></label><label class="vk-document-field"><span>País</span><input id="documentCreateCountry" type="text" maxlength="100"></label></div>
     </article>
+    <div class="vk-note-favorite">
+      <span>Añadir a favoritos</span>
+      <button id="documentCreateFavorite"
+              class="vk-note-favorite-switch"
+              type="button"
+              role="switch"
+              aria-checked="false"
+              aria-label="Añadir a favoritos"
+              onclick="toggleDocumentCreateFavorite()">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
     <div class="vk-document-form-actions"><button type="button" class="vk-document-button-secondary" onclick="showDocuments('left')">Cancelar</button><button type="submit" class="vk-document-button-primary">Crear</button></div>
   </form>
 </section>
@@ -1529,7 +1699,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 
 <section id="documentEdit" class="screen vk-document-form-screen">
   <header class="vk-document-editor-topbar"><button type="button" class="vk-note-back" aria-label="Volver al detalle" onclick="showDocumentDetail(window.__vkCurrentDocumentId)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button></header>
-  <form id="documentEditForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(window.__vkCurrentDocumentId,documentEditName.value,documentEditExpiry.value,documentEditIssuedBy.value,documentEditCountry.value)">
+  <form id="documentEditForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(window.__vkCurrentDocumentId,documentEditName.value,documentEditExpiry.value,documentEditIssuedBy.value,documentEditCountry.value,document.getElementById('documentEditFavorite')?.getAttribute('aria-checked')==='true')">
     <h1 class="vk-document-screen-title">Editar documento</h1><div class="vk-document-category-line"><span id="documentEditCategoryIcon"></span><strong id="documentEditCategory"></strong></div>
     <article class="vk-document-form-card"><span class="vk-document-preview-label">Vista previa</span><img id="documentEditImage" class="vk-document-form-image" alt="Documento"><button type="button" class="vk-document-replace-button" onclick="openDocumentEditSource()">Repetir escaneo/importar</button>
       <label class="vk-document-field"><span>Nombre</span><input id="documentEditName" type="text" maxlength="150"></label>
@@ -1537,6 +1707,18 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
       <button id="documentEditMoreButton" type="button" class="vk-document-more-button" onclick="toggleDocumentMoreInfo('documentEdit')">+ Más información</button>
       <div id="documentEditMore" class="vk-document-more-fields" hidden><label class="vk-document-field"><span>Emitido por</span><input id="documentEditIssuedBy" type="text" maxlength="150"></label><label class="vk-document-field"><span>País</span><input id="documentEditCountry" type="text" maxlength="100"></label></div>
     </article>
+    <div class="vk-note-favorite">
+      <span>Añadir a favoritos</span>
+      <button id="documentEditFavorite"
+              class="vk-note-favorite-switch"
+              type="button"
+              role="switch"
+              aria-checked="false"
+              aria-label="Añadir a favoritos"
+              onclick="toggleDocumentEditFavorite()">
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
     <div class="vk-document-form-actions"><button type="button" class="vk-document-button-secondary" onclick="showDocumentDetail(window.__vkCurrentDocumentId)">Cancelar</button><button type="submit" class="vk-document-button-primary">Guardar</button></div>
   </form>
 </section>
@@ -2476,7 +2658,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
         <span class="vk-drive-copy"><strong>Crear copia de seguridad</strong><small>Subir ahora</small></span>
       </button>
       <button id="driveRestoreCard" type="button" class="vk-drive-card" data-drive-action="restore" hidden>
-        <span class="vk-drive-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14a2 2 0 0 0 2-2v-3"/><path d="M3 16v3a2 2 0 0 0 2 2"/></svg></span>
+        <span class="vk-drive-icon" aria-hidden="true"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14.3333V1M21 14.3333V18.7778C21 19.3671 20.7659 19.9324 20.3491 20.3491C19.9324 20.7659 19.3671 21 18.7778 21H3.22222C2.63285 21 2.06762 20.7659 1.65087 20.3491C1.23413 19.9324 1 19.3671 1 18.7778V14.3333"/><path d="M5.44434 8.77783L10.9999 14.3334L16.5554 8.77783"/></svg></span>
         <span class="vk-drive-copy"><strong>Restaurar copia</strong><small>Desde Google Drive</small></span>
         <span class="vk-drive-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
@@ -3537,9 +3719,9 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 
 <div class="modal" id="confirmModal">
   <div class="sheet">
-    <span class="vk-confirm-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14a2 2 0 0 0 2-2v-3"/><path d="M3 16v3a2 2 0 0 0 2 2"/></svg></span>
+    <div id="confirmDriveRestoreIcon" aria-hidden="true" style="position:absolute;left:28px;top:24px;width:24px;height:24px;color:#3b82f6"><svg viewBox="0 0 22 22" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;width:100%;height:100%"><path d="M11 14.3333V1M21 14.3333V18.7778C21 19.3671 20.7659 19.9324 20.3491 20.3491C19.9324 20.7659 19.3671 21 18.7778 21H3.22222C2.63285 21 2.06762 20.7659 1.65087 20.3491C1.23413 19.9324 1 19.3671 1 18.7778V14.3333"></path><path d="M5.44434 8.77783L10.9999 14.3334L16.5554 8.77783"></path></svg></div>
     <span class="vk-confirm-icon vk-confirm-icon--backup-create" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14a2 2 0 0 0 2-2v-3"/><path d="M3 15v3a2 2 0 0 0 2 2"/></svg></span>
-    <span class="vk-confirm-icon vk-confirm-icon--backup-restore" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"/></svg></span>
+    <span class="vk-confirm-icon vk-confirm-icon--backup-restore" aria-hidden="true"><img alt="" src="https://www.figma.com/api/mcp/asset/e2ce0c0a-0c6a-4eb8-bf14-c0b0d7b6bdde.svg" style="display:block;width:100%;height:100%"></span>
     <div class="sheetHead">
       <div class="sheetTitle" id="confirmTitle">Confirmar acción</div>
       <div class="spacer"></div>
@@ -4118,6 +4300,7 @@ document.addEventListener("DOMContentLoaded",function(){
 <script src="models.js"></script>
 
 <!-- fin núcleo 2.0 -->
+<script src="vault-backup.js"></script>
 <script src="drive.js"></script>
 <script src="app.js"></script>
 
@@ -4699,6 +4882,72 @@ if(typeof legacyHandleVisibilityChange==="function"){
       </div>
 
       <button class="btn" onclick="closeModals()" style="width:100%">Entendido</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="modal" id="restoreCredentialModal">
+  <div class="sheet" style="box-sizing:border-box;position:relative;width:300px;height:240px;max-width:calc(100vw - 32px);max-height:none;overflow:hidden;padding:0;border:1px solid #030508;border-radius:16px;background:#243246;box-shadow:none">
+    <div aria-hidden="true" style="position:absolute;left:30px;top:28px;width:20px;height:20px;color:#3b82f6">
+      <svg viewBox="0 0 22 22" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;width:100%;height:100%">
+        <path d="M11 14.3333V1M21 14.3333V18.7778C21 19.3671 20.7659 19.9324 20.3491 20.3491C19.9324 20.7659 19.3671 21 18.7778 21H3.22222C2.63285 21 2.06762 20.7659 1.65087 20.3491C1.23413 19.9324 1 19.3671 1 18.7778V14.3333"></path>
+        <path d="M5.44434 8.77783L10.9999 14.3334L16.5554 8.77783"></path>
+      </svg>
+    </div>
+    <div id="restoreCredentialTitle" style="position:absolute;left:66px;top:25px;width:202px;height:26px;color:#fff;font-family:Inter,system-ui,sans-serif;font-size:24px;line-height:1.08;font-weight:700;text-align:center;word-break:break-word;overflow:hidden">Restaurar copia</div>
+
+    <p id="restoreCredentialLabel" style="position:absolute;left:46px;top:77px;width:154px;height:15px;margin:0;color:rgba(167,182,201,.8);font-family:Inter,system-ui,sans-serif;font-size:12px;line-height:1.25;font-weight:500;text-align:left">Contraseña maestra o kit</p>
+
+    <p id="restoreCredentialHelper" aria-hidden="true" style="display:none;margin:0"></p>
+
+    <textarea id="restoreCredentialInput" class="inp" name="vk-restore-credential" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" rows="2" wrap="soft"
+      style="position:absolute;left:34px;top:96px;width:232px;height:49px;box-sizing:border-box;border:1px solid rgba(58,74,96,.6);border-radius:16px;background:#182F4E;color:#fff;font:inherit;font-size:10px;line-height:1.3;padding:14px 12px;outline:none;resize:none;overflow:visible;white-space:pre-wrap;word-wrap:break-word;overflow-wrap:break-word;word-break:normal;-webkit-text-security:disc;text-align:center"
+      placeholder=" "></textarea>
+    <span aria-hidden="true" style="position:absolute;left:34px;top:96px;width:232px;height:49px;box-sizing:border-box;padding:9px 14px;pointer-events:none;color:rgba(167,182,201,.8);font-family:Inter,system-ui,sans-serif;font-size:10px;line-height:1.3;text-align:center;white-space:normal;word-wrap:break-word;overflow-wrap:break-word;display:flex;align-items:center;justify-content:center">Introduce tu contraseña maestra o kit de emergencia.</span>
+    <style>#restoreCredentialInput:not(:placeholder-shown) + span{display:none !important}</style>
+
+    <div class="rowBtns" style="position:absolute;left:0;top:0;width:300px;height:240px;pointer-events:none">
+      <button type="button" id="restoreCredentialCancel" style="pointer-events:auto;position:absolute;left:40px;top:172px;width:85px;height:42.57766342163086px;min-width:0;padding:0;border:1px solid #3a4a60;border-radius:16px;font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:400;color:#fff;background:transparent;box-shadow:none;cursor:pointer">Cancelar</button>
+      <button type="button" id="restoreCredentialOk" style="pointer-events:auto;position:absolute;left:190px;top:172px;width:85px;height:42.57766342163086px;min-width:0;padding:0;border:1px solid #3a4a60;border-radius:16px;font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:400;color:#fff;background:#f59e0b;box-shadow:none;cursor:pointer">Restaurar</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" id="restorePinModal">
+  <div class="sheet" style="box-sizing:border-box;position:relative;width:300px;height:240px;max-width:calc(100vw - 32px);max-height:none;overflow:hidden;padding:0;border:1px solid #030508;border-radius:16px;background:#243246;box-shadow:none">
+    <div aria-hidden="true" style="position:absolute;left:24px;top:20px;width:24px;height:24px;color:#3b82f6">
+      <svg viewBox="0 0 22 22" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;width:100%;height:100%">
+        <path d="M11 14.3333V1M21 14.3333V18.7778C21 19.3671 20.7659 19.9324 20.3491 20.3491C19.9324 20.7659 19.3671 21 18.7778 21H3.22222C2.63285 21 2.06762 20.7659 1.65087 20.3491C1.23413 19.9324 1 19.3671 1 18.7778V14.3333"></path>
+        <path d="M5.44434 8.77783L10.9999 14.3334L16.5554 8.77783"></path>
+      </svg>
+    </div>
+    <div id="restorePinTitle" style="position:absolute;left:57px;top:25px;width:234px;height:26px;color:#fff;font-family:Inter,system-ui,sans-serif;font-size:24px;line-height:1.08;font-weight:700;text-align:center;word-break:break-word;overflow:hidden">PIN de restauración</div>
+
+    <p id="restorePinLabel" style="position:absolute;left:57px;top:68px;width:33px;height:15px;margin:0;color:rgba(167,182,201,.8);font-family:Inter,system-ui,sans-serif;font-size:12px;line-height:1.25;font-weight:500;text-align:left">PIN</p>
+    <p id="restorePinHelper" style="position:absolute;left:53px;top:145px;width:117px;height:15px;margin:0;color:rgba(167,182,201,.8);font-family:Inter,system-ui,sans-serif;font-size:10px;line-height:1.25;font-weight:500;text-align:left">Debe tener 6 dígitos.</p>
+
+    <input id="restorePinInput" type="password" class="inp" name="vk-restore-pin" autocomplete="new-password" inputmode="numeric" maxlength="6" pattern="[0-9]*" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true"
+      style="position:absolute;left:53px;top:91px;width:220px;height:43px;box-sizing:border-box;border:1px solid rgba(58,74,96,.6);border-radius:16px;background:#182F4E;color:#fff;font:inherit;font-size:12px;line-height:1.2;padding:0 16px;outline:none;text-overflow:ellipsis;text-align:center;letter-spacing:2px"
+      placeholder="Introduce 6 dígitos">
+
+    <div class="rowBtns" style="position:absolute;left:0;top:0;width:300px;height:240px;pointer-events:none">
+      <button type="button" id="restorePinCancel" style="pointer-events:auto;position:absolute;left:40px;top:172px;width:85px;height:42.57766342163086px;min-width:0;padding:0;border:1px solid #3a4a60;border-radius:16px;font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:400;color:#fff;background:transparent;box-shadow:none;cursor:pointer">Atrás</button>
+      <button type="button" id="restorePinOk" style="pointer-events:auto;position:absolute;left:190px;top:172px;width:85px;height:42.57766342163086px;min-width:0;padding:0;border:1px solid #3a4a60;border-radius:16px;font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:400;color:#fff;background:#f59e0b;box-shadow:none;cursor:pointer">Restaurar</button>
+    </div>
+  </div>
+</div>
+<div class="modal" id="driveRestoreErrorModal">
+  <div class="sheet" style="box-sizing:border-box;position:relative;width:300px;height:240px;max-width:calc(100vw - 32px);max-height:none;overflow:hidden;padding:0;border:1px solid rgba(58,74,96,.6);border-radius:16px;background:#243246;box-shadow:none">
+    <div id="driveRestoreErrorTitle" style="position:absolute;left:20px;top:22px;width:260px;color:#fff;font-family:Inter,system-ui,sans-serif;font-size:24px;line-height:1.15;font-weight:700;text-align:center;word-break:break-word">No se pudo restaurar el respaldo</div>
+    <p id="driveRestoreErrorSubtitle" style="position:absolute;left:12px;top:90px;width:276px;margin:0;color:rgba(167,182,201,.8);font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:1.3;font-weight:500;text-align:center">No hemos podido restaurar tu respaldo</p>
+    <p id="driveRestoreErrorBody" style="position:absolute;left:32px;top:118px;width:236px;margin:0;color:rgba(167,182,201,.8);font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:1.3;font-weight:500;text-align:center">Comprueba tu respaldo e inténtalo de nuevo.</p>
+    <div class="rowBtns" style="position:absolute;left:0;top:0;width:300px;height:240px;pointer-events:none">
+      <button type="button" id="driveRestoreErrorCancel" style="pointer-events:auto;position:absolute;left:40px;top:172px;width:85px;height:43px;min-width:0;padding:0;border:1px solid #3a4a60;border-radius:16px;font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:400;color:#fff;background:transparent;box-shadow:none;cursor:pointer">Cancelar</button>
+      <button type="button" id="driveRestoreErrorRetry" style="pointer-events:auto;position:absolute;left:190px;top:172px;width:85px;height:43px;min-width:0;padding:0;border:1px solid #3a4a60;border-radius:16px;font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:normal;font-weight:400;color:#fff;background:#f59e0b;box-shadow:none;cursor:pointer">Reintentar</button>
     </div>
   </div>
 </div>

@@ -2143,25 +2143,14 @@ function useGen(){
 async function exportBackup(){
   if(typeof vkStore!=='undefined'&&vkStore.hasVault()){
     try{
+      if(typeof vkBackup==='undefined'||typeof vkBackup.createEnvelope!=='function'){
+        throw new Error('vkBackup.createEnvelope no esta disponible');
+      }
       if(typeof vkAttachments==='undefined'||typeof vkAttachments.exportAll!=='function'){
-        throw new Error('vkAttachments.exportAll no está disponible');
+        throw new Error('vkAttachments.exportAll no esta disponible');
       }
 
       const vk2Blob=vkStore.loadBlob();
-      const validBlob=vk2Blob&&typeof vk2Blob==='object'&&!Array.isArray(vk2Blob)
-        &&vk2Blob.app==='VaultKey'
-        &&Number(vk2Blob.schemaVersion)===2
-        &&typeof vk2Blob.cryptoVersion==='number'
-        &&vk2Blob.kdf&&typeof vk2Blob.kdf==='object'
-        &&vk2Blob.wraps&&typeof vk2Blob.wraps==='object'
-        &&vk2Blob.wraps.master
-        &&vk2Blob.wraps.kit
-        &&vk2Blob.vault&&typeof vk2Blob.vault==='object';
-
-      if(!validBlob){
-        throw new Error('La bóveda VaultKey 2.0 no tiene un formato válido');
-      }
-
       const attachments=await vkAttachments.exportAll();
       const now=Date.now();
       const date=new Date(now);
@@ -2169,15 +2158,11 @@ async function exportBackup(){
       const mm=String(date.getMonth()+1).padStart(2,'0');
       const yyyy=date.getFullYear();
 
-      const data={
-        app:'VaultKey',
-        format:'vkbak',
-        version:3,
-        vaultFormat:'vk2_blob',
-        createdAt:new Date(now).toISOString(),
-        vk2_blob:vk2Blob,
-        attachments:attachments
-      };
+      const data=vkBackup.createEnvelope({
+        blob:vk2Blob,
+        attachments:attachments,
+        createdAt:new Date(now).toISOString()
+      });
 
       const fileBlob=new Blob(
         [JSON.stringify(data,null,2)],
@@ -2194,12 +2179,13 @@ async function exportBackup(){
 
       soundSuccess();
       toast('Respaldo local cifrado exportado correctamente','ok');
+      return true;
     }catch(err){
       console.error('exportBackup VK2:',err);
       soundError();
       toast('No se pudo exportar el respaldo local','err');
+      return false;
     }
-    return;
   }
 
   let pack=localStorage.getItem(LS_DATA);
@@ -2231,6 +2217,168 @@ async function exportBackup(){
 // ============================================================
 // IMPORTACIÓN CON PANTALLA PROPIA
 // ============================================================
+
+let _restoreCredentialResolver = null;
+let _restorePinResolver = null;
+
+function normalizeRestoreCredentialInput(value) {
+  const text = String(value || '').trim();
+  const compact = text.replace(/[\s-]/g, '').toUpperCase();
+  if (/^VK2[A-Z0-9]{26}$/.test(compact)) {
+    return { kitCode: text };
+  }
+  return { master: text };
+}
+
+function closeRestoreCredentialModal(value) {
+  const modal = $('restoreCredentialModal');
+  if (modal) modal.classList.remove('open');
+  const input = $('restoreCredentialInput');
+  if (input) input.value = '';
+  if (_restoreCredentialResolver) {
+    const resolver = _restoreCredentialResolver;
+    _restoreCredentialResolver = null;
+    resolver(value);
+  }
+}
+
+function openRestoreCredentialModal(options = {}) {
+  return new Promise((resolve) => {
+    _restoreCredentialResolver = resolve;
+    const modal = $('restoreCredentialModal');
+    const title = $('restoreCredentialTitle');
+    const label = $('restoreCredentialLabel');
+    const helper = $('restoreCredentialHelper');
+    const input = $('restoreCredentialInput');
+    const ok = $('restoreCredentialOk');
+    const cancel = $('restoreCredentialCancel');
+
+    if (title) title.textContent = options.title || 'Restaurar copia';
+    if (label) label.textContent = options.label || 'Contraseña maestra o kit';
+    if (helper) helper.textContent = options.helper || 'Introduce tu contraseña maestra o kit de emergencia.';
+    if (input) {
+      if (input.tagName === 'TEXTAREA') {
+        input.removeAttribute('type');
+        input.rows = 2;
+      } else {
+        input.type = 'password';
+      }
+      input.setAttribute('value', '');
+      input.value = '';
+      input.placeholder = ' '; // el texto real lo muestra el <span> superpuesto en app.html, no el placeholder nativo
+      input.autocomplete = 'new-password';
+      input.oninput = () => {
+        if (input.tagName === 'TEXTAREA') {
+          input.value = input.value.replace(/\n/g, ' ');
+        }
+      };
+      input.onkeydown = (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          if (ok) ok.click();
+        } else if (event.key === 'Escape') {
+          event.preventDefault();
+          if (cancel) cancel.click();
+        }
+      };
+    }
+
+    if (ok) ok.textContent = options.confirmText || 'Restaurar';
+    if (cancel) cancel.textContent = options.cancelText || 'Cancelar';
+
+    if (ok) ok.onclick = () => {
+      const raw = String(input && input.value || '').trim();
+      if (!raw) {
+        if (typeof toast === 'function') toast('Introduce tu contraseña maestra o kit de emergencia', 'err');
+        if (input) input.focus();
+        return;
+      }
+      closeRestoreCredentialModal(raw);
+    };
+
+    if (cancel) cancel.onclick = () => closeRestoreCredentialModal(null);
+
+    if (modal) {
+      modal.classList.add('open');
+      setTimeout(() => { if (input) input.focus(); }, 150);
+    }
+  });
+}
+
+function closeRestorePinModal(value) {
+  const modal = $('restorePinModal');
+  if (modal) modal.classList.remove('open');
+  const input = $('restorePinInput');
+  if (input) input.value = '';
+  if (_restorePinResolver) {
+    const resolver = _restorePinResolver;
+    _restorePinResolver = null;
+    resolver(value);
+  }
+}
+
+function openRestorePinModal(options = {}) {
+  return new Promise((resolve) => {
+    _restorePinResolver = resolve;
+    const modal = $('restorePinModal');
+    const title = $('restorePinTitle');
+    const label = $('restorePinLabel');
+    const helper = $('restorePinHelper');
+    const input = $('restorePinInput');
+    const ok = $('restorePinOk');
+    const cancel = $('restorePinCancel');
+
+    if (title) title.textContent = options.title || 'PIN de restauración';
+    if (label) label.textContent = options.label || 'PIN';
+    if (helper) helper.textContent = options.helper || 'Debe tener 6 dígitos.';
+    if (input) {
+      input.type = 'password';
+      input.setAttribute('value', '');
+      input.value = '';
+      input.placeholder = options.placeholder || 'Introduce 6 dígitos';
+      input.autocomplete = 'new-password';
+      input.oninput = () => {
+        input.value = input.value.replace(/\D/g, '').slice(0, 6);
+      };
+      input.onkeydown = (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          if (ok) ok.click();
+        } else if (event.key === 'Escape') {
+          event.preventDefault();
+          if (cancel) cancel.click();
+        }
+      };
+    }
+
+    if (ok) ok.textContent = options.confirmText || 'Restaurar';
+    if (cancel) cancel.textContent = options.cancelText || 'Atrás';
+
+    if (ok) ok.onclick = () => {
+      const pin = String(input && input.value || '').replace(/\D/g, '').slice(0, 6);
+      if (!/^\d{6}$/.test(pin)) {
+        if (typeof toast === 'function') toast('Introduce un PIN de 6 dígitos', 'err');
+        if (input) input.focus();
+        return;
+      }
+      closeRestorePinModal(pin);
+    };
+
+    if (cancel) cancel.onclick = () => closeRestorePinModal(null);
+
+    if (modal) {
+      modal.classList.add('open');
+      setTimeout(() => { if (input) input.focus(); }, 150);
+    }
+  });
+}
+
+window.normalizeRestoreCredentialInput = normalizeRestoreCredentialInput;
+window.openRestoreCredentialModal = openRestoreCredentialModal;
+window.openRestorePinModal = openRestorePinModal;
+window.closeRestoreCredentialModal = closeRestoreCredentialModal;
+window.closeRestorePinModal = closeRestorePinModal;
+
 let _importFile = null;
 let _importDecrypted = null;
 
@@ -2382,26 +2530,70 @@ async function importBackup(file) {
       data.vk2_blob &&
       typeof vkStore!=='undefined'
     ){
-      if(typeof vkAttachments==='undefined'||typeof vkAttachments.importAll!=='function'){
-        throw new Error('vkAttachments.importAll no está disponible');
+      if(typeof vkBackup==='undefined' || typeof vkBackup.restore!=='function'){
+        throw new Error('vkBackup.restore no está disponible');
       }
 
       if(typeof vkStore.hasVault==='function' && vkStore.hasVault()){
         const ok = await vkConfirm(
-          'Restaurar bóveda VaultKey 2.0',
-          'Se reemplazará la bóveda local actual por el respaldo seleccionado.',
+          'Restaurar Boveda Vaultkey',
+          'Se sustituirá la bóveda local actual por el respaldo elegido.',
           {variant:'drive-restore',confirmText:'Restaurar'}
         );
-        if(!ok)return;
+        if(!ok) return;
       }
 
-      if(data.attachments){
-        await vkAttachments.importAll(data.attachments,{mode:'replace'});
+      const credentialText = await (typeof window.openRestoreCredentialModal === 'function'
+        ? window.openRestoreCredentialModal({
+            title: 'Restaurar copia',
+            label: 'Contraseña maestra o kit',
+            helper: 'Introduce tu contraseña maestra o kit de emergencia.',
+            placeholder: 'Introduce tu contraseña maestra o kit...',
+            confirmText: 'Restaurar',
+            cancelText: 'Cancelar'
+          })
+        : Promise.resolve(prompt('Introduce tu contraseña maestra o kit de emergencia:')));
+
+      if (credentialText === null) {
+        return;
       }
 
-      vkStore.saveBlob(data.vk2_blob);
+      const credential = typeof window.normalizeRestoreCredentialInput === 'function'
+        ? window.normalizeRestoreCredentialInput(credentialText)
+        : (/^VK2/i.test(String(credentialText).trim())
+            ? { kitCode: String(credentialText).trim() }
+            : { master: String(credentialText).trim() });
+
+      const pin = await (typeof window.openRestorePinModal === 'function'
+        ? window.openRestorePinModal({
+            title: 'PIN de restauración',
+            label: 'PIN',
+            helper: 'Debe tener 6 dígitos.',
+            placeholder: 'Introduce 6 dígitos',
+            confirmText: 'Restaurar',
+            cancelText: 'Atrás'
+          })
+        : Promise.resolve(prompt('Introduce el PIN de 6 dígitos para este dispositivo:')));
+
+      if (pin === null) {
+        return;
+      }
+
+      if(!/^[0-9]{6}$/.test(pin)){
+        throw new Error('El PIN de restauración debe tener 6 dígitos');
+      }
+
+      await vkBackup.restore(data, {
+        credential,
+        pin,
+        store: vkStore,
+        attachments: vkAttachments,
+        crypto: vkCrypto
+      });
 
       toast('✓ Respaldo VaultKey 2.0 restaurado','ok');
+      try{ driveAutoSync(); }catch(e){}
+      if(typeof lock==='function') lock();
       return;
     }
 
@@ -2417,6 +2609,7 @@ async function importBackup(file) {
     toast('No se pudo importar el respaldo','err');
   }
 }
+
 
 /* ============================================================
    Copias de seguridad — conecta la interfaz (Figma node-id
@@ -2460,9 +2653,11 @@ window.openBackupCreateModal=async function(){
     }
   );
   if(!ok)return;
-  await exportBackup();
-  localStorage.setItem('vk_local_backup_last',String(Date.now()));
-  renderBackupLocalStatus();
+  const exported=await exportBackup();
+  if(exported){
+    localStorage.setItem('vk_local_backup_last',String(Date.now()));
+    renderBackupLocalStatus();
+  }
 };
 
 window.openBackupRestoreModal=async function(){
@@ -4016,7 +4211,7 @@ function render(){
   if(_ves)_ves.style.display=vault.length===0?'block':'none';
   const _fes=$('favEmptyState');
   if(_fes)_fes.style.display=vault.filter(e=>e.fav).length===0?'block':'none';$('statFav')&&($('statFav').textContent=vault.filter(e=>e.fav).length);$('statWeak')&&($('statWeak').textContent=vault.filter(e=>e.entryType==='password'&&score(e.pass)<3).length);
-  const _dashPasswords=vault.filter(e=>!e.entryType||e.entryType==='password'||e.entryType==='wifi').length;
+  const _dashPasswords=vault.filter(isPasswordFamilyEntry).length;
   const _dashNotes=(typeof window.vkNotes!=='undefined'&&window.vkNotes.read)?window.vkNotes.read().length:vault.filter(e=>e.entryType==='note').length;
   const _dashCards=(typeof window.vkCards!=='undefined'&&window.vkCards.read)?window.vkCards.read().length:vault.filter(e=>e.entryType==='card').length;
   const _dashDocuments=(typeof window.vkDocuments!=='undefined'&&window.vkDocuments.read)?window.vkDocuments.read().length:vault.filter(e=>['id','license','medical'].includes(e.entryType)).length;
@@ -4161,6 +4356,9 @@ function favoriteEntryKind(e){
 }
 function openFavoriteEntry(e){
   if(isPasswordFamilyEntry(e))openPasswordDetail(e.id);
+  else if(e.type==='note')window.showNoteDetail(e.id);
+  else if(e.type==='card')window.showCardDetail(e.id);
+  else if(e.type==='document')window.showDocumentDetail(e.id);
   else quick(e.id);
 }
 function favoriteSearchMarkup(){
@@ -6618,6 +6816,7 @@ try {
       id:entry.id,
       title:entry.title||'',
       content:entry.body||'',
+      fav:entry.fav===true,
       createdAt:entry.createdAt,
       updatedAt:entry.updatedAt
     };
@@ -6747,12 +6946,21 @@ try {
   window.openCreateNote=function(){
     var form=document.getElementById('noteCreateForm');
     if(form)form.reset();
+    var favoriteButton=document.getElementById('noteCreateFavorite');
+    if(favoriteButton)setFavoriteSwitch(favoriteButton,false);
     window.__vkCurrentNoteId=null;
     if(typeof window.show==='function')window.show('noteCreate','right');
     setTimeout(function(){
       var input=document.getElementById('noteCreateTitleInput');
       if(input)input.focus();
     },280);
+  };
+
+  window.toggleNoteCreateFavorite=function(){
+    var button=document.getElementById('noteCreateFavorite');
+    if(!button)return;
+    var value=button.getAttribute('aria-checked')!=='true';
+    setFavoriteSwitch(button,value);
   };
 
   window.openEditNote=function(id){
@@ -6762,10 +6970,19 @@ try {
     window.__vkCurrentNoteId=note.id;
     document.getElementById('noteEditTitleInput').value=note.title||'';
     document.getElementById('noteEditContentInput').value=note.content||'';
+    var favoriteButton=document.getElementById('noteEditFavorite');
+    if(favoriteButton)setFavoriteSwitch(favoriteButton,note.fav===true);
     if(typeof window.show==='function')window.show('noteEdit','right');
   };
 
-  window.saveNote=async function(id,title,content){
+  window.toggleNoteEditFavorite=function(){
+    var button=document.getElementById('noteEditFavorite');
+    if(!button)return;
+    var value=button.getAttribute('aria-checked')!=='true';
+    setFavoriteSwitch(button,value);
+  };
+
+  window.saveNote=async function(id,title,content,fav){
     title=String(title||'').trim();
     content=String(content||'').trim();
 
@@ -6808,13 +7025,15 @@ try {
           entry=Object.assign({},vault[vaultIndex],{
             title:title,
             body:content,
+            fav:fav===true,
             updatedAt:Date.now()
           });
           vault[vaultIndex]=entry;
         }else{
           entry=vkModels.create('note',{
             title:title,
-            body:content
+            body:content,
+            fav:fav===true
           });
           vault.push(entry);
           _pushedNoteEntry=entry;
@@ -6943,6 +7162,7 @@ try {
       expiry:entry.expiry||'',
       cvv:entry.cvv||'',
       note:entry.notes||'',
+      fav:entry.fav===true,
       createdAt:entry.createdAt,
       updatedAt:entry.updatedAt
     };
@@ -7104,11 +7324,20 @@ try {
     var noteButton=document.getElementById('cardCreateAddNote');
     if(noteField)noteField.hidden=true;
     if(noteButton)noteButton.textContent='+ Añadir nota';
+    var favoriteButton=document.getElementById('cardCreateFavorite');
+    if(favoriteButton)setFavoriteSwitch(favoriteButton,false);
 
     if(typeof window.show==='function')window.show('cardCreate','right');
     setTimeout(function(){
       document.getElementById('cardCreateHolder')?.focus();
     },280);
+  };
+
+  window.toggleCardCreateFavorite=function(){
+    var button=document.getElementById('cardCreateFavorite');
+    if(!button)return;
+    var value=button.getAttribute('aria-checked')!=='true';
+    setFavoriteSwitch(button,value);
   };
 
   window.openEditCard=function(id,openNote){
@@ -7122,6 +7351,8 @@ try {
     document.getElementById('cardEditCvv').value=String(card.cvv||'');
     document.getElementById('cardEditCvv').type='password';
     document.getElementById('cardEditNote').value=card.note||'';
+    var favoriteButton=document.getElementById('cardEditFavorite');
+    if(favoriteButton)setFavoriteSwitch(favoriteButton,card.fav===true);
 
     var noteField=document.getElementById('cardEditNoteField');
     var noteButton=document.getElementById('cardEditAddNote');
@@ -7137,7 +7368,14 @@ try {
     }
   };
 
-  window.saveCard=async function(id,holder,number,expiry,cvv,note){
+  window.toggleCardEditFavorite=function(){
+    var button=document.getElementById('cardEditFavorite');
+    if(!button)return;
+    var value=button.getAttribute('aria-checked')!=='true';
+    setFavoriteSwitch(button,value);
+  };
+
+  window.saveCard=async function(id,holder,number,expiry,cvv,note,fav){
     holder=String(holder||'').trim();
     number=cardDigits(number);
     expiry=normalizeExpiry(expiry);
@@ -7202,6 +7440,7 @@ try {
             expiry:expiry,
             cvv:cvv,
             notes:note,
+            fav:fav===true,
             updatedAt:Date.now()
           });
           vault[vaultIndex]=entry;
@@ -7211,7 +7450,8 @@ try {
             number:number,
             expiry:expiry,
             cvv:cvv,
-            notes:note
+            notes:note,
+            fav:fav===true
           });
           vault.push(entry);
           _pushedCardEntry=entry;
@@ -7437,6 +7677,7 @@ function vk2EntryToDocument(e){
     issuedBy:e.issuer||'',
     country:e.country||'',
     attachmentRef:e.attachmentRef||'',
+    fav:e.fav===true,
     image:'',
     createdAt:e.createdAt||0,
     updatedAt:e.updatedAt||0
@@ -7518,8 +7759,10 @@ window.openDocumentSource=function(m){
 };
 window.handleDocumentFile=function(ev){var input=ev&&ev.target,file=input&&input.files&&input.files[0];if(!file)return;if(!file.type||!file.type.startsWith('image/')){toast('Selecciona un archivo de imagen válido','err');input.value='';return;}var r=new FileReader();r.onerror=function(){toast('No se pudo leer la imagen seleccionada','err');input.value='';};r.onload=function(){if(typeof r.result!=='string'||!r.result.startsWith('data:image/')){toast('La imagen seleccionada no es válida','err');input.value='';return;}image=r.result;modal('documentSourceSheet',false);if(editingId){document.getElementById('documentEditImage').src=image;show('documentEdit','right');}else{document.getElementById('documentPreviewImage').src=image;show('documentPreview','right');}input.value='';};r.readAsDataURL(file);};
 window.repeatDocumentSelection=function(){modal('documentSourceSheet',true);};
-window.openCreateDocumentForm=function(){if(!image||!category){toast('Selecciona primero una imagen','err');openTypePicker();return;}document.getElementById('documentCreateForm').reset();document.getElementById('documentCreateImage').src=image;document.getElementById('documentCreateName').value=label(category);document.getElementById('documentCreateMore').hidden=true;document.getElementById('documentCreateMoreButton').textContent='+ Más información';visual('documentCreate',category);show('documentCreate','right');};
-window.openEditDocument=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;editingId=d.id;category=d.category;image=await documentImageUrl(d);window.__vkCurrentDocumentId=d.id;document.getElementById('documentEditImage').src=image;document.getElementById('documentEditName').value=d.name||'';document.getElementById('documentEditExpiry').value=date(d.expiry);document.getElementById('documentEditIssuedBy').value=d.issuedBy||'';document.getElementById('documentEditCountry').value=d.country||'';visual('documentEdit',d.category);var more=!!(d.issuedBy||d.country);document.getElementById('documentEditMore').hidden=!more;document.getElementById('documentEditMoreButton').textContent=more?'− Menos información':'+ Más información';show('documentEdit','right');};
+window.openCreateDocumentForm=function(){if(!image||!category){toast('Selecciona primero una imagen','err');openTypePicker();return;}document.getElementById('documentCreateForm').reset();document.getElementById('documentCreateImage').src=image;document.getElementById('documentCreateName').value=label(category);document.getElementById('documentCreateMore').hidden=true;document.getElementById('documentCreateMoreButton').textContent='+ Más información';var favoriteButton=document.getElementById('documentCreateFavorite');if(favoriteButton)setFavoriteSwitch(favoriteButton,false);visual('documentCreate',category);show('documentCreate','right');};
+window.toggleDocumentCreateFavorite=function(){var button=document.getElementById('documentCreateFavorite');if(!button)return;var value=button.getAttribute('aria-checked')!=='true';setFavoriteSwitch(button,value);};
+window.openEditDocument=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;editingId=d.id;category=d.category;image=await documentImageUrl(d);window.__vkCurrentDocumentId=d.id;document.getElementById('documentEditImage').src=image;document.getElementById('documentEditName').value=d.name||'';document.getElementById('documentEditExpiry').value=date(d.expiry);document.getElementById('documentEditIssuedBy').value=d.issuedBy||'';document.getElementById('documentEditCountry').value=d.country||'';visual('documentEdit',d.category);var more=!!(d.issuedBy||d.country);document.getElementById('documentEditMore').hidden=!more;document.getElementById('documentEditMoreButton').textContent=more?'− Menos información':'+ Más información';var favoriteButton=document.getElementById('documentEditFavorite');if(favoriteButton)setFavoriteSwitch(favoriteButton,d.fav===true);show('documentEdit','right');};
+window.toggleDocumentEditFavorite=function(){var button=document.getElementById('documentEditFavorite');if(!button)return;var value=button.getAttribute('aria-checked')!=='true';setFavoriteSwitch(button,value);};
 window.openDocumentEditSource=function(){if(editingId)modal('documentSourceSheet',true);};
 window.formatDocumentExpiry=function(el){
   var v=String(el.value||'').replace(/\D/g,'').slice(0,8);
@@ -7550,7 +7793,7 @@ function isValidDocumentExpiry(v){
   return d.getFullYear()===year&&d.getMonth()===month-1&&d.getDate()===day;
 }
 
-window.saveDocument=async function(docId,name,expiry,issuedBy,country){
+window.saveDocument=async function(docId,name,expiry,issuedBy,country,fav){
   name=String(name||'').trim();
   var rawExpiry=String(expiry||'').trim();
   if(!isValidDocumentExpiry(rawExpiry)){
@@ -7615,6 +7858,7 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country){
           issuer:issuedBy,
           country:country,
           attachmentRef:attachmentRef,
+          fav:fav===true,
           updatedAt:now
         });
       }else{
@@ -7624,7 +7868,8 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country){
           expiry:expiry,
           issuer:issuedBy,
           country:country,
-          attachmentRef:attachmentRef
+          attachmentRef:attachmentRef,
+          fav:fav===true
         });
         vkEntry.type='document';
         vkEntry.entryType='document';

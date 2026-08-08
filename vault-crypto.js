@@ -233,6 +233,65 @@
       });
     });
   }
+  function createPinWrapFromVault(blob, cred, pin, pepperKey) {
+    if (!blob || blob.cryptoVersion !== CRYPTO_VERSION) {
+      return Promise.reject(new Error('cryptoVersion no soportada'));
+    }
+    if (
+      !blob.kdf || typeof blob.kdf !== 'object' ||
+      !blob.wraps || typeof blob.wraps !== 'object' ||
+      !blob.wraps.master || !blob.wraps.kit ||
+      !blob.vault || typeof blob.vault !== 'object'
+    ) {
+      return Promise.reject(new Error('blob de boveda invalido'));
+    }
+    if (!cred || typeof cred !== 'object') {
+      return Promise.reject(new Error('credencial no soportada'));
+    }
+
+    var route, salt, iter, secret;
+    if (typeof cred.master === 'string') {
+      route = 'master';
+      salt = unb64(blob.kdf.saltMaster);
+      iter = blob.kdf.iterMaster;
+      secret = cred.master;
+    } else if (typeof cred.kitCode === 'string') {
+      route = 'kit';
+      salt = unb64(blob.kdf.saltKit);
+      iter = blob.kdf.iterKit;
+      secret = normalizeKitCode(cred.kitCode);
+    } else {
+      return Promise.reject(new Error('credencial no soportada'));
+    }
+
+    var dekRaw;
+    var operation = deriveKEK(secret, salt, iter)
+      .then(function (kek) {
+        return unwrapDEKRaw(blob.wraps[route], kek);
+      })
+      .then(function (raw) {
+        dekRaw = raw;
+        return importDEK(raw);
+      })
+      .then(function (dekKey) {
+        return decryptVault(dekKey, blob.vault);
+      })
+      .then(function () {
+        return createPinWrap(dekRaw, pin, pepperKey);
+      });
+
+    return operation.then(
+      function (pinWrap) {
+        zero(dekRaw);
+        return pinWrap;
+      },
+      function (err) {
+        zero(dekRaw);
+        throw err;
+      }
+    );
+  }
+
   function openPinWrap(pinWrap, pin, pepperKey) {
     var dekRaw;
     return deriveKEKPin(pin, unb64(pinWrap.saltPin), pepperKey)
@@ -295,6 +354,7 @@
     createVaultBlob: createVaultBlob, openVaultBlob: openVaultBlob,
     rotateMaster: rotateMaster, regenerateKit: regenerateKit,
     createPinWrap: createPinWrap, openPinWrap: openPinWrap,
+    createPinWrapFromVault: createPinWrapFromVault,
     importPepperKey: importPepperKey,
     getOrCreatePepper: getOrCreatePepper, deletePepper: deletePepper
   };

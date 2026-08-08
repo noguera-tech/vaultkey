@@ -213,15 +213,15 @@
         '<div class="vk-onb-pin__content">' +
           '<h1 class="vk-onb-pin__title">Crea tu PIN local</h1>' +
           '<p class="vk-onb-pin__subtitle">Servirá para desbloquear VaultKey rápidamente en este dispositivo.</p>' +
-          '<form class="vk-onb-pin__form" onsubmit="return false">' +
+          '<form class="vk-onb-pin__form" onsubmit="return false" autocomplete="off">' +
             '<label class="vk-onb-pin__field">' +
               '<span class="vk-onb-pin__sr-label">Introduce tu PIN</span>' +
-              '<input class="vk-input vk-onb-pin__input" id="ob-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Introduce tu PIN" autocomplete="off">' +
+              '<input class="vk-input vk-onb-pin__input" id="ob-pin" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Introduce tu PIN" name="vk-onboarding-pin-1" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" style="-webkit-text-security:disc;text-security:disc">' +
               '<span class="vk-field__hint vk-onb-pin__hint" id="ob-pin-hint"></span>' +
             '</label>' +
             '<label class="vk-onb-pin__field">' +
               '<span class="vk-onb-pin__sr-label">Vuelve a introducir el PIN</span>' +
-              '<input class="vk-input vk-onb-pin__input" id="ob-pin2" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Vuelve a introducir el PIN" autocomplete="off">' +
+              '<input class="vk-input vk-onb-pin__input" id="ob-pin2" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Vuelve a introducir el PIN" name="vk-onboarding-pin-2" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" style="-webkit-text-security:disc;text-security:disc">' +
               '<span class="vk-field__hint vk-onb-pin__hint" id="ob-pin2-hint"></span>' +
             '</label>' +
           '</form>' +
@@ -512,6 +512,9 @@
         var pinConfirm = root.document.getElementById('ob-pin2');
         var pinSubmit = root.document.getElementById('ob-pin-submit');
 
+        if (pinInput) { pinInput.value = ''; }
+        if (pinConfirm) { pinConfirm.value = ''; }
+
         var updatePinUi = function () {
           var p1 = pinInput ? pinInput.value.replace(/\D/g, '').slice(0, 6) : '';
           var p2 = pinConfirm ? pinConfirm.value.replace(/\D/g, '').slice(0, 6) : '';
@@ -525,7 +528,7 @@
 
         if (pinInput) { pinInput.addEventListener('input', updatePinUi); bindInputHaptics(pinInput); }
         if (pinConfirm) { pinConfirm.addEventListener('input', updatePinUi); bindInputHaptics(pinConfirm); }
-        updatePinUi();
+        root.setTimeout(updatePinUi, 0);
         setupKeyboardAwareOnboarding('.vk-onb-pin', '.vk-onb-pin__input');
       }
       if (route.name === 'onboarding-kit-save') {

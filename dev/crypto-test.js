@@ -60,6 +60,13 @@ function fails(p) { return p.then(function(){return false;}, function(){return t
   console.log('== credenciales erróneas y manipulación ==');
   t('master errónea falla', await fails(vk.openVaultBlob(blob, { master: 'otra' })));
   t('kit erróneo falla', await fails(vk.openVaultBlob(blob, { kitCode: vk.generateKitCode() })));
+  console.log('== regeneracion de pin-wrap al restaurar ==');
+  var restoredPinWrap = await vk.createPinWrapFromVault(blob, { master: MASTER }, '731905', otherPepper);
+  var restoredDek = await vk.openPinWrap(restoredPinWrap, '731905', otherPepper);
+  t('regenera pin-wrap con el pepper del dispositivo destino', (await vk.decryptVault(restoredDek, blob.vault)) === PAYLOAD);
+  t('rechaza una master incorrecta al regenerar', await fails(vk.createPinWrapFromVault(blob, { master: 'otra' }, '731905', otherPepper)));
+  t('rechaza un blob incompleto al regenerar', await fails(vk.createPinWrapFromVault({ cryptoVersion: 1 }, { master: MASTER }, '731905', otherPepper)));
+
   var tampered = JSON.parse(JSON.stringify(blob));
   var ctb = Buffer.from(tampered.vault.ct, 'base64'); ctb[5] ^= 0xff;
   tampered.vault.ct = ctb.toString('base64');

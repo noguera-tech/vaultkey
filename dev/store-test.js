@@ -37,6 +37,14 @@ function t(name, cond) {
   t('round-trip pinwrap', JSON.stringify(st.loadPinWrap()) === JSON.stringify(pw));
   t('hasPinWrap true', st.hasPinWrap() === true);
 
+  console.log('== eliminacion individual ==');
+  st.removeBlob();
+  t('removeBlob elimina la clave y hasVault queda false', localStorage.getItem('vk2_blob') === null && st.hasVault() === false);
+  st.saveBlob(blob);
+  st.removePinWrap();
+  t('removePinWrap elimina la clave y hasPinWrap queda false', localStorage.getItem('vk2_pinwrap') === null && st.hasPinWrap() === false);
+  st.savePinWrap(pw);
+
   console.log('== meta ==');
   var m = st.getMeta();
   t('meta con defaults', m.failedAttempts === 0 && m.autolockOption === 'immediate' && m.onboardingDone === false);
