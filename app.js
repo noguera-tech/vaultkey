@@ -4309,7 +4309,7 @@ function row(e){
 
   let div=document.createElement('div');
   div.className='entry';
-  div.onclick=()=>quick(e.id);
+  div.onclick=()=>openFavoriteEntry(e);
   let ic=iconForEntry(e);
   const weak=e?.entryType==='password'&&score(e.pass)<3;
   const isPass=!e?.entryType||e?.entryType==='password';
@@ -5513,6 +5513,7 @@ function healthReadNotes(){
 
 function healthReadCards(){
   const items=[];
+  const seenCardIds={};
   const moduleCards=window.vkCards&&typeof window.vkCards.read==='function'
     ?window.vkCards.read()
     :[];
@@ -5520,9 +5521,12 @@ function healthReadCards(){
   if(Array.isArray(moduleCards)){
     moduleCards.forEach(card=>{
       if(!card||typeof card!=='object'||!card.id)return;
+      const id=String(card.id);
+      if(seenCardIds[id])return;
+      seenCardIds[id]=true;
 
       items.push({
-        id:String(card.id),
+        id,
         source:'cards',
         kind:'card',
         title:healthEntryTitle(card,'Tarjeta'),
@@ -5538,9 +5542,12 @@ function healthReadCards(){
       .filter(entry=>healthEntryType(entry)==='card')
       .forEach(card=>{
         if(!card?.id)return;
+        const id=String(card.id);
+        if(seenCardIds[id])return;
+        seenCardIds[id]=true;
 
         items.push({
-          id:String(card.id),
+          id,
           source:'vault',
           kind:'card',
           title:healthEntryTitle(card,'Tarjeta'),
