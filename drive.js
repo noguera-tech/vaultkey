@@ -11,6 +11,7 @@ const DRIVE_TOKEN_KEY = 'vk_drive_token';
 const DRIVE_LAST_SYNC_KEY = 'vk_drive_last_sync';
 const DRIVE_AUTO_KEY = 'vk_drive_auto';
 const DRIVE_TOKEN_SAFETY_MS = 60 * 1000;
+const DRIVE_KEEP_BACKUPS = 2; // TEMPORAL — prueba de limpieza. Revertir a 10 cuando el usuario confirme.
 
 let driveTokenClient = null;
 let driveUiState = 'disconnected';
@@ -96,7 +97,11 @@ function driveBackupFileName(timestamp) {
   const dd = String(date.getDate()).padStart(2, '0');
   const mm = String(date.getMonth() + 1).padStart(2, '0');
   const yyyy = date.getFullYear();
-  return `VaultKey_Backup_${dd}${mm}${yyyy}.vkbak`;
+  const hh = String(date.getHours()).padStart(2, '0');
+  const min = String(date.getMinutes()).padStart(2, '0');
+  // TEMPORAL — prueba de limpieza: nombre único por hora/minuto en vez de por día.
+  // Revertir a `VaultKey_Backup_${dd}${mm}${yyyy}.vkbak` cuando el usuario confirme.
+  return `VaultKey_Backup_${dd}${mm}${yyyy}_${hh}${min}.vkbak`;
 }
 
 function driveToast(message, sound) {
@@ -284,6 +289,52 @@ async function driveFindLatestBackup(accessToken) {
   return result && Array.isArray(result.files) ? result.files[0] || null : null;
 }
 
+// Lista todas las copias de seguridad existentes en Drive, de más reciente a más antigua.
+// Variante de driveFindLatestBackup con pageSize mayor — no modifica esa función.
+async function driveListAllBackups(accessToken) {
+  const query = encodeURIComponent("name contains 'VaultKey_Backup_' and trashed=false");
+  const fields = encodeURIComponent('files(id,name,modifiedTime)');
+  const url = `https://www.googleapis.com/drive/v3/files?q=${query}&spaces=drive&orderBy=modifiedTime desc&fields=${fields}&pageSize=100`;
+
+  const result = await driveFetchJson(url, {
+    headers: { Authorization: `Bearer ${accessToken}` }
+  });
+
+  return result && Array.isArray(result.files) ? result.files : [];
+}
+
+// Mueve a la papelera de Drive las copias que sobran, manteniendo solo las
+// `keep` más recientes. Nunca lanza: cada borrado se intenta por separado y
+// un fallo aislado no interrumpe los siguientes ni afecta a la sincronización
+// que ya se completó con éxito.
+async function driveTrimOldBackups(accessToken, keep = DRIVE_KEEP_BACKUPS) {
+  let files;
+  try {
+    files = await driveListAllBackups(accessToken);
+  } catch (error) {
+    console.warn('Drive: no se pudo listar copias para limpiar', error);
+    return;
+  }
+
+  const toTrash = files.slice(keep);
+  if (!toTrash.length) return;
+
+  for (const file of toTrash) {
+    try {
+      await driveFetchJson(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(file.id)}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ trashed: true })
+      });
+    } catch (error) {
+      console.warn('Drive: no se pudo mover a la papelera una copia antigua', file.name, error);
+    }
+  }
+}
+
 // Lee la boveda cifrada actual, sea cual sea el sistema de guardado activo.
 async function driveReadVaultPayload() {
   if (typeof window.vkStore !== 'undefined' && window.vkStore.hasVault()) {
@@ -377,6 +428,15 @@ async function driveSyncNow(silent = false) {
       driveToast(`✅ Respaldo sincronizado ${driveFormatDate(timestamp, true)}`, 'ok');
     }
     console.info('VaultKey backup enviado', fileName);
+
+    // Limpieza de copias antiguas — solo tras subida confirmada con éxito.
+    // Un fallo aquí nunca afecta al resultado de la sincronización ya completada.
+    try {
+      await driveTrimOldBackups(accessToken);
+    } catch (error) {
+      console.warn('Drive: limpieza de copias antiguas no completada', error);
+    }
+
     return true;
   } catch (error) {
     if (error && error.status === 401) {
