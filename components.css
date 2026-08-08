@@ -2854,7 +2854,9 @@ body.vk-lock { overflow: hidden; }
   border-radius: 16px;
   background: rgba(17,24,39,.14);
 }
-
+.vk-health-area {
+  margin-top: 14px;
+}
 .vk-health-area__title {
   margin: 0;
   color: var(--vk-r1-text);

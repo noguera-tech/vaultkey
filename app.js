@@ -1,6 +1,13 @@
 let _searchDebounce=null;
 let confirmResolver=null;
 let appBooted=false;
+const APP_VERSION='VaultKey 2.6.2';
+window.APP_VERSION=APP_VERSION;
+function applyAppVersion(){
+  document.querySelectorAll('[data-app-version]').forEach(function(el){
+    el.textContent=APP_VERSION;
+  });
+}
 const LS_META='vk_meta_v1',LS_DATA='vk_data_v1',LS_REC='vk_recovery_v1';let pin='',mode='unlock',tempPin='',unlocked=false,vault=[],current=null,editId=null,lastKey=null,useGenTarget=false,autoLockTimer=null,hiddenSince=null,lockCountdownTimer=null,_entryType='password',_catFilter='',_vaultTab='todas';
 
 // Category filter — IDs estables + compatibilidad con categorías legacy
@@ -4788,6 +4795,7 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     if(window.resetScreensForBoot) window.resetScreensForBoot();
     if(window.applyVisualLook) window.applyVisualLook();
     appBooted=true;
+    applyAppVersion();
     if('serviceWorker'in navigator){
       const _swInstallTime = Date.now();
       navigator.serviceWorker.register('./sw.js').catch(()=>{});
@@ -5980,9 +5988,16 @@ function healthReadLocalSecurity(){
 }
 
 function healthReadContinuity(hasContent,now=Date.now()){
-  const rawLastSync=localStorage.getItem('vk_drive_last_sync');
-  const lastSync=Number(rawLastSync);
-  const validLastSync=Number.isFinite(lastSync)&&lastSync>0&&lastSync<=now;
+  const rawDriveSync=localStorage.getItem('vk_drive_last_sync');
+  const driveSync=Number(rawDriveSync);
+  const validDriveSync=Number.isFinite(driveSync)&&driveSync>0&&driveSync<=now;
+
+  const rawLocalBackup=localStorage.getItem('vk_local_backup_last');
+  const localBackup=Number(rawLocalBackup);
+  const validLocalBackup=Number.isFinite(localBackup)&&localBackup>0&&localBackup<=now;
+
+  const lastSync=Math.max(validDriveSync?driveSync:0,validLocalBackup?localBackup:0);
+  const validLastSync=lastSync>0;
   const ageDays=validLastSync?Math.floor((now-lastSync)/864e5):null;
 
   let backup;
@@ -6000,7 +6015,7 @@ function healthReadContinuity(hasContent,now=Date.now()){
         level:'attention',
         lastSync:0,
         ageDays:null,
-        reason:'A\u00fan no has creado una copia de seguridad en Google Drive.'
+        reason:'A\u00fan no has creado ninguna copia de seguridad.'
       };
     }
   }else if(ageDays<=7){
@@ -6243,6 +6258,19 @@ function renderHealthPanel(){
       item=>item.level==='attention'||item.level==='risk'
     ).length;
 
+    const passwordRiskItems=report.security.passwords.items
+      .filter(item=>item.level==='attention'||item.level==='risk')
+      .sort((a,b)=>(a.level==='risk'?0:1)-(b.level==='risk'?0:1));
+
+    const passwordRiskBody=passwordRiskItems.length
+      ?passwordRiskItems.slice(0,5).map(item=>
+          healthPanelDetail(item.title||'Sin nombre',item.reason,item.level)
+        ).join('')+
+        (passwordRiskItems.length>5
+          ?'<p class="vk-health-detail__reason">y '+(passwordRiskItems.length-5)+' m\u00e1s.</p>'
+          :'')
+      :'';
+
     const securityBody=
       '<div class="vk-health-metrics vk-health-metrics--two">'+
         healthPanelMetric('Contrase\u00f1as',passwordCounts.total)+
@@ -6268,7 +6296,10 @@ function renderHealthPanel(){
           ?'Bloqueo autom\u00e1tico activo.'
           :report.security.local.autolock.reason,
         report.security.local.autolock.level
-      );
+      )+
+      (passwordRiskItems.length
+        ?healthPanelArea('Elementos que requieren atenci\u00f3n',passwordRiskBody)
+        :'');
 
     const continuityBody=
       healthPanelDetail(
@@ -6286,6 +6317,23 @@ function renderHealthPanel(){
         report.continuity.kit.level
       );
 
+    const maintenanceRiskItems=report.maintenance.items
+      .filter(item=>item.level==='attention'||item.level==='risk')
+      .sort((a,b)=>(a.level==='risk'?0:1)-(b.level==='risk'?0:1));
+
+    const maintenanceRiskBody=maintenanceRiskItems.length
+      ?maintenanceRiskItems.slice(0,5).map(item=>
+          healthPanelDetail(
+            (item.kind==='document'?'Documento \u00b7 ':'Tarjeta \u00b7 ')+(item.title||'Sin nombre'),
+            item.reason,
+            item.level
+          )
+        ).join('')+
+        (maintenanceRiskItems.length>5
+          ?'<p class="vk-health-detail__reason">y '+(maintenanceRiskItems.length-5)+' m\u00e1s.</p>'
+          :'')
+      :'';
+
     const maintenanceBody=
       '<div class="vk-health-metrics vk-health-metrics--three">'+
         healthPanelMetric('Tarjetas',report.maintenance.cards.length)+
@@ -6298,7 +6346,10 @@ function renderHealthPanel(){
           ?maintenanceIssues+' elemento'+(maintenanceIssues===1?'':'s')+' requiere'+(maintenanceIssues===1?'':'n')+' revisi\u00f3n.'
           :'No hay caducidades pendientes.',
         report.maintenance.level
-      );
+      )+
+      (maintenanceRiskItems.length
+        ?healthPanelArea('Caducidades detectadas',maintenanceRiskBody)
+        :'');
 
     element.innerHTML=
       '<section class="vk-health-overview" data-health-level="'+safeEsc(report.level)+'">'+
