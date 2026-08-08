@@ -3,7 +3,7 @@
 //  Versión auto-generada: no editar CACHE_VERSION manualmente.
 //  Para forzar actualización en usuarios: incrementar el número.
 // ─────────────────────────────────────────────────────────────
-const CACHE_VERSION = 33;
+const CACHE_VERSION = 34;
 const CACHE = `vaultkey-v${CACHE_VERSION}`;
 
 const FILES = [
@@ -14,6 +14,7 @@ const FILES = [
   './components.css',
   './vault-crypto.js',
   './vault-store.js',
+  './vault-backup.js',
   './router.js',
   './components.js',
   './session.js',
@@ -89,7 +90,7 @@ self.addEventListener('fetch', event => {
   }
 
   // app.js, style.css, drive.js, app.html, components.css, theme.css — Network first (para recibir actualizaciones)
-  if (url.pathname.endsWith('app.js') || url.pathname.endsWith('onboarding.js') || url.pathname.endsWith('unlock.js') || url.pathname.endsWith('vault-attachments.js') || url.pathname.endsWith('style.css') || url.pathname.endsWith('drive.js') || url.pathname.endsWith('app.html') || url.pathname.endsWith('components.css') || url.pathname.endsWith('theme.css')) {
+  if (url.pathname.endsWith('app.js') || url.pathname.endsWith('onboarding.js') || url.pathname.endsWith('unlock.js') || url.pathname.endsWith('vault-attachments.js') || url.pathname.endsWith('vault-backup.js') || url.pathname.endsWith('style.css') || url.pathname.endsWith('drive.js') || url.pathname.endsWith('app.html') || url.pathname.endsWith('components.css') || url.pathname.endsWith('theme.css')) {
     event.respondWith(
       fetch(event.request, { cache: 'no-store' })
         .then(response => {
