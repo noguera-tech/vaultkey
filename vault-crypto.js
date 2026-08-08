@@ -332,7 +332,32 @@
       });
     });
   }
-  function deletePepper() {
+  function pepperExists() {
+  return idbOpen().then(function (db) {
+    return new Promise(function (res, rej) {
+      var tx;
+      var get;
+
+      try {
+        tx = db.transaction(PEPPER_STORE, 'readonly');
+        get = tx.objectStore(PEPPER_STORE).get(PEPPER_ID);
+      } catch (err) {
+        rej(err);
+        return;
+      }
+
+      get.onsuccess = function () {
+        res(get.result !== undefined && get.result !== null);
+      };
+
+      get.onerror = function () {
+        rej(get.error || new Error('No se pudo consultar el pepper'));
+      };
+    });
+  });
+}
+   
+   function deletePepper() {
     return idbOpen().then(function (db) {
       return new Promise(function (res, rej) {
         var tx = db.transaction(PEPPER_STORE, 'readwrite');
@@ -356,6 +381,8 @@
     createPinWrap: createPinWrap, openPinWrap: openPinWrap,
     createPinWrapFromVault: createPinWrapFromVault,
     importPepperKey: importPepperKey,
-    getOrCreatePepper: getOrCreatePepper, deletePepper: deletePepper
+    getOrCreatePepper: getOrCreatePepper,
+    pepperExists: pepperExists,
+    deletePepper: deletePepper
   };
 });
