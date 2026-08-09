@@ -4899,7 +4899,7 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     }
   }
 
-  window.addEventListener('load',()=>{
+  document.addEventListener('DOMContentLoaded',()=>{
     runSplash(bootApp);
   });
 
