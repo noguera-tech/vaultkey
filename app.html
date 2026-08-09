@@ -3774,6 +3774,16 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 
 <script>
 (function(){
+  var splash=document.getElementById('vkSplash');
+  if(splash){
+    var scale=Math.min(window.innerWidth/412,window.innerHeight/917);
+    splash.style.setProperty('--vk-splash-scale',String(scale));
+  }
+})();
+</script>
+
+<script>
+(function(){
 "use strict";
 var I={s:"masterPasswordChange",f:"masterPasswordChangeForm",c:"masterPasswordCurrent",n:"masterPasswordNew",x:"masterPasswordConfirm",b:"masterPasswordStrengthFill",t:"masterPasswordStrength",m:"masterPasswordMessage",g:"masterPasswordSave"};
 var R=["masterRuleLength","masterRuleComposition","masterRuleReuse"];

@@ -4825,7 +4825,7 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
   setTimeout(()=>{
     hideSplashHard();
     cb();
-  },1300);
+  },600);
 }
 
   function hideSplashHard(){
