@@ -2513,21 +2513,19 @@ body.vk-lock { overflow: hidden; }
   line-height: 1.2;
 }
 
-.vk-dash-status__dot,
-.vk-dash-status__area-dot {
+.vk-dash-status__dot {
   flex: none;
   border-radius: 50%;
   background: var(--vk-success);
-}
-
-.vk-dash-status__dot {
   width: 9px;
   height: 9px;
 }
 
-.vk-dash-status__area-dot {
-  width: 7px;
-  height: 7px;
+.vk-dash-status__area-icon {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--vk-r1-accent);
 }
 
 .vk-dash-status__label {
@@ -2581,29 +2579,44 @@ body.vk-lock { overflow: hidden; }
   white-space: nowrap;
 }
 
-.vk-dash-status[data-health-level="empty"] .vk-dash-status__dot,
-.vk-dash-status__area-dot[data-health-level="empty"] {
+.vk-dash-status[data-health-level="empty"] .vk-dash-status__dot {
   background: #64748b;
 }
 
-.vk-dash-status[data-health-level="protected"] .vk-dash-status__dot,
-.vk-dash-status__area-dot[data-health-level="protected"] {
+.vk-dash-status[data-health-level="protected"] .vk-dash-status__dot {
   background: var(--vk-success);
 }
 
-.vk-dash-status[data-health-level="good"] .vk-dash-status__dot,
-.vk-dash-status__area-dot[data-health-level="good"] {
+.vk-dash-status[data-health-level="good"] .vk-dash-status__dot {
   background: #3b82f6;
 }
 
-.vk-dash-status[data-health-level="attention"] .vk-dash-status__dot,
-.vk-dash-status__area-dot[data-health-level="attention"] {
+.vk-dash-status[data-health-level="attention"] .vk-dash-status__dot {
   background: #f59e0b;
 }
 
-.vk-dash-status[data-health-level="risk"] .vk-dash-status__dot,
-.vk-dash-status__area-dot[data-health-level="risk"] {
+.vk-dash-status[data-health-level="risk"] .vk-dash-status__dot {
   background: #ef4444;
+}
+
+.vk-dash-status__area-icon--continuity[data-health-level="empty"] {
+  color: #64748b;
+}
+
+.vk-dash-status__area-icon--continuity[data-health-level="protected"] {
+  color: var(--vk-success);
+}
+
+.vk-dash-status__area-icon--continuity[data-health-level="good"] {
+  color: #3b82f6;
+}
+
+.vk-dash-status__area-icon--continuity[data-health-level="attention"] {
+  color: #f59e0b;
+}
+
+.vk-dash-status__area-icon--continuity[data-health-level="risk"] {
+  color: #ef4444;
 }
 
 
