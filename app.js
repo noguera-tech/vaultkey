@@ -4811,16 +4811,22 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
   updatePinScale();
   window.addEventListener('resize',updatePinScale);
   function runSplash(cb){
-    const splash=$('vkSplash');
-    if(!splash){cb();return;}
-    updateSplashScale();
-    splash.classList.add('vkSplashVisible');
-    splash.style.opacity='1';
-    setTimeout(()=>{
-      hideSplashHard();
-      cb();
-    },1300);
+  if(window.__VK_TWA__){
+    hideSplashHard();
+    cb();
+    return;
   }
+
+  const splash=$('vkSplash');
+  if(!splash){cb();return;}
+  updateSplashScale();
+  splash.classList.add('vkSplashVisible');
+  splash.style.opacity='1';
+  setTimeout(()=>{
+    hideSplashHard();
+    cb();
+  },1300);
+}
 
   function hideSplashHard(){
     const splash=$('vkSplash');
