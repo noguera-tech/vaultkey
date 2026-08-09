@@ -5806,6 +5806,21 @@ function healthAnalyzePasswords(passwords){
       };
     }
 
+    const ageMonths=item.updatedAt?(Date.now()-item.updatedAt)/(30.44*864e5):null;
+    const ageLevel=ageMonths===null?null:(ageMonths>12?'risk':(ageMonths>=6?'attention':null));
+    const ageIsWorse=ageLevel&&VK_HEALTH_LEVELS[ageLevel]>VK_HEALTH_LEVELS[assessment.level];
+
+    if(ageIsWorse){
+      return {
+        ...item,
+        level:ageLevel,
+        issue:'age',
+        reason:ageLevel==='risk'
+          ?'Esta contrase\u00f1a lleva m\u00e1s de 12 meses sin actualizarse.'
+          :'Esta contrase\u00f1a lleva m\u00e1s de 6 meses sin actualizarse.'
+      };
+    }
+
     return {
       ...item,
       level:assessment.level,
@@ -5871,6 +5886,13 @@ function healthDaysUntil(date,now=Date.now()){
   return Math.ceil((date.getTime()-now)/864e5);
 }
 
+function healthExpiryBadge(days){
+  if(days==null)return '';
+  if(days<0)return '<small class="vk-expiry-badge vk-expiry-badge--risk">Caducado</small>';
+  if(days<=90)return '<small class="vk-expiry-badge vk-expiry-badge--attention">Caduca en '+days+' d\u00edas</small>';
+  return '';
+}
+
 function healthAnalyzeMaintenance(cards,documents,now=Date.now()){
   const cardItems=cards.map(item=>{
     const expiry=healthParseCardExpiry(item.expiry);
@@ -5882,8 +5904,7 @@ function healthAnalyzeMaintenance(cards,documents,now=Date.now()){
     const days=healthDaysUntil(expiry,now);
 
     if(days<0)return {...item,level:'risk',days,reason:'La tarjeta est\u00e1 caducada.'};
-    if(days<=30)return {...item,level:'attention',days,reason:'La tarjeta caduca en 30 d\u00edas o menos.'};
-    if(days<=60)return {...item,level:'good',days,reason:'La tarjeta caducar\u00e1 pr\u00f3ximamente.'};
+    if(days<=90)return {...item,level:'attention',days,reason:'La tarjeta caduca en 90 d\u00edas o menos.'};
 
     return {...item,level:'protected',days,reason:'La tarjeta no caduca pr\u00f3ximamente.'};
   });
@@ -5902,8 +5923,7 @@ function healthAnalyzeMaintenance(cards,documents,now=Date.now()){
     const days=healthDaysUntil(expiry,now);
 
     if(days<0)return {...item,level:'risk',days,reason:'El documento est\u00e1 caducado.'};
-    if(days<=30)return {...item,level:'attention',days,reason:'El documento caduca en 30 d\u00edas o menos.'};
-    if(days<=90)return {...item,level:'good',days,reason:'El documento caducar\u00e1 pr\u00f3ximamente.'};
+    if(days<=90)return {...item,level:'attention',days,reason:'El documento caduca en 90 d\u00edas o menos.'};
 
     return {...item,level:'protected',days,reason:'El documento no caduca pr\u00f3ximamente.'};
   });
@@ -6237,6 +6257,11 @@ function renderVaultHealthDashboard(){
     healthSetAreaLevel('healthAreaSecurity',report.security.level);
     healthSetAreaLevel('healthAreaContinuity',report.continuity.level);
     healthSetAreaLevel('healthAreaMaintenance',report.maintenance.level);
+
+    healthSetAreaLevel('dashTilePasswords',report.security.passwords.items.length?report.security.passwords.level:'empty');
+    healthSetAreaLevel('dashTileNotes','empty');
+    healthSetAreaLevel('dashTileCards',report.maintenance.cards.length?healthWorstLevel(report.maintenance.cards,'protected'):'empty');
+    healthSetAreaLevel('dashTileDocuments',report.maintenance.documents.length?healthWorstLevel(report.maintenance.documents,'protected'):'empty');
   }catch(error){
     console.warn('Vault health dashboard:',error);
     card.dataset.healthLevel='attention';
@@ -6252,6 +6277,11 @@ function renderVaultHealthDashboard(){
     healthSetAreaLevel('healthAreaSecurity','attention');
     healthSetAreaLevel('healthAreaContinuity','attention');
     healthSetAreaLevel('healthAreaMaintenance','attention');
+
+    healthSetAreaLevel('dashTilePasswords','attention');
+    healthSetAreaLevel('dashTileNotes','attention');
+    healthSetAreaLevel('dashTileCards','attention');
+    healthSetAreaLevel('dashTileDocuments','attention');
   }
 }
 
@@ -7380,6 +7410,7 @@ try {
         '<span class="vk-card-row-main">'+
           '<strong>'+cardEscape(card.holder||'Sin titular')+'</strong>'+
           '<small>'+cardEscape(cardMaskedNumber(card.number))+'</small>'+
+          (function(){var expiry=card.expiry?healthParseCardExpiry(card.expiry):null;return expiry?healthExpiryBadge(healthDaysUntil(expiry)):'';})()+
         '</span>'+
         '<svg class="vk-card-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>'+
       '</button>';
@@ -7811,7 +7842,7 @@ function date(v){if(!v)return'';var p=String(v).split('-');return p.length===3?p
 function count(){var e=document.getElementById('statDocuments');if(e){var n=read().length;e.textContent=n+' documento'+(n===1?'':'s');}}
 function modal(id,on){var e=document.getElementById(id);if(e)e.hidden=!on;document.body.classList.toggle('vk-document-modal-open',!!document.querySelector('.vk-document-modal:not([hidden])'));}
 function visual(prefix,c){var a=document.getElementById(prefix+'Category'),b=document.getElementById(prefix+'CategoryIcon');if(a)a.textContent=label(c);if(b)b.innerHTML=icon(c);}
-function render(){var list=document.getElementById('documentsList');if(!list)return;var q=String(document.getElementById('documentsSearch')?.value||'').trim().toLowerCase();var items=read().filter(function(d){return !q||String(d.name||'').toLowerCase().includes(q);}).sort(function(a,b){return Number(b.updatedAt||b.createdAt||0)-Number(a.updatedAt||a.createdAt||0);});if(!items.length){list.innerHTML='<div class="vk-documents-empty"><strong>'+(q?'No se encontraron documentos':'Aún no hay documentos')+'</strong><span>'+(q?'Prueba con otro nombre.':'Pulsa + para añadir el primero.')+'</span></div>';return;}list.innerHTML=items.map(function(d){var sub=d.expiry?'Caduca: '+date(d.expiry):(d.issuedBy||d.country||label(d.category));return '<button type="button" class="vk-document-row" data-document-id="'+esc(d.id)+'"><span class="vk-document-row-icon">'+icon(d.category)+'</span><span class="vk-document-row-main"><strong>'+esc(d.name||label(d.category))+'</strong><small>'+esc(sub)+'</small></span><svg class="vk-document-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg></button>';}).join('');}
+function render(){var list=document.getElementById('documentsList');if(!list)return;var q=String(document.getElementById('documentsSearch')?.value||'').trim().toLowerCase();var items=read().filter(function(d){return !q||String(d.name||'').toLowerCase().includes(q);}).sort(function(a,b){return Number(b.updatedAt||b.createdAt||0)-Number(a.updatedAt||a.createdAt||0);});if(!items.length){list.innerHTML='<div class="vk-documents-empty"><strong>'+(q?'No se encontraron documentos':'Aún no hay documentos')+'</strong><span>'+(q?'Prueba con otro nombre.':'Pulsa + para añadir el primero.')+'</span></div>';return;}list.innerHTML=items.map(function(d){var sub=d.expiry?'Caduca: '+date(d.expiry):(d.issuedBy||d.country||label(d.category));var expiry=d.expiry?healthParseDocumentExpiry(d.expiry):null;var badge=expiry?healthExpiryBadge(healthDaysUntil(expiry)):'';return '<button type="button" class="vk-document-row" data-document-id="'+esc(d.id)+'"><span class="vk-document-row-icon">'+icon(d.category)+'</span><span class="vk-document-row-main"><strong>'+esc(d.name||label(d.category))+'</strong><small>'+esc(sub)+'</small>'+badge+'</span><svg class="vk-document-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg></button>';}).join('');}
 window.showDocuments=function(dir){modal('documentTypePicker',false);modal('documentSourceSheet',false);show('documents',dir);render();count();};
 function documentDataUrlToBlob(dataUrl){
   var parts=String(dataUrl||'').split(',');

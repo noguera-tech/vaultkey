@@ -3086,6 +3086,37 @@ body.vk-lock { overflow: hidden; }
   cursor: pointer;
 }
 
+.vk-expiry-badge {
+  display: block;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.vk-expiry-badge--attention {
+  color: #f59e0b;
+}
+
+.vk-expiry-badge--risk {
+  color: #ef4444;
+}
+
+.vk-dash-tile[data-health-level="empty"] {
+  border-color: var(--vk-r1-border-soft);
+}
+
+.vk-dash-tile[data-health-level="protected"],
+.vk-dash-tile[data-health-level="good"] {
+  border-color: rgba(34, 197, 94, 0.6);
+}
+
+.vk-dash-tile[data-health-level="attention"] {
+  border-color: rgba(245, 158, 11, 0.6);
+}
+
+.vk-dash-tile[data-health-level="risk"] {
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
 
 .vk-dash-tile__icon {
   grid-column: 1;
