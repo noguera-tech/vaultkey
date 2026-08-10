@@ -395,6 +395,16 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
   background:rgba(0,7,18,.85);
   z-index:1201
 }
+#driveBackupPickerModal.vk-drive-picker{z-index:1300}
+#driveBackupPickerModal .vk-drive-picker__sheet{box-sizing:border-box;display:flex;flex-direction:column;min-height:54%;padding:20px 23px max(34px,env(safe-area-inset-bottom));overflow:hidden}
+.vk-drive-picker__sheet h2{margin:0 0 6px;color:#fff;font-size:16px;line-height:20px;font-weight:600;text-align:center}.vk-drive-picker__subtitle{margin:0 0 18px;color:#a7b6c9;font-size:13px;line-height:18px;font-weight:400;text-align:center}
+.vk-drive-picker__list{display:flex;flex-direction:column;gap:18px;overflow:auto;min-height:0;padding:1px;scrollbar-width:none}.vk-drive-picker__list::-webkit-scrollbar{display:none}
+.vk-drive-picker__item{box-sizing:border-box;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:7px;width:100%;min-height:65px;padding:9px 12px;border:1px solid rgba(58,74,96,.6);border-radius:16px;background:#243246;color:#fff;text-align:left;font:inherit;cursor:pointer}
+.vk-drive-picker__item:active{opacity:.86;transform:scale(.985)}.vk-drive-picker__item:focus-visible,.vk-drive-picker__item.is-selected{border-color:#3485ff;outline:2px solid rgba(52,133,255,.35);outline-offset:1px}
+.vk-drive-picker__item strong{padding:6px 12px;border:1px solid rgba(58,74,96,.6);border-radius:16px;color:#fff;font-size:12px;line-height:normal;font-weight:400}.vk-drive-picker__item small{max-width:100%;padding-left:8px;overflow:hidden;color:#a7b6c9;font-size:11px;line-height:normal;font-weight:500;text-overflow:ellipsis;white-space:nowrap}
+.vk-drive-picker__actions{display:flex;justify-content:center;margin-top:18px;padding-top:18px;border-top:1px solid rgba(58,74,96,.8)}
+.vk-drive-picker__cancel{box-sizing:border-box;width:174px;height:48px;min-height:48px;padding:0;border:1px solid #3a4a60;border-radius:16px;background:transparent;color:#fff;font:400 14px/normal Inter,system-ui,sans-serif;cursor:pointer}
+@media(max-height:760px){#driveBackupPickerModal .vk-drive-picker__sheet{min-height:66%}.vk-drive-picker__list{gap:12px}.vk-drive-picker__actions{margin-top:12px;padding-top:12px}}
 #restoreCredentialModal .sheet,#restorePinModal .sheet{
   box-sizing:border-box;
   position:relative;
@@ -561,6 +571,23 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 .vk-backup-sheet__cancel{border:1px solid #3a4a60;background:transparent}
 .vk-backup-sheet__create{border:none;background:#3b82f6}
 .vk-backup-sheet__cancel:active,.vk-backup-sheet__create:active{opacity:.86;transform:scale(.985)}
+
+/* Sistema visual compartido para los bottom sheets aprobados en Figma.
+   Referencia: Estado de tu boveda (nodo 561:329). */
+:root{
+  --vk-sheet-base:linear-gradient(143.863deg,#111827 15.964%,#182f4e 63.204%);
+  --vk-sheet-scrim:rgba(0,0,0,.35);
+  --vk-sheet-panel:rgba(36,50,70,.35);
+  --vk-sheet-radius:24px;
+  --vk-sheet-handle:#6b7280;
+  --vk-sheet-card:#243246;
+  --vk-sheet-border:rgba(58,74,96,.6);
+}
+
+@keyframes vkUnifiedSheetUp{
+  from{transform:translateY(100%)}
+  to{transform:translateY(0)}
+}
 
 .vk-auto-header{box-sizing:border-box;height:64px;background:#243246;border-bottom:1px solid #000;display:flex;align-items:center;padding:0 24px}
 .vk-auto-back{width:32px;height:32px;padding:0;border:0;background:transparent;color:#a7b6c9;display:flex;align-items:center;justify-content:center;cursor:pointer}
@@ -5048,6 +5075,94 @@ if(typeof legacyHandleVisibilityChange==="function"){
   </div>
 </div>
 
+<style id="vkUnifiedBottomSheetOverrides">
+/* Capa final deliberada: evita que los estilos legacy posteriores vuelvan a
+   introducir fondos solidos, borde cian o anchos distintos. */
+.vk-create-picker,
+#backupSheet,
+#driveBackupPickerModal.vk-drive-picker{
+  width:min(100%,430px);
+  background:var(--vk-sheet-base);
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+#driveBackupPickerModal.vk-drive-picker{
+  inset:0;
+}
+.vk-document-modal{
+  background:var(--vk-sheet-base);
+}
+.vk-create-picker__backdrop,
+.vk-document-modal-backdrop{
+  background:var(--vk-sheet-scrim);
+}
+#backupSheet::before,
+#driveBackupPickerModal.vk-drive-picker::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  background:var(--vk-sheet-scrim);
+  pointer-events:none;
+}
+.vk-create-picker__sheet,
+.vk-document-source-sheet,
+#backupSheet .sheet.vk-backup-sheet,
+#driveBackupPickerModal .vk-drive-picker__sheet{
+  z-index:2;
+  border:0;
+  border-radius:var(--vk-sheet-radius) var(--vk-sheet-radius) 0 0;
+  background:var(--vk-sheet-panel);
+  box-shadow:none;
+}
+#driveBackupPickerModal .vk-drive-picker__sheet{
+  position:relative;
+}
+#driveBackupPickerModal .vk-drive-picker__list{
+  padding-right:7px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(167,182,201,.4) transparent;
+}
+#driveBackupPickerModal .vk-drive-picker__list::-webkit-scrollbar{
+  display:block;
+  width:4px;
+}
+#driveBackupPickerModal .vk-drive-picker__list::-webkit-scrollbar-thumb{
+  border-radius:2px;
+  background:rgba(167,182,201,.4);
+}
+#driveBackupPickerModal .vk-drive-picker__list::-webkit-scrollbar-track{
+  background:transparent;
+}
+#driveBackupPickerModal .vk-drive-picker__item{
+  flex:0 0 auto;
+  min-height:84px;
+}
+#driveBackupPickerModal .vk-drive-picker__item strong,
+#driveBackupPickerModal .vk-drive-picker__item small{
+  flex:0 0 auto;
+}
+#driveBackupPickerModal .vk-drive-picker__item small{
+  min-height:16px;
+  line-height:16px;
+}
+.vk-create-picker__sheet,
+.vk-document-source-sheet,
+#backupSheet.open .vk-backup-sheet,
+#driveBackupPickerModal.open .vk-drive-picker__sheet,
+#healthModal.open .vk-health-sheet{
+  animation:vkUnifiedSheetUp 280ms cubic-bezier(.22,1,.36,1) both;
+}
+@media (prefers-reduced-motion:reduce){
+  .vk-create-picker__sheet,
+  .vk-document-source-sheet,
+  #backupSheet.open .vk-backup-sheet,
+  #driveBackupPickerModal.open .vk-drive-picker__sheet,
+  #healthModal.open .vk-health-sheet{
+    animation:none;
+  }
+}
+</style>
+
 </body>
 </html>
-

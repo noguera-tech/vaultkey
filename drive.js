@@ -97,7 +97,13 @@ function driveBackupFileName(timestamp) {
   const dd = String(date.getDate()).padStart(2, '0');
   const mm = String(date.getMonth() + 1).padStart(2, '0');
   const yyyy = date.getFullYear();
-  return `VaultKey_Backup_${dd}${mm}${yyyy}.vkbak`;
+  const hh = String(date.getHours()).padStart(2, '0');
+  const min = String(date.getMinutes()).padStart(2, '0');
+  const ss = String(date.getSeconds()).padStart(2, '0');
+  const random = new Uint8Array(4);
+  crypto.getRandomValues(random);
+  const suffix = Array.from(random, value => value.toString(16).padStart(2, '0')).join('');
+  return `VaultKey_Backup_${dd}${mm}${yyyy}_${hh}${min}${ss}_${suffix}.vkbak`;
 }
 
 function driveToast(message, sound) {
@@ -209,13 +215,9 @@ async function driveConnect() {
     await driveWaitForGoogleIdentity();
     const response = await driveRequestToken();
     driveSaveToken(response);
-    driveToast('✅ Conectado a Drive', 'ok');
-    console.info('Drive connected');
-
-    // Primer respaldo automático tras conectar (silencioso; si falla no bloquea la conexión)
-    const synced = await driveSyncNow(true);
     driveSyncUI();
-    if (!synced) driveToast('Drive conectado, pero no se pudo crear la copia inicial', 'err');
+    driveToast('✅ Google Drive conectado. No se ha creado ninguna copia automáticamente.', 'ok');
+    console.info('Drive connected');
     return true;
   } catch (error) {
     localStorage.removeItem(DRIVE_TOKEN_KEY);
@@ -225,7 +227,7 @@ async function driveConnect() {
     if (typeof vkConfirm === 'function') {
       retry = await vkConfirm(
         'No se pudo conectar con Google Drive',
-        'No hemos podido establecer la conexi?n.\n\nComprueba tu conexi?n a Internet e int?ntalo de nuevo.',
+        'No hemos podido establecer la conexión.\n\nComprueba tu conexión a Internet e inténtalo de nuevo.',
         {
           variant: 'drive-connect-error',
           confirmText: 'Reintentar'
@@ -289,14 +291,16 @@ async function driveFindLatestBackup(accessToken) {
 // Variante de driveFindLatestBackup con pageSize mayor — no modifica esa función.
 async function driveListAllBackups(accessToken) {
   const query = encodeURIComponent("name contains 'VaultKey_Backup_' and trashed=false");
-  const fields = encodeURIComponent('files(id,name,modifiedTime)');
+  const fields = encodeURIComponent('files(id,name,createdTime,modifiedTime,size,md5Checksum)');
   const url = `https://www.googleapis.com/drive/v3/files?q=${query}&spaces=drive&orderBy=modifiedTime desc&fields=${fields}&pageSize=100`;
 
   const result = await driveFetchJson(url, {
     headers: { Authorization: `Bearer ${accessToken}` }
   });
 
-  return result && Array.isArray(result.files) ? result.files : [];
+  return result && Array.isArray(result.files)
+    ? result.files.filter(file => typeof file.name === 'string' && file.name.endsWith('.vkbak'))
+    : [];
 }
 
 // Mueve a la papelera de Drive las copias que sobran, manteniendo solo las
@@ -371,20 +375,91 @@ async function driveUploadBackup(accessToken, fileName, payload) {
       };
   const backup = JSON.stringify(backupData);
 
-  const existing = await driveFindBackup(accessToken, fileName);
   const metadata = { name: fileName, mimeType: 'application/octet-stream' };
   const form = new FormData();
   form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
   form.append('file', new Blob([backup], { type: 'application/octet-stream' }), fileName);
 
-  const endpoint = existing
-    ? `https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(existing.id)}?uploadType=multipart&fields=id,name,modifiedTime`
-    : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,modifiedTime';
+  // Las copias son inmutables: cada subida crea un archivo nuevo. Nunca se
+  // sobrescribe una copia anterior buscando por nombre.
+  const endpoint = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,createdTime,modifiedTime,size,md5Checksum';
 
   return driveFetchJson(endpoint, {
-    method: existing ? 'PATCH' : 'POST',
+    method: 'POST',
     headers: { Authorization: `Bearer ${accessToken}` },
     body: form
+  });
+}
+
+function driveFormatBackupSize(rawSize) {
+  const size = Number(rawSize);
+  if (!Number.isFinite(size) || size < 0) return 'Tamaño no disponible';
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${Math.max(1, Math.round(size / 1024))} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function driveChooseBackup(files) {
+  return new Promise((resolve) => {
+    const existing = document.getElementById('driveBackupPickerModal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'driveBackupPickerModal';
+    modal.className = 'modal open vk-drive-picker';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-labelledby', 'driveBackupPickerTitle');
+
+    const sheet = document.createElement('div');
+    sheet.className = 'sheet vk-drive-picker__sheet';
+    const title = document.createElement('h2');
+    title.id = 'driveBackupPickerTitle';
+    title.textContent = 'Elegir copia de seguridad';
+    const subtitle = document.createElement('p');
+    subtitle.className = 'vk-drive-picker__subtitle';
+    subtitle.textContent = 'Selecciona la copia que quieres restaurar.';
+    const list = document.createElement('div');
+    list.className = 'vk-drive-picker__list';
+
+    let settled = false;
+    const close = (value) => {
+      if (settled) return;
+      settled = true;
+      document.removeEventListener('keydown', onKeyDown);
+      modal.remove();
+      resolve(value);
+    };
+    const onKeyDown = (event) => { if (event.key === 'Escape') close(null); };
+
+    files.forEach((file, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'vk-drive-picker__item';
+      const date = document.createElement('strong');
+      date.textContent = driveFormatDate(Date.parse(file.modifiedTime), true);
+      const details = document.createElement('small');
+      details.textContent = `${driveFormatBackupSize(file.size)} · ${file.name}`;
+      button.append(date, details);
+      button.addEventListener('click', () => close(file));
+      list.appendChild(button);
+      if (index === 0) setTimeout(() => button.focus(), 0);
+    });
+
+    const actions = document.createElement('div');
+    actions.className = 'vk-drive-picker__actions';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'vk-drive-picker__cancel';
+    cancel.textContent = 'Cancelar';
+    cancel.addEventListener('click', () => close(null));
+
+    actions.append(cancel);
+    sheet.append(title, subtitle, list, actions);
+    modal.appendChild(sheet);
+    const appRoot = document.querySelector('.app');
+    (appRoot || document.body).appendChild(modal);
+    document.addEventListener('keydown', onKeyDown);
   });
 }
 
@@ -482,18 +557,21 @@ async function driveRestore() {
   const accessToken = driveGetValidAccessToken();
   if (!accessToken) { driveToast('❌ Primero conecta Google Drive', 'err'); return false; }
 
-  driveSetUiState('syncing');
+  driveSetUiState('restoring');
   try {
-    const file = await driveFindLatestBackup(accessToken);
-    if (!file) {
+    const files = await driveListAllBackups(accessToken);
+    if (!files.length) {
       driveSyncUI();
       driveToast('No se encontró ningún respaldo en Drive', 'err');
       return false;
     }
 
+    const file = await driveChooseBackup(files);
+    if (!file) { driveSyncUI(); return false; }
+
     const ok = await vkConfirm(
       'Restaurar copia',
-      'Esta acción reemplazará los datos actuales de este dispositivo por la copia seleccionada.',
+      `Esta acción reemplazará los datos actuales por la copia del ${driveFormatDate(Date.parse(file.modifiedTime), true)} (${driveFormatBackupSize(file.size)}).`,
       { variant: 'drive-restore', confirmText: 'Restaurar' }
     );
     if (!ok) { driveSyncUI(); return false; }
@@ -512,15 +590,6 @@ async function driveRestore() {
       }
       if (typeof window.vkStore === 'undefined' || typeof window.vkAttachments === 'undefined') {
         throw new Error('vkStore o vkAttachments no están disponibles');
-      }
-
-      if (typeof window.vkStore.hasVault === 'function' && window.vkStore.hasVault()) {
-        const confirmed = await vkConfirm(
-          'Restaurar Boveda Vaultkey',
-          'Se sustituirá la bóveda local actual por el respaldo elegido.',
-          { variant: 'drive-restore', confirmText: 'Restaurar' }
-        );
-        if (!confirmed) { driveSyncUI(); return false; }
       }
 
       let credential = null;

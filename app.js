@@ -1084,7 +1084,16 @@ window.syncDriveSettingsUI=function(state){
     document.getElementById('driveRetryCard').hidden=false;
     return;
   }
-  if(statusText)statusText.textContent=state==='syncing'?'Sincronizando...':'Todo sincronizado';
+  if(statusText){
+    const hasSync=Boolean(localStorage.getItem('vk_drive_last_sync'));
+    statusText.textContent=state==='syncing'
+      ?'Creando copia...'
+      :state==='restoring'
+        ?'Preparando restauración...'
+        :hasSync
+          ?'Copia de seguridad actualizada'
+          :'Conectado · aún no hay copias creadas';
+  }
   document.getElementById('driveBackupCard').hidden=false;
   document.getElementById('driveRestoreCard').hidden=false;
   if(state==='connected')document.getElementById('driveDisconnectCard').hidden=false;
@@ -2541,8 +2550,7 @@ async function doImportConfirm() {
     const count = vault.length;
     closeImportModal();
     soundSuccess(); vibe([30,20,60]);
-    toast('✓ Respaldo importado — ' + count + ' entradas restauradas');
-    try{ driveAutoSync(); }catch(e){}
+    toast('✓ Respaldo importado — ' + count + ' entradas restauradas. Google Drive no se ha sincronizado.');
   } catch(e) {
     vault = _prevVault;
     soundError();
@@ -2639,8 +2647,7 @@ async function importBackup(file) {
         crypto: vkCrypto
       });
 
-      toast('✓ Respaldo VaultKey 2.0 restaurado','ok');
-      try{ driveAutoSync(); }catch(e){}
+      toast('✓ Respaldo VaultKey 2.0 restaurado. Google Drive no se ha sincronizado.','ok');
       if(typeof lock==='function') lock();
       return;
     }
@@ -8060,4 +8067,3 @@ document.addEventListener('click',function(e){var r=e.target.closest&&e.target.c
 document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('[data-doc-icon]').forEach(function(n){n.innerHTML=icon(n.getAttribute('data-doc-icon'));});var s=document.getElementById('documentsSearch');if(s&&!bound){bound=true;s.addEventListener('input',render);}count();});
 window.vkDocuments={read:read,render:render,updateCount:count};
 })();
-
