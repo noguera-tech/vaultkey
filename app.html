@@ -3148,7 +3148,8 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
   bottom:0;
   box-sizing:border-box;
   min-height:0;
-  height:92dvh;
+  height:auto;
+  max-height:92dvh;
   padding:18px 24px 24px;
   border-radius:24px 24px 0 0;
   background:#182F4E;
@@ -3165,19 +3166,6 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
   padding:0 4px 4px 0;
   scrollbar-width:thin;
   scrollbar-color:rgba(167,182,201,.4) transparent;
-}
-
-.vk-generator-scroll::after {
-  content:"";
-  display:block;
-  position:sticky;
-  bottom:0;
-  left:0;
-  right:0;
-  height:26px;
-  margin-top:-26px;
-  background:linear-gradient(to bottom, rgba(20,28,42,0), rgba(20,28,42,.82));
-  pointer-events:none;
 }
 
 .vk-generator-scroll::-webkit-scrollbar {
@@ -3444,6 +3432,10 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
   display:none;
 }
 
+.vk-generator-sheet--expanded {
+  height:92dvh;
+}
+
 .vk-generator-stepper-row {
   display:flex;
   align-items:center;
@@ -3556,6 +3548,27 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 
   .vk-generator-actions {
     gap:12px;
+  }
+}
+
+@media (max-height:760px) {
+  .vk-generator-sheet,
+  .vk-generator-sheet--expanded {
+    max-height:96dvh;
+  }
+  .vk-generator-sheet--expanded {
+    height:96dvh;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .vk-generator-modal.open,
+  .vk-generator-sheet {
+    animation:none;
+  }
+
+  .vk-generator-advanced-toggle svg {
+    transition:none;
   }
 }
 </style>
@@ -4455,6 +4468,7 @@ document.addEventListener("DOMContentLoaded",function(){
     genEl("generatorCategoryRows").hidden=false;
     genEl("generatorAdvancedOptions").hidden=true;
     genEl("generatorAdvancedToggle").setAttribute("aria-expanded","false");
+    genEl("generatorAdvancedToggle").closest(".vk-generator-sheet").classList.remove("vk-generator-sheet--expanded");
     syncRanges(false);
   }
 
@@ -4526,9 +4540,11 @@ document.addEventListener("DOMContentLoaded",function(){
     var panel=genEl("generatorAdvancedOptions");
     var button=genEl("generatorAdvancedToggle");
     var expanded=button.getAttribute("aria-expanded")==="true";
+    var sheet=button.closest(".vk-generator-sheet");
 
     panel.hidden=expanded;
     button.setAttribute("aria-expanded",expanded?"false":"true");
+    if(sheet)sheet.classList.toggle("vk-generator-sheet--expanded",!expanded);
   };
 
   window.toggleGeneratorPinMode=function(){
