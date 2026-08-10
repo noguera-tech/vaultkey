@@ -1482,13 +1482,13 @@ body.vk-lock { overflow: hidden; }
 .vk-onb > .vk-onb__start {
   position: absolute;
   top: 644px;
-  left: 50%;
+  left: 0;
+  right: 0;
   width: 320px;
   min-height: 56px;
   height: 56px;
-  margin: 0;
+  margin: 0 auto;
   padding: 0;
-  transform: translateX(-50%);
   border: 0;
   border-radius: 16px;
   background: #2f6fea;
@@ -4939,6 +4939,6 @@ body.vk-create-picker-open {
 
   .vk-onb > .vk-onb__start {
     width: min(320px, calc(100% - 40px));
-    transform: translate(-50%, var(--vk-welcome-shift-y));
+    transform: translateY(var(--vk-welcome-shift-y));
   }
 }
