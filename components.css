@@ -3414,6 +3414,51 @@ body.vk-create-picker-open {
   overflow: hidden;
 }
 
+/* Cabeceras principales: misma altura, alineación y zona táctil. */
+.vk-section-header {
+  box-sizing: border-box;
+  height: 64px !important;
+  min-height: 64px !important;
+  flex: 0 0 64px;
+  padding-inline: 0 !important;
+}
+
+.vk-section-header .vk-note-back,
+.vk-section-header .vk-iconbtn,
+.vk-section-header .vk-notes-icon-button,
+.vk-section-header .vk-cards-icon-button,
+.vk-section-header .vk-documents-icon-button {
+  width: 48px !important;
+  height: 48px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.vk-section-header .vk-note-back svg,
+.vk-section-header .vk-iconbtn svg,
+.vk-section-header .vk-notes-icon-button svg,
+.vk-section-header .vk-cards-icon-button svg,
+.vk-section-header .vk-documents-icon-button svg {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.vk-section-header .vk-passwords-header__actions,
+.vk-section-header .vk-notes-topbar-actions,
+.vk-section-header .vk-cards-topbar-actions,
+.vk-section-header .vk-documents-topbar-actions,
+.vk-section-header .vk-header__actions {
+  gap: 0 !important;
+}
+
+#passwords .vk-passwords-content {
+  height: calc(100% - 64px);
+}
+
 @keyframes vk-create-picker-sheet-in {
   from {
     transform: translateY(100%);
