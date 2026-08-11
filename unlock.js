@@ -201,7 +201,12 @@
      que el llamador decida si el borrado quedó completo. */
   function autoWipeFragmentedStores() {
     var results = {};
-    ['vaultkey_notes', 'vaultkey_cards', 'vaultkey_documents'].forEach(function (key) {
+    [
+      'vaultkey_notes', 'vaultkey_cards', 'vaultkey_documents',
+      'vk_pin_change_backup',
+      'vk_drive_token', 'vk_drive_last_sync', 'vk_local_backup_last',
+      'vk_recovery_pending', 'vk_recovery_saved'
+    ].forEach(function (key) {
       try { root.localStorage.removeItem(key); results[key] = { ok: true }; }
       catch (err) { results[key] = { ok: false, error: err }; }
     });
@@ -217,7 +222,10 @@
   function autoWipeCheckRemaining() {
     var remaining = [];
     var keys = ['vk2_blob', 'vk2_pinwrap', 'vk2_meta',
-      'vaultkey_notes', 'vaultkey_cards', 'vaultkey_documents'];
+      'vaultkey_notes', 'vaultkey_cards', 'vaultkey_documents',
+      'vk_pin_change_backup',
+      'vk_drive_token', 'vk_drive_last_sync', 'vk_local_backup_last',
+      'vk_recovery_pending', 'vk_recovery_saved'];
     keys.forEach(function (k) {
       try { if (root.localStorage.getItem(k) !== null) remaining.push(k); }
       catch (e) { remaining.push(k + ' (no verificable)'); }
@@ -360,9 +368,11 @@
               })
               .then(function () {
                 return ctx.store.wipeLocal().then(function (result) {
-                  wipeResults.vk2Store = { ok: true, pepperDeleted: !!(result && result.pepperDeleted) };
+                  var pepperDeleted = !!(result && result.pepperDeleted);
+                  wipeResults.vk2Store = { ok: pepperDeleted, pepperDeleted: pepperDeleted };
                   if (result && result.pepperDeleted === false) {
                     console.error('[VK2] wipeLocal: el pepper del dispositivo no se pudo borrar', result.pepperError);
+                    wipeResults.vk2Store.error = result.pepperError || 'pepper no eliminado';
                   }
                 }, function (err) {
                   console.error('[VK2] auto-wipe: fallo al borrar la bóveda local', err);

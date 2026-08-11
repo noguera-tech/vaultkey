@@ -702,7 +702,22 @@ function lock(){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSessio
    que el llamador decida si el borrado quedó completo. */
 function wipeFragmentedLocalStores(){
   var results={};
-  [['notes','vaultkey_notes'],['cards','vaultkey_cards'],['documents','vaultkey_documents']].forEach(function(pair){
+  [
+    ['notes','vaultkey_notes'],
+    ['cards','vaultkey_cards'],
+    ['documents','vaultkey_documents'],
+    /* Copia transitoria de la boveda legacy durante un cambio de PIN. */
+    ['pinChangeBackup','vk_pin_change_backup'],
+    /* La conexion OAuth y sus marcas pertenecen a la boveda local borrada.
+       Las copias remotas de Drive no se tocan. */
+    ['driveToken','vk_drive_token'],
+    ['driveLastSync','vk_drive_last_sync'],
+    ['localBackupLast','vk_local_backup_last'],
+    /* Estado del flujo de recuperacion; no contiene el codigo, pero no debe
+       sobrevivir y contaminar el onboarding de una boveda nueva. */
+    ['recoveryPending','vk_recovery_pending'],
+    ['recoverySaved','vk_recovery_saved']
+  ].forEach(function(pair){
     try{ localStorage.removeItem(pair[1]); results[pair[0]]={ok:true}; }
     catch(err){ results[pair[0]]={ok:false,error:err}; }
   });
@@ -717,7 +732,9 @@ function wipeFragmentedLocalStores(){
 function wipeCheckRemaining(){
   var remaining=[];
   var keys=['vk2_blob','vk2_pinwrap','vk2_meta',LS_META,LS_DATA,LS_REC,
-    'vaultkey_notes','vaultkey_cards','vaultkey_documents'];
+    'vaultkey_notes','vaultkey_cards','vaultkey_documents',
+    'vk_pin_change_backup','vk_drive_token','vk_drive_last_sync',
+    'vk_local_backup_last','vk_recovery_pending','vk_recovery_saved'];
   keys.forEach(function(k){
     try{ if(localStorage.getItem(k)!==null) remaining.push(k); }
     catch(e){ remaining.push(k+' (no verificable)'); }
@@ -727,8 +744,9 @@ function wipeCheckRemaining(){
   return remaining;
 }
 
-async function wipe(){
-  if(!(await vkConfirm('Borrar todos los datos','Se eliminará la bóveda de este dispositivo. Esta acción no se puede deshacer.',{variant:'wipe',confirmText:'Borrar'})))return;
+async function wipe(options){
+  options=options||{};
+  if(!options.skipConfirm&&!(await vkConfirm('Borrar la bóveda local','Se eliminará la bóveda de este dispositivo. Las copias de Drive y los archivos descargados se conservarán.',{variant:'wipe',confirmText:'Borrar'})))return false;
 
   soundError();vibe([60,30,60,30,100]);
   const isVk2=typeof vkStore!=='undefined'&&vkStore.hasVault();
@@ -743,19 +761,23 @@ async function wipe(){
     results.attachments={ok:false,error:'vkAttachments no disponible'};
   }
 
-  /* Paso 2 — modelo central VK2 (vk2_blob, vk2_pinwrap, vk2_meta, pepper) */
-  if(isVk2){
+  /* Paso 2 — modelo central VK2 (vk2_blob, vk2_pinwrap, vk2_meta, pepper).
+     Se ejecuta aunque ya no haya blob: un intento anterior interrumpido pudo
+     borrar localStorage y dejar el pepper del dispositivo. */
+  if(typeof vkStore!=='undefined'&&typeof vkStore.wipeLocal==='function'){
     try{
       const r=await vkStore.wipeLocal();
-      results.vk2Store={ok:true,pepperDeleted:!!(r&&r.pepperDeleted)};
+      const pepperDeleted=!!(r&&r.pepperDeleted);
+      results.vk2Store={ok:pepperDeleted,pepperDeleted:pepperDeleted};
       if(r&&r.pepperDeleted===false){
         console.error('wipe: el pepper del dispositivo no se pudo borrar',r.pepperError);
+        results.vk2Store.error=r.pepperError||'pepper no eliminado';
       }
     }catch(err){
       console.error('wipe: fallo al borrar la bóveda VK2',err);
       results.vk2Store={ok:false,error:err};
     }
-  }
+  }else results.vk2Store={ok:false,error:'vkStore.wipeLocal no disponible'};
 
   /* Paso 3 — claves legacy 1.x, independientes de si hay bóveda VK2 */
   [['legacyMeta',LS_META],['legacyData',LS_DATA],['legacyRecovery',LS_REC]].forEach(function(pair){
@@ -781,7 +803,7 @@ async function wipe(){
     console.error('wipe: borrado incompleto',{results:results,remaining:remaining,coreOk:coreOk});
     toast('El borrado no se completó del todo. Revisa la consola y vuelve a intentarlo.','err');
     lock();
-    return;
+    return false;
   }
 
   /* Solo se avanza a onboarding (o se cierra sesión en modo legacy) cuando el
@@ -790,8 +812,10 @@ async function wipe(){
      sessionStorage— puede sobrevivir a "Borrar todos los datos". coreOk se
      conserva arriba solo para depurar, nunca decide si se avanza. */
   localStorage.removeItem('vaultkey_onboarding_v130');
+  if(options.deferNavigation)return true;
   if(isVk2){ openOnboardingHard(); }
   else{ lock(); }
+  return true;
 }
 
 /* ============================================================
@@ -1306,8 +1330,56 @@ function confirmRecoverySaved(){
   closeModals();
 }
 
-function registerFailedPin(){vibe([40,30,40]);soundPinErr();let m=defaultSecurity(meta());if(!m){$('pinMsg').textContent='PIN incorrecto';pin='';renderDots();return}m.failedAttempts=(m.failedAttempts||0)+1;m.totalFailed=(m.totalFailed||0)+1;m.lastFail=Date.now();let msg='PIN incorrecto';const remaining=m.autoWipe?Math.max(0,10-m.totalFailed):null;if(m.autoWipe&&remaining<=3&&remaining>0)msg='PIN incorrecto. '+(remaining===1?'⚠️ Último intento antes del borrado':'⚠️ Quedan '+remaining+' intentos antes del borrado');if(m.autoWipe&&m.totalFailed>=10){saveMeta(m);soundError();vibe([80,40,80,40,120]);localStorage.removeItem(LS_META);localStorage.removeItem(LS_DATA);localStorage.removeItem(LS_REC);vault=[];$('pinMsg').className='pinSub pinWarn';$('pinMsg').textContent='Demasiados intentos. Bóveda borrada.';pin='';renderDots();setTimeout(()=>lock(),1800);return;}if(m.failedAttempts===4&&!m.autoWipe)msg='PIN incorrecto. Te quedan 2 intentos';if(m.failedAttempts===5&&!m.autoWipe)msg='PIN incorrecto. Te queda 1 intento';if(m.failedAttempts>=6){const levels=[30000,60000,300000,900000];let idx=Math.min(m.lockLevel||0,levels.length-1);let ms=levels[idx];m.lockedUntil=Date.now()+ms;m.lockLevel=Math.min(idx+1,levels.length-1);m.failedAttempts=0;if(!m.autoWipe)msg='Demasiados intentos. Bóveda bloqueada '+Math.ceil(ms/1000)+' s';else msg='Bóveda bloqueada '+Math.ceil(ms/1000)+' s · Quedan '+(Math.max(0,10-m.totalFailed))+' intentos antes del borrado';}
-saveMeta(m);$('pinMsg').className='pinSub '+(m.lockedUntil>Date.now()?'pinLocked':'pinWarn');$('pinMsg').textContent=msg;pin='';renderDots();updateLockCountdown();}
+function registerFailedPin(){
+  vibe([40,30,40]);soundPinErr();
+  let m=defaultSecurity(meta());
+  if(!m){$('pinMsg').textContent='PIN incorrecto';pin='';renderDots();return;}
+  m.failedAttempts=(m.failedAttempts||0)+1;
+  m.totalFailed=(m.totalFailed||0)+1;
+  m.lastFail=Date.now();
+  let msg='PIN incorrecto';
+  const remaining=m.autoWipe?Math.max(0,10-m.totalFailed):null;
+  if(m.autoWipe&&remaining<=3&&remaining>0){
+    msg='PIN incorrecto. '+(remaining===1?'⚠️ Último intento antes del borrado':'⚠️ Quedan '+remaining+' intentos antes del borrado');
+  }
+  if(m.autoWipe&&m.totalFailed>=10){
+    saveMeta(m);soundError();vibe([80,40,80,40,120]);
+    pin='';renderDots();
+    $('pinMsg').className='pinSub pinWarn';
+    $('pinMsg').textContent='Décimo intento fallido. Borrando datos locales…';
+    Promise.resolve(wipe({skipConfirm:true,deferNavigation:true})).then(function(complete){
+      const msgEl=$('pinMsg');
+      if(complete){
+        if(msgEl){msgEl.className='pinSub pinWarn';msgEl.textContent='Demasiados intentos. Bóveda local borrada.';}
+        setTimeout(function(){window.location.reload();},1800);
+      }else if(msgEl){
+        msgEl.className='pinSub pinWarn';
+        msgEl.textContent='No se pudo completar el borrado. La aplicación permanece bloqueada.';
+      }
+    }).catch(function(err){
+      console.error('auto-wipe legacy: error inesperado',err);
+      lock();
+      const msgEl=$('pinMsg');
+      if(msgEl){msgEl.className='pinSub pinWarn';msgEl.textContent='No se pudo completar el borrado. La aplicación permanece bloqueada.';}
+    });
+    return;
+  }
+  if(m.failedAttempts===4&&!m.autoWipe)msg='PIN incorrecto. Te quedan 2 intentos';
+  if(m.failedAttempts===5&&!m.autoWipe)msg='PIN incorrecto. Te queda 1 intento';
+  if(m.failedAttempts>=6){
+    const levels=[30000,60000,300000,900000];
+    let idx=Math.min(m.lockLevel||0,levels.length-1);
+    let ms=levels[idx];
+    m.lockedUntil=Date.now()+ms;
+    m.lockLevel=Math.min(idx+1,levels.length-1);
+    m.failedAttempts=0;
+    if(!m.autoWipe)msg='Demasiados intentos. Bóveda bloqueada '+Math.ceil(ms/1000)+' s';
+    else msg='Bóveda bloqueada '+Math.ceil(ms/1000)+' s · Quedan '+Math.max(0,10-m.totalFailed)+' intentos antes del borrado';
+  }
+  saveMeta(m);
+  $('pinMsg').className='pinSub '+(m.lockedUntil>Date.now()?'pinLocked':'pinWarn');
+  $('pinMsg').textContent=msg;pin='';renderDots();updateLockCountdown();
+}
 function updateLockCountdown(){clearInterval(lockCountdownTimer);let left=lockRemaining();if(!left)return;lockCountdownTimer=setInterval(()=>{let s=lockRemaining();if(!s){clearInterval(lockCountdownTimer);$('pinMsg').className='pinSub';$('pinMsg').textContent='Introduce tu PIN';return}$('pinMsg').textContent='Bóveda bloqueada. Espera '+s+' s';},1000)}
 function getAutoLockMs(){let m=defaultSecurity(meta());return m?Number(m.autoLockMs||0):0}
 function setAutoLock(v){let m=defaultSecurity(meta());if(!m)return;m.autoLockMs=Number(v);saveMeta(m);toast(m.autoLockMs===0?'Bloqueo inmediato al salir activado':'Autobloqueo inteligente actualizado');resetAutoLockTimer()}
