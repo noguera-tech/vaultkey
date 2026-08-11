@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#020b18">
 <meta name="google-site-verification" content="_8meo7ShNT42Ti3V1tBcEr4MHRVlIMoDhp6uBMfpl_s" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com; script-src-elem 'self' https://accounts.google.com 'sha256-oKqMkSzexOvpPIWl5D/bf4HH7/QeZ2lS6q7JBzxaCpo=' 'sha256-I4l+E9zZdjPekPfKUarKSArNW/pzFLEJpXCE7ZJSOBU=' 'sha256-yEQTeVAiRMIU+W6ckqpSuDQq223sZGQ1bwD3TPEowrg=' 'sha256-flI/zTnTEJNBznWLx+OfARnnw0P9opRq1yhsemoSqlc=' 'sha256-ffQc3681ZiuGpMSyi1VrI17z4yTzc2Kjuu6CSj/DdvY=' 'sha256-BZp15IYjvHMyUcrxKUmJeFv8/YfUAs45PrvOaqGl25Q=' 'sha256-nbU2rhx6t+dEAjqDd5HHAA+oGfMTd3TR+d96g9gAdWw=' 'sha256-qY8rrHmLGOLK8PjsEOZuK6xqLFKbMvnJ7tDPjqs43hA='; script-src-attr 'unsafe-inline'; style-src 'self'; style-src-elem 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://*.googleusercontent.com; connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com https://www.google.com; frame-src 'none'; object-src 'none'; base-uri 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com; script-src-elem 'self' https://accounts.google.com 'sha256-oKqMkSzexOvpPIWl5D/bf4HH7/QeZ2lS6q7JBzxaCpo=' 'sha256-I4l+E9zZdjPekPfKUarKSArNW/pzFLEJpXCE7ZJSOBU=' 'sha256-yEQTeVAiRMIU+W6ckqpSuDQq223sZGQ1bwD3TPEowrg=' 'sha256-flI/zTnTEJNBznWLx+OfARnnw0P9opRq1yhsemoSqlc=' 'sha256-ffQc3681ZiuGpMSyi1VrI17z4yTzc2Kjuu6CSj/DdvY=' 'sha256-BZp15IYjvHMyUcrxKUmJeFv8/YfUAs45PrvOaqGl25Q=' 'sha256-nbU2rhx6t+dEAjqDd5HHAA+oGfMTd3TR+d96g9gAdWw=' 'sha256-o+u9qLVCL3p7pgJgr5DRPebUDpHZ71DUR9NA7d+gkaM='; script-src-attr 'unsafe-inline'; style-src 'self'; style-src-elem 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https://*.googleusercontent.com; connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com https://www.google.com; frame-src 'none'; object-src 'none'; base-uri 'self';">
 <title>VaultKey</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="vaultkey-icon-192.png?v=48">
@@ -3580,7 +3580,6 @@ var VK2_OPTION_TO_MS={immediate:0,"30s":30000,"1m":60000,"5m":300000};
 var legacyGetAutoLockMs=window.getAutoLockMs;
 var legacySetAutoLock=window.setAutoLock;
 var legacyResetAutoLockTimer=window.resetAutoLockTimer;
-var legacyHandleVisibilityChange=window.handleVisibilityChange;
 
 function isVK2Vault(){
   return !!(window.vkStore &&
@@ -3620,29 +3619,11 @@ window.setAutoLock=function(ms){
      typeof window.vkSession.setAutolockOption==="function"){
     window.vkSession.setAutolockOption(option);
   }
-};
 
-window.resetAutoLockTimer=function(){
-  if(isVK2Vault()) return;
   if(typeof legacyResetAutoLockTimer==="function"){
     legacyResetAutoLockTimer();
   }
 };
-
-/* Evita que el listener legacy cree un segundo temporizador en VK2. */
-if(typeof legacyHandleVisibilityChange==="function"){
-  document.removeEventListener("visibilitychange",legacyHandleVisibilityChange);
-  document.addEventListener("visibilitychange",function(){
-    if(isVK2Vault()){
-      if(document.hidden &&
-         typeof window.showPrivacyOverlay==="function"){
-        window.showPrivacyOverlay();
-      }
-      return;
-    }
-    legacyHandleVisibilityChange();
-  });
-}
 })();
 </script>
 <div class="modal" id="securityModal">
