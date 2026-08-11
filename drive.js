@@ -14,6 +14,7 @@ const DRIVE_TOKEN_SAFETY_MS = 60 * 1000;
 const DRIVE_KEEP_BACKUPS = 10;
 
 let driveTokenClient = null;
+let driveAccessToken = null;
 let driveUiState = 'disconnected';
 let driveNetworkListenersBound = false;
 
@@ -35,24 +36,15 @@ function driveEndOAuthGuard() {
   window._vkGoogleOAuthGraceUntil = Date.now() + 1500;
 }
 
-// ---------- Token (persistente, con expiración) ----------
+// ---------- Token (solo en memoria, con expiración) ----------
+function driveClearToken() {
+  driveAccessToken = null;
+  // Limpieza de compatibilidad: versiones anteriores persistían el bearer.
+  try { localStorage.removeItem(DRIVE_TOKEN_KEY); } catch (_) { /* mejor esfuerzo */ }
+}
+
 function driveReadToken() {
-  try {
-    const raw = localStorage.getItem(DRIVE_TOKEN_KEY);
-    if (!raw) return null;
-
-    // Compatibilidad con una posible versión antigua que guardase solo el string.
-    if (raw.charAt(0) !== '{') {
-      return { access_token: raw, expires_at: 0 };
-    }
-
-    const token = JSON.parse(raw);
-    if (!token || typeof token.access_token !== 'string') return null;
-    return token;
-  } catch (error) {
-    console.warn('Drive: token local inválido', error);
-    return null;
-  }
+  return driveAccessToken;
 }
 
 function driveGetValidAccessToken() {
@@ -60,7 +52,7 @@ function driveGetValidAccessToken() {
   if (!token) return null;
 
   if (token.expires_at && Date.now() >= token.expires_at - DRIVE_TOKEN_SAFETY_MS) {
-    localStorage.removeItem(DRIVE_TOKEN_KEY);
+    driveClearToken();
     return null;
   }
 
@@ -68,14 +60,30 @@ function driveGetValidAccessToken() {
 }
 
 function driveSaveToken(response) {
-  const expiresInSeconds = Number(response.expires_in || 3600);
-  const token = {
+  if (!response || typeof response.access_token !== 'string' || !response.access_token.trim()) {
+    throw new Error('Google no devolvió un token de acceso válido.');
+  }
+  const expiresInSeconds = Number(response.expires_in);
+  if (!Number.isFinite(expiresInSeconds) || expiresInSeconds <= 0) {
+    throw new Error('Google no devolvió una caducidad válida para el token.');
+  }
+  const grantedScopes = String(response.scope || '').split(/\s+/).filter(Boolean);
+  const scopeGranted = grantedScopes.includes(DRIVE_SCOPE) ||
+    Boolean(window.google && google.accounts && google.accounts.oauth2 &&
+      typeof google.accounts.oauth2.hasGrantedAllScopes === 'function' &&
+      google.accounts.oauth2.hasGrantedAllScopes(response, DRIVE_SCOPE));
+  if (!scopeGranted) {
+    throw new Error('No se concedió el permiso necesario para Google Drive.');
+  }
+  driveAccessToken = {
     access_token: response.access_token,
     token_type: response.token_type || 'Bearer',
-    scope: response.scope || DRIVE_SCOPE,
+    scope: grantedScopes.join(' '),
     expires_at: Date.now() + expiresInSeconds * 1000
   };
-  localStorage.setItem(DRIVE_TOKEN_KEY, JSON.stringify(token));
+  // Nunca persistir el bearer: solo vive en memoria durante esta carga.
+  try { localStorage.removeItem(DRIVE_TOKEN_KEY); } catch (_) { /* compatibilidad */ }
+  return driveAccessToken;
 }
 
 // ---------- Utilidades ----------
@@ -152,6 +160,9 @@ function driveSyncUI() {
 }
 
 function driveInit() {
+  // Puede llamarse varias veces al abrir Ajustes: limpiar solo el formato
+  // persistido antiguo, sin desconectar el token válido de esta sesión.
+  try { localStorage.removeItem(DRIVE_TOKEN_KEY); } catch (_) { /* mejor esfuerzo */ }
   if (!driveNetworkListenersBound) {
     window.addEventListener('online', driveSyncUI);
     window.addEventListener('offline', driveSyncUI);
@@ -202,7 +213,7 @@ function driveRequestToken() {
       }
     });
 
-    driveTokenClient.requestAccessToken({ prompt: 'consent' });
+    driveTokenClient.requestAccessToken();
   });
 }
 
@@ -220,7 +231,7 @@ async function driveConnect() {
     console.info('Drive connected');
     return true;
   } catch (error) {
-    localStorage.removeItem(DRIVE_TOKEN_KEY);
+    driveClearToken();
     driveSyncUI();
     console.error('Drive: No se pudo conectar con Google Drive', error);
 
@@ -511,7 +522,7 @@ async function driveSyncNow(silent = false) {
     return true;
   } catch (error) {
     if (error && error.status === 401) {
-      localStorage.removeItem(DRIVE_TOKEN_KEY);
+      driveClearToken();
       driveSyncUI();
       const expiredError = new Error('Vuelve a conectar Google Drive para continuar.');
       if (!silent) await driveShowError('La sesión de Google Drive ha caducado', expiredError, { variant: 'drive-connect-error', confirmText: 'Entendido' });
@@ -580,7 +591,11 @@ async function driveRestore() {
       `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(file.id)}?alt=media`,
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
-    if (!download.ok) throw new Error(`No se pudo descargar el respaldo (HTTP ${download.status})`);
+    if (!download.ok) {
+      const error = new Error(`No se pudo descargar el respaldo (HTTP ${download.status})`);
+      error.status = download.status;
+      throw error;
+    }
 
     const raw = await download.json();
 
@@ -662,6 +677,12 @@ async function driveRestore() {
     if (typeof lock === 'function') lock();
     return true;
   } catch (error) {
+    if (error && error.status === 401) {
+      driveClearToken();
+      driveSyncUI();
+      await driveShowError('La sesión de Google Drive ha caducado', new Error('Vuelve a conectar Google Drive para continuar.'), { variant: 'drive-connect-error', confirmText: 'Entendido' });
+      return false;
+    }
     driveSyncUI();
     console.error('Drive: No se pudo restaurar el respaldo', error);
     const message = (typeof window.vkBackup !== 'undefined' && typeof window.vkBackup.restoreErrorMessage === 'function')
@@ -707,11 +728,18 @@ function driveShowRestoreErrorModal(message) {
 function driveRevokeToken(accessToken) {
   return new Promise((resolve) => {
     if (!accessToken || !window.google || !google.accounts || !google.accounts.oauth2) {
-      resolve(false);
+      resolve({ attempted: false, revoked: false, error: 'Google Identity Services no disponible' });
       return;
     }
 
-    google.accounts.oauth2.revoke(accessToken, () => resolve(true));
+    google.accounts.oauth2.revoke(accessToken, (response) => {
+      const revoked = Boolean(response && (response.successful === true || response.error === 'invalid_token'));
+      resolve({
+        attempted: true,
+        revoked,
+        error: revoked ? null : ((response && (response.error_description || response.error)) || 'revocación no confirmada')
+      });
+    });
   });
 }
 
@@ -727,15 +755,19 @@ async function driveDisconnect() {
     }
 
     const accessToken = driveReadToken();
-    await driveRevokeToken(accessToken && accessToken.access_token);
-
-    localStorage.removeItem(DRIVE_TOKEN_KEY);
+    const revocation = await driveRevokeToken(accessToken && accessToken.access_token);
+    driveClearToken();
     driveSyncUI();
-    driveToast('✅ Desconectado de Drive', 'ok');
-    console.info('Drive disconnected');
-    return true;
+    if (revocation.revoked) {
+      driveToast('✅ Desconectado de Drive y permiso revocado', 'ok');
+      console.info('Drive disconnected and grant revoked');
+      return true;
+    }
+    driveToast('⚠️ Desconectado en este dispositivo. Google no confirmó la revocación del permiso.', 'err');
+    console.warn('Drive disconnected locally; grant revocation not confirmed', revocation.error);
+    return false;
   } catch (error) {
-    localStorage.removeItem(DRIVE_TOKEN_KEY);
+    driveClearToken();
     driveSyncUI();
     await driveShowError('Drive se desconectó localmente, pero no se pudo revocar el token', error);
     return false;
