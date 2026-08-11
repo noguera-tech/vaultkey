@@ -5,6 +5,7 @@ const path=require('path');
 
 const root=path.resolve(__dirname,'..');
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
+const appHtml=fs.readFileSync(path.join(root,'app.html'),'utf8');
 const sessionSource=fs.readFileSync(path.join(root,'session.js'),'utf8');
 const vkSession=require(path.join(root,'session.js'));
 
@@ -25,6 +26,12 @@ expect(/manageLifecycle\s*=\s*opts\.manageLifecycle\s*!==\s*false/.test(sessionS
   'La sesión debe admitir que la aplicación gestione el ciclo de vida.');
 expect(/manageLifecycle:false/.test(app),
   'La integración debe desactivar los listeners duplicados de session.js.');
+expect(!/window\.resetAutoLockTimer\s*=\s*function\(\)\s*\{\s*if\(isVK2Vault\(\)\)\s*return/.test(appHtml),
+  'VK2 no debe anular el temporizador único gestionado por app.js.');
+expect(!/removeEventListener\(["']visibilitychange["'],\s*legacyHandleVisibilityChange\)/.test(appHtml),
+  'VK2 no debe retirar el controlador único de visibilitychange de app.js.');
+expect(/vkSession\.setAutolockOption\(option\)[\s\S]*?legacyResetAutoLockTimer\(\)/.test(appHtml),
+  'Al cambiar la opción VK2 debe reiniciarse el temporizador único de app.js.');
 
 vkSession.start({dekKey:fakeKey,store:fakeStore,router:{replace:()=>{}},manageLifecycle:false});
 expect(vkSession.isActive(),'La sesión debe conservar la clave mientras la aplicación está visible.');
