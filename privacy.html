@@ -165,7 +165,7 @@
       </div>
 
       <h1>Política de Privacidad</h1>
-      <p class="subtitle">Última actualización: 8 de agosto de 2026</p>
+      <p class="subtitle">Última actualización: 11 de agosto de 2026</p>
 
       <section class="section">
         <h2>Introducción</h2>
@@ -189,7 +189,7 @@
 
       <section class="section">
         <h2>Almacenamiento local y cifrado</h2>
-        <p>La información guardada en VaultKey se almacena localmente en el dispositivo del usuario y se protege mediante cifrado. VaultKey utiliza cifrado AES-GCM y derivación de clave PBKDF2 para proteger la bóveda a partir del PIN o método de acceso configurado.</p>
+        <p>La información guardada en VaultKey se almacena localmente en el dispositivo del usuario y se protege mediante cifrado. VaultKey utiliza AES-GCM para cifrar la bóveda y mecanismos como PBKDF2, HKDF y un factor local del dispositivo para proteger las claves asociadas a los métodos de acceso y recuperación configurados.</p>
         <ul>
           <li>El contenido de la bóveda no se envía a servidores propios de VaultKey.</li>
           <li>VaultKey no vende los datos del usuario.</li>
@@ -209,7 +209,8 @@
           <li>VaultKey puede solicitar autorización de Google únicamente para guardar o leer archivos propios de la aplicación, como respaldos cifrados.</li>
           <li>El respaldo se almacena cifrado. VaultKey no envía el PIN ni la clave de descifrado a Google Drive.</li>
           <li>Google Drive actúa como proveedor de almacenamiento externo para el respaldo cifrado.</li>
-          <li>El usuario puede desconectar Google Drive desde la aplicación cuando la función esté disponible.</li>
+          <li>La autorización temporal utilizada para comunicarse con Google Drive se mantiene únicamente en memoria mientras la página está abierta y no se conserva como parte de la bóveda.</li>
+          <li>El usuario puede desconectar Google Drive desde la aplicación. La desconexión elimina la autorización local, pero no borra automáticamente las copias que ya estén almacenadas en Google Drive.</li>
           <li>El respaldo puede guardarse en una carpeta visible del usuario en Google Drive, según la configuración usada por VaultKey.</li>
           <li>VaultKey puede realizar una limpieza automática de copias antiguas cuando la función de respaldo o sincronización esté activa, para mantener el almacenamiento organizado.</li>
         </ul>
@@ -226,36 +227,44 @@
       </section>
 
       <section class="section">
+        <h2>Alojamiento web y datos técnicos</h2>
+        <p>La versión PWA/TWA de VaultKey se distribuye mediante GitHub Pages. Al cargar la aplicación, el dispositivo se conecta a este servicio de alojamiento. GitHub indica que registra y conserva la dirección IP de los visitantes por motivos de seguridad y que puede utilizarla para inferir una ubicación geográfica general, de acuerdo con su propia política de privacidad.</p>
+        <ul>
+          <li>Noguera Technologies no utiliza esta información para publicidad, seguimiento de usuarios ni elaboración de perfiles.</li>
+          <li>El contenido descifrado de la bóveda, el PIN y las claves de descifrado no se envían a GitHub Pages.</li>
+          <li>El tratamiento técnico realizado por GitHub está sujeto a la <a href="https://docs.github.com/es/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener noreferrer">política de privacidad de GitHub</a>.</li>
+        </ul>
+      </section>
+
+      <section class="section">
         <h2>Acceso al dispositivo y funciones utilizadas</h2>
         <p>VaultKey puede utilizar funciones del dispositivo necesarias para ofrecer seguridad y funcionamiento básico:</p>
         <ul>
           <li><strong>Almacenamiento local:</strong> para guardar la bóveda cifrada y la configuración de la app.</li>
-          <li><strong>Biometría nativa de Android:</strong> huella, rostro u otro método compatible para desbloqueo rápido opcional.</li>
           <li><strong>Selector o acceso a archivos:</strong> para importar o exportar respaldos cuando el usuario lo solicita.</li>
-          <li><strong>Conexión a internet:</strong> para cargar la PWA/TWA, publicar actualizaciones y usar Google Drive si el usuario activa esa función.</li>
+          <li><strong>Conexión a internet:</strong> para cargar la PWA/TWA desde GitHub Pages, recibir actualizaciones y usar Google Drive si el usuario activa esa función.</li>
         </ul>
-        <p>VaultKey no recibe ni almacena plantillas biométricas. La autenticación biométrica es gestionada por el sistema Android del dispositivo.</p>
       </section>
 
       <section class="section">
         <h2>Protección visual</h2>
-        <p>VaultKey puede usar mecanismos de protección visual, como bloqueo de capturas de pantalla en Android, para reducir el riesgo de exposición accidental de datos sensibles. Estas medidas ayudan a mejorar la privacidad, pero no constituyen una garantía absoluta frente a dispositivos comprometidos, cámaras externas u otros métodos de captura.</p>
+        <p>Cuando VaultKey pasa a segundo plano o pierde el foco, puede mostrar una pantalla de privacidad para reducir el riesgo de que el contenido de la bóveda aparezca en la vista de aplicaciones recientes. También puede bloquear automáticamente la sesión según el tiempo configurado. VaultKey no afirma bloquear todas las capturas de pantalla. Estas medidas reducen la exposición accidental, pero no constituyen una garantía absoluta frente a dispositivos comprometidos, cámaras externas u otros métodos de captura.</p>
       </section>
 
       <section class="section">
         <h2>Compartición de datos con terceros</h2>
-        <p>VaultKey no vende, alquila ni comparte el contenido privado de la bóveda con terceros. La aplicación puede interactuar con servicios externos únicamente cuando el usuario utiliza funciones opcionales, como Google Drive para respaldos cifrados. En esos casos, el uso del servicio externo también puede estar sujeto a las políticas de privacidad del proveedor correspondiente.</p>
+        <p>VaultKey no vende, alquila ni comparte el contenido privado de la bóveda con terceros. La aplicación interactúa con GitHub Pages para cargar y actualizar la PWA/TWA y puede interactuar con Google Drive si el usuario activa voluntariamente los respaldos cifrados. El uso de estos servicios externos también está sujeto a las políticas de privacidad de sus proveedores.</p>
       </section>
 
       <section class="section">
         <h2>Retención y eliminación de datos</h2>
         <p>Los datos de la bóveda permanecen en el dispositivo del usuario hasta que el usuario los elimine, borre los datos de la aplicación o desinstale VaultKey. Si el usuario crea respaldos locales o en Google Drive, esos respaldos permanecerán donde el usuario los haya guardado hasta que los elimine manualmente o mediante las opciones disponibles en la aplicación o en el servicio correspondiente.</p>
-        <p>VaultKey no mantiene cuentas propias de usuario en servidores propios. Para eliminar datos locales, el usuario puede borrar las entradas guardadas, borrar los datos de la aplicación desde Android o desinstalar la app.</p>
+        <p>VaultKey no mantiene cuentas propias de usuario en servidores propios. Para eliminar datos locales, el usuario puede borrar entradas concretas, usar la opción de borrado local disponible en VaultKey, borrar los datos de la aplicación desde Android o desinstalar la app. El borrado local no elimina automáticamente los respaldos guardados fuera del dispositivo.</p>
       </section>
 
       <section class="section">
         <h2>Seguridad</h2>
-        <p>VaultKey aplica medidas de seguridad como cifrado local, bloqueo automático, PIN, autenticación biométrica opcional y protección visual en Android. No obstante, ningún sistema puede garantizar una seguridad absoluta. El usuario debe proteger su dispositivo, su PIN, sus respaldos y su cuenta de Google si decide activar Google Drive.</p>
+        <p>VaultKey aplica medidas de seguridad como cifrado local, bloqueo automático, PIN, métodos de recuperación configurables y protección visual al pasar a segundo plano. En la versión actual, VaultKey no ofrece desbloqueo biométrico. No obstante, ningún sistema puede garantizar una seguridad absoluta. El usuario debe proteger su dispositivo, su PIN, sus métodos de recuperación, sus respaldos y su cuenta de Google si decide activar Google Drive.</p>
       </section>
 
       <section class="section">
