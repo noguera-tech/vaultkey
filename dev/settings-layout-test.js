@@ -17,7 +17,7 @@ expect(
   'Ajustes debe impedir el scroll vertical residual.'
 );
 expect(
-  /CACHE_VERSION\s*=\s*53\s*;/,
+  /CACHE_VERSION\s*=\s*54\s*;/,
   'La caché debe renovarse para entregar la corrección a las instalaciones existentes.',
   sw
 );

@@ -210,29 +210,30 @@
           onsubmit="event.preventDefault();savePasswordEdit()">
 
       <label class="vk-password-edit-field">
-        <span>Nombre</span>
-        <input id="passwordEditName" type="text" autocomplete="off">
-      </label>
-
-      <label class="vk-password-edit-field">
         <span>Usuario</span>
-        <input id="passwordEditUser" type="text" autocomplete="off">
+        <div class="vk-password-edit-control">
+          <input id="passwordEditUser" type="text" autocomplete="username">
+          <span class="vk-password-edit-inline-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          </span>
+        </div>
       </label>
 
       <label class="vk-password-edit-field">
-        <span>Contraseña</span>
+        <span>Contraseña actual</span>
 
         <div class="vk-password-edit-secret">
-          <input id="passwordEditSecret"
+          <input id="passwordEditCurrentSecret"
                  type="password"
-                 autocomplete="off">
+                 autocomplete="current-password"
+                 readonly>
 
           <button type="button"
                   class="vk-password-edit-eye"
-                  aria-label="Mostrar u ocultar contraseña"
+                  aria-label="Mostrar u ocultar contraseña actual"
                   onclick="togglePasswordEditSecret()">
 
-            <svg id="passwordEditEyeOpen"
+            <svg id="passwordEditCurrentEyeOpen"
                  viewBox="0 0 24 24"
                  fill="none"
                  stroke="currentColor"
@@ -244,7 +245,7 @@
               <circle cx="12" cy="12" r="2.7"/>
             </svg>
 
-            <svg id="passwordEditEyeOff"
+            <svg id="passwordEditCurrentEyeOff"
                  class="vk-password-edit-hidden"
                  viewBox="0 0 24 24"
                  fill="none"
@@ -264,14 +265,38 @@
 
       <label class="vk-password-edit-field">
         <span>Sitio web</span>
-        <input id="passwordEditUrl"
-               type="url"
-               inputmode="url"
-               autocomplete="off">
+        <div class="vk-password-edit-control">
+          <input id="passwordEditUrl"
+                 type="url"
+                 inputmode="url"
+                 autocomplete="url">
+          <button type="button" class="vk-password-edit-inline-action" aria-label="Abrir sitio web" onclick="openPasswordEditUrl()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 14 20 4"/></svg>
+          </button>
+        </div>
+      </label>
+
+      <label class="vk-password-edit-field">
+        <span>Nueva contraseña</span>
+        <div class="vk-password-edit-secret vk-password-edit-secret--new">
+          <input id="passwordEditNewSecret"
+                 type="password"
+                 placeholder="Introduce la contraseña"
+                 autocomplete="new-password">
+          <div class="vk-password-edit-secret-actions">
+            <button type="button" class="vk-password-edit-eye" aria-label="Mostrar u ocultar nueva contraseña" onclick="togglePasswordEditSecret('new')">
+              <svg id="passwordEditNewEyeOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6Z"/><circle cx="12" cy="12" r="2.7"/></svg>
+              <svg id="passwordEditNewEyeOff" class="vk-password-edit-hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 3 18 18"/><path d="M10.6 10.7a2 2 0 0 0 2.7 2.7"/><path d="M9.9 4.4A10.6 10.6 0 0 1 12 4.2c6.2 0 9.9 7.8 9.9 7.8a16.6 16.6 0 0 1-2.7 3.7"/><path d="M6.7 6.8C3.8 8.7 2.1 12 2.1 12s3.7 7.8 9.9 7.8c1.5 0 2.8-.4 4-1"/></svg>
+            </button>
+            <button id="passwordEditGenerator" type="button" class="vk-password-edit-generator" aria-label="Abrir generador de contraseñas" onclick="openGen(true,'passwordEditNewSecret')">
+              <img id="passwordEditGeneratorImage" alt="">
+            </button>
+          </div>
+        </div>
       </label>
 
       <div class="vk-password-edit-favorite">
-        <span>Favorito</span>
+        <span>Añadir a favoritos</span>
         <button id="passwordEditFavorite"
                 class="vk-favorite-switch"
                 type="button"

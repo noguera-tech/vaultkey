@@ -3961,7 +3961,7 @@ body.vk-create-picker-open {
   flex: 1;
   min-height: 0;
   box-sizing: border-box;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
   padding:
     16px
@@ -4040,12 +4040,86 @@ body.vk-create-picker-open {
   border-color: var(--vk-r1-accent);
 }
 
+.vk-password-edit-field input[readonly] {
+  cursor: default;
+}
+
+.vk-password-edit-control {
+  position: relative;
+}
+
+.vk-password-edit-control input {
+  padding-right: 56px;
+}
+
+.vk-password-edit-inline-icon,
+.vk-password-edit-inline-action {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vk-r1-accent);
+}
+
+.vk-password-edit-inline-action {
+  cursor: pointer;
+}
+
+.vk-password-edit-inline-icon svg,
+.vk-password-edit-inline-action svg {
+  width: var(--vk-r1-icon-size);
+  height: var(--vk-r1-icon-size);
+}
+
 .vk-password-edit-secret {
   position: relative;
 }
 
 .vk-password-edit-secret input {
   padding-right: 56px;
+}
+
+.vk-password-edit-secret--new input {
+  padding-right: 96px;
+}
+
+.vk-password-edit-secret-actions {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.vk-password-edit-secret-actions .vk-password-edit-eye {
+  position: static;
+}
+
+.vk-password-edit-generator {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.vk-password-edit-generator img {
+  width: 24px;
+  height: 27px;
+  display: block;
+  object-fit: contain;
 }
 
 .vk-password-edit-eye {
@@ -4159,6 +4233,12 @@ body.vk-create-picker-open {
     solid
     var(--vk-r1-primary);
   background: var(--vk-r1-primary);
+}
+
+@media (max-height: 640px) {
+  .vk-password-edit-content {
+    overflow-y: auto;
+  }
 }
 
 
