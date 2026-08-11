@@ -2225,6 +2225,12 @@ function useGen(){
       _passwordCreateGenerated=true;
       show('passwordCreate');
       toast('Contraseña añadida');
+    }else if(fieldId==='passwordEditNewSecret'){
+      const input=$('passwordEditNewSecret');
+      if(input)input.type='password';
+      $('passwordEditNewEyeOpen')?.classList.remove('vk-password-edit-hidden');
+      $('passwordEditNewEyeOff')?.classList.add('vk-password-edit-hidden');
+      toast('Nueva contraseña añadida');
     }else{
       $('entryModal').classList.add('open');
       toast('Contraseña añadida a la entrada');
@@ -3688,23 +3694,32 @@ function passwordDetailIcon(name){
 function openPasswordEdit(){
   if(!current||!isPasswordFamilyEntry(current))return;
 
-  $('passwordEditName').value=
-    current.service||current.title||current.wifiSsid||'';
-
   $('passwordEditUser').value=
     current.user||current.username||current.email||'';
 
-  const secret=$('passwordEditSecret');
-  secret.type='password';
-  secret.value=current.pass||current.password||current.wifiPass||'';
+  const currentSecret=$('passwordEditCurrentSecret');
+  currentSecret.type='password';
+  currentSecret.value=current.pass||current.password||current.wifiPass||'';
+
+  const newSecret=$('passwordEditNewSecret');
+  newSecret.type='password';
+  newSecret.value='';
 
   $('passwordEditUrl').value=current.url||'';
   $('passwordEditNotes').value=current.note||current.notes||'';
   setFavoriteSwitch($('passwordEditFavorite'),current.fav===true);
 
 
-  $('passwordEditEyeOpen')?.classList.remove('vk-password-edit-hidden');
-  $('passwordEditEyeOff')?.classList.add('vk-password-edit-hidden');
+  $('passwordEditCurrentEyeOpen')?.classList.remove('vk-password-edit-hidden');
+  $('passwordEditCurrentEyeOff')?.classList.add('vk-password-edit-hidden');
+  $('passwordEditNewEyeOpen')?.classList.remove('vk-password-edit-hidden');
+  $('passwordEditNewEyeOff')?.classList.add('vk-password-edit-hidden');
+
+  const sourceGeneratorImage=$('vkPasswordCreateGenerator')?.querySelector('img');
+  const editGeneratorImage=$('passwordEditGeneratorImage');
+  if(sourceGeneratorImage&&editGeneratorImage){
+    editGeneratorImage.src=sourceGeneratorImage.src;
+  }
 
   show('passwordEdit','right');
 }
@@ -3715,18 +3730,28 @@ function cancelPasswordEdit(){
   show('passwordDetail','left');
 }
 
-function togglePasswordEditSecret(){
-  const input=$('passwordEditSecret');
+function togglePasswordEditSecret(target='current'){
+  const isNew=target==='new';
+  const input=$(isNew?'passwordEditNewSecret':'passwordEditCurrentSecret');
   if(!input)return;
 
   const reveal=input.type==='password';
   input.type=reveal?'text':'password';
 
-  $('passwordEditEyeOpen')
+  $(isNew?'passwordEditNewEyeOpen':'passwordEditCurrentEyeOpen')
     ?.classList.toggle('vk-password-edit-hidden',reveal);
 
-  $('passwordEditEyeOff')
+  $(isNew?'passwordEditNewEyeOff':'passwordEditCurrentEyeOff')
     ?.classList.toggle('vk-password-edit-hidden',!reveal);
+}
+
+function openPasswordEditUrl(){
+  const value=($('passwordEditUrl')?.value||'').trim();
+  if(!value){
+    toast('No hay sitio web para abrir.');
+    return;
+  }
+  openUrl(value);
 }
 
 function setFavoriteSwitch(button,value){
@@ -3754,19 +3779,13 @@ function togglePasswordEditFavorite(){
 async function savePasswordEdit(){
   if(!current||!isPasswordFamilyEntry(current))return;
 
-  const service=($('passwordEditName')?.value||'').trim();
+  const service=(current.service||current.title||current.wifiSsid||'').trim();
   const identity=($('passwordEditUser')?.value||'').trim();
-  const secret=$('passwordEditSecret')?.value||'';
+  const newSecret=$('passwordEditNewSecret')?.value||'';
   const rawUrl=($('passwordEditUrl')?.value||'').trim();
   const notes=($('passwordEditNotes')?.value||'').trim();
   const fav=
     $('passwordEditFavorite')?.getAttribute('aria-checked')==='true';
-
-  if(!service){
-    toast('El nombre es obligatorio.');
-    $('passwordEditName')?.focus();
-    return;
-  }
 
   if(!identity){
     toast('El usuario es obligatorio.');
@@ -3774,9 +3793,9 @@ async function savePasswordEdit(){
     return;
   }
 
-  if(secret.length<6){
+  if(newSecret&&newSecret.length<6){
     toast('La contraseña debe tener mínimo 6 caracteres.');
-    $('passwordEditSecret')?.focus();
+    $('passwordEditNewSecret')?.focus();
     return;
   }
 
@@ -3800,6 +3819,7 @@ async function savePasswordEdit(){
 
   const oldSecret=
     previous.pass||previous.password||previous.wifiPass||'';
+  const secret=newSecret||oldSecret;
 
   if(Object.prototype.hasOwnProperty.call(next,'title')){
     next.title=service;
@@ -3821,6 +3841,10 @@ async function savePasswordEdit(){
 
   if(Object.prototype.hasOwnProperty.call(next,'password')){
     next.password=secret;
+  }
+
+  if(Object.prototype.hasOwnProperty.call(next,'wifiPass')){
+    next.wifiPass=secret;
   }
 
   if(Object.prototype.hasOwnProperty.call(next,'pass')||
