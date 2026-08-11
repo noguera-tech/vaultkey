@@ -538,7 +538,8 @@ function hasOpenModal(){
 window._vk2UnlockOk=async function(dekKey){
   if(typeof vkSession!=='undefined'){
     vkSession.start({dekKey:dekKey,store:vkStore,
-      router:{replace:function(p){if(p==='/unlock')lock();}}});
+      router:{replace:function(p){if(p==='/unlock')lock();}},
+      manageLifecycle:false});
   }
   try{
     const _blob=vkStore.loadBlob();
@@ -1396,6 +1397,15 @@ function resetAutoLockTimer(){clearAutoLockTimer();if(!unlocked||document.hidden
 function markActivity(){if(unlocked){hidePrivacyOverlay();resetAutoLockTimer()}}
 function showPrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.add('show');document.body.classList.add('vk-locked')}
 function hidePrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.remove('show');document.body.classList.remove('vk-locked')}
+function lockForBackground(){
+  unlocked=false;
+  lastKey=null;
+  pin='';
+  hiddenSince=null;
+  clearAutoLockTimer();
+  if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();
+  closeModals();
+}
 window.isFilePickerGuardActive=function(){
   return window._vkFilePickerOpen===true ||
     Date.now()<Number(window._vkFilePickerGraceUntil||0) ||
@@ -1429,8 +1439,8 @@ function handleVisibilityChange(){
       }
       showPrivacyOverlay();
       const ms=getAutoLockMs();
-      if(ms===0){unlocked=false;lastKey=null;pin='';clearAutoLockTimer();closeModals();hiddenSince=null;}
-      else{hiddenSince=Date.now();clearAutoLockTimer();autoLockTimer=setTimeout(()=>{if(!unlocked)return;soundLock();unlocked=false;lastKey=null;pin='';closeModals();hiddenSince=null;},ms);}
+      if(ms===0){lockForBackground();}
+      else{hiddenSince=Date.now();clearAutoLockTimer();autoLockTimer=setTimeout(()=>{if(!unlocked)return;soundLock();lockForBackground();},ms);}
     }
   } else {
     if(!unlocked){
@@ -1446,8 +1456,7 @@ function handleVisibilityChange(){
     } else if(autoLockTimer && hiddenSince && (Date.now()-hiddenSince) >= getAutoLockMs()){
       // Había un timer corriendo Y ya pasó el tiempo real configurado — bloquear al volver
       clearTimeout(autoLockTimer);autoLockTimer=null;hiddenSince=null;
-      unlocked=false;lastKey=null;pin='';
-      closeModals();
+      lockForBackground();
       hidePrivacyOverlay();
       const pinScreen=$('pin');
       if(pinScreen){
@@ -1493,8 +1502,8 @@ window.addEventListener('focus', () => {
   if(!appBooted || window._vkSharing || window._vkBiometricFlow) return;
   handleVisibilityChange();
 });
-window.addEventListener('pagehide',()=>{if(unlocked){unlocked=false;lastKey=null;pin='';showPrivacyOverlay();}});
-['pointerdown','touchstart','keydown','input','scroll','click'].forEach(ev=>document.addEventListener(ev,markActivity,{capture:true,passive:true}));
+window.addEventListener('pagehide',()=>{if(unlocked){showPrivacyOverlay();lockForBackground();}});
+['pointerdown','keydown','input','scroll'].forEach(ev=>document.addEventListener(ev,markActivity,{capture:true,passive:true}));
 
 let selectedEntryIcon='';
 const MANUAL_ICONS=[

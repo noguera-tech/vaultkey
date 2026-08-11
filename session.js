@@ -27,6 +27,7 @@
   var _onVisibility = null;
   var _onBlur = null;
   var _timeoutMs = 0;
+  var _manageLifecycle = true;
 
   function clearTimer() {
     if (_timer !== null) { root.clearTimeout(_timer); _timer = null; }
@@ -67,7 +68,7 @@
     removeListeners();
 
     _timeoutMs = TIMEOUTS[option] !== undefined ? TIMEOUTS[option] : 0;
-    if (!_dek) { return; }
+    if (!_dek || !_manageLifecycle) { return; }
 
     if (option === 'immediate') {
       _onVisibility = function () {
@@ -96,6 +97,7 @@
     _dek = opts.dekKey;
     _store = opts.store;
     _router = opts.router;
+    _manageLifecycle = opts.manageLifecycle !== false;
 
     var option = (_store && _store.getMeta().autolockOption) || 'immediate';
     configureOption(option);
@@ -124,6 +126,7 @@
     _dek = null;
     clearTimer();
     removeListeners();
+    _manageLifecycle = true;
   }
 
   function getDEK() { return _dek; }
