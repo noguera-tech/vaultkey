@@ -2359,12 +2359,12 @@ input[type=range]::-moz-range-thumb {
   min-height: 0;
   width: 100%;
   box-sizing: border-box;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
   padding:
     4px
     var(--vk-r1-screen-padding-inline)
-    calc(var(--nav-h) + 20px + env(safe-area-inset-bottom, 0px));
+    calc(12px + env(safe-area-inset-bottom, 0px));
   scrollbar-width: none;
 }
 
@@ -2378,8 +2378,8 @@ input[type=range]::-moz-range-thumb {
 
 #settings .vk-settings-version {
   margin-top: auto;
-  padding-top: 24px;
-  transform: translateY(54px);
+  padding-top: 12px;
+  transform: none;
   color: var(--vk-r1-text-tertiary);
   font-size: var(--vk-r1-font-size-row-subtitle);
   font-weight: var(--vk-r1-font-weight-regular);
