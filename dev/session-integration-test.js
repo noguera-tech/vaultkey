@@ -41,8 +41,12 @@ expect(!vkSession.isActive(),'El bloqueo de la aplicación debe retirar la clave
 
 expect(/function lockForBackground\(\)[\s\S]*?vkSession\.stop\(\)[\s\S]*?closeModals\(\)/.test(app),
   'El bloqueo en segundo plano debe limpiar clave, temporizadores y modales una sola vez.');
-expect(/if\(ms===0\)\{lockForBackground\(\);\}/.test(app),
-  'El bloqueo inmediato debe usar el controlador único.');
+expect(/function startBackgroundAutoLock\(\)[\s\S]*?hiddenSince===null[\s\S]*?Date\.now\(\)-hiddenSince[\s\S]*?lockForBackground\(\)/.test(app),
+  'La salida debe registrar la hora real y retirar la sesión al vencer el plazo.');
+expect(/addEventListener\('blur',[\s\S]*?startBackgroundAutoLock\(\)/.test(app),
+  'blur debe actuar como respaldo cuando la TWA no emite visibilitychange.');
+expect(/if\(document\.hidden\)[\s\S]*?startBackgroundAutoLock\(\)/.test(app),
+  'visibilitychange debe compartir el mismo controlador de salida que blur.');
 expect(/pagehide[^\n]*showPrivacyOverlay\(\);lockForBackground\(\)/.test(app),
   'pagehide debe ocultar primero la bóveda y después limpiar la sesión.');
 expect(/\['pointerdown','keydown','input','scroll'\]/.test(app),

@@ -1406,6 +1406,16 @@ function lockForBackground(){
   if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();
   closeModals();
 }
+function startBackgroundAutoLock(){
+  if(!unlocked)return;
+  showPrivacyOverlay();
+  const ms=getAutoLockMs();
+  if(ms===0){lockForBackground();return;}
+  if(hiddenSince===null)hiddenSince=Date.now();
+  const remaining=Math.max(0,ms-(Date.now()-hiddenSince));
+  clearAutoLockTimer();
+  autoLockTimer=setTimeout(()=>{if(!unlocked)return;soundLock();lockForBackground();},remaining);
+}
 window.isFilePickerGuardActive=function(){
   return window._vkFilePickerOpen===true ||
     Date.now()<Number(window._vkFilePickerGraceUntil||0) ||
@@ -1437,10 +1447,7 @@ function handleVisibilityChange(){
         };
         sessionStorage.setItem('vk_entry_draft',JSON.stringify(draft));
       }
-      showPrivacyOverlay();
-      const ms=getAutoLockMs();
-      if(ms===0){lockForBackground();}
-      else{hiddenSince=Date.now();clearAutoLockTimer();autoLockTimer=setTimeout(()=>{if(!unlocked)return;soundLock();lockForBackground();},ms);}
+      startBackgroundAutoLock();
     }
   } else {
     if(!unlocked){
@@ -1485,7 +1492,7 @@ window.addEventListener('pageshow',(e)=>{
 window.addEventListener('blur', () => {
   if(window.isFilePickerGuardActive()) return;
   if(!appBooted || !unlocked || window._vkSharing || window._vkBiometricFlow) return;
-  showPrivacyOverlay();
+  startBackgroundAutoLock();
 });
 // Recuperar overlay al volver el foco cuando NO hay cambio de pestaña
 // (ej. abrir/usar DevTools en la misma ventana no dispara visibilitychange)
