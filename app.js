@@ -278,7 +278,15 @@ function vibe(ms=40){return haptic(ms);}
 document.addEventListener('click',function(event){
   const target=event.target?.closest?.('button,a[href],[role="button"],summary,select,input[type="checkbox"],input[type="radio"],[onclick]');
   if(!target||target.disabled||target.getAttribute?.('aria-disabled')==='true'||target.dataset?.haptic==='none')return;
-  queueHaptic(inferHapticPattern(target));
+  haptic(inferHapticPattern(target));
+},true);
+
+document.addEventListener('input',function(event){
+  const target=event.target;
+  if(!target?.matches?.('textarea,input:not([type="hidden"]):not([type="file"]):not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"])'))return;
+  if(target.disabled||target.getAttribute?.('aria-disabled')==='true'||target.dataset?.haptic==='none')return;
+  const inputType=String(event.inputType||'').toLowerCase();
+  haptic(inputType.startsWith('delete')?'backspace':'key');
 },true);
 
 // ── SISTEMA DE SONIDOS ──────────────────────────────────────

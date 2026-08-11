@@ -3,12 +3,14 @@
 //  Versión auto-generada: no editar CACHE_VERSION manualmente.
 //  Para forzar actualización en usuarios: incrementar el número.
 // ─────────────────────────────────────────────────────────────
-const CACHE_VERSION = 51;
+const CACHE_VERSION = 52;
 const CACHE = `vaultkey-v${CACHE_VERSION}`;
 
 const FILES = [
   './index.html',
   './app.html',
+  './csp-base.css',
+  './csp-overrides.css',
   './style.css',
   './theme.css',
   './components.css',

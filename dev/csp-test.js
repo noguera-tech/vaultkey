@@ -30,6 +30,23 @@ function inlineHashes(html) {
     .map(source => `'sha256-${crypto.createHash('sha256').update(source, 'utf8').digest('base64')}'`);
 }
 
+function requireExternalStyles(file) {
+  const html = read(file);
+  const inlineStyles = [...html.matchAll(/<style\b[^>]*>[\s\S]*?<\/style>/gi)];
+  if (inlineStyles.length) {
+    throw new Error(`${file}: quedan ${inlineStyles.length} bloques <style> incompatibles con la CSP`);
+  }
+
+  for (const match of html.matchAll(/<link\s+[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>/gi)) {
+    const href = match[1];
+    if (/^(?:https?:|data:|\/\/)/i.test(href)) continue;
+    const cleanPath = href.split(/[?#]/, 1)[0];
+    if (!fs.existsSync(path.join(root, cleanPath))) {
+      throw new Error(`${file}: hoja CSS local ausente: ${cleanPath}`);
+    }
+  }
+}
+
 function requireHashes(file, directive) {
   const html = read(file);
   const policy = policyFrom(html, file);
@@ -44,6 +61,7 @@ function requireHashes(file, directive) {
 }
 
 const appPolicy = requireHashes('app.html', 'script-src-elem');
+requireExternalStyles('app.html');
 if (!appPolicy['script-src-attr'] || !appPolicy['script-src-attr'].includes("'unsafe-inline'")) {
   throw new Error('app.html: los manejadores legacy deben conservarse explicitamente durante la fase 1');
 }
@@ -56,4 +74,11 @@ if (!appPolicy['style-src-attr'] || !appPolicy['style-src-attr'].includes("'unsa
 }
 
 requireHashes('index.html', 'script-src');
-console.log('OK: hashes CSP de app.html e index.html verificados');
+const serviceWorker = read('sw.js');
+for (const file of ['csp-base.css', 'csp-overrides.css']) {
+  if (!serviceWorker.includes(`'./${file}'`)) {
+    throw new Error(`sw.js: falta precachear ${file}`);
+  }
+}
+
+console.log('OK: CSP, estilos externos y precache verificados');
