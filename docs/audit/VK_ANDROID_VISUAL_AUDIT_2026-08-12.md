@@ -110,6 +110,44 @@ Decisión: inventariar todos los sheets y separar claramente `panel`, `scroll-bo
 
 Decisión: no borrar legacy durante la corrección funcional. Primero identificar qué selectores legacy siguen alcanzando DOM activo; la limpieza debe ser una fase separada y verificable.
 
+### H-11 — Conviven al menos tres sistemas de overlay/modal
+
+El DOM y CSS activos muestran tres arquitecturas distintas para superposiciones:
+
+1. Modal legacy genérico: `.modal > .sheet`, usado por `urlModal`, `noteModal`, `quickModal`, `recoveryModal` y onboarding histórico.
+2. Sistema de componentes: `.vk-sheet` / `.vk-dialog` definido en `components.css`.
+3. Sistema documental/generador: `.vk-document-modal`, `.vk-document-source-sheet`, `.vk-generator-sheet`.
+
+Estas arquitecturas tienen reglas diferentes de altura, overflow, padding, radio y safe-area. El problema de botones cortados no puede darse por cerrado mientras estas tres familias sigan sin una política común de viewport y safe-area.
+
+Decisión: no fusionarlas a ciegas en un único componente durante esta auditoría. Primero normalizar el contrato geométrico común: `max-height`, cuerpo scrollable, footer de acciones y safe-area inferior.
+
+### H-12 — El sistema legacy de modales contiene geometría inline y estilos que anulan la centralización
+
+`app.html` conserva ejemplos como `style="max-height:50dvh"`, `style="max-height:60dvh"`, `style="height:100dvh;max-height:none..."` y otros estilos inline en elementos activos. Esto hace que una regla CSS global de modal pueda no surtir efecto o comportarse de manera distinta según el elemento.
+
+La checklist visual ya prohíbe estilos inline cuando existe un token/componente reutilizable. Esta deuda debe registrarse y eliminarse en una fase controlada después de estabilizar Android.
+
+### H-13 — Persisten emojis en UI legacy y overlays
+
+En `app.html` siguen existiendo emojis usados como iconografía/texto decorativo en modales y onboarding legacy (`🔗`, `📝`, `⚠️`, `💡`, `🔐`, etc.). La checklist visual exige cero emojis y el sistema actual prescribe SVG lineales.
+
+No es la causa del recorte Android, pero sí es una inconsistencia objetiva de pulido y forma parte de la auditoría completa solicitada.
+
+Decisión: separar esta limpieza visual del parche de safe-area para no mezclar una corrección de geometría con sustituciones iconográficas masivas.
+
+### H-14 — Los sheets de componentes también carecen de safe-area inferior en su contrato base
+
+El componente `.vk-sheet__panel` usa `padding:8px 16px 24px` y `max-height:85vh`, sin incorporar `env(safe-area-inset-bottom)`. Por tanto, incluso el sistema de componentes más moderno no garantiza por sí mismo una distancia segura respecto a la navegación Android.
+
+Decisión: el contrato común de sheet deberá reservar el inset inferior exactamente una vez, preferentemente en el panel/footer, y usar `dvh` donde el comportamiento de viewport móvil lo requiera.
+
+### H-15 — El generador demuestra que el patrón correcto es “vista compacta fija + expansión scrollable” cuando el contenido tiene dos estados
+
+La corrección ya verificada físicamente del generador confirma que activar `overflow-y:auto` de forma permanente crea scroll residual incluso cuando el contenido cabe. La solución validada mantiene la vista normal sin scroll y habilita scroll únicamente en estado expandido.
+
+Esta regla no debe copiarse indiscriminadamente, pero sí usarse como criterio para paneles con contenido colapsable: el scroll debe responder a necesidad real, no estar activo por defecto.
+
 ## Familias de pantalla detectadas en `app.html`
 
 ### Raíz / dashboard
@@ -156,6 +194,18 @@ Decisión: no borrar legacy durante la corrección funcional. Primero identifica
 - Google Drive
 - Copia local
 - Autobloqueo
+
+### Overlays / modales / sheets
+- Modal URL legacy
+- Modal Nota legacy
+- Quick modal fullscreen
+- Código de recuperación
+- Onboarding legacy y onboarding actual
+- Generador de contraseñas
+- Selector de tipo/origen de documento
+- Bottom sheets de componentes (`vk-sheet`)
+- Diálogos de componentes (`vk-dialog`)
+- Confirmaciones/restauración y credenciales (pendiente de cerrar inventario exacto por DOM dinámico)
 
 ## Clasificación provisional de cabeceras
 
@@ -223,6 +273,9 @@ Cada familia/pantalla debe revisarse en estos ejes antes de aprobarla:
 13. Web vs Android/WebView: diferencias deliberadas documentadas.
 14. Navegación/atrás Android.
 15. Regresión funcional: no tocar cripto, storage, sesión, PIN/master/kit/Drive salvo que el hallazgo lo requiera explícitamente.
+16. Ausencia de estilos inline que impidan reutilización/cascada controlada.
+17. Ausencia de iconografía emoji donde el sistema visual exige SVG.
+18. Overlays: scrim, foco, cierre, scroll interno y acciones siempre accesibles.
 
 ## Arquitectura propuesta para safe-area (provisional)
 
@@ -240,6 +293,17 @@ Modelo previsto:
 
 Esta arquitectura debe probarse primero en representantes de Familia A, B, C y D antes de generalizar.
 
+## Contrato geométrico provisional para overlays
+
+Para cualquier bottom sheet/diálogo de pantalla completa o anclado al borde inferior:
+
+- El panel define `max-height` respecto al viewport dinámico.
+- El cuerpo, no el panel completo, es la región scrollable cuando existen acciones fijas.
+- El footer de acciones debe permanecer visible cuando sea posible.
+- `safe-area-inset-bottom` se consume exactamente una vez.
+- Cabeceras internas de sheet no reciben automáticamente `safe-area-inset-top` salvo que el sheet llegue deliberadamente al borde superior del viewport.
+- Los modos compactos no deben mostrar scrollbar/scroll residual si todo el contenido cabe.
+
 ## Estrategia de corrección
 
 ### Fase A — Inventario y clasificación
@@ -253,7 +317,7 @@ Esta arquitectura debe probarse primero en representantes de Familia A, B, C y D
 
 - Crear una abstracción común de AppBar Android-safe-area.
 - Normalizar contenedores scrollables y acciones inferiores.
-- Centralizar reglas de bottom sheet/modal donde sea posible.
+- Centralizar el contrato geométrico de bottom sheet/modal donde sea posible.
 - Mantener variantes documentadas (56/62/64/72/74 px u otras confirmadas), sin inventar valores.
 
 ### Fase C — Auditoría pantalla por pantalla
@@ -266,7 +330,16 @@ Usar `VAULTKEY_VISUAL_CHECKLIST.md` como control de aceptación, pero corregir p
 - Documentar diferencias específicas del wrapper Android.
 - Definir procedimiento reproducible de actualización de assets web en el prototipo.
 
-### Fase E — APK de auditoría final
+### Fase E — Limpieza visual/arquitectónica no funcional
+
+Una vez estabilizada la geometría Android:
+
+- retirar estilos inline sustituibles por clases/tokens;
+- sustituir emojis de UI por SVG del sistema;
+- identificar y retirar selectores legacy que ya no alcancen DOM necesario;
+- reducir duplicación entre familias sin cambiar decisiones visuales confirmadas.
+
+### Fase F — APK de auditoría final
 
 Pasada física completa en dispositivo Android con datos ficticios, incluyendo alturas normales y pequeñas, teclado, scroll, modales, navegación, bloqueo y capturas protegidas.
 
@@ -280,10 +353,11 @@ Pasada física completa en dispositivo Android con datos ficticios, incluyendo a
 
 ## Próxima fase inmediata
 
-1. Completar inventario de overlays, diálogos y bottom sheets.
-2. Identificar todos los contenedores que usan `100dvh - Npx`.
+1. Cerrar inventario exacto de confirmaciones/restauración y overlays generados dinámicamente.
+2. Completar mapa de `100dvh - Npx` y contenidos con altura fija.
 3. Diseñar el primer parche estructural de AppBar para representantes de familias A/B/C/D.
-4. Preparar una única APK de prueba con matriz de pantallas, evitando nuevos parches locales hasta validar el patrón.
+4. Incorporar un contrato común de safe-area inferior para sheets sin tocar todavía iconografía/legacy.
+5. Preparar una única APK de prueba con matriz de pantallas, evitando nuevos parches locales hasta validar el patrón.
 
 ## Regla de cierre
 
