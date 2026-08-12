@@ -577,3 +577,12 @@
     animation:none;
   }
 }
+
+/* Android/WebView: preserve bottom gesture/navigation inset around generator actions. */
+.vk-generator-sheet {
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+.vk-generator-actions {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
