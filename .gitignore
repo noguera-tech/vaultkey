@@ -10,3 +10,20 @@ desktop.ini
 
 # Logs
 *.log
+
+# Android / Gradle local
+.gradle/
+**/build/
+local.properties
+keystore.properties
+*.jks
+*.keystore
+
+# Artefactos Android generados
+*.apk
+*.aab
+installed-check/
+
+# Backups temporales de trabajo
+*.bak
+*.bak-*
