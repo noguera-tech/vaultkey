@@ -1,0 +1,13 @@
+/* VaultKey Android — Family B editors safe-area pilot
+   Scope: internal Note/Card/Document editor headers only.
+   No icon-size, field, form, scroll, modal, JavaScript or HTML changes. */
+
+.vk-note-editor-topbar,
+.vk-card-editor-topbar,
+.vk-document-editor-topbar {
+  box-sizing: border-box;
+  height: calc(64px + env(safe-area-inset-top, 0px));
+  min-height: calc(64px + env(safe-area-inset-top, 0px));
+  flex: 0 0 calc(64px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+}
