@@ -1,0 +1,10 @@
+/* VaultKey Android — Dashboard safe-area pilot
+   Scope: #home only. No tile spacing, FAB, content, modal, form or JS changes. */
+
+#home.vk-dash-root > .vk-header {
+  box-sizing: border-box;
+  height: calc(64px + env(safe-area-inset-top, 0px)) !important;
+  min-height: calc(64px + env(safe-area-inset-top, 0px)) !important;
+  flex: 0 0 calc(64px + env(safe-area-inset-top, 0px)) !important;
+  padding-top: env(safe-area-inset-top, 0px) !important;
+}
