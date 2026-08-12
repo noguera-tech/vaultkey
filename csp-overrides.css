@@ -577,3 +577,83 @@
     animation:none;
   }
 }
+
+/* Android/WebView: preserve bottom gesture/navigation inset around generator actions. */
+.vk-generator-sheet {
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+.vk-generator-actions {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* VK_ANDROID_COMPACT_LAYOUT_FIX_V2 */
+
+/* Safe-area inferior aplicado una sola vez a las acciones */
+.vk-generator-actions {
+  padding-bottom: 0;
+}
+
+.vk-password-edit-content {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.vk-password-edit-actions {
+  padding-bottom: 0;
+}
+
+/* Generador normal: todo visible sin scroll */
+.vk-generator-sheet:not(.vk-generator-sheet--expanded) {
+  max-height: 96dvh;
+}
+
+.vk-generator-sheet:not(.vk-generator-sheet--expanded) .vk-generator-scroll {
+  overflow-y: hidden;
+}
+
+.vk-generator-sheet:not(.vk-generator-sheet--expanded) .vk-generator-title {
+  margin-bottom: 10px;
+}
+
+.vk-generator-sheet:not(.vk-generator-sheet--expanded) .vk-generator-preview-card {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.vk-generator-sheet:not(.vk-generator-sheet--expanded) .vk-generator-length-card {
+  margin-top: 8px;
+  padding-top: 8px;
+  padding-bottom: 9px;
+}
+
+.vk-generator-sheet:not(.vk-generator-sheet--expanded) .vk-generator-category-rows {
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.vk-generator-sheet:not(.vk-generator-sheet--expanded) .vk-generator-toggle-row {
+  min-height: 54px;
+}
+
+.vk-generator-sheet:not(.vk-generator-sheet--expanded) .vk-generator-advanced-toggle {
+  margin-top: 11px;
+  margin-bottom: 0;
+}
+
+.vk-generator-sheet:not(.vk-generator-sheet--expanded) .vk-generator-actions {
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+/* Opciones avanzadas: scroll deliberado */
+.vk-generator-sheet--expanded .vk-generator-scroll {
+  overflow-y: auto;
+}
+
+/* Editar contraseña: scroll solo cuando la altura realmente lo requiere */
+@media (max-height:640px) {
+  .vk-password-edit-content {
+    overflow-y: auto;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
