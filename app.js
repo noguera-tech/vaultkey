@@ -7645,7 +7645,7 @@ try {
     holder=String(holder||'').trim();
     number=cardDigits(number);
     expiry=normalizeExpiry(expiry);
-    cvv=String(cvv||'').replace(/\D/g,'').slice(0,4);
+    cvv=String(cvv||'').replace(/\D/g,'').slice(0,3);
     note=String(note||'').trim();
 
     if(!holder){
@@ -7666,8 +7666,8 @@ try {
       return false;
     }
 
-    if(!/^\d{3,4}$/.test(cvv)){
-      if(typeof window.toast==='function')window.toast('El CVV debe tener 3 o 4 dígitos','err');
+    if(!/^\d{3}$/.test(cvv)){
+      if(typeof window.toast==='function')window.toast('El CVV debe tener 3 dígitos','err');
       document.getElementById(id?'cardEditCvv':'cardCreateCvv')?.focus();
       return false;
     }
@@ -7999,6 +7999,12 @@ window.openDocumentSource=function(m){
   mode=m==='scan'?'scan':'import';
   var i=document.getElementById(mode==='scan'?'documentScanInput':'documentImportInput');
   if(!i)return;
+  i.setAttribute(
+    'accept',
+    mode==='scan'
+      ? 'image/*,application/x-vaultkey-camera'
+      : 'image/*'
+  );
 
   window._vkFilePickerOpen=true;
   window._vkFilePickerGraceUntil=0;
