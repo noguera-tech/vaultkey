@@ -16,7 +16,7 @@ La auditoría toma como fuentes de verdad:
 4. Código real de `app.html`, `components.css`, `style.css`, `csp-base.css`, `csp-overrides.css`
 5. Validación física en el prototipo Android/WebView
 
-## Hallazgos estructurales
+## Hallazgos estructurales iniciales
 
 ### H-01 — Cabeceras fragmentadas
 
@@ -62,40 +62,53 @@ Durante la sesión se verificó que la capa web embebida en `VaultKey_WEBVIEW_PR
 
 No se considerará cerrada la auditoría mientras no exista una reconciliación reproducible entre ambas capas.
 
-### H-05 — Hay más de un sistema de AppBar activo
+### H-05 — La altura de contenido depende de constantes duplicadas
 
-La base compartida de `components.css` define:
+Varias pantallas calculan su zona de contenido restando una altura fija de cabecera a `100dvh`, por ejemplo `calc(100dvh - 64px)` o equivalentes. Si se añade safe-area únicamente a la cabecera, el contenido puede quedar demasiado alto y generar scroll residual o recorte inferior.
 
-- `.vk-header` con altura 56 px;
-- `.vk-appbar` con altura 56 px.
+Decisión: cada familia que use una resta fija debe migrar conjuntamente a `altura visual + safe-area`, no solo su cabecera.
 
-Pero otras familias declaran su propia geometría en reglas posteriores. Ejemplos confirmados en el código actual:
+### H-06 — Existen al menos cinco alturas visuales de cabecera activas
 
-- `vk-password-detail-header`: 56 px;
-- `vk-password-edit-header`: 56 px;
-- `vk-password-create-topbar`: 56 px;
-- `vk-master-header`: 62 px;
-- `vk-pin-header`: 64 px;
-- `vk-kit-header`: 64 px;
-- `vk-danger-header`: 64 px;
-- `vk-info-header`: 64 px;
-- `vk-drive-header`: 64 px;
-- `vk-interaction-header`: 72 px;
-- `vk-notif-header`: 74 px.
+La implementación real contiene alturas de 56, 62, 64, 72 y 74 px según familia/pantalla. No son solo diferencias entre “principal” y “secundaria”; también existen implementaciones históricas distintas para configuraciones y formularios.
 
-Por tanto, el problema no es únicamente “falta safe-area”: la implementación ha acumulado varias familias con alturas y reglas independientes. La solución debe preservar la altura visual documentada por familia y añadir una capa común de insets, en lugar de reemplazar toda la geometría por un único valor.
+Ejemplos confirmados:
 
-### H-06 — La altura del contenido depende de la altura del header en múltiples pantallas
+- Contraseña detalle/editar/crear: 56 px.
+- Cambio de contraseña maestra: 62 px.
+- Notas/Tarjetas/Documentos y múltiples ajustes: 64 px.
+- Interacción: 72 px.
+- Notificaciones: 74 px.
 
-Varias pantallas calculan su zona de contenido con expresiones como `height: calc(100dvh - 64px)` o equivalentes. Ejemplos confirmados: Zona de peligro, Información, Drive, cambio de PIN y cambio de contraseña maestra.
+Esto impide una corrección ingenua de altura única y refuerza la necesidad de una capa común de safe-area independiente de la altura visual.
 
-Consecuencia: añadir `padding-top` al header sin actualizar el contrato de altura del contenido puede provocar desbordamiento, scroll residual o recorte inferior. La abstracción común debe exponer una altura total de AppBar = altura visual + safe-area y hacer que el contenido consuma exactamente el espacio restante.
+### H-07 — Notas, Tarjetas y Documentos ya forman familias reutilizables, pero no comparten una abstracción superior común
 
-### H-07 — El sistema visual compartido existe, pero las pantallas históricas no convergieron completamente a él
+Notas y Tarjetas reutilizan una cabecera de 64 px para lista y una cabecera de editor de 64 px para detalle/crear/editar. Documentos hace lo mismo con `vk-documents-topbar` y `vk-document-editor-topbar`, también de 64 px.
 
-`components.css` contiene componentes base reutilizables (`vk-header`, `vk-appbar`, botones, filas, inputs, sheets y diálogos), mientras que numerosas pantallas posteriores conservan componentes específicos. La auditoría debe decidir, familia por familia, qué puede converger al componente común sin alterar el diseño confirmado y qué debe mantenerse como variante explícita.
+Oportunidad: estas familias pueden migrar a una clase/variable común de AppBar secundaria Android-safe sin modificar el diseño interno de cada pantalla.
 
-No se hará una refactorización masiva solo por “limpieza”: primero se probará equivalencia visual y funcional.
+### H-08 — Acciones inferiores de formularios dependen de `margin-top:auto` y padding fijo
+
+Notas, Tarjetas y Documentos colocan sus acciones inferiores mediante `margin-top:auto`, con botones de 48 px. Documentos además usa formularios `overflow-y:auto` y padding inferior fijo de 28 px.
+
+Riesgo Android: al cambiar altura de cabecera o aparecer teclado/safe-area, estos pies pueden quedar cortados o introducir scroll mínimo, exactamente el tipo de defecto ya observado en Generador y Editar contraseña.
+
+Decisión: auditar las acciones inferiores como una familia propia (`form-actions`) y no corregir cada formulario por separado.
+
+### H-09 — Bottom sheets/document sheets usan geometría fija y no siempre incorporan safe-area inferior
+
+El selector de origen de documentos usa `min-height:494px` y `padding:18px 24px 28px` sin sumar explícitamente `safe-area-inset-bottom`. Existen otros bottom sheets posteriores en `csp-overrides.css` con reglas propias.
+
+Riesgo: botones inferiores correctos en web pueden quedar demasiado cerca de navegación Android o provocar recortes en determinados dispositivos.
+
+Decisión: inventariar todos los sheets y separar claramente `panel`, `scroll-body` y `actions/footer`, usando safe-area solo una vez.
+
+### H-10 — Existe una capa visual legacy todavía activa en `style.css`
+
+`style.css` conserva un sistema visual anterior con tokens, fondos, sombras, `.top`, `.card`, `.primary`, `.ghost`, etc., mientras `components.css` y la documentación maestra definen el sistema R1/actual. Aunque muchas reglas nuevas sobrescriben las antiguas, esta convivencia aumenta el riesgo de cascada inesperada y hace que un componente aparentemente igual pueda heredar reglas distintas según el orden de carga.
+
+Decisión: no borrar legacy durante la corrección funcional. Primero identificar qué selectores legacy siguen alcanzando DOM activo; la limpieza debe ser una fase separada y verificable.
 
 ## Familias de pantalla detectadas en `app.html`
 
@@ -144,21 +157,52 @@ No se hará una refactorización masiva solo por “limpieza”: primero se prob
 - Copia local
 - Autobloqueo
 
-## Matriz inicial de familias de cabecera
+## Clasificación provisional de cabeceras
 
-| Familia | Pantallas confirmadas | Altura visual actual conocida | Safe-area superior común | Riesgo asociado |
-|---|---|---:|---|---|
-| `vk-section-header` | Contraseñas, Notas, Tarjetas, Documentos, Favoritos, Ajustes, Seguridad | 64 px forzada por capa de consistencia | No en `main`; prueba Android positiva | Medio |
-| Header principal `vk-header` | Dashboard y Ajustes como clase combinada | 56 px base; Ajustes recibe otras reglas | No centralizada | Alto |
-| Password detail/edit/create | Detalle, Editar, Crear contraseña | 56 px | No centralizada | Alto |
-| Note editor | Detalle, Crear, Editar nota | pendiente de extracción completa | No centralizada | Alto |
-| Card editor | Detalle, Crear, Editar tarjeta | pendiente de extracción completa | No centralizada | Alto |
-| Document editor | Vista previa, Crear, Detalle, Editar documento | pendiente de extracción completa | No centralizada | Alto |
-| Seguridad avanzada | Master, PIN, Kit, Autobloqueo | 62/64 px y variantes | No centralizada | Alto |
-| Ajustes secundarios | Peligro, Información, Notificaciones, Interacción | 64/64/74/72 px | No centralizada | Alto |
-| Drive / copia local | Drive, backup local | 64 px | No centralizada | Alto |
+### Familia A — Secciones principales de 64 px
+- Contraseñas lista
+- Notas lista
+- Tarjetas lista
+- Documentos lista
+- Favoritos
+- Ajustes
+- Seguridad
 
-Esta tabla es de inventario, no de normalización: los valores distintos no se consideran errores por sí solos mientras el sistema visual no declare que deban ser iguales.
+Estado: prueba safe-area positiva en Android para las que usan `vk-section-header`.
+
+### Familia B — Formularios/detalle de contraseña de 56 px
+- Detalle contraseña
+- Editar contraseña
+- Crear contraseña
+
+Estado: pendiente de prueba Android-safe. Requiere ajustar simultáneamente contenido/flex restante.
+
+### Familia C — Editores de contenido de 64 px
+- Nota detalle/crear/editar
+- Tarjeta detalle/crear/editar
+- Documento vista previa/crear/detalle/editar
+
+Estado: candidatos claros a una abstracción común de AppBar secundaria 64 px + safe-area.
+
+### Familia D — Seguridad avanzada / utilidades
+- Cambio contraseña maestra: 62 px
+- Cambio PIN: 64 px
+- Kit de emergencia: 64 px
+- Zona de peligro: 64 px
+- Información: 64 px
+- Drive/Copia local: 64 px
+- Interacción: 72 px
+- Notificaciones: 74 px
+- Autobloqueo: altura propia pendiente de cerrar en inventario
+
+Estado: no normalizar altura visual sin referencia de diseño; sí normalizar la forma de sumar safe-area.
+
+### Exclusiones de la abstracción de AppBar de pantalla
+- Cabeceras internas de modales.
+- Cabeceras de bottom sheets.
+- Onboarding/unlock cuando su composición sea específica.
+
+Estas no deben recibir automáticamente el safe-area de las pantallas completas.
 
 ## Matriz de auditoría obligatoria
 
@@ -180,18 +224,23 @@ Cada familia/pantalla debe revisarse en estos ejes antes de aprobarla:
 14. Navegación/atrás Android.
 15. Regresión funcional: no tocar cripto, storage, sesión, PIN/master/kit/Drive salvo que el hallazgo lo requiera explícitamente.
 
-## Estrategia técnica propuesta para AppBar + Android safe-area
+## Arquitectura propuesta para safe-area (provisional)
 
-No se integrará todavía; debe validarse primero en la rama y en APK.
+No usar un `header { ... }` global.
 
-1. Definir un contrato común de inset superior, separado de la altura visual del AppBar.
-2. Aplicarlo mediante una clase/atributo común a todas las cabeceras de pantalla completa, no a modales que no deban tocar la barra de estado.
-3. Mantener por familia una variable de altura visual (`56`, `62`, `64`, `72`, `74`, `75` solo cuando el diseño/código vigente lo justifique).
-4. Calcular altura total y `flex-basis` como `altura visual + safe-area-inset-top`.
-5. Ajustar los contenedores que actualmente restan una constante fija de `100dvh` para que resten también el inset superior o, preferiblemente, migren a layout flex cuando sea seguro.
-6. No usar un parche global sobre todos los `header` porque también existen cabeceras de modales/bottom sheets con un contrato distinto.
+Modelo previsto:
 
-## Estrategia de corrección general
+- Variable/clase de `--vk-appbar-visual-height` por familia.
+- Altura total: `calc(var(--vk-appbar-visual-height) + env(safe-area-inset-top, 0px))`.
+- `padding-top: env(safe-area-inset-top, 0px)` en el contenedor de AppBar de pantalla.
+- Zona visual interna conserva su altura original (56/62/64/72/74 según corresponda).
+- Contenido con `flex:1; min-height:0` preferido frente a `height:calc(100dvh - Npx)` cuando sea viable.
+- Donde una resta explícita sea necesaria, restar también el safe-area.
+- Safe-area inferior se aplica una sola vez en el footer/acciones o contenedor raíz, nunca duplicado.
+
+Esta arquitectura debe probarse primero en representantes de Familia A, B, C y D antes de generalizar.
+
+## Estrategia de corrección
 
 ### Fase A — Inventario y clasificación
 
@@ -205,7 +254,7 @@ No se integrará todavía; debe validarse primero en la rama y en APK.
 - Crear una abstracción común de AppBar Android-safe-area.
 - Normalizar contenedores scrollables y acciones inferiores.
 - Centralizar reglas de bottom sheet/modal donde sea posible.
-- Mantener variantes documentadas, sin inventar valores.
+- Mantener variantes documentadas (56/62/64/72/74 px u otras confirmadas), sin inventar valores.
 
 ### Fase C — Auditoría pantalla por pantalla
 
@@ -229,16 +278,12 @@ Pasada física completa en dispositivo Android con datos ficticios, incluyendo a
 - Editar contraseña: acciones inferiores ajustadas.
 - Safe-area en `vk-section-header`: prueba física positiva; pendiente generalizar correctamente al resto de familias.
 
-## Pendientes visuales ya conocidos que deben entrar en esta auditoría
+## Próxima fase inmediata
 
-- Cabeceras e iconos superiores tapados por barra de estado.
-- Márgenes/insets y controles cortados en pantallas y avisos.
-- Notificación/pantalla “Restaurar copia”.
-- “PIN de restauración”.
-- “Estado de tu bóveda”: scroll/fondo/consistencia de bottom sheet.
-- Vibración del generador.
-- Diálogos y acciones inferiores con riesgo de recorte.
-- Scroll residual donde el contenido cabe completo.
+1. Completar inventario de overlays, diálogos y bottom sheets.
+2. Identificar todos los contenedores que usan `100dvh - Npx`.
+3. Diseñar el primer parche estructural de AppBar para representantes de familias A/B/C/D.
+4. Preparar una única APK de prueba con matriz de pantallas, evitando nuevos parches locales hasta validar el patrón.
 
 ## Regla de cierre
 
