@@ -2758,7 +2758,7 @@ button.vk-security-card:active { background: #243246; }
 .vk-notes-fab {
   position:absolute;
   right:21px;
-  bottom:25px;
+  bottom:calc(25px + env(safe-area-inset-bottom, 0px));
   width:56px;
   height:56px;
   border:0;
@@ -3241,7 +3241,7 @@ button.vk-security-card:active { background: #243246; }
 .vk-cards-fab {
   position:absolute;
   right:21px;
-  bottom:25px;
+  bottom:calc(25px + env(safe-area-inset-bottom, 0px));
   width:56px;
   height:56px;
   border:0;
