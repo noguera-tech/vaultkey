@@ -11,14 +11,14 @@ html.vk-twa body{
    ============================================================ */
 #dangerZoneSettings{box-sizing:border-box;width:100%;height:100dvh;min-height:0;overflow:hidden;border:1px solid #030508;background:linear-gradient(149.3508256958964deg,#111827 15.964%,#182f4e 63.204%);color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 #dangerZoneSettings[hidden]{display:none!important}
-.vk-danger-header{box-sizing:border-box;position:relative;width:100%;height:64px;flex:0 0 64px;display:grid;grid-template-columns:32px minmax(0,1fr) 32px;align-items:center;padding:0 24px;border-bottom:1px solid #000;background:#243246}
+.vk-danger-header{box-sizing:border-box;position:relative;width:100%;height:calc(64px + env(safe-area-inset-top, 0px));flex:0 0 calc(64px + env(safe-area-inset-top, 0px));display:flex;align-items:center;padding:env(safe-area-inset-top, 0px) 24px 0;border-bottom:1px solid #000;background:#243246}
 .vk-danger-back{box-sizing:border-box;width:32px;height:32px;padding:0;border:0;background:transparent;color:#a7b6c9;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity 300ms ease-in-out,transform 300ms ease-in-out}
 .vk-danger-back svg{display:block;width:24px;height:24px}
 .vk-danger-back:active{opacity:.72;transform:scale(.94)}
 .vk-danger-back:focus-visible{outline:2px solid rgba(0,217,255,.45);outline-offset:2px;border-radius:8px}
-.vk-danger-title{min-width:0;margin:0;color:#fff;font-size:20px;line-height:normal;font-weight:700;text-align:center}
-.vk-danger-header-spacer{width:32px;height:32px}
-.vk-danger-content{box-sizing:border-box;position:relative;width:min(365px,calc(100% - 40px));height:calc(100dvh - 64px);min-height:0;margin:0 auto;padding:101px 0 max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;overflow:hidden}
+.vk-danger-title{min-width:0;margin:0 0 32px;color:#fff;font-size:20px;line-height:24px;font-weight:700;text-align:center}
+.vk-danger-header-spacer{display:none}
+.vk-danger-content{box-sizing:border-box;position:relative;width:min(365px,calc(100% - 40px));height:calc(100dvh - 64px - env(safe-area-inset-top, 0px));min-height:0;margin:0 auto;padding:24px 0 max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;overflow:hidden}
 .vk-danger-actions{width:100%;display:flex;flex-direction:column;gap:15px}
 .vk-danger-card{box-sizing:border-box;position:relative;width:100%;height:72px;min-height:72px;padding:0 18px 0 22px;border:1px solid rgba(58,74,96,.6);border-radius:16px;background:#243246;color:#fff;display:grid;grid-template-columns:46px minmax(0,1fr) 24px;align-items:center;text-align:center !important;cursor:pointer;appearance:none;-webkit-appearance:none;transition:border-color 300ms ease-in-out,background-color 300ms ease-in-out,opacity 300ms ease-in-out,transform 300ms ease-in-out}
 .vk-danger-card:hover{border-color:rgba(90,112,142,.78)}
