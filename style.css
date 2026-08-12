@@ -3653,3 +3653,8 @@ button.vk-security-card:active { background: #243246; }
 #cardEdit .vk-card-form {
   padding-bottom: calc(38px + env(safe-area-inset-bottom, 0px));
 }
+
+/* Android visual audit: align only Seguridad > Favoritos with the other headers. */
+#securitySettings .vk-security-header__button[data-security-action="favorites"] {
+  transform: translateX(-8px);
+}
