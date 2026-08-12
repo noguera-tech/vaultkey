@@ -2402,7 +2402,7 @@ input[type=range]::-moz-range-thumb {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 0 21px 0 24px;
+  padding: 0 25px 0 24px;
   background: #243246;
   border: 0;
   border-bottom: 1px solid #000000;
@@ -2417,7 +2417,7 @@ input[type=range]::-moz-range-thumb {
   box-sizing: border-box;
   position: relative;
   width: min(100%, 412px);
-  min-height: calc(100dvh - 64px);
+  min-height: calc(100dvh - 75px);
   margin: 0 auto;
   padding: 0 23px 21px 24px;
   display: flex;
