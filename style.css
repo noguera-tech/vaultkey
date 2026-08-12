@@ -3648,3 +3648,8 @@ button.vk-security-card:active { background: #243246; }
   border: 2px solid #243246;
   border-radius: 999px;
 }
+
+/* Android: keep Edit Card actions clear of the bottom system inset. */
+#cardEdit .vk-card-form {
+  padding-bottom: calc(38px + env(safe-area-inset-bottom, 0px));
+}

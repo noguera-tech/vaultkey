@@ -2721,11 +2721,7 @@ body.vk-lock { overflow: hidden; }
   align-items: stretch;
   justify-content: stretch;
   overflow: hidden;
-  background: linear-gradient(
-    143.863deg,
-    #111827 15.964%,
-    #182f4e 63.204%
-  );
+  background: var(--vk-r1-bg-gradient);
   backdrop-filter: none;
 }
 
@@ -2744,7 +2740,7 @@ body.vk-lock { overflow: hidden; }
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: rgba(0,0,0,.35);
+  background: transparent;
   pointer-events: none;
 }
 
@@ -4344,13 +4340,18 @@ body.vk-create-picker-open {
   text-align: center;
 }
 
+#passwordCreate[data-password-create-type="recovery"] .vk-password-create-title {
+  font-size: 20px;
+  white-space: nowrap;
+}
+
 .vk-password-create-tabs {
   position: relative;
   z-index: 2;
   flex: 0 0 36px;
   height: 36px;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 0.92fr) minmax(0, 0.72fr) minmax(0, 1.44fr);
   align-items: stretch;
   box-sizing: border-box;
   margin: 24px var(--vk-r1-screen-padding-inline) 0;
@@ -5066,4 +5067,20 @@ body.vk-create-picker-open {
     width: min(320px, calc(100% - 40px));
     transform: translateY(var(--vk-welcome-shift-y));
   }
+}
+
+/* Dashboard: microajuste visual por tarjeta, sin alterar la rejilla. */
+#dashTileCards .vk-dash-tile__label,
+#dashTileCards .vk-dash-tile__count {
+  transform: translateX(-2px);
+}
+
+#dashTilePasswords .vk-dash-tile__label,
+#dashTilePasswords .vk-dash-tile__count {
+  transform: translateX(-4px);
+}
+
+#dashTileDocuments .vk-dash-tile__label,
+#dashTileDocuments .vk-dash-tile__count {
+  transform: translateX(-6px);
 }
