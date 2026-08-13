@@ -5300,11 +5300,15 @@ function openAutofillSettings() {
   // Abrir ajustes de autocompletado de Android directamente
   try {
     // Intent ACTION_REQUEST_SET_AUTOFILL_SERVICE — abre la pantalla correcta
-    window.location.href = 'intent:#Intent;action=android.settings.REQUEST_SET_AUTOFILL_SERVICE;package=com.nogueratech.vaultkey;end';
+    window.location.href = /VaultKeyWebViewPrototype\//.test(navigator.userAgent||'')
+      ? 'https://appassets.androidplatform.net/native/settings/autofill'
+      : 'intent:#Intent;action=android.settings.REQUEST_SET_AUTOFILL_SERVICE;package=com.nogueratech.vaultkey;end';
   } catch(e) {
     // Fallback: ajustes generales
     try {
-      window.location.href = 'intent:#Intent;action=android.settings.SETTINGS;end';
+      window.location.href = /VaultKeyWebViewPrototype\//.test(navigator.userAgent||'')
+        ? 'https://appassets.androidplatform.net/native/settings/system'
+        : 'intent:#Intent;action=android.settings.SETTINGS;end';
     } catch(e2) {}
   }
   dismissAutofillBanner();
