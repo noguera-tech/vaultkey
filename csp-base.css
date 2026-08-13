@@ -811,3 +811,28 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 .vk-drive-content{
   height:calc(100dvh - 64px - env(safe-area-inset-top, 0px));
 }
+/* VK 2026-08-13 - Local backup create confirmation: description first, actions below */
+#confirmModal.vk-confirm--backup-create .sheet{
+  height:286px;
+  padding:20px 24px 24px;
+  display:flex;
+  flex-direction:column;
+}
+#confirmModal.vk-confirm--backup-create #confirmMsg{
+  margin:24px 0 0;
+  line-height:1.4;
+}
+#confirmModal.vk-confirm--backup-create #confirmMsg2{
+  margin:14px 0 16px;
+  line-height:1.4;
+}
+#confirmModal.vk-confirm--backup-create .rowBtns{
+  position:static;
+  width:100%;
+  margin-top:auto;
+  display:grid;
+  grid-template-columns:96px 96px;
+  justify-content:space-between;
+  gap:0;
+}
+#confirmModal.vk-confirm--backup-create .rowBtns>button{width:96px;}
