@@ -836,3 +836,29 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
   gap:0;
 }
 #confirmModal.vk-confirm--backup-create .rowBtns>button{width:96px;}
+/* VK 2026-08-13 - Danger confirmations: keep actions below description */
+#confirmModal.vk-confirm--reset .sheet,
+#confirmModal.vk-confirm--wipe .sheet,
+#confirmModal.vk-confirm--drive-disconnect .sheet{
+  height:276px;
+  padding-bottom:24px;
+  display:flex;
+  flex-direction:column;
+}
+#confirmModal.vk-confirm--reset #confirmMsg,
+#confirmModal.vk-confirm--wipe #confirmMsg,
+#confirmModal.vk-confirm--drive-disconnect #confirmMsg{
+  margin:10px 0 18px;
+  line-height:1.35;
+}
+#confirmModal.vk-confirm--reset .rowBtns,
+#confirmModal.vk-confirm--wipe .rowBtns,
+#confirmModal.vk-confirm--drive-disconnect .rowBtns{
+  position:static;
+  margin-top:auto;
+  width:100%;
+  display:grid;
+  grid-template-columns:85px 85px;
+  justify-content:space-between;
+  gap:0;
+}
