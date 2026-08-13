@@ -698,3 +698,17 @@
   flex: 0 0 calc(64px + env(safe-area-inset-top, 0px));
   padding-top: env(safe-area-inset-top, 0px);
 }
+/* VK_SECURITY_CREDENTIAL_SUBFLOWS_SAFEAREA_RESTORED_2026_08_13 */
+.vk-master-header,
+.vk-pin-header {
+  box-sizing: border-box;
+  height: calc(64px + env(safe-area-inset-top, 0px));
+  min-height: calc(64px + env(safe-area-inset-top, 0px));
+  flex: 0 0 calc(64px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.vk-master-content,
+.vk-pin-content {
+  height: calc(100dvh - 64px - env(safe-area-inset-top, 0px));
+}
