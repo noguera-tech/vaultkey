@@ -4077,6 +4077,8 @@ function setPasswordCreateType(type){
   const next=config[type];
   if(!next)return;
   _passwordCreateType=type;
+  const passwordCreateRoot=document.getElementById('passwordCreate');
+  if(passwordCreateRoot)passwordCreateRoot.dataset.passwordCreateType=type;
   setFavoriteSwitch(
     $('vkPasswordCreateFavorite'),
     _passwordCreateFavorites[type]===true
