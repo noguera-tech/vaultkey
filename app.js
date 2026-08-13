@@ -4984,7 +4984,15 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     if(window.applyVisualLook) window.applyVisualLook();
     appBooted=true;
     applyAppVersion();
-    if('serviceWorker'in navigator){
+    const _nativeAndroid=/VaultKeyWebViewPrototype\//.test(navigator.userAgent||'');
+    if(_nativeAndroid&&'serviceWorker'in navigator){
+      navigator.serviceWorker.getRegistrations()
+        .then(registrations=>Promise.all(registrations.map(reg=>reg.unregister())))
+        .catch(()=>{});
+      if('caches'in window){
+        caches.keys().then(keys=>Promise.all(keys.map(key=>caches.delete(key)))).catch(()=>{});
+      }
+    }else if('serviceWorker'in navigator){
       const _swInstallTime = Date.now();
       navigator.serviceWorker.register('./sw.js').catch(()=>{});
       navigator.serviceWorker.addEventListener('message',e=>{
