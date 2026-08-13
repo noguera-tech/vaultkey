@@ -17,6 +17,39 @@ let driveTokenClient = null;
 let driveAccessToken = null;
 let driveUiState = 'disconnected';
 let driveNetworkListenersBound = false;
+let driveNativeAuthorizationResolver = null;
+let driveNativeDisconnectResolver = null;
+
+function driveUsesNativeAuthorization() {
+  return /VaultKeyWebViewPrototype\//.test(navigator.userAgent || '');
+}
+
+window.vkNativeDriveAuthorizationResult = function (response) {
+  if (!driveNativeAuthorizationResolver) return;
+  const resolver = driveNativeAuthorizationResolver;
+  driveNativeAuthorizationResolver = null;
+  if (response && response.access_token) resolver.resolve(response);
+  else resolver.reject(new Error((response && response.error) || 'La autorización de Google fue cancelada.'));
+};
+
+window.vkNativeDriveDisconnectResult = function (response) {
+  if (!driveNativeDisconnectResolver) return;
+  const resolver = driveNativeDisconnectResolver;
+  driveNativeDisconnectResolver = null;
+  if (response && response.ok === true) resolver.resolve(response);
+  else resolver.reject(new Error((response && response.error) || 'Google no confirmó la revocación'));
+};
+
+function driveRequestNativeDisconnect() {
+  return new Promise((resolve, reject) => {
+    if (driveNativeDisconnectResolver) {
+      reject(new Error('Ya hay una desconexión de Drive en curso'));
+      return;
+    }
+    driveNativeDisconnectResolver = { resolve, reject };
+    window.location.href = 'https://appassets.androidplatform.net/native/drive/disconnect';
+  });
+}
 
 // ---------- Estado visual (conectando/sincronizando/conectado/offline) ----------
 function driveSetUiState(state) {
@@ -195,6 +228,16 @@ function driveWaitForGoogleIdentity(timeoutMs = 5000) {
 }
 
 function driveRequestToken() {
+  if (driveUsesNativeAuthorization()) {
+    return new Promise((resolve, reject) => {
+      if (driveNativeAuthorizationResolver) {
+        reject(new Error('Ya hay una autorización de Google en curso.'));
+        return;
+      }
+      driveNativeAuthorizationResolver = { resolve, reject };
+      window.location.href = 'https://appassets.androidplatform.net/native/drive/connect';
+    });
+  }
   return new Promise((resolve, reject) => {
     driveTokenClient = google.accounts.oauth2.initTokenClient({
       client_id: DRIVE_CLIENT_ID,
@@ -223,7 +266,7 @@ async function driveConnect() {
   let retry = false;
 
   try {
-    await driveWaitForGoogleIdentity();
+    if (!driveUsesNativeAuthorization()) await driveWaitForGoogleIdentity();
     const response = await driveRequestToken();
     driveSaveToken(response);
     driveSyncUI();
@@ -755,7 +798,9 @@ async function driveDisconnect() {
     }
 
     const accessToken = driveReadToken();
-    const revocation = await driveRevokeToken(accessToken && accessToken.access_token);
+    const revocation = driveUsesNativeAuthorization()
+      ? (await driveRequestNativeDisconnect(), { attempted: true, revoked: true, error: null })
+      : await driveRevokeToken(accessToken && accessToken.access_token);
     driveClearToken();
     driveSyncUI();
     if (revocation.revoked) {
