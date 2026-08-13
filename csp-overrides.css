@@ -734,3 +734,7 @@
   margin-right: auto;
   font-size: 17px;
 }
+/* VK_PIN_BOTTOM_SAFEAREA_RESTORED_2026_08_13 */
+.vk-pin-save {
+  margin-bottom: 32px;
+}
