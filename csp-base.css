@@ -601,7 +601,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 #emergencyKitView[hidden]{display:none!important}
 .vk-kit-header{
   box-sizing:border-box;
-  height:64px;
+  height:calc(64px + env(safe-area-inset-top, 0px));
   background:#243246;
   border-bottom:1px solid #000000;
   display:flex;
@@ -623,7 +623,7 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 .vk-kit-back svg{width:24px;height:24px}
 .vk-kit-content{
   width:min(364px,calc(100% - 44px));
-  height:calc(100dvh - 64px);
+  height:calc(100dvh - 64px - env(safe-area-inset-top, 0px));
   margin:0 auto;
   padding:17px 0 max(18px,env(safe-area-inset-bottom));
   box-sizing:border-box;
