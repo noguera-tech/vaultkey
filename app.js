@@ -2663,6 +2663,11 @@ async function doImportConfirm() {
 async function importBackup(file) {
   if(!file) return;
 
+  const maxBackupBytes=100*1024*1024;
+  if(Number(file.size)>maxBackupBytes){
+    toast('La copia supera el límite de 100 MB','err');
+    return;
+  }
   try {
     const raw = await file.text();
     const data = JSON.parse(raw);
