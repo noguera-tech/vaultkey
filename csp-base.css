@@ -782,3 +782,32 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
 .vk-master-save{border:0;background:#2f6fea;color:#fff}.vk-master-save:disabled{opacity:.55;cursor:not-allowed}
 .vk-master-cancel{border:1px solid rgba(167,182,201,.6);background:transparent;color:#fff}
 @media(max-height:780px){.vk-master-content{padding-top:10px}.vk-master-subtitle{margin:12px auto 16px}.vk-master-field{margin-bottom:10px}.vk-master-strength{margin-top:10px}.vk-master-rules{margin:6px 0 10px}.vk-master-rules li{margin-bottom:5px}.vk-master-note{margin-bottom:6px}.vk-master-actions{gap:6px}.vk-master-save,.vk-master-cancel{height:46px;font-size:18px}}
+/* VK 2026-08-13 - Settings subpages: 64px visual bar + Android safe-area */
+.vk-info-header{
+  height:calc(64px + env(safe-area-inset-top, 0px));
+  padding:env(safe-area-inset-top, 0px) 20px 0;
+}
+.vk-info-content{
+  height:calc(100dvh - 64px - env(safe-area-inset-top, 0px));
+}
+.vk-notif-header{
+  height:calc(64px + env(safe-area-inset-top, 0px));
+  padding:env(safe-area-inset-top, 0px) 20px 0;
+}
+.vk-notif-content{
+  height:calc(100dvh - 64px - env(safe-area-inset-top, 0px));
+}
+.vk-interaction-header{
+  height:calc(64px + env(safe-area-inset-top, 0px));
+  padding:env(safe-area-inset-top, 0px) 20px 0;
+}
+.vk-interaction-content{
+  height:calc(100dvh - 64px - env(safe-area-inset-top, 0px));
+}
+.vk-drive-header{
+  height:calc(64px + env(safe-area-inset-top, 0px));
+  padding:env(safe-area-inset-top, 0px) 20px 0;
+}
+.vk-drive-content{
+  height:calc(100dvh - 64px - env(safe-area-inset-top, 0px));
+}
