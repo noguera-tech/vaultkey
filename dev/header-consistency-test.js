@@ -7,6 +7,7 @@ const root=path.resolve(__dirname,'..');
 const html=fs.readFileSync(path.join(root,'app.html'),'utf8');
 const css=fs.readFileSync(path.join(root,'components.css'),'utf8');
 const style=fs.readFileSync(path.join(root,'style.css'),'utf8');
+const overrides=fs.readFileSync(path.join(root,'csp-overrides.css'),'utf8');
 
 function expect(condition,message){
   if(!condition){
@@ -27,8 +28,8 @@ const favorites=screen('fav','settings');
 
 expect((html.match(/vk-section-header/g)||[]).length===7,
   'Las siete cabeceras principales deben usar el mismo contrato visual.');
-expect(!/aria-label="Favoritos"/.test(security),
-  'Seguridad no debe mostrar un acceso ajeno a Favoritos.');
+expect(/aria-label="Favoritos"/.test(security),
+  'Seguridad debe conservar el acceso a Favoritos.');
 expect(!/aria-current="page"/.test(settings),
   'Ajustes no debe repetir un engranaje inactivo para la pantalla actual.');
 expect(/aria-label="Favoritos"/.test(settings)&&/aria-label="Ajustes"/.test(favorites),
@@ -46,8 +47,8 @@ expect(/\.vk-section-header \.vk-note-back,[\s\S]*?width:\s*48px\s*!important;[\
   'Las acciones deben tener una zona táctil de 48 px.');
 expect(/\.vk-section-header \.vk-note-back svg,[\s\S]*?width:\s*24px\s*!important;[\s\S]*?height:\s*24px\s*!important;/.test(css),
   'Los glifos visibles deben medir 24 px.');
-expect(/min-height:\s*calc\(100dvh - 64px\)/.test(style),
-  'Seguridad debe descontar la nueva altura unificada.');
+expect(/\.vk-section-header\s*\{[\s\S]*?height:\s*calc\(64px \+ env\(safe-area-inset-top,\s*0px\)\)\s*!important;[\s\S]*?min-height:\s*calc\(64px \+ env\(safe-area-inset-top,\s*0px\)\)\s*!important;/.test(overrides),
+  'Las cabeceras principales deben conservar la safe-area superior de Android.');
 
 if(!process.exitCode){
   console.log('OK: cabeceras y accesos superiores siguen una regla visual única');
