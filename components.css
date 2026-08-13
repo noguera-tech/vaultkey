@@ -2941,7 +2941,7 @@ body.vk-lock { overflow: hidden; }
   padding: 16px 18px 18px;
   border: 1px solid rgba(58,74,96,.9);
   border-radius: 16px;
-  background: rgba(17,24,39,.14);
+  background: rgba(36,50,70,.58);
 }
 .vk-health-area {
   margin-top: 14px;
@@ -3029,7 +3029,7 @@ body.vk-lock { overflow: hidden; }
   min-width: 0;
   padding: 10px 8px 9px;
   border-radius: 12px;
-  background: rgba(36,50,70,.72);
+  background: var(--vk-r1-surface-alt);
   text-align: center;
 }
 
