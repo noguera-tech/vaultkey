@@ -2175,7 +2175,7 @@ function copyText(t='',btn=null){
   }).catch(()=>toast('No se pudo copiar'))
 }
 function scheduleClipboardClear(value){setTimeout(async()=>{try{const txt=await navigator.clipboard.readText?.();if(txt===value)await navigator.clipboard.writeText('');}catch(e){}},30000)}
-function openUrl(u){vibe(20);if(!/^https?:\/\//.test(u))u='https://'+u;window.open(u,'_blank')}
+function openUrl(u){vibe(20);if(!/^https?:\/\//.test(u))u='https://'+u;if(/VaultKeyWebViewPrototype\//.test(navigator.userAgent||'')){window.location.href=u}else{window.open(u,'_blank','noopener')}}
 function openGen(target=false,targetField='ePass'){useGenTarget=target;window._genTargetField=targetField;$('genModal').classList.add('open');syncRanges(false);if($('genOut').textContent==='Pulsa generar')markGeneratorDirty()}
 function markGeneratorDirty(){syncRanges(false);$('genOut').textContent='Pulsa generar';}
 function generatePass(){
