@@ -669,3 +669,13 @@
 #passwords .vk-passwords-content {
   height: calc(100% - 64px - env(safe-area-inset-top, 0px));
 }
+/* VK_FAMILY_B_EDITORS_SAFEAREA_RESTORED_2026_08_13 */
+.vk-note-editor-topbar,
+.vk-card-editor-topbar,
+.vk-document-editor-topbar {
+  box-sizing: border-box;
+  height: calc(64px + env(safe-area-inset-top, 0px));
+  min-height: calc(64px + env(safe-area-inset-top, 0px));
+  flex: 0 0 calc(64px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+}
