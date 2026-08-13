@@ -679,3 +679,22 @@
   flex: 0 0 calc(64px + env(safe-area-inset-top, 0px));
   padding-top: env(safe-area-inset-top, 0px);
 }
+/* VK_PASSWORD_INTERNAL_SAFEAREA_RESTORED_2026_08_13 */
+.vk-password-detail-header {
+  box-sizing: border-box;
+  height: calc(64px + env(safe-area-inset-top, 0px));
+  min-height: calc(64px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.vk-password-detail-content {
+  height: calc(100% - 64px - env(safe-area-inset-top, 0px));
+}
+
+.vk-password-edit-header {
+  box-sizing: border-box;
+  height: calc(64px + env(safe-area-inset-top, 0px));
+  min-height: calc(64px + env(safe-area-inset-top, 0px));
+  flex: 0 0 calc(64px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+}
