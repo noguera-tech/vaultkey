@@ -870,3 +870,10 @@ button.vk-drive-card{cursor:pointer}.vk-drive-card:active{opacity:.86;transform:
   height:286px;
   max-height:calc(100dvh - 48px - env(safe-area-inset-bottom, 0px));
 }
+/* VK 2026-08-13 - Drive disconnect: give destructive label enough width */
+#confirmModal.vk-confirm--drive-disconnect .rowBtns{grid-template-columns:104px 104px;}
+#confirmModal.vk-confirm--drive-disconnect .rowBtns>button{
+  width:104px;
+  font-size:13px;
+  white-space:nowrap;
+}
