@@ -887,7 +887,11 @@ if(!window.__vkInformationActionsBound){
         toast('Próximamente');
         break;
       case 'privacy':
-        window.open('https://nogueratech.app/privacy.html','_blank','noopener');
+        if(/VaultKeyWebViewPrototype\//.test(navigator.userAgent||'')){
+          window.location.href='https://nogueratech.app/privacy.html';
+        }else{
+          window.open('https://nogueratech.app/privacy.html','_blank','noopener');
+        }
         break;
       case 'licenses':
         toast('Próximamente');
