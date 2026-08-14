@@ -1,0 +1,18 @@
+/* VaultKey Android — Family A safe-area pilot
+   Scope deliberately limited to existing .vk-section-header screens.
+   No icon-size, gap, content-layout, scroll, modal, form or JavaScript changes. */
+
+.vk-section-header {
+  box-sizing: border-box;
+  height: calc(64px + env(safe-area-inset-top, 0px)) !important;
+  min-height: calc(64px + env(safe-area-inset-top, 0px)) !important;
+  flex: 0 0 calc(64px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px) !important;
+}
+
+/* Passwords is the only Family-A screen whose content height is explicitly
+   coupled to the 64px header in the shared header block. Keep the existing
+   visual contract while subtracting the Android top inset exactly once. */
+#passwords .vk-passwords-content {
+  height: calc(100% - 64px - env(safe-area-inset-top, 0px));
+}

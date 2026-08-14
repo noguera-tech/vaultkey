@@ -1,0 +1,10 @@
+# VaultKey validated APK manifest
+source=C:\Users\alank\Documents\Codex\01_WORK_ACTIVE\VaultKey_ANDROID_WEBVIEW_CHECKPOINT_2026-08-13\app\build\outputs\apk\debug\app-debug.apk
+preserved=artifacts\validated\app-debug-validated-39a5e8d0.apk
+bytes=4508247
+sha256=39a5e8d0d85bfc67cfb6292d0cc506485c9f015ef435dcd24461a9eddf7819fb
+package=com.nogueratech.vaultkey
+versionName=2.7.0-webview-candidate
+versionCode=36
+variant=debug
+certificateSha256=262c21b90db0b2ab7f54ac288f9146f6d45387d94c2b05bab0f1cab62e65a412

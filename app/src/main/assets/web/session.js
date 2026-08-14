@@ -1,0 +1,146 @@
+/* ============================================================
+   VaultKey 2.0 — session.js
+   Autobloqueo de sesión (Módulo 2 · tarea 2.6) — AISLADO
+   CONTRATO: decisiones congeladas — opciones immediate/30s/1m/5m;
+   eventos de actividad: pointerdown, keydown, touchstart.
+
+   REGLAS: sin app.js/app.html/index.html/sw.js/drive.js; sin
+   dependencias. Complementa unlock.js y vault-store.js.
+   ============================================================ */
+
+(function (root, factory) {
+  'use strict';
+  var api = factory(root);
+  if (typeof module === 'object' && module.exports) { module.exports = api; }
+  if (root) { root.vkSession = api; }
+})(typeof window !== 'undefined' ? window : globalThis, function (root) {
+  'use strict';
+
+  var TIMEOUTS = { 'immediate': 0, '30s': 30000, '1m': 60000, '5m': 300000 };
+  var ACTIVITY_EVENTS = ['pointerdown', 'keydown', 'touchstart'];
+
+  var _dek = null;
+  var _store = null;
+  var _router = null;
+  var _timer = null;
+  var _onActivity = null;
+  var _onVisibility = null;
+  var _onBlur = null;
+  var _timeoutMs = 0;
+  var _manageLifecycle = true;
+
+  function clearTimer() {
+    if (_timer !== null) { root.clearTimeout(_timer); _timer = null; }
+  }
+
+  function scheduleTimer() {
+    clearTimer();
+    if (_timeoutMs <= 0) { return; }
+    _timer = root.setTimeout(function () { lock(); }, _timeoutMs);
+  }
+
+  function removeListeners() {
+    if (_onActivity) {
+      ACTIVITY_EVENTS.forEach(function (ev) {
+        root.removeEventListener(ev, _onActivity, true);
+      });
+      _onActivity = null;
+    }
+    if (_onVisibility) {
+      root.document && root.document.removeEventListener('visibilitychange', _onVisibility);
+      _onVisibility = null;
+    }
+    if (_onBlur) {
+      root.removeEventListener('blur', _onBlur);
+      _onBlur = null;
+    }
+  }
+
+  function lock() {
+    _dek = null;
+    clearTimer();
+    removeListeners();
+    if (_router) { _router.replace('/unlock'); }
+  }
+
+  function configureOption(option) {
+    clearTimer();
+    removeListeners();
+
+    _timeoutMs = TIMEOUTS[option] !== undefined ? TIMEOUTS[option] : 0;
+    if (!_dek || !_manageLifecycle) { return; }
+
+    if (option === 'immediate') {
+      _onVisibility = function () {
+        if (typeof root.isFilePickerGuardActive === 'function' &&
+            root.isFilePickerGuardActive()) { return; }
+        if (root.document && root.document.visibilityState === 'hidden') { lock(); }
+      };
+      _onBlur = function () {
+        if (typeof root.isFilePickerGuardActive === 'function' &&
+            root.isFilePickerGuardActive()) { return; }
+        lock();
+      };
+      root.document && root.document.addEventListener('visibilitychange', _onVisibility);
+      root.addEventListener('blur', _onBlur);
+    } else {
+      _onActivity = function () { scheduleTimer(); };
+      ACTIVITY_EVENTS.forEach(function (ev) {
+        root.addEventListener(ev, _onActivity, true);
+      });
+      scheduleTimer();
+    }
+  }
+
+  function start(opts) {
+    stop();
+    _dek = opts.dekKey;
+    _store = opts.store;
+    _router = opts.router;
+    _manageLifecycle = opts.manageLifecycle !== false;
+
+    var option = (_store && _store.getMeta().autolockOption) || 'immediate';
+    configureOption(option);
+  }
+
+  function setAutolockOption(option) {
+    if (TIMEOUTS[option] === undefined) { return false; }
+
+    if (_store && typeof _store.setMeta === 'function') {
+      _store.setMeta({ autolockOption: option });
+    }
+
+    configureOption(option);
+    return true;
+  }
+
+  function getAutolockOption() {
+    if (_store && typeof _store.getMeta === 'function') {
+      var option = _store.getMeta().autolockOption;
+      if (TIMEOUTS[option] !== undefined) { return option; }
+    }
+    return 'immediate';
+  }
+
+  function stop() {
+    _dek = null;
+    clearTimer();
+    removeListeners();
+    _manageLifecycle = true;
+  }
+
+  function getDEK() { return _dek; }
+  function isActive() { return _dek !== null; }
+
+  return {
+    TIMEOUTS: TIMEOUTS,
+    ACTIVITY_EVENTS: ACTIVITY_EVENTS.slice(),
+    start: start,
+    setAutolockOption: setAutolockOption,
+    getAutolockOption: getAutolockOption,
+    lock: lock,
+    stop: stop,
+    getDEK: getDEK,
+    isActive: isActive
+  };
+});

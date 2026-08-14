@@ -1,0 +1,130 @@
+// ─────────────────────────────────────────────────────────────
+//  VaultKey Service Worker
+//  Versión auto-generada: no editar CACHE_VERSION manualmente.
+//  Para forzar actualización en usuarios: incrementar el número.
+// ─────────────────────────────────────────────────────────────
+const CACHE_VERSION = 56;
+const CACHE = `vaultkey-v${CACHE_VERSION}`;
+
+const FILES = [
+  './index.html',
+  './app.html',
+  './csp-base.css',
+  './csp-overrides.css',
+  './style.css',
+  './theme.css',
+  './components.css',
+  './vault-crypto.js',
+  './vault-store.js',
+  './vault-backup.js',
+  './router.js',
+  './components.js',
+  './session.js',
+  './onboarding.js',
+  './unlock.js',
+  './kit-manager.js',
+  './credentials.js',
+  './app.js',
+  './drive.js',
+  './manifest.json',
+  './vaultkey-icon-192.png',
+  './vaultkey-icon-512.png',
+  './vaultkey-maskable-192.png',
+  './vaultkey-maskable-512.png',
+  './vaultkey-apple-touch-180.png'
+];
+
+const NO_CACHE_HOSTS = [
+  'accounts.google.com',
+  'oauth2.googleapis.com',
+  'www.googleapis.com',
+  'googleusercontent.com'
+];
+
+// ── Instalación: cachear todos los archivos ──────────────────
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE)
+      .then(cache => cache.addAll(FILES))
+      .then(() => self.skipWaiting())
+  );
+});
+
+// ── Activación: limpiar cachés viejos + notificar clientes ───
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(
+        keys
+          .filter(key => key !== CACHE)
+          .map(key => caches.delete(key))
+      ))
+      .then(() => self.clients.claim())
+      .then(() => self.clients.matchAll({ type: 'window' }))
+      .then(clients => clients.forEach(client =>
+        client.postMessage({ type: 'SW_UPDATED', version: CACHE_VERSION })
+      ))
+  );
+});
+
+// ── Fetch: estrategia por tipo de recurso ────────────────────
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+
+  const url = new URL(event.request.url);
+
+  // Nunca cachear peticiones a Google APIs
+  if (NO_CACHE_HOSTS.some(host => url.hostname.includes(host))) return;
+
+  // Nunca cachear peticiones con Authorization header
+  if (event.request.headers.get('Authorization')) return;
+
+  // index.html — Network first, caché como fallback
+  if (url.pathname === '/' || url.pathname.endsWith('/vaultkey/') || url.pathname.endsWith('index.html')) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+        .then(response => {
+          // Actualizar el caché con la versión nueva
+          const copy = response.clone();
+          caches.open(CACHE).then(cache => cache.put(event.request, copy));
+          return response;
+        })
+        .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  // app.js, style.css, drive.js, app.html, components.css, theme.css — Network first (para recibir actualizaciones)
+  if (url.pathname.endsWith('app.js') || url.pathname.endsWith('onboarding.js') || url.pathname.endsWith('unlock.js') || url.pathname.endsWith('vault-attachments.js') || url.pathname.endsWith('vault-backup.js') || url.pathname.endsWith('style.css') || url.pathname.endsWith('drive.js') || url.pathname.endsWith('app.html') || url.pathname.endsWith('components.css') || url.pathname.endsWith('theme.css')) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE).then(cache => cache.put(event.request, copy));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Resto (iconos, manifest, imágenes) — Cache first
+  event.respondWith(
+    caches.match(event.request).then(cached => {
+      if (cached) return cached;
+      return fetch(event.request).then(response => {
+        const copy = response.clone();
+        caches.open(CACHE).then(cache => cache.put(event.request, copy));
+        return response;
+      });
+    })
+  );
+});
+
+// ── Mensajes desde la app ─────────────────────────────────────
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+  if (event.data?.type === 'GET_VERSION') {
+    event.source?.postMessage({ type: 'SW_VERSION', version: CACHE_VERSION });
+  }
+});

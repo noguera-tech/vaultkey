@@ -1,0 +1,133 @@
+﻿/* ============================================================
+   VaultKey 2.0 — theme.css
+   Tokens de la paleta oficial R1 (congelada)
+   Fuente: Especificación Final para Desarrollo v1.0 (08-07-2026)
+   Registro de Decisiones v1.1+ — la paleta final de Figma
+   sustituye a la del Manual de Diseño v1.0.
+
+   REGLA (Plan Módulo 1, tarea 1.5): prohibido hardcodear
+   valores hex en componentes; todo color pasa por estos tokens.
+   Este fichero es la única fuente de verdad de color de la PWA.
+   ============================================================ */
+
+:root {
+  /* Acción / semánticos */
+  --vk-primary: #3B82F6;        /* Azul primario / acciones */
+  --vk-success: #22C55E;        /* Verde correcto */
+  --vk-warning: #F59E0B;        /* Naranja advertencia */
+  --vk-danger: #EF4444;         /* Rojo destructivo */
+  --vk-caution: #FACC15;        /* Amarillo precaución suave */
+
+  /* Superficies */
+  --vk-bg: #0F172A;             /* Fondo app */
+  --vk-header: #24354B;         /* Header */
+  --vk-card: #2B3B52;           /* Tarjetas */
+  --vk-border: #374151;         /* Bordes */
+
+  /* Texto */
+  --vk-text: #FFFFFF;           /* Texto primario */
+  --vk-text-muted: #9CA3AF;     /* Texto secundario */
+  --vk-text-disabled: #6B7280;  /* Texto deshabilitado */
+}
+
+:root {
+  /* Tokens de componente — campos de formulario (Figma 07-07) */
+  --vk-input-bg: #243246;
+  --vk-input-border: rgba(58, 74, 96, 0.6);
+}
+
+/* ============================================================
+   VaultKey 2.0 — theme.css — BLOQUE R1 (paralelo, temporal)
+   Fuente: Auditoría visual Figma R1 (aprobada como fuente
+   visual oficial). Prefijo --vk-r1-* para introducir el
+   sistema Figma sin tocar los tokens --vk-* ya consumidos
+   por Unlock y Onboarding (Módulo 2, ya integrados y en QA).
+
+   REGLA: ningún componente actual debe leer estos tokens
+   todavía. Se activan pantalla a pantalla, solo cuando se
+   autorice explícitamente, editando components.css/style.css
+   para que un selector concreto empiece a usar --vk-r1-*.
+
+   No incluye: --vk-r1-header (valor no confirmado en Figma),
+   ni carga de la tipografía Inter (solo se declara el nombre
+   de familia; falta decidir cómo se sirve el recurso).
+   ============================================================ */
+
+:root {
+  /* Fondo */
+  --vk-r1-bg-gradient:
+    linear-gradient(180deg, #111827 17%, #182F4E 67%);
+
+  /* Marca */
+  --vk-r1-primary: #2F6FEA;
+  --vk-r1-accent: #3B82F6;
+
+  /* Superficies */
+  --vk-r1-surface: #243246;
+  --vk-r1-surface-alt: #334155;
+  --vk-r1-neutral-light: #D9D9D9;
+
+  /* Texto */
+  --vk-r1-text: #FFFFFF;
+  --vk-r1-text-secondary: #9CA3AF;
+  --vk-r1-text-tertiary: #A7B6C9;
+
+  /* Bordes y divisores */
+  --vk-r1-border: #3A4A60;
+  --vk-r1-border-soft: rgba(58, 74, 96, 0.60);
+  --vk-r1-divider: #475569;
+
+  /* Semántico */
+  --vk-r1-success: #22C55E;
+  --vk-r1-warning: #F59E0B;
+  --vk-r1-danger: #DC2626;
+  --vk-r1-danger-emphasis: #EF4444;
+
+  /* Overlay */
+  --vk-r1-overlay: rgba(0, 0, 0, 0.35);
+
+  /* Geometría */
+  --vk-r1-radius-sm: 12px;
+  --vk-r1-radius-md: 16px;
+  --vk-r1-radius-full: 999px;
+
+  /* Tipografía — solo declaración del token, sin cargar el recurso */
+  --vk-r1-font-family: Inter, system-ui, -apple-system, sans-serif;
+}
+
+/* ============================================================
+   VaultKey R1 — tokens visuales confirmados
+   Fuente: docs/design-system/VAULTKEY_VISUAL_MASTER_v1.0.md
+   No sustituye todavía los tokens legacy --vk-*.
+   ============================================================ */
+
+:root {
+  /* Tipografía */
+  --vk-r1-font-weight-regular: 400;
+  --vk-r1-font-weight-semibold: 600;
+  --vk-r1-font-weight-bold: 700;
+
+  --vk-r1-font-size-screen-title: 20px;
+  --vk-r1-font-size-row-title: 16px;
+  --vk-r1-font-size-row-subtitle: 13px;
+  --vk-r1-font-size-label: 14px;
+  --vk-r1-font-size-input: 16px;
+  --vk-r1-font-size-button: 14px;
+
+  --vk-r1-line-height-auto: normal;
+  --vk-r1-letter-spacing: 0;
+
+  /* Geometría confirmada */
+  --vk-r1-radius-xs: 6px;
+  --vk-r1-radius-fab: 28px;
+  --vk-r1-border-width: 1px;
+
+  /* Layout */
+  --vk-r1-screen-padding-inline: 24px;
+  --vk-r1-row-gap: 15px;
+  --vk-r1-row-height: 72px;
+
+  /* Iconografía */
+  --vk-r1-icon-size: 24px;
+  --vk-r1-icon-stroke-width: 2;
+}
