@@ -2265,6 +2265,34 @@ function useGen(){
     toast('Ahora completa servicio y usuario, luego Guardar');
   }
 }
+async function saveBackupFile(fileName, content, mimeType) {
+  if(window.VaultKeyAndroid&&typeof window.VaultKeyAndroid.saveLocalBackup==='function'){
+    const saved=await new Promise((resolve)=>{
+      window.__vaultKeyLocalBackupResult=(ok,message)=>{
+        delete window.__vaultKeyLocalBackupResult;
+        resolve({ok:Boolean(ok),message:String(message||'')});
+      };
+      window.VaultKeyAndroid.saveLocalBackup(fileName,content);
+    });
+    if(!saved.ok){
+      if(saved.message==='Guardado cancelado') return false;
+      throw new Error(saved.message||'No se pudo guardar la copia local');
+    }
+    return true;
+  }
+
+  const fileBlob=new Blob([content],{type:mimeType||'application/octet-stream'});
+  const url=URL.createObjectURL(fileBlob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url);},1000);
+  return true;
+}
+
 async function exportBackup(){
   if(typeof vkStore!=='undefined'&&vkStore.hasVault()){
     try{
@@ -2291,29 +2319,7 @@ async function exportBackup(){
 
       const fileName='VaultKey_Backup_'+dd+mm+yyyy+'.vkbak';
       const content=JSON.stringify(data,null,2);
-      if(window.VaultKeyAndroid&&typeof window.VaultKeyAndroid.saveLocalBackup==='function'){
-        const saved=await new Promise((resolve)=>{
-          window.__vaultKeyLocalBackupResult=(ok,message)=>{
-            delete window.__vaultKeyLocalBackupResult;
-            resolve({ok:Boolean(ok),message:String(message||'')});
-          };
-          window.VaultKeyAndroid.saveLocalBackup(fileName,content);
-        });
-        if(!saved.ok){
-          if(saved.message==='Guardado cancelado') return false;
-          throw new Error(saved.message||'No se pudo guardar la copia local');
-        }
-      }else{
-        const fileBlob=new Blob([content],{type:'application/octet-stream'});
-        const url=URL.createObjectURL(fileBlob);
-        const a=document.createElement('a');
-        a.href=url;
-        a.download=fileName;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(function(){URL.revokeObjectURL(url);},1000);
-      }
+      if(!(await saveBackupFile(fileName,content,'application/octet-stream'))) return false;
 
       soundSuccess();
       toast('Respaldo local cifrado exportado correctamente','ok');
@@ -2339,17 +2345,26 @@ async function exportBackup(){
     exported:Date.now(),
     payload:JSON.parse(pack)
   };
-  let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  let a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='VaultKey-respaldo-cifrado.json';
-  a.click();
+  try{
+    const saved=await saveBackupFile(
+      'VaultKey-respaldo-cifrado.json',
+      JSON.stringify(data,null,2),
+      'application/json'
+    );
+    if(!saved)return false;
+  }catch(err){
+    console.error('exportBackup legacy:',err);
+    soundError();
+    toast('No se pudo exportar el respaldo local','err');
+    return false;
+  }
   let m=meta();
   m.lastBackup=Date.now();
   localStorage.setItem(LS_META,JSON.stringify(m));
   render();
   soundSuccess();
   toast('Respaldo cifrado exportado. Solo se restaura con tu PIN');
+  return true;
 }
 
 // ============================================================

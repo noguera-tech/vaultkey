@@ -300,7 +300,10 @@ public final class MainActivity extends Activity {
             String fileName = requestedName == null
                     ? "VaultKey_Backup.vkbak"
                     : requestedName.replaceAll("[^A-Za-z0-9._-]", "_");
-            if (!fileName.endsWith(".vkbak")) fileName += ".vkbak";
+            String lowerName = fileName.toLowerCase(Locale.ROOT);
+            if (!lowerName.endsWith(".vkbak") && !lowerName.endsWith(".json")) {
+                fileName += ".vkbak";
+            }
 
             try {
                 clearPendingLocalBackup();
