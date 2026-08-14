@@ -2289,18 +2289,31 @@ async function exportBackup(){
         createdAt:new Date(now).toISOString()
       });
 
-      const fileBlob=new Blob(
-        [JSON.stringify(data,null,2)],
-        {type:'application/octet-stream'}
-      );
-      const url=URL.createObjectURL(fileBlob);
-      const a=document.createElement('a');
-      a.href=url;
-      a.download='VaultKey_Backup_'+dd+mm+yyyy+'.vkbak';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(function(){URL.revokeObjectURL(url);},1000);
+      const fileName='VaultKey_Backup_'+dd+mm+yyyy+'.vkbak';
+      const content=JSON.stringify(data,null,2);
+      if(window.VaultKeyAndroid&&typeof window.VaultKeyAndroid.saveLocalBackup==='function'){
+        const saved=await new Promise((resolve)=>{
+          window.__vaultKeyLocalBackupResult=(ok,message)=>{
+            delete window.__vaultKeyLocalBackupResult;
+            resolve({ok:Boolean(ok),message:String(message||'')});
+          };
+          window.VaultKeyAndroid.saveLocalBackup(fileName,content);
+        });
+        if(!saved.ok){
+          if(saved.message==='Guardado cancelado') return false;
+          throw new Error(saved.message||'No se pudo guardar la copia local');
+        }
+      }else{
+        const fileBlob=new Blob([content],{type:'application/octet-stream'});
+        const url=URL.createObjectURL(fileBlob);
+        const a=document.createElement('a');
+        a.href=url;
+        a.download=fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function(){URL.revokeObjectURL(url);},1000);
+      }
 
       soundSuccess();
       toast('Respaldo local cifrado exportado correctamente','ok');
@@ -2355,11 +2368,48 @@ function normalizeRestoreCredentialInput(value) {
   return { master: text };
 }
 
+function setRestoreFieldVisibility(inputId, buttonId, visible) {
+  const input = $(inputId);
+  const button = $(buttonId);
+  if (!input || !button) return;
+
+  if (input.tagName === 'TEXTAREA') {
+    input.style.webkitTextSecurity = visible ? 'none' : 'disc';
+  } else {
+    input.type = visible ? 'text' : 'password';
+  }
+  button.setAttribute('aria-pressed', visible ? 'true' : 'false');
+  button.setAttribute('aria-label', (visible ? 'Ocultar ' : 'Mostrar ') +
+    (inputId === 'restorePinInput' ? 'PIN' : 'contraseña maestra o kit'));
+}
+
+function bindRestoreVisibility(inputId, buttonId) {
+  const input = $(inputId);
+  const button = $(buttonId);
+  if (!input || !button) return;
+  setRestoreFieldVisibility(inputId, buttonId, false);
+  button.hidden = !input.value;
+  button.onclick = () => {
+    const visible = button.getAttribute('aria-pressed') !== 'true';
+    setRestoreFieldVisibility(inputId, buttonId, visible);
+  };
+}
+
+function updateRestoreVisibilityButton(inputId, buttonId) {
+  const input = $(inputId);
+  const button = $(buttonId);
+  if (!input || !button) return;
+  const hasValue = input.value.length > 0;
+  button.hidden = !hasValue;
+  if (!hasValue) setRestoreFieldVisibility(inputId, buttonId, false);
+}
+
 function closeRestoreCredentialModal(value) {
   const modal = $('restoreCredentialModal');
   if (modal) modal.classList.remove('open');
   const input = $('restoreCredentialInput');
   if (input) input.value = '';
+  setRestoreFieldVisibility('restoreCredentialInput', 'restoreCredentialVisibility', false);
   if (_restoreCredentialResolver) {
     const resolver = _restoreCredentialResolver;
     _restoreCredentialResolver = null;
@@ -2377,6 +2427,7 @@ function openRestoreCredentialModal(options = {}) {
     const input = $('restoreCredentialInput');
     const ok = $('restoreCredentialOk');
     const cancel = $('restoreCredentialCancel');
+    bindRestoreVisibility('restoreCredentialInput', 'restoreCredentialVisibility');
 
     if (title) title.textContent = options.title || 'Restaurar copia';
     if (label) label.textContent = options.label || 'Contraseña maestra o kit';
@@ -2396,6 +2447,7 @@ function openRestoreCredentialModal(options = {}) {
         if (input.tagName === 'TEXTAREA') {
           input.value = input.value.replace(/\n/g, ' ');
         }
+        updateRestoreVisibilityButton('restoreCredentialInput', 'restoreCredentialVisibility');
       };
       input.onkeydown = (event) => {
         if (event.key === 'Enter') {
@@ -2464,6 +2516,7 @@ function closeRestorePinModal(value) {
   if (modal) modal.classList.remove('open');
   const input = $('restorePinInput');
   if (input) input.value = '';
+  setRestoreFieldVisibility('restorePinInput', 'restorePinVisibility', false);
   if (_restorePinResolver) {
     const resolver = _restorePinResolver;
     _restorePinResolver = null;
@@ -2481,6 +2534,7 @@ function openRestorePinModal(options = {}) {
     const input = $('restorePinInput');
     const ok = $('restorePinOk');
     const cancel = $('restorePinCancel');
+    bindRestoreVisibility('restorePinInput', 'restorePinVisibility');
 
     if (title) title.textContent = options.title || 'PIN de restauración';
     if (label) label.textContent = options.label || 'PIN';
@@ -2493,6 +2547,7 @@ function openRestorePinModal(options = {}) {
       input.autocomplete = 'new-password';
       input.oninput = () => {
         input.value = input.value.replace(/\D/g, '').slice(0, 6);
+        updateRestoreVisibilityButton('restorePinInput', 'restorePinVisibility');
       };
       input.onkeydown = (event) => {
         if (event.key === 'Enter') {

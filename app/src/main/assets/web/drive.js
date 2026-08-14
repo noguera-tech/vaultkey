@@ -607,7 +607,7 @@ function askDrivePin() {
   });
 }
 
-async function driveRestore() {
+async function driveRestore(allowAuthorizationRetry = true) {
   const accessToken = driveGetValidAccessToken();
   if (!accessToken) { driveToast('❌ Primero conecta Google Drive', 'err'); return false; }
 
@@ -723,6 +723,10 @@ async function driveRestore() {
     if (error && error.status === 401) {
       driveClearToken();
       driveSyncUI();
+      if (allowAuthorizationRetry) {
+        const reconnected = await driveConnect();
+        if (reconnected) return driveRestore(false);
+      }
       await driveShowError('La sesión de Google Drive ha caducado', new Error('Vuelve a conectar Google Drive para continuar.'), { variant: 'drive-connect-error', confirmText: 'Entendido' });
       return false;
     }

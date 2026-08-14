@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.MimeTypeMap;
 import android.webkit.SafeBrowsingResponse;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.api.identity.AuthorizationRequest;
 import com.google.android.gms.auth.api.identity.AuthorizationResult;
+import com.google.android.gms.auth.api.identity.ClearTokenRequest;
 import com.google.android.gms.auth.api.identity.Identity;
 import com.google.android.gms.auth.api.identity.RevokeAccessRequest;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -38,6 +40,7 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Scope;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -54,6 +57,7 @@ public final class MainActivity extends Activity {
     private static final String TAG = "VaultKeyDrive";
     private static final int FILE_CHOOSER_REQUEST = 4107;
     private static final int DRIVE_AUTHORIZATION_REQUEST = 4108;
+    private static final int LOCAL_BACKUP_SAVE_REQUEST = 4109;
     private static final String LOCAL_ORIGIN = "https://appassets.androidplatform.net";
     private static final String ASSET_PREFIX = "/assets/web/";
     private static final String NATIVE_DRIVE_CONNECT_PATH = "/native/drive/connect";
@@ -71,6 +75,7 @@ public final class MainActivity extends Activity {
     private boolean awaitingOwnActivityResult;
     private Account driveAccount;
     private String driveAccessToken;
+    private File pendingLocalBackupFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +120,7 @@ public final class MainActivity extends Activity {
         settings.setUserAgentString(settings.getUserAgentString() + " VaultKeyWebViewPrototype/0.4");
 
         CookieManager.getInstance().setAcceptThirdPartyCookies(view, false);
+        view.addJavascriptInterface(new NativeBridge(), "VaultKeyAndroid");
         view.setWebChromeClient(new PrototypeChromeClient());
         view.setWebViewClient(new LocalAssetClient());
         return view;
@@ -183,6 +189,7 @@ public final class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         coverSensitiveContent();
+        clearPendingLocalBackup();
         if (fileChooserCallback != null) {
             fileChooserCallback.onReceiveValue(null);
             fileChooserCallback = null;
@@ -231,7 +238,100 @@ public final class MainActivity extends Activity {
             }
             return;
         }
+        if (requestCode == LOCAL_BACKUP_SAVE_REQUEST) {
+            Uri destination = resultCode == RESULT_OK && data != null ? data.getData() : null;
+            if (destination == null) {
+                awaitingOwnActivityResult = false;
+                clearPendingLocalBackup();
+                deliverLocalBackupResult(false, "Guardado cancelado");
+                return;
+            }
+
+            File source = pendingLocalBackupFile;
+            new Thread(() -> {
+                boolean saved = false;
+                String message = "No se pudo guardar la copia local";
+                if (source != null && source.isFile()) {
+                    try (InputStream input = new java.io.FileInputStream(source);
+                         OutputStream output = getContentResolver().openOutputStream(destination, "w")) {
+                        if (output == null) throw new IOException("Destino no disponible");
+                        byte[] buffer = new byte[8192];
+                        int count;
+                        while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);
+                        output.flush();
+                        saved = true;
+                        message = "Copia local guardada correctamente";
+                    } catch (IOException error) {
+                        Log.e(TAG, "No se pudo escribir la copia local", error);
+                    }
+                }
+                final boolean result = saved;
+                final String detail = message;
+                runOnUiThread(() -> {
+                    awaitingOwnActivityResult = false;
+                    clearPendingLocalBackup();
+                    deliverLocalBackupResult(result, detail);
+                });
+            }, "VaultKeyLocalBackup").start();
+            return;
+        }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void clearPendingLocalBackup() {
+        File file = pendingLocalBackupFile;
+        pendingLocalBackupFile = null;
+        if (file != null && file.exists() && !file.delete()) {
+            Log.w(TAG, "No se pudo borrar el archivo temporal de la copia local");
+        }
+    }
+
+    private void deliverLocalBackupResult(boolean saved, String message) {
+        if (webView == null) return;
+        String script = "try{if(typeof window.__vaultKeyLocalBackupResult==='function'){" +
+                "window.__vaultKeyLocalBackupResult(" + saved + "," +
+                JSONObject.quote(message) + ");}}catch(e){}";
+        webView.evaluateJavascript(script, null);
+    }
+
+    private final class NativeBridge {
+        @JavascriptInterface
+        public void saveLocalBackup(String requestedName, String content) {
+            String fileName = requestedName == null
+                    ? "VaultKey_Backup.vkbak"
+                    : requestedName.replaceAll("[^A-Za-z0-9._-]", "_");
+            if (!fileName.endsWith(".vkbak")) fileName += ".vkbak";
+
+            try {
+                clearPendingLocalBackup();
+                File output = File.createTempFile("vaultkey-backup-", ".vkbak", getCacheDir());
+                try (OutputStream stream = new FileOutputStream(output)) {
+                    stream.write(String.valueOf(content).getBytes(StandardCharsets.UTF_8));
+                }
+                pendingLocalBackupFile = output;
+            } catch (IOException error) {
+                Log.e(TAG, "No se pudo preparar la copia local", error);
+                runOnUiThread(() -> deliverLocalBackupResult(
+                        false, "No se pudo preparar la copia local"));
+                return;
+            }
+
+            final String suggestedName = fileName;
+            runOnUiThread(() -> {
+                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("application/octet-stream");
+                intent.putExtra(Intent.EXTRA_TITLE, suggestedName);
+                try {
+                    awaitingOwnActivityResult = true;
+                    startActivityForResult(intent, LOCAL_BACKUP_SAVE_REQUEST);
+                } catch (RuntimeException error) {
+                    awaitingOwnActivityResult = false;
+                    clearPendingLocalBackup();
+                    deliverLocalBackupResult(false, "No hay un selector para guardar archivos");
+                }
+            });
+        }
     }
 
     private void beginDriveAuthorization() {
@@ -239,6 +339,21 @@ public final class MainActivity extends Activity {
                 .setRequestedScopes(Collections.singletonList(new Scope(DRIVE_SCOPE)))
                 .build();
 
+        String cachedToken = driveAccessToken;
+        if (cachedToken != null && !cachedToken.trim().isEmpty()) {
+            driveAccessToken = null;
+            ClearTokenRequest clearRequest = ClearTokenRequest.builder()
+                    .setToken(cachedToken)
+                    .build();
+            Identity.getAuthorizationClient(this).clearToken(clearRequest)
+                    .addOnCompleteListener(ignored -> authorizeDrive(request));
+            return;
+        }
+
+        authorizeDrive(request);
+    }
+
+    private void authorizeDrive(AuthorizationRequest request) {
         Identity.getAuthorizationClient(this).authorize(request)
                 .addOnSuccessListener(result -> {
                     if (result.hasResolution()) {
