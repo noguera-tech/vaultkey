@@ -940,6 +940,20 @@
     background-image: var(--vk-r1-bg-gradient);
 }
 
+#healthModal.vk-health-modal::before,
+#healthModal.vk-health-modal::after {
+    display: none !important;
+}
+
+#healthModal .vk-health-sheet {
+    background-color: #111827 !important;
+    background-image: var(--vk-r1-bg-gradient) !important;
+}
+
+#healthModal .vk-health-sheet::after {
+    background: #243246 !important;
+}
+
 body.vk-health-open .app > .screen.active {
     visibility: hidden !important;
 }

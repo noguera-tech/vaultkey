@@ -20,6 +20,8 @@ if ($overrides -notmatch '#healthModal\.vk-health-modal\s*\{[\s\S]*?position:\s*
 if ($appJs -notmatch "classList\.add\('vk-health-open'\)" -or $appJs -notmatch "classList\.remove\('vk-health-open'\)") { throw 'La pantalla trasera no se oculta y restaura con el panel de estado.' }
 if ($overrides -notmatch 'body\.vk-health-open\s+\.app\s*>\s*\.screen\.active[\s\S]*?visibility:\s*hidden') { throw 'Falta ocultar visualmente la pantalla trasera dentro del contenedor .app.' }
 if ($overrides -notmatch '#healthModal\.open\s+\.vk-health-sheet[\s\S]*?animation:\s*none') { throw 'El panel de estado conserva la animación de hoja.' }
+if ($overrides -notmatch '#healthModal\.vk-health-modal::before,[\s\S]*?#healthModal\.vk-health-modal::after\s*\{[\s\S]*?display:\s*none') { throw 'El panel de estado conserva la franja superior artificial.' }
+if ($overrides -notmatch '#healthModal\s+\.vk-health-sheet\s*\{[\s\S]*?background-color:\s*#111827[\s\S]*?background-image:\s*var\(--vk-r1-bg-gradient\)') { throw 'La hoja del panel de estado no tiene fondo opaco.' }
 if ($gradle -notmatch "applicationIdSuffix '\.pendingerrorsdiagnostic'") { throw 'Falta el paquete independiente del lote pendiente.' }
 
 Write-Output 'PASS: siete incidencias pendientes cubiertas por comprobaciones estructurales.'
