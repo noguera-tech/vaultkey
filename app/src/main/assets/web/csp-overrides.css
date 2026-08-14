@@ -940,7 +940,7 @@
     background-image: var(--vk-r1-bg-gradient);
 }
 
-body.vk-health-open > .screen.active {
+body.vk-health-open .app > .screen.active {
     visibility: hidden !important;
 }
 

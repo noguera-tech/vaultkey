@@ -18,7 +18,7 @@ if ($appHtml -match 'vk-interaction-version') { throw 'Interacción conserva la 
 if ($overrides -notmatch '\.vk-info-version\s*\{[\s\S]*?margin-top:\s*24px') { throw 'La versión inferior de Información no se ha subido.' }
 if ($overrides -notmatch '#healthModal\.vk-health-modal\s*\{[\s\S]*?position:\s*fixed') { throw 'Estado de la bóveda no cubre la pantalla anterior.' }
 if ($appJs -notmatch "classList\.add\('vk-health-open'\)" -or $appJs -notmatch "classList\.remove\('vk-health-open'\)") { throw 'La pantalla trasera no se oculta y restaura con el panel de estado.' }
-if ($overrides -notmatch 'body\.vk-health-open\s*>\s*\.screen\.active[\s\S]*?visibility:\s*hidden') { throw 'Falta ocultar visualmente la pantalla trasera.' }
+if ($overrides -notmatch 'body\.vk-health-open\s+\.app\s*>\s*\.screen\.active[\s\S]*?visibility:\s*hidden') { throw 'Falta ocultar visualmente la pantalla trasera dentro del contenedor .app.' }
 if ($overrides -notmatch '#healthModal\.open\s+\.vk-health-sheet[\s\S]*?animation:\s*none') { throw 'El panel de estado conserva la animación de hoja.' }
 if ($gradle -notmatch "applicationIdSuffix '\.pendingerrorsdiagnostic'") { throw 'Falta el paquete independiente del lote pendiente.' }
 
