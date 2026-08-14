@@ -704,7 +704,13 @@ function show(id,dir){
   });
 
 })();
-function lock(){if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();vibe(30);soundLock();unlocked=false;lastKey=null;pin='';vault=[];clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay()}
+function lock(reason='web:unspecified'){
+  traceLifecycleEvent('lock enter',{reason});
+  if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();
+  vibe(30);soundLock();unlocked=false;lastKey=null;pin='';vault=[];
+  clearAutoLockTimer();closeModals();initPin();show('pin');hidePrivacyOverlay();
+  traceLifecycleEvent('lock exit',{reason});
+}
 /* ============================================================
    Borrado total — almacenes fragmentados (notas/tarjetas/documentos
    legacy) y borradores sensibles de sessionStorage.
@@ -1398,6 +1404,31 @@ function registerFailedPin(){
 }
 function updateLockCountdown(){clearInterval(lockCountdownTimer);let left=lockRemaining();if(!left)return;lockCountdownTimer=setInterval(()=>{let s=lockRemaining();if(!s){clearInterval(lockCountdownTimer);$('pinMsg').className='pinSub';$('pinMsg').textContent='Introduce tu PIN';return}$('pinMsg').textContent='Bóveda bloqueada. Espera '+s+' s';},1000)}
 function getAutoLockMs(){let m=defaultSecurity(meta());return m?Number(m.autoLockMs||0):0}
+let _vkLifecycleTraceSeq=0;
+function traceLifecycleEvent(event,extra){
+  try{
+    const payload={
+      seq:++_vkLifecycleTraceSeq,
+      epochMs:Date.now(),
+      perfMs:Math.round(performance.now()),
+      event,
+      hidden:document.hidden,
+      focus:document.hasFocus(),
+      unlocked:!!unlocked,
+      appBooted:!!appBooted,
+      filePickerOpen:window._vkFilePickerOpen===true,
+      filePickerGraceUntil:Number(window._vkFilePickerGraceUntil||0),
+      guard:typeof window.isFilePickerGuardActive==='function'
+        ?window.isFilePickerGuardActive():null,
+      hiddenSince,
+      autoLockMs:getAutoLockMs(),
+      extra:extra||null
+    };
+    console.info('[VK-LIFECYCLE]'+JSON.stringify(payload));
+  }catch(error){
+    console.info('[VK-LIFECYCLE]{"event":"trace-error"}');
+  }
+}
 function setAutoLock(v){let m=defaultSecurity(meta());if(!m)return;m.autoLockMs=Number(v);saveMeta(m);toast(m.autoLockMs===0?'Bloqueo inmediato al salir activado':'Autobloqueo inteligente actualizado');resetAutoLockTimer()}
 function clearAutoLockTimer(){if(autoLockTimer){clearTimeout(autoLockTimer);autoLockTimer=null}}
 function resetAutoLockTimer(){clearAutoLockTimer();if(!unlocked||document.hidden)return;let ms=getAutoLockMs();if(ms>0){autoLockTimer=setTimeout(()=>{if(unlocked&&!document.hidden){soundLock();lock()}},ms)}}
@@ -1405,6 +1436,7 @@ function markActivity(){if(unlocked){hidePrivacyOverlay();resetAutoLockTimer()}}
 function showPrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.add('show');document.body.classList.add('vk-locked')}
 function hidePrivacyOverlay(){let o=$('privacyOverlay');if(o)o.classList.remove('show');document.body.classList.remove('vk-locked')}
 function lockForBackground(){
+  traceLifecycleEvent('lockForBackground enter');
   unlocked=false;
   lastKey=null;
   pin='';
@@ -1412,8 +1444,10 @@ function lockForBackground(){
   clearAutoLockTimer();
   if(typeof vkSession!=='undefined'&&vkSession.isActive())vkSession.stop();
   closeModals();
+  traceLifecycleEvent('lockForBackground exit');
 }
 function startBackgroundAutoLock(){
+  traceLifecycleEvent('startBackgroundAutoLock enter');
   if(!unlocked)return;
   showPrivacyOverlay();
   const ms=getAutoLockMs();
@@ -1422,6 +1456,7 @@ function startBackgroundAutoLock(){
   const remaining=Math.max(0,ms-(Date.now()-hiddenSince));
   clearAutoLockTimer();
   autoLockTimer=setTimeout(()=>{if(!unlocked)return;soundLock();lockForBackground();},remaining);
+  traceLifecycleEvent('startBackgroundAutoLock armed',{remaining});
 }
 window.isFilePickerGuardActive=function(){
   return window._vkFilePickerOpen===true ||
@@ -1430,16 +1465,22 @@ window.isFilePickerGuardActive=function(){
     Date.now()<Number(window._vkGoogleOAuthGraceUntil||0);
 };
 window.finishFilePicker=function(){
+  traceLifecycleEvent('finishFilePicker enter');
   window._vkFilePickerOpen=false;
   window._vkFilePickerGraceUntil=Date.now()+500;
   if(window._vkFilePickerFocusFallbackTimer){
     clearTimeout(window._vkFilePickerFocusFallbackTimer);
     window._vkFilePickerFocusFallbackTimer=null;
   }
+  traceLifecycleEvent('finishFilePicker exit');
 };
 function handleVisibilityChange(){
+  traceLifecycleEvent('visibilitychange handler enter');
   if(!appBooted)return;
-  if(window._vkSharing||window._vkBiometricFlow||window.isFilePickerGuardActive())return;
+  if(window._vkSharing||window._vkBiometricFlow||window.isFilePickerGuardActive()){
+    traceLifecycleEvent('visibilitychange handler guarded');
+    return;
+  }
   if(document.hidden){
     if(unlocked){
       // Guardar borrador del formulario si está abierto
@@ -1485,9 +1526,14 @@ function handleVisibilityChange(){
       hidePrivacyOverlay();resetAutoLockTimer();
     }
   }
+  traceLifecycleEvent('visibilitychange handler exit');
 }
-document.addEventListener('visibilitychange',handleVisibilityChange);
+document.addEventListener('visibilitychange',()=>{
+  traceLifecycleEvent('visibilitychange event');
+  handleVisibilityChange();
+});
 window.addEventListener('pageshow',(e)=>{
+  traceLifecycleEvent('pageshow event',{persisted:!!e.persisted});
   if(!appBooted)return;
   if(!document.hidden&&!unlocked&&localStorage.getItem('vaultkey_onboarding_v130')){
     hidePrivacyOverlay();
@@ -1497,6 +1543,7 @@ window.addEventListener('pageshow',(e)=>{
 // Mostrar privacy overlay inmediatamente en blur/pagehide
 // para evitar que Android capture contenido sensible en recientes
 window.addEventListener('blur', () => {
+  traceLifecycleEvent('blur event');
   if(window.isFilePickerGuardActive()) return;
   if(!appBooted || !unlocked || window._vkSharing || window._vkBiometricFlow) return;
   startBackgroundAutoLock();
@@ -1504,6 +1551,7 @@ window.addEventListener('blur', () => {
 // Recuperar overlay al volver el foco cuando NO hay cambio de pestaña
 // (ej. abrir/usar DevTools en la misma ventana no dispara visibilitychange)
 window.addEventListener('focus', () => {
+  traceLifecycleEvent('focus event');
   if(window.isFilePickerGuardActive()){
     if(window._vkFilePickerOpen&&window._vkFilePickerCancelSupported===false){
       clearTimeout(window._vkFilePickerFocusFallbackTimer);
@@ -1516,7 +1564,11 @@ window.addEventListener('focus', () => {
   if(!appBooted || window._vkSharing || window._vkBiometricFlow) return;
   handleVisibilityChange();
 });
-window.addEventListener('pagehide',()=>{if(window.isFilePickerGuardActive())return;if(unlocked){showPrivacyOverlay();lockForBackground();}});
+window.addEventListener('pagehide',(event)=>{
+  traceLifecycleEvent('pagehide event',{persisted:!!event.persisted});
+  if(window.isFilePickerGuardActive())return;
+  if(unlocked){showPrivacyOverlay();lockForBackground();}
+});
 ['pointerdown','keydown','input','scroll'].forEach(ev=>document.addEventListener(ev,markActivity,{capture:true,passive:true}));
 
 let selectedEntryIcon='';
