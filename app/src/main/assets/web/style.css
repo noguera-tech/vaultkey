@@ -242,8 +242,7 @@ select option { background:#001830; color:#e8f6ff; }
 .vkSplashFrame {
   position:absolute; left:50%; top:0; z-index:1;
   width:412px; height:917px;
-  transform:translateX(-50%) scale(var(--vk-startup-scale, 1));
-  transform-origin:top center;
+  transform:translateX(-50%);
 }
 .vkSplashShield {
   position:absolute; left:131px; top:337px;

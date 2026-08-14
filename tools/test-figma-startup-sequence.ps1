@@ -49,8 +49,8 @@ $components = Get-Content -LiteralPath (Join-Path $projectRoot 'app\src\main\ass
 if ($components -match 'vk-welcome-shift-y') {
     throw 'Permanece el desplazamiento móvil que alteraba las coordenadas de Figma.'
 }
-if ($components -notmatch 'transform:\s*scale\(var\(--vk-startup-scale, 1\)\)') {
-    throw 'Bienvenida no comparte la escala proporcional del splash.'
+if ($components -match '--vk-startup-scale' -or $style -match '--vk-startup-scale' -or $appJs -match 'updateSplashScale') {
+    throw 'El arranque vuelve a aplicar una escala dinámica que puede producir saltos.'
 }
 
-Write-Output 'PASS: fondo 412x917, splash y bienvenida Figma conservan activos, orden y escala común.'
+Write-Output 'PASS: fondo 412x917, splash y bienvenida Figma conservan activos, orden y lienzo estable.'

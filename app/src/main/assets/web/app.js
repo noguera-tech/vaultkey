@@ -5009,12 +5009,6 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
 
 (function(){
   const LS_SPLASH='vk_splash_v1';
-  function updateSplashScale(){
-    const splash=$('vkSplash');
-    if(!splash)return;
-    const scale=Math.min(window.innerWidth/412,window.innerHeight/917);
-    document.documentElement.style.setProperty('--vk-startup-scale',String(scale));
-  }
   function updatePinScale(){
     const scale=Math.min(1,window.innerWidth/412,window.innerHeight/917);
     document.documentElement.style.setProperty('--vk-pin-scale',String(scale));
@@ -5024,7 +5018,6 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
   function runSplash(cb){
   const splash=$('vkSplash');
   if(!splash){cb();return;}
-  updateSplashScale();
   splash.classList.add('vkSplashVisible');
   splash.style.opacity='1';
   setTimeout(()=>{

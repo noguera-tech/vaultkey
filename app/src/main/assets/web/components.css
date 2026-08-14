@@ -1403,7 +1403,7 @@ body.vk-lock { overflow: hidden; }
 #onboardingModal.vk2-onboarding,
 #onboardingModal .vk2-onboarding-host {
   min-height: 100dvh;
-  background: linear-gradient(180deg, #111827 17%, #182f4e 67%);
+  background: transparent;
 }
 
 #onboardingModal .vk2-onboarding-host {
@@ -1422,8 +1422,6 @@ body.vk-lock { overflow: hidden; }
   font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
   text-align: center;
   overflow: hidden;
-  transform: scale(var(--vk-startup-scale, 1));
-  transform-origin: top center;
 }
 
 .vk-onb__shield {
