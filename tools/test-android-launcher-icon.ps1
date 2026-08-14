@@ -5,12 +5,19 @@ $manifestPath = Join-Path $projectRoot 'app\src\main\AndroidManifest.xml'
 [xml] $manifest = Get-Content -LiteralPath $manifestPath -Raw
 $androidNamespace = 'http://schemas.android.com/apk/res/android'
 $application = $manifest.manifest.application
+$colorsPath = Join-Path $projectRoot 'app\src\main\res\values\colors.xml'
+[xml] $colors = Get-Content -LiteralPath $colorsPath -Raw
 
 if ($application.GetAttribute('icon', $androidNamespace) -ne '@mipmap/ic_launcher') {
     throw 'AndroidManifest.xml no declara android:icon=@mipmap/ic_launcher.'
 }
 if ($application.GetAttribute('roundIcon', $androidNamespace) -ne '@mipmap/ic_launcher_round') {
     throw 'AndroidManifest.xml no declara android:roundIcon=@mipmap/ic_launcher_round.'
+}
+
+$launcherBackground = $colors.resources.color | Where-Object { $_.name -eq 'launcher_icon_background' }
+if (-not $launcherBackground -or $launcherBackground.InnerText.ToUpperInvariant() -ne '#182F4E') {
+    throw 'El fondo adaptable no coincide con el fondo oficial #182F4E.'
 }
 
 $expectedSizes = [ordered]@{

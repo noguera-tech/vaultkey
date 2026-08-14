@@ -32,6 +32,12 @@ android {
     }
 
     buildTypes {
+        iconBackgroundDiagnostic {
+            initWith debug
+            applicationIdSuffix '.iconbackgrounddiagnostic'
+            versionNameSuffix '-iconbackgrounddiagnostic'
+            debuggable true
+        }
         iconDiagnostic {
             initWith debug
             applicationIdSuffix '.icondiagnostic'
