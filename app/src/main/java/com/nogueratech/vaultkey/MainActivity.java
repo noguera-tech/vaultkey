@@ -502,6 +502,14 @@ public final class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        String currentUrl = webView != null ? webView.getUrl() : null;
+        boolean localLegalPage = currentUrl != null &&
+                (currentUrl.startsWith(LOCAL_ORIGIN + ASSET_PREFIX + "privacy.html") ||
+                 currentUrl.startsWith(LOCAL_ORIGIN + ASSET_PREFIX + "terms.html"));
+        if (localLegalPage && webView.canGoBack()) {
+            webView.goBack();
+            return;
+        }
         coverSensitiveContent();
         super.onBackPressed();
     }

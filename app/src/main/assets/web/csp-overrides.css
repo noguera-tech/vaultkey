@@ -924,6 +924,22 @@
 .vk-onb-kit-verify__heading { top: 89px; }
 .vk-onb-kit-verify__block { top: 215px; }
 
+/* VK_PENDING_ERRORS_BATCH_2026_08_14 */
+.vk-notif-content {
+    overflow-y: hidden !important;
+}
+
+.vk-info-version {
+    margin-top: 24px !important;
+    margin-bottom: max(24px, env(safe-area-inset-bottom, 0px)) !important;
+}
+
+#healthModal.vk-health-modal {
+    position: fixed;
+    background-color: #111827;
+    background-image: var(--vk-r1-bg-gradient);
+}
+
 /* VK_CONFIRM_LAYOUT_NORMALIZATION_2026_08_14
    Text, semantic colors, icons and actions remain owned by each variant. */
 #confirmModal.vk-confirm--standard,

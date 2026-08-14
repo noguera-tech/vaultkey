@@ -758,7 +758,20 @@ function wipeCheckRemaining(){
 
 async function wipe(options){
   options=options||{};
-  if(!options.skipConfirm&&!(await vkConfirm('Borrar la bóveda local','Se eliminará la bóveda de este dispositivo. Las copias de Drive y los archivos descargados se conservarán.',{variant:'wipe',confirmText:'Borrar'})))return false;
+  if(!options.skipConfirm){
+    const firstConfirmed=await vkConfirm(
+      'Borrar la bóveda local',
+      'Se eliminará la bóveda de este dispositivo. Las copias de Drive y los archivos descargados se conservarán.',
+      {variant:'wipe',confirmText:'Continuar'}
+    );
+    if(!firstConfirmed)return false;
+    const finalConfirmed=await vkConfirm(
+      '¿Borrar definitivamente?',
+      'Esta acción no se puede deshacer. Confirma de nuevo para borrar todos los datos locales de la bóveda.',
+      {variant:'wipe',confirmText:'Borrar definitivamente'}
+    );
+    if(!finalConfirmed)return false;
+  }
 
   soundError();vibe([60,30,60,30,100]);
   const isVk2=typeof vkStore!=='undefined'&&vkStore.hasVault();
@@ -891,7 +904,7 @@ if(!window.__vkInformationActionsBound){
         break;
       case 'privacy':
         if(/VaultKeyWebViewPrototype\//.test(navigator.userAgent||'')){
-          window.location.href='https://nogueratech.app/privacy.html';
+          window.location.href='privacy.html?from=vaultkey';
         }else{
           window.open('https://nogueratech.app/privacy.html','_blank','noopener');
         }

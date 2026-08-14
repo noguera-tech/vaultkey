@@ -367,7 +367,14 @@
     var R = ctx.router;
     if (action === 'go-welcome') { R.navigate('/welcome'); return; }
     if (action === 'go-master') { R.navigate('/onboarding/master'); return; }
-    if (action === 'back') { R.back(); return; }
+    if (action === 'back') {
+      if (R.current && R.current().name === 'onboarding-kit-verify') {
+        R.navigate('/onboarding/kit-save');
+      } else {
+        R.back();
+      }
+      return;
+    }
 
     if (action.indexOf('toggle-visibility:') === 0) {
       var targetId = action.slice('toggle-visibility:'.length);
