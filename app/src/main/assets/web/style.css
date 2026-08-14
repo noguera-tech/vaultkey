@@ -234,7 +234,7 @@ select option { background:#001830; color:#e8f6ff; }
   position:absolute; top:0; bottom:0; left:50%;
   width:min(100%, 430px);
   transform:translateX(-50%);
-  background:linear-gradient(149.35deg, #111827 15.964%, #182F4E 63.204%);
+  background:#111827 url("vault-figma-startup-background.png") center top / 412px 917px no-repeat;
 }
 #vkSplash.vkSplashVisible { display:block; }
 #vkSplash.vkSplashOut { pointer-events:none; }

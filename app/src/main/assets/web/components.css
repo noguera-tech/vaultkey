@@ -1418,7 +1418,7 @@ body.vk-lock { overflow: hidden; }
   min-height: 917px;
   box-sizing: border-box;
   color: #ffffff;
-  background: linear-gradient(149.35deg, #111827 15.964%, #182f4e 63.204%);
+  background: #111827 url("vault-figma-startup-background.png") center top / 412px 917px no-repeat;
   font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
   text-align: center;
   overflow: hidden;

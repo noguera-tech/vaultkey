@@ -46,11 +46,19 @@ if ($backgroundUses -ne 3) {
 }
 
 $components = Get-Content -LiteralPath (Join-Path $projectRoot 'app\src\main\assets\web\components.css') -Raw
+$style = Get-Content -LiteralPath (Join-Path $projectRoot 'app\src\main\assets\web\style.css') -Raw
+$figmaWebBackground = Join-Path $projectRoot 'app\src\main\assets\web\vault-figma-startup-background.png'
+if (-not (Test-Path -LiteralPath $figmaWebBackground)) {
+    throw 'Falta el fondo raster exacto de Figma para el arranque web.'
+}
+if ($style -notmatch 'vault-figma-startup-background\.png' -or $components -notmatch 'vault-figma-startup-background\.png') {
+    throw 'Splash y bienvenida no comparten el fondo raster exacto de Figma.'
+}
 if ($components -match 'vk-welcome-shift-y') {
     throw 'Permanece el desplazamiento móvil que alteraba las coordenadas de Figma.'
 }
-if ($components -match '--vk-startup-scale' -or $style -match '--vk-startup-scale' -or $appJs -match 'updateSplashScale') {
+if ($components -match '--vk-startup-scale' -or $style -match '--vk-startup-scale' -or $appScript -match 'updateSplashScale') {
     throw 'El arranque vuelve a aplicar una escala dinámica que puede producir saltos.'
 }
 
-Write-Output 'PASS: fondo 412x917, splash y bienvenida Figma conservan activos, orden y lienzo estable.'
+Write-Output 'PASS: fondo raster Figma 412x917, splash y bienvenida conservan activos, orden y lienzo estable.'
