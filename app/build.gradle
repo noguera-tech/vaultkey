@@ -32,6 +32,12 @@ android {
     }
 
     buildTypes {
+        iconDiagnostic {
+            initWith debug
+            applicationIdSuffix '.icondiagnostic'
+            versionNameSuffix '-icondiagnostic'
+            debuggable true
+        }
         cameraResultFix {
             initWith debug
             applicationIdSuffix '.cameraresultfix'
