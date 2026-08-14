@@ -1,0 +1,18 @@
+# Local Android and IDE state
+.android-user-home/
+.gradle/
+.gradle-user-home/
+.idea/
+local.properties
+keystore.properties
+
+# Generated outputs
+build/
+**/build/
+
+# Preserved binary artifacts are verified by manifests, not stored in Git
+artifacts/
+
+# Local backup copies must not enter the canonical source tree
+*.bak
+

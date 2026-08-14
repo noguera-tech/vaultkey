@@ -1,8 +1,0 @@
-﻿{
-  "app": "VaultKey WebView Prototype",
-  "buildDate": "2026-08-12",
-  "prototypePhase": "Fase 4A - A07 cerrado (firma real configurada)",
-  "versionName": "0.5-webview-a07",
-  "versionCode": 3,
-  "note": "Este paquete no tiene control de versiones Git propio; los assets web se copiaron manualmente desde el repositorio principal noguera-tech/vaultkey. Esta fecha es la referencia de cuándo se generó esta build."
-}
