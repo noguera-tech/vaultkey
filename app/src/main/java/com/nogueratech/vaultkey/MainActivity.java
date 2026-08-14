@@ -685,6 +685,11 @@ public final class MainActivity extends Activity {
         }
 
         @Override
+        public void onPageCommitVisible(WebView view, String url) {
+            if (url != null && url.startsWith(LOCAL_ORIGIN + ASSET_PREFIX)) markPageReady();
+        }
+
+        @Override
         public void onPageFinished(WebView view, String url) {
             if (url != null && url.startsWith(LOCAL_ORIGIN + ASSET_PREFIX)) markPageReady();
         }

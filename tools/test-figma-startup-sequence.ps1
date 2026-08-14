@@ -44,6 +44,12 @@ $backgroundUses = [regex]::Matches($mainActivity, 'setBackgroundResource\(R\.dra
 if ($backgroundUses -ne 3) {
     throw "Se esperaban tres superficies nativas con fondo Figma; encontradas: $backgroundUses."
 }
+if ($mainActivity -notmatch 'onPageCommitVisible[\s\S]*?markPageReady\(\)') {
+    throw 'Android no revela el primer frame web al quedar visible.'
+}
+if ($mainActivity -notmatch 'onPageFinished[\s\S]*?markPageReady\(\)') {
+    throw 'Falta el respaldo de revelado al finalizar la página.'
+}
 
 $components = Get-Content -LiteralPath (Join-Path $projectRoot 'app\src\main\assets\web\components.css') -Raw
 $style = Get-Content -LiteralPath (Join-Path $projectRoot 'app\src\main\assets\web\style.css') -Raw
