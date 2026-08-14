@@ -940,6 +940,15 @@
     background-image: var(--vk-r1-bg-gradient);
 }
 
+body.vk-health-open > .screen.active {
+    visibility: hidden !important;
+}
+
+#healthModal.open .vk-health-sheet {
+    animation: none !important;
+    transform: none !important;
+}
+
 /* VK_CONFIRM_LAYOUT_NORMALIZATION_2026_08_14
    Text, semantic colors, icons and actions remain owned by each variant. */
 #confirmModal.vk-confirm--standard,

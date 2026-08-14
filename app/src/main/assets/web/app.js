@@ -768,7 +768,7 @@ async function wipe(options){
     const finalConfirmed=await vkConfirm(
       '¿Borrar definitivamente?',
       'Esta acción no se puede deshacer. Confirma de nuevo para borrar todos los datos locales de la bóveda.',
-      {variant:'wipe',confirmText:'Borrar definitivamente'}
+      {variant:'wipe',confirmText:'Borrar ahora'}
     );
     if(!finalConfirmed)return false;
   }
@@ -1268,6 +1268,7 @@ if(!window.__vkDangerActionsBound){
 }
 
 function closeModals(){
+  document.body.classList.remove('vk-health-open');
   document.querySelectorAll('.modal').forEach(m=>{
     if(m.id==='recoveryModal'){
       const btn=$('recoveryCloseBtn');
@@ -6545,6 +6546,7 @@ function showHealthPanel(){
   const modal=$('healthModal');
   if(!modal)return;
 
+  document.body.classList.add('vk-health-open');
   modal.classList.add('open');
   renderHealthPanel();
 }

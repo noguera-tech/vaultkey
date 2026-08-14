@@ -11,11 +11,15 @@ $gradle = Get-Content -LiteralPath (Join-Path $projectRoot 'app\build.gradle') -
 if ($appJs -notmatch "privacy\.html\?from=vaultkey") { throw 'Privacidad no abre la copia local.' }
 if ($activity -notmatch 'localLegalPage[\s\S]*?webView\.goBack\(\)') { throw 'Las páginas legales no tienen regreso interno seguro.' }
 if ([regex]::Matches($appJs, "await vkConfirm\(").Count -lt 2 -or $appJs -notmatch '¿Borrar definitivamente\?') { throw 'Falta la segunda confirmación de borrado local.' }
+if ($appJs -notmatch "confirmText:'Borrar ahora'") { throw 'El texto final de borrado no usa la etiqueta corta.' }
 if ($onboarding -notmatch "onboarding-kit-verify'[\s\S]*?navigate\('/onboarding/kit-save'\)") { throw 'Atrás desde verificar kit no vuelve al kit generado.' }
 if ($overrides -notmatch '\.vk-notif-content\s*\{[\s\S]*?overflow-y:\s*hidden') { throw 'Notificaciones todavía permite scroll vertical.' }
 if ($appHtml -match 'vk-interaction-version') { throw 'Interacción conserva la versión redundante.' }
 if ($overrides -notmatch '\.vk-info-version\s*\{[\s\S]*?margin-top:\s*24px') { throw 'La versión inferior de Información no se ha subido.' }
 if ($overrides -notmatch '#healthModal\.vk-health-modal\s*\{[\s\S]*?position:\s*fixed') { throw 'Estado de la bóveda no cubre la pantalla anterior.' }
+if ($appJs -notmatch "classList\.add\('vk-health-open'\)" -or $appJs -notmatch "classList\.remove\('vk-health-open'\)") { throw 'La pantalla trasera no se oculta y restaura con el panel de estado.' }
+if ($overrides -notmatch 'body\.vk-health-open\s*>\s*\.screen\.active[\s\S]*?visibility:\s*hidden') { throw 'Falta ocultar visualmente la pantalla trasera.' }
+if ($overrides -notmatch '#healthModal\.open\s+\.vk-health-sheet[\s\S]*?animation:\s*none') { throw 'El panel de estado conserva la animación de hoja.' }
 if ($gradle -notmatch "applicationIdSuffix '\.pendingerrorsdiagnostic'") { throw 'Falta el paquete independiente del lote pendiente.' }
 
 Write-Output 'PASS: siete incidencias pendientes cubiertas por comprobaciones estructurales.'
