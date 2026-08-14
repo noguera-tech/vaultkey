@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -50,6 +51,7 @@ import java.util.Locale;
 import org.json.JSONObject;
 
 public final class MainActivity extends Activity {
+    private static final String TAG = "VaultKeyDrive";
     private static final int FILE_CHOOSER_REQUEST = 4107;
     private static final int DRIVE_AUTHORIZATION_REQUEST = 4108;
     private static final String LOCAL_ORIGIN = "https://appassets.androidplatform.net";
@@ -174,7 +176,6 @@ public final class MainActivity extends Activity {
             revealContentIfReady();
             webView.invalidate();
             webView.requestLayout();
-            awaitingOwnActivityResult = false;
         }
         super.onWindowFocusChanged(hasFocus);
     }
@@ -200,6 +201,7 @@ public final class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FILE_CHOOSER_REQUEST) {
+            awaitingOwnActivityResult = false;
             ValueCallback<Uri[]> callback = fileChooserCallback;
             fileChooserCallback = null;
 
@@ -218,12 +220,14 @@ public final class MainActivity extends Activity {
             return;
         }
         if (requestCode == DRIVE_AUTHORIZATION_REQUEST) {
+            awaitingOwnActivityResult = false;
             try {
                 AuthorizationResult result = Identity.getAuthorizationClient(this)
                         .getAuthorizationResultFromIntent(data);
                 deliverDriveAuthorization(result);
             } catch (ApiException error) {
-                failDriveAuthorization("AutorizaciÃƒÆ’Ã‚Â³n cancelada o rechazada");
+                failDriveAuthorization(reportApiException(
+                        "Autorización cancelada o rechazada", error));
             }
             return;
         }
@@ -240,27 +244,41 @@ public final class MainActivity extends Activity {
                     if (result.hasResolution()) {
                         PendingIntent pendingIntent = result.getPendingIntent();
                         if (pendingIntent == null) {
-                            failDriveAuthorization("Google no devolviÃƒÆ’Ã‚Â³ una autorizaciÃƒÆ’Ã‚Â³n vÃƒÆ’Ã‚Â¡lida");
+                            failDriveAuthorization("Google no devolvió una autorización válida");
                             return;
                         }
                         try {
+                            awaitingOwnActivityResult = true;
                             startIntentSenderForResult(pendingIntent.getIntentSender(),
                                     DRIVE_AUTHORIZATION_REQUEST, null, 0, 0, 0);
                         } catch (IntentSender.SendIntentException error) {
-                            failDriveAuthorization("No se pudo abrir la autorizaciÃƒÆ’Ã‚Â³n de Google");
+                            awaitingOwnActivityResult = false;
+                            failDriveAuthorization("No se pudo abrir la autorización de Google");
                         }
                     } else {
                         deliverDriveAuthorization(result);
                     }
                 })
-                .addOnFailureListener(error ->
-                        failDriveAuthorization("Google Play Services no pudo autorizar Drive"));
+                .addOnFailureListener(error -> {
+                    awaitingOwnActivityResult = false;
+                    if (error instanceof ApiException) {
+                        failDriveAuthorization(reportApiException(
+                                "Google Play Services no pudo autorizar Drive",
+                                (ApiException) error));
+                    } else {
+                        String detail = error.getMessage();
+                        failDriveAuthorization("Google Play Services no pudo autorizar Drive" +
+                                (detail == null || detail.trim().isEmpty()
+                                        ? ""
+                                        : ": " + detail));
+                    }
+                });
     }
 
     private void deliverDriveAuthorization(AuthorizationResult result) {
         String accessToken = result == null ? null : result.getAccessToken();
         if (accessToken == null || accessToken.trim().isEmpty()) {
-            failDriveAuthorization("Google no devolviÃƒÆ’Ã‚Â³ un token de acceso");
+            failDriveAuthorization("Google no devolvió un token de acceso");
             return;
         }
         GoogleSignInAccount googleAccount = result.toGoogleSignInAccount();
@@ -295,7 +313,7 @@ public final class MainActivity extends Activity {
     private void revokeDriveTokenOverHttps() {
         final String token = driveAccessToken;
         if (token == null || token.trim().isEmpty()) {
-            deliverDriveRevocation(false, "El token de Drive ya no estÃƒÆ’Ã‚Â¡ disponible en memoria");
+            deliverDriveRevocation(false, "El token de Drive ya no está disponible en memoria");
             return;
         }
         new Thread(() -> {
@@ -320,7 +338,7 @@ public final class MainActivity extends Activity {
                     driveAccessToken = null;
                     deliverDriveRevocation(true, null);
                 } else {
-                    deliverDriveRevocation(false, "Google devolviÃƒÆ’Ã‚Â³ el estado " + status);
+                    deliverDriveRevocation(false, "Google devolvió el estado " + status);
                 }
             } catch (IOException error) {
                 deliverDriveRevocation(false, "No se pudo contactar con Google para revocar el permiso");
@@ -351,6 +369,12 @@ public final class MainActivity extends Activity {
             }
             Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
         });
+    }
+
+    private String reportApiException(String context, ApiException error) {
+        Log.e(TAG, context + " [statusCode=" + error.getStatusCode() +
+                ", message=" + error.getMessage() + "]", error);
+        return context;
     }
 
     @Override
@@ -418,6 +442,7 @@ public final class MainActivity extends Activity {
                     return true;
 
                 } catch (IOException | RuntimeException error) {
+                    awaitingOwnActivityResult = false;
                     cameraOutputUri = null;
                     fileChooserCallback = null;
                     callback.onReceiveValue(null);
@@ -448,6 +473,7 @@ public final class MainActivity extends Activity {
                 return true;
 
             } catch (RuntimeException error) {
+                awaitingOwnActivityResult = false;
                 fileChooserCallback = null;
                 callback.onReceiveValue(null);
 
