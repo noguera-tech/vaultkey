@@ -32,6 +32,12 @@ android {
     }
 
     buildTypes {
+        pendingErrorsDiagnostic {
+            initWith debug
+            applicationIdSuffix '.pendingerrorsdiagnostic'
+            versionNameSuffix '-pendingerrorsdiagnostic'
+            debuggable true
+        }
         startupSequenceDiagnostic {
             initWith debug
             applicationIdSuffix '.startupsequencediagnostic'
