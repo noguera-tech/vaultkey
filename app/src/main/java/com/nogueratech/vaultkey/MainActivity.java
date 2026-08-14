@@ -85,7 +85,7 @@ public final class MainActivity extends Activity {
         WebView.setWebContentsDebuggingEnabled(false);
 
         FrameLayout root = new FrameLayout(this);
-        root.setBackgroundColor(getColorCompat(R.color.vault_background));
+        root.setBackgroundResource(R.drawable.vault_figma_startup_background);
 
         webView = createWebView();
         root.addView(webView, new FrameLayout.LayoutParams(
@@ -105,7 +105,7 @@ public final class MainActivity extends Activity {
     @SuppressLint("SetJavaScriptEnabled")
     private WebView createWebView() {
         WebView view = new WebView(this);
-        view.setBackgroundColor(getColorCompat(R.color.vault_background));
+        view.setBackgroundResource(R.drawable.vault_figma_startup_background);
 
         WebSettings settings = view.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -129,7 +129,7 @@ public final class MainActivity extends Activity {
 
     private View createPrivacyScreen() {
         FrameLayout panel = new FrameLayout(this);
-        panel.setBackgroundColor(getColorCompat(R.color.vault_background));
+        panel.setBackgroundResource(R.drawable.vault_figma_startup_background);
         panel.setClickable(true);
         panel.setFocusable(true);
         return panel;

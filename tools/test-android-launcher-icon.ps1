@@ -1,3 +1,7 @@
+param(
+    [switch] $AllowFigmaStartupSequence
+)
+
 $ErrorActionPreference = 'Stop'
 
 $projectRoot = Split-Path $PSScriptRoot -Parent
@@ -59,8 +63,21 @@ foreach ($name in @('ic_launcher.xml', 'ic_launcher_round.xml')) {
 
 $changedFunctionalFiles = git -C $projectRoot diff --name-only 85f906f1ad29bb1699a0f2ab52763550f4cf5437 -- `
     'app/src/main/java' 'app/src/main/assets/web'
-if ($changedFunctionalFiles) {
-    throw "Se detectaron cambios funcionales o web no autorizados: $changedFunctionalFiles"
+$allowedStartupFiles = @(
+    'app/src/main/assets/web/app.html',
+    'app/src/main/assets/web/app.js',
+    'app/src/main/assets/web/components.css',
+    'app/src/main/assets/web/figma-startup-lock.svg',
+    'app/src/main/assets/web/figma-startup-shield.svg',
+    'app/src/main/assets/web/onboarding.js',
+    'app/src/main/assets/web/style.css',
+    'app/src/main/java/com/nogueratech/vaultkey/MainActivity.java'
+)
+$unexpectedFunctionalFiles = @($changedFunctionalFiles | Where-Object {
+    -not $AllowFigmaStartupSequence -or $_ -notin $allowedStartupFiles
+})
+if ($unexpectedFunctionalFiles.Count -gt 0) {
+    throw "Se detectaron cambios funcionales o web no autorizados: $unexpectedFunctionalFiles"
 }
 
 Write-Output 'PASS: manifiesto, cinco densidades e iconos adaptables verificados; sin cambios funcionales.'

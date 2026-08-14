@@ -5013,7 +5013,7 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
     const splash=$('vkSplash');
     if(!splash)return;
     const scale=Math.min(window.innerWidth/412,window.innerHeight/917);
-    splash.style.setProperty('--vk-splash-scale',String(scale));
+    document.documentElement.style.setProperty('--vk-startup-scale',String(scale));
   }
   function updatePinScale(){
     const scale=Math.min(1,window.innerWidth/412,window.innerHeight/917);
@@ -5022,12 +5022,6 @@ $('quickBody').innerHTML=h;$('quickModal').classList.add('open');render();}
   updatePinScale();
   window.addEventListener('resize',updatePinScale);
   function runSplash(cb){
-  if(window.__VK_TWA__){
-    hideSplashHard();
-    cb();
-    return;
-  }
-
   const splash=$('vkSplash');
   if(!splash){cb();return;}
   updateSplashScale();

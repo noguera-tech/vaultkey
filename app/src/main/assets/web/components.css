@@ -1406,9 +1406,15 @@ body.vk-lock { overflow: hidden; }
   background: linear-gradient(180deg, #111827 17%, #182f4e 67%);
 }
 
+#onboardingModal .vk2-onboarding-host {
+  align-items: center;
+  overflow: hidden;
+}
+
 .vk-onb {
   position: relative;
-  width: 100%;
+  width: 412px;
+  height: 917px;
   min-height: 917px;
   box-sizing: border-box;
   color: #ffffff;
@@ -1416,6 +1422,8 @@ body.vk-lock { overflow: hidden; }
   font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
   text-align: center;
   overflow: hidden;
+  transform: scale(var(--vk-startup-scale, 1));
+  transform-origin: top center;
 }
 
 .vk-onb__shield {
@@ -1428,14 +1436,10 @@ body.vk-lock { overflow: hidden; }
   color: var(--vk-onb-stroke);
 }
 
-.vk-onb__shield > svg:first-child {
+.vk-onb__shield > img:first-child {
   display: block;
   width: 150px;
   height: 180px;
-}
-
-.vk-onb__shield path {
-  stroke: var(--vk-onb-stroke);
 }
 
 .vk-onb__shield-lock {
@@ -1445,12 +1449,6 @@ body.vk-lock { overflow: hidden; }
   width: 36px;
   height: 40px;
   transform: translate(-50%, -50%);
-  color: var(--vk-onb-stroke);
-}
-
-.vk-onb__shield-lock path,
-.vk-onb__shield-lock rect {
-  stroke: var(--vk-onb-stroke);
 }
 
 .vk-onb__brand {
@@ -5079,22 +5077,8 @@ body.vk-create-picker-open {
 
 /* VaultKey R1 — ajuste móvil de la pantalla de bienvenida */
 @media (max-width: 600px) {
-  .vk-onb {
-    --vk-welcome-shift-y: calc(-1 * clamp(125px, 8dvh, 96px));
-  }
-
-  .vk-onb__shield {
-    transform: translate(-50%, var(--vk-welcome-shift-y));
-  }
-
-  .vk-onb__brand,
-  .vk-onb__subtitle {
-    transform: translateY(var(--vk-welcome-shift-y));
-  }
-
   .vk-onb > .vk-onb__start {
     width: min(320px, calc(100% - 40px));
-    transform: translateY(var(--vk-welcome-shift-y));
   }
 }
 
