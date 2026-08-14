@@ -32,13 +32,6 @@ android {
     }
 
     buildTypes {
-        diagnostic {
-            initWith debug
-            applicationIdSuffix '.lifecycletrace'
-            versionNameSuffix '-lifecycletrace'
-            debuggable true
-            matchingFallbacks = ['debug']
-        }
         release {
             minifyEnabled false
             signingConfig signingConfigs.release

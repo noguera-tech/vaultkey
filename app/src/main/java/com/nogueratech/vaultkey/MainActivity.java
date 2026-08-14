@@ -10,8 +10,6 @@ import android.content.IntentSender;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Process;
-import android.os.SystemClock;
 import android.provider.Settings;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -19,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
-import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.MimeTypeMap;
@@ -53,17 +50,11 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Locale;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.json.JSONObject;
 
 public final class MainActivity extends Activity {
     private static final String TAG = "VaultKeyDrive";
-    private static final String LIFECYCLE_TAG = "VaultKeyLifecycle";
-    private static final String PROCESS_TOKEN = UUID.randomUUID().toString();
-    private static final long PROCESS_TRACE_STARTED_MS = SystemClock.elapsedRealtime();
-    private static final AtomicLong LIFECYCLE_SEQUENCE = new AtomicLong();
     private static final int FILE_CHOOSER_REQUEST = 4107;
     private static final int DRIVE_AUTHORIZATION_REQUEST = 4108;
     private static final int LOCAL_BACKUP_SAVE_REQUEST = 4109;
@@ -85,35 +76,10 @@ public final class MainActivity extends Activity {
     private Account driveAccount;
     private String driveAccessToken;
     private File pendingLocalBackupFile;
-    private final String activityToken = UUID.randomUUID().toString();
-
-    private void traceLifecycle(String event) {
-        long sequence = LIFECYCLE_SEQUENCE.incrementAndGet();
-        long now = SystemClock.elapsedRealtime();
-        String webVisibility = webView == null
-                ? "null"
-                : (webView.getVisibility() == View.VISIBLE ? "visible" :
-                (webView.getVisibility() == View.INVISIBLE ? "invisible" : "gone"));
-        Log.i(LIFECYCLE_TAG,
-                "seq=" + sequence +
-                        " uptimeMs=" + now +
-                        " processAgeMs=" + (now - PROCESS_TRACE_STARTED_MS) +
-                        " pid=" + Process.myPid() +
-                        " process=" + PROCESS_TOKEN +
-                        " activity=" + activityToken +
-                        " event=" + event +
-                        " awaiting=" + awaitingOwnActivityResult +
-                        " pageReady=" + pageReady +
-                        " windowFocus=" + hasWindowFocus() +
-                        " web=" + webVisibility +
-                        " callback=" + (fileChooserCallback != null) +
-                        " cameraUri=" + (cameraOutputUri != null));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        traceLifecycle("onCreate savedState=" + (savedInstanceState != null));
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         WebView.setWebContentsDebuggingEnabled(false);
 
@@ -131,9 +97,8 @@ public final class MainActivity extends Activity {
                 ViewGroup.LayoutParams.MATCH_PARENT));
 
         setContentView(root);
-        coverSensitiveContent("onCreate");
+        coverSensitiveContent();
         webView.loadUrl(START_URL);
-        traceLifecycle("onCreate loadUrl");
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -171,85 +136,59 @@ public final class MainActivity extends Activity {
 
     private void markPageReady() {
         pageReady = true;
-        traceLifecycle("markPageReady");
         revealContentIfReady();
     }
 
     private void revealContentIfReady() {
-        traceLifecycle("revealContentIfReady enter");
-        if (!pageReady || !hasWindowFocus()) {
-            traceLifecycle("revealContentIfReady skipped");
-            return;
-        }
+        if (!pageReady || !hasWindowFocus()) return;
         webView.setVisibility(View.VISIBLE);
         privacyScreen.setVisibility(View.GONE);
-        traceLifecycle("revealContentIfReady revealed");
     }
 
-    private void coverSensitiveContent(String reason) {
-        traceLifecycle("cover enter reason=" + reason);
+    private void coverSensitiveContent() {
         if (privacyScreen != null) privacyScreen.setVisibility(View.VISIBLE);
         if (webView != null) {
             webView.setVisibility(View.INVISIBLE);
             if (!awaitingOwnActivityResult) {
-                traceLifecycle("cover evaluate lock reason=" + reason);
                 webView.evaluateJavascript(
-                        "try{if(typeof lock==='function'){lock('native:" + reason + "');}}catch(e){}",
-                        result -> traceLifecycle("cover lock callback reason=" + reason +
-                                " result=" + result));
-            } else {
-                traceLifecycle("cover suppressed awaiting reason=" + reason);
+                        "try{if(typeof lock==='function'){lock();}}catch(e){}", null);
             }
         }
-        traceLifecycle("cover exit reason=" + reason);
     }
 
     @Override
     protected void onPause() {
-        traceLifecycle("onPause enter");
-        if (!awaitingOwnActivityResult) coverSensitiveContent("onPause");
-        else traceLifecycle("onPause suppressed awaiting");
+        if (!awaitingOwnActivityResult) coverSensitiveContent();
         super.onPause();
-        traceLifecycle("onPause exit");
     }
 
     @Override
     protected void onStop() {
-        traceLifecycle("onStop enter");
-        if (!awaitingOwnActivityResult) coverSensitiveContent("onStop");
-        else traceLifecycle("onStop suppressed awaiting");
+        if (!awaitingOwnActivityResult) coverSensitiveContent();
         super.onStop();
-        traceLifecycle("onStop exit");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        traceLifecycle("onResume afterSuper");
-        if (!awaitingOwnActivityResult) coverSensitiveContent("onResume");
-        else traceLifecycle("onResume suppressed awaiting");
+        if (!awaitingOwnActivityResult) coverSensitiveContent();
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-        traceLifecycle("onWindowFocusChanged enter hasFocus=" + hasFocus);
         if (!hasFocus) {
-            if (!awaitingOwnActivityResult) coverSensitiveContent("windowFocus=false");
-            else traceLifecycle("windowFocus=false suppressed awaiting");
+            if (!awaitingOwnActivityResult) coverSensitiveContent();
         } else {
             revealContentIfReady();
             webView.invalidate();
             webView.requestLayout();
         }
         super.onWindowFocusChanged(hasFocus);
-        traceLifecycle("onWindowFocusChanged exit hasFocus=" + hasFocus);
     }
 
     @Override
     protected void onDestroy() {
-        traceLifecycle("onDestroy enter finishing=" + isFinishing() +
-                " changingConfig=" + isChangingConfigurations());
-        coverSensitiveContent("onDestroy");
+        coverSensitiveContent();
         clearPendingLocalBackup();
         if (fileChooserCallback != null) {
             fileChooserCallback.onReceiveValue(null);
@@ -264,16 +203,12 @@ public final class MainActivity extends Activity {
             webView = null;
         }
         super.onDestroy();
-        traceLifecycle("onDestroy exit");
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        traceLifecycle("onActivityResult enter request=" + requestCode +
-                " result=" + resultCode + " data=" + (data != null));
         if (requestCode == FILE_CHOOSER_REQUEST) {
             awaitingOwnActivityResult = false;
-            traceLifecycle("onActivityResult file awaiting=false");
             ValueCallback<Uri[]> callback = fileChooserCallback;
             fileChooserCallback = null;
 
@@ -282,16 +217,13 @@ public final class MainActivity extends Activity {
 
             if (callback != null) {
                 if (resultCode == RESULT_OK && pendingCameraUri != null) {
-                    traceLifecycle("onActivityResult deliver camera uri");
                     callback.onReceiveValue(new Uri[]{pendingCameraUri});
                 } else {
-                    traceLifecycle("onActivityResult deliver parsed result");
                     callback.onReceiveValue(
                             WebChromeClient.FileChooserParams.parseResult(resultCode, data)
                     );
                 }
             }
-            traceLifecycle("onActivityResult file exit");
             return;
         }
         if (requestCode == DRIVE_AUTHORIZATION_REQUEST) {
@@ -565,7 +497,7 @@ public final class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        coverSensitiveContent("onBackPressed");
+        coverSensitiveContent();
         super.onBackPressed();
     }
 
@@ -575,19 +507,8 @@ public final class MainActivity extends Activity {
 
     private final class PrototypeChromeClient extends WebChromeClient {
         @Override
-        public boolean onConsoleMessage(ConsoleMessage message) {
-            String text = message == null ? "null" : message.message();
-            if (text != null && text.startsWith("[VK-LIFECYCLE]")) {
-                Log.i(LIFECYCLE_TAG, "web " + text);
-                return true;
-            }
-            return super.onConsoleMessage(message);
-        }
-
-        @Override
         public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback,
                                          FileChooserParams params) {
-            traceLifecycle("onShowFileChooser enter");
             if (fileChooserCallback != null) fileChooserCallback.onReceiveValue(null);
             fileChooserCallback = callback;
             cameraOutputUri = null;
@@ -605,7 +526,6 @@ public final class MainActivity extends Activity {
             }
 
             if (cameraRequested) {
-                traceLifecycle("onShowFileChooser camera requested");
                 try {
                     File scanDir = new File(getCacheDir(), "document_scans");
 
@@ -636,15 +556,11 @@ public final class MainActivity extends Activity {
                     );
 
                     awaitingOwnActivityResult = true;
-                    traceLifecycle("camera awaiting=true before start");
                     startActivityForResult(cameraIntent, FILE_CHOOSER_REQUEST);
-                    traceLifecycle("camera startActivityForResult returned");
                     return true;
 
                 } catch (IOException | RuntimeException error) {
                     awaitingOwnActivityResult = false;
-                    traceLifecycle("camera launch failed awaiting=false " +
-                            error.getClass().getSimpleName());
                     cameraOutputUri = null;
                     fileChooserCallback = null;
                     callback.onReceiveValue(null);
@@ -671,15 +587,11 @@ public final class MainActivity extends Activity {
 
             try {
                 awaitingOwnActivityResult = true;
-                traceLifecycle("picker awaiting=true before start");
                 startActivityForResult(intent, FILE_CHOOSER_REQUEST);
-                traceLifecycle("picker startActivityForResult returned");
                 return true;
 
             } catch (RuntimeException error) {
                 awaitingOwnActivityResult = false;
-                traceLifecycle("picker launch failed awaiting=false " +
-                        error.getClass().getSimpleName());
                 fileChooserCallback = null;
                 callback.onReceiveValue(null);
 
