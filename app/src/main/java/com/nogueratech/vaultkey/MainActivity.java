@@ -73,6 +73,7 @@ public final class MainActivity extends Activity {
     private ValueCallback<Uri[]> fileChooserCallback;
     private Uri cameraOutputUri;
     private boolean awaitingOwnActivityResult;
+    private boolean fileChooserResultDelivered;
     private Account driveAccount;
     private String driveAccessToken;
     private File pendingLocalBackupFile;
@@ -182,6 +183,10 @@ public final class MainActivity extends Activity {
             revealContentIfReady();
             webView.invalidate();
             webView.requestLayout();
+            if (pageReady && awaitingOwnActivityResult && fileChooserResultDelivered) {
+                awaitingOwnActivityResult = false;
+                fileChooserResultDelivered = false;
+            }
         }
         super.onWindowFocusChanged(hasFocus);
     }
@@ -208,7 +213,6 @@ public final class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FILE_CHOOSER_REQUEST) {
-            awaitingOwnActivityResult = false;
             ValueCallback<Uri[]> callback = fileChooserCallback;
             fileChooserCallback = null;
 
@@ -224,6 +228,7 @@ public final class MainActivity extends Activity {
                     );
                 }
             }
+            fileChooserResultDelivered = true;
             return;
         }
         if (requestCode == DRIVE_AUTHORIZATION_REQUEST) {
@@ -555,12 +560,14 @@ public final class MainActivity extends Activity {
                             ClipData.newRawUri("VaultKey document scan", cameraOutputUri)
                     );
 
+                    fileChooserResultDelivered = false;
                     awaitingOwnActivityResult = true;
                     startActivityForResult(cameraIntent, FILE_CHOOSER_REQUEST);
                     return true;
 
                 } catch (IOException | RuntimeException error) {
                     awaitingOwnActivityResult = false;
+                    fileChooserResultDelivered = false;
                     cameraOutputUri = null;
                     fileChooserCallback = null;
                     callback.onReceiveValue(null);
@@ -586,12 +593,14 @@ public final class MainActivity extends Activity {
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
 
             try {
+                fileChooserResultDelivered = false;
                 awaitingOwnActivityResult = true;
                 startActivityForResult(intent, FILE_CHOOSER_REQUEST);
                 return true;
 
             } catch (RuntimeException error) {
                 awaitingOwnActivityResult = false;
+                fileChooserResultDelivered = false;
                 fileChooserCallback = null;
                 callback.onReceiveValue(null);
 

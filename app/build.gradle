@@ -32,6 +32,12 @@ android {
     }
 
     buildTypes {
+        cameraResultFix {
+            initWith debug
+            applicationIdSuffix '.cameraresultfix'
+            versionNameSuffix '-cameraresultfix'
+            debuggable true
+        }
         release {
             minifyEnabled false
             signingConfig signingConfigs.release
