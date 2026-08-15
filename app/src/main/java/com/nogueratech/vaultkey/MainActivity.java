@@ -74,6 +74,7 @@ public final class MainActivity extends Activity {
     private Uri cameraOutputUri;
     private boolean awaitingOwnActivityResult;
     private boolean fileChooserResultDelivered;
+    private boolean driveAuthorizationResultDelivered;
     private Account driveAccount;
     private String driveAccessToken;
     private File pendingLocalBackupFile;
@@ -183,9 +184,11 @@ public final class MainActivity extends Activity {
             revealContentIfReady();
             webView.invalidate();
             webView.requestLayout();
-            if (pageReady && awaitingOwnActivityResult && fileChooserResultDelivered) {
+            if (pageReady && awaitingOwnActivityResult &&
+                    (fileChooserResultDelivered || driveAuthorizationResultDelivered)) {
                 awaitingOwnActivityResult = false;
                 fileChooserResultDelivered = false;
+                driveAuthorizationResultDelivered = false;
             }
         }
         super.onWindowFocusChanged(hasFocus);
@@ -232,7 +235,7 @@ public final class MainActivity extends Activity {
             return;
         }
         if (requestCode == DRIVE_AUTHORIZATION_REQUEST) {
-            awaitingOwnActivityResult = false;
+            driveAuthorizationResultDelivered = true;
             try {
                 AuthorizationResult result = Identity.getAuthorizationClient(this)
                         .getAuthorizationResultFromIntent(data);
@@ -371,11 +374,13 @@ public final class MainActivity extends Activity {
                             return;
                         }
                         try {
+                            driveAuthorizationResultDelivered = false;
                             awaitingOwnActivityResult = true;
                             startIntentSenderForResult(pendingIntent.getIntentSender(),
                                     DRIVE_AUTHORIZATION_REQUEST, null, 0, 0, 0);
                         } catch (IntentSender.SendIntentException error) {
                             awaitingOwnActivityResult = false;
+                            driveAuthorizationResultDelivered = false;
                             failDriveAuthorization("No se pudo abrir la autorización de Google");
                         }
                     } else {
