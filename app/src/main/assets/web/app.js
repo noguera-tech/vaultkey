@@ -1,7 +1,7 @@
 let _searchDebounce=null;
 let confirmResolver=null;
 let appBooted=false;
-const APP_VERSION='VaultKey 2.6.2';
+const APP_VERSION='VaultKey 2.7.0';
 window.APP_VERSION=APP_VERSION;
 function applyAppVersion(){
   document.querySelectorAll('[data-app-version]').forEach(function(el){
