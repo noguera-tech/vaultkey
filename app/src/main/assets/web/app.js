@@ -1440,6 +1440,8 @@ function startBackgroundAutoLock(){
 window.isFilePickerGuardActive=function(){
   return window._vkFilePickerOpen===true ||
     Date.now()<Number(window._vkFilePickerGraceUntil||0) ||
+    window._vkLocalBackupPickerOpen===true ||
+    Date.now()<Number(window._vkLocalBackupPickerGraceUntil||0) ||
     window._vkGoogleOAuthOpen===true ||
     Date.now()<Number(window._vkGoogleOAuthGraceUntil||0);
 };
@@ -2281,12 +2283,23 @@ function useGen(){
 }
 async function saveBackupFile(fileName, content, mimeType) {
   if(window.VaultKeyAndroid&&typeof window.VaultKeyAndroid.saveLocalBackup==='function'){
+    window._vkLocalBackupPickerOpen=true;
+    window._vkLocalBackupPickerGraceUntil=0;
     const saved=await new Promise((resolve)=>{
       window.__vaultKeyLocalBackupResult=(ok,message)=>{
         delete window.__vaultKeyLocalBackupResult;
+        window._vkLocalBackupPickerOpen=false;
+        window._vkLocalBackupPickerGraceUntil=Date.now()+500;
         resolve({ok:Boolean(ok),message:String(message||'')});
       };
-      window.VaultKeyAndroid.saveLocalBackup(fileName,content);
+      try{
+        window.VaultKeyAndroid.saveLocalBackup(fileName,content);
+      }catch(error){
+        delete window.__vaultKeyLocalBackupResult;
+        window._vkLocalBackupPickerOpen=false;
+        window._vkLocalBackupPickerGraceUntil=Date.now()+500;
+        resolve({ok:false,message:error&&error.message?String(error.message):'No se pudo abrir el selector de copia local'});
+      }
     });
     if(!saved.ok){
       if(saved.message==='Guardado cancelado') return false;

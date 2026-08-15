@@ -68,6 +68,12 @@ android {
             versionNameSuffix '-driveauthguard'
             debuggable true
         }
+        localBackupFocusDiagnostic {
+            initWith debug
+            applicationIdSuffix '.localbackupfocusdiagnostic'
+            versionNameSuffix '-localbackupfocusdiagnostic'
+            debuggable true
+        }
         release {
             minifyEnabled false
             signingConfig signingConfigs.release

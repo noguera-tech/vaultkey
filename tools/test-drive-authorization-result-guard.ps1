@@ -46,7 +46,7 @@ Assert-SourceMatch `
 
 # Recuperacion de foco: revelar primero, liberar despues y solo para un resultado propio entregado.
 Assert-SourceMatch `
-    '(?s)public void onWindowFocusChanged\(boolean hasFocus\).*?else \{\s*revealContentIfReady\(\);.*?if \(pageReady && awaitingOwnActivityResult &&\s*\(fileChooserResultDelivered \|\| driveAuthorizationResultDelivered\)\).*?awaitingOwnActivityResult = false;.*?driveAuthorizationResultDelivered = false;' `
+    '(?s)public void onWindowFocusChanged\(boolean hasFocus\).*?else \{\s*revealContentIfReady\(\);.*?if \(pageReady && awaitingOwnActivityResult &&\s*\(fileChooserResultDelivered \|\| driveAuthorizationResultDelivered \|\|\s*localBackupResultDelivered\)\).*?awaitingOwnActivityResult = false;.*?driveAuthorizationResultDelivered = false;' `
     'La guarda de Drive no se libera despues de recuperar el foco.'
 
 # Inicio y error al abrir: solo se activa si se lanza la actividad; si no sale, se limpia.

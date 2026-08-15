@@ -35,7 +35,7 @@ Assert-SourceMatch `
     '(?s)protected void onResume\(\).*?if \(!awaitingOwnActivityResult\) coverSensitiveContent\(\);' `
     'onResume dejo de respetar awaitingOwnActivityResult.'
 Assert-SourceMatch `
-    '(?s)public void onWindowFocusChanged\(boolean hasFocus\).*?else \{\s*revealContentIfReady\(\);.*?if \(pageReady && awaitingOwnActivityResult &&\s*\(fileChooserResultDelivered \|\| driveAuthorizationResultDelivered\)\) \{\s*awaitingOwnActivityResult = false;\s*fileChooserResultDelivered = false;' `
+    '(?s)public void onWindowFocusChanged\(boolean hasFocus\).*?else \{\s*revealContentIfReady\(\);.*?if \(pageReady && awaitingOwnActivityResult &&\s*\(fileChooserResultDelivered \|\| driveAuthorizationResultDelivered \|\|\s*localBackupResultDelivered\)\) \{\s*awaitingOwnActivityResult = false;\s*fileChooserResultDelivered = false;' `
     'La guarda no se libera despues de revelar el contenido al recuperar foco.'
 Assert-SourceMatch `
     '(?s)fileChooserResultDelivered = false;\s*awaitingOwnActivityResult = true;\s*startActivityForResult\(cameraIntent, FILE_CHOOSER_REQUEST\)' `

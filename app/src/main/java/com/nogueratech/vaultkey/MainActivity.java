@@ -75,6 +75,7 @@ public final class MainActivity extends Activity {
     private boolean awaitingOwnActivityResult;
     private boolean fileChooserResultDelivered;
     private boolean driveAuthorizationResultDelivered;
+    private boolean localBackupResultDelivered;
     private Account driveAccount;
     private String driveAccessToken;
     private File pendingLocalBackupFile;
@@ -185,10 +186,12 @@ public final class MainActivity extends Activity {
             webView.invalidate();
             webView.requestLayout();
             if (pageReady && awaitingOwnActivityResult &&
-                    (fileChooserResultDelivered || driveAuthorizationResultDelivered)) {
+                    (fileChooserResultDelivered || driveAuthorizationResultDelivered ||
+                            localBackupResultDelivered)) {
                 awaitingOwnActivityResult = false;
                 fileChooserResultDelivered = false;
                 driveAuthorizationResultDelivered = false;
+                localBackupResultDelivered = false;
             }
         }
         super.onWindowFocusChanged(hasFocus);
@@ -249,9 +252,9 @@ public final class MainActivity extends Activity {
         if (requestCode == LOCAL_BACKUP_SAVE_REQUEST) {
             Uri destination = resultCode == RESULT_OK && data != null ? data.getData() : null;
             if (destination == null) {
-                awaitingOwnActivityResult = false;
                 clearPendingLocalBackup();
                 deliverLocalBackupResult(false, "Guardado cancelado");
+                markLocalBackupResultDelivered();
                 return;
             }
 
@@ -276,9 +279,9 @@ public final class MainActivity extends Activity {
                 final boolean result = saved;
                 final String detail = message;
                 runOnUiThread(() -> {
-                    awaitingOwnActivityResult = false;
                     clearPendingLocalBackup();
                     deliverLocalBackupResult(result, detail);
+                    markLocalBackupResultDelivered();
                 });
             }, "VaultKeyLocalBackup").start();
             return;
@@ -300,6 +303,14 @@ public final class MainActivity extends Activity {
                 "window.__vaultKeyLocalBackupResult(" + saved + "," +
                 JSONObject.quote(message) + ");}}catch(e){}";
         webView.evaluateJavascript(script, null);
+    }
+
+    private void markLocalBackupResultDelivered() {
+        localBackupResultDelivered = true;
+        if (pageReady && hasWindowFocus()) {
+            awaitingOwnActivityResult = false;
+            localBackupResultDelivered = false;
+        }
     }
 
     private final class NativeBridge {
@@ -334,10 +345,12 @@ public final class MainActivity extends Activity {
                 intent.setType("application/octet-stream");
                 intent.putExtra(Intent.EXTRA_TITLE, suggestedName);
                 try {
+                    localBackupResultDelivered = false;
                     awaitingOwnActivityResult = true;
                     startActivityForResult(intent, LOCAL_BACKUP_SAVE_REQUEST);
                 } catch (RuntimeException error) {
                     awaitingOwnActivityResult = false;
+                    localBackupResultDelivered = false;
                     clearPendingLocalBackup();
                     deliverLocalBackupResult(false, "No hay un selector para guardar archivos");
                 }
