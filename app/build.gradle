@@ -15,9 +15,9 @@ android {
     defaultConfig {
         applicationId 'com.nogueratech.vaultkey'
         minSdk 23
-        targetSdk 35
+        targetSdk 36
         versionCode 36
-        versionName '2.7.0-webview-candidate'
+        versionName '2.7.0'
     }
 
     signingConfigs {
