@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VaultKey WebView Prototype</string>
+    <string name="privacy_title">VaultKey protegida</string>
+    <string name="privacy_message">La pantalla nativa permanece delante hasta que decidas mostrar el prototipo.</string>
+    <string name="privacy_action">Mostrar VaultKey de prueba</string>
+    <string name="blocked_navigation">Navegacion externa bloqueada en el prototipo</string>
+</resources>
