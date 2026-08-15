@@ -16,7 +16,7 @@ android {
         applicationId 'com.nogueratech.vaultkey'
         minSdk 23
         targetSdk 36
-        versionCode 36
+        versionCode 37
         versionName '2.7.0'
     }
 
