@@ -8050,6 +8050,8 @@ function vk2EntryToDocument(e){
     id:e.id,
     category:e.docType||'other',
     name:e.title||'',
+    number:e.number||'',
+    holder:e.holder||'',
     expiry:e.expiry||'',
     issuedBy:e.issuer||'',
     country:e.country||'',
@@ -8101,7 +8103,7 @@ async function documentImageUrl(d){
   }
   return d&&d.image?d.image:'';
 }
-window.showDocumentDetail=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d){showDocuments('left');return;}window.__vkCurrentDocumentId=d.id;document.getElementById('documentDetailTitle').textContent=d.name||label(d.category);document.getElementById('documentDetailImage').src=await documentImageUrl(d);visual('documentDetail',d.category);var rows=[['Número / Nombre',d.name],['Caduca',date(d.expiry)],['Emitido por',d.issuedBy],['País',d.country]].filter(function(r){return r[1];});document.getElementById('documentDetailFields').innerHTML=rows.map(function(r){return '<div class="vk-document-detail-field"><span>'+esc(r[0])+'</span><strong>'+esc(r[1])+'</strong></div>';}).join('');show('documentDetail','right');};
+window.showDocumentDetail=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d){showDocuments('left');return;}window.__vkCurrentDocumentId=d.id;document.getElementById('documentDetailTitle').textContent=d.name||label(d.category);document.getElementById('documentDetailImage').src=await documentImageUrl(d);visual('documentDetail',d.category);var rows=[['Número',d.number],['Caduca',date(d.expiry)],['Emitido por',d.issuedBy],['País',d.country],['Titular',d.holder]].filter(function(r){return r[1];});document.getElementById('documentDetailFields').innerHTML=rows.map(function(r){return '<div class="vk-document-detail-field"><span>'+esc(r[0])+'</span><strong>'+esc(r[1])+'</strong></div>';}).join('');show('documentDetail','right');};
 window.openTypePicker=function(){category='';image='';editingId=null;modal('documentTypePicker',true);};
 window.closeDocumentTypePicker=function(){modal('documentTypePicker',false);};
 window.selectDocumentType=function(c){if(!labels[c])return;category=c;image='';editingId=null;modal('documentTypePicker',false);modal('documentSourceSheet',true);};
@@ -8144,7 +8146,7 @@ window.handleDocumentFile=function(ev){var input=ev&&ev.target,file=input&&input
 window.repeatDocumentSelection=function(){modal('documentSourceSheet',true);};
 window.openCreateDocumentForm=function(){if(!image||!category){toast('Selecciona primero una imagen','err');openTypePicker();return;}document.getElementById('documentCreateForm').reset();document.getElementById('documentCreateImage').src=image;document.getElementById('documentCreateName').value=label(category);document.getElementById('documentCreateMore').hidden=true;document.getElementById('documentCreateMoreButton').textContent='+ Más información';var favoriteButton=document.getElementById('documentCreateFavorite');if(favoriteButton)setFavoriteSwitch(favoriteButton,false);visual('documentCreate',category);show('documentCreate','right');};
 window.toggleDocumentCreateFavorite=function(){var button=document.getElementById('documentCreateFavorite');if(!button)return;var value=button.getAttribute('aria-checked')!=='true';setFavoriteSwitch(button,value);};
-window.openEditDocument=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;editingId=d.id;category=d.category;image=await documentImageUrl(d);window.__vkCurrentDocumentId=d.id;document.getElementById('documentEditImage').src=image;document.getElementById('documentEditName').value=d.name||'';document.getElementById('documentEditExpiry').value=date(d.expiry);document.getElementById('documentEditIssuedBy').value=d.issuedBy||'';document.getElementById('documentEditCountry').value=d.country||'';visual('documentEdit',d.category);var more=!!(d.issuedBy||d.country);document.getElementById('documentEditMore').hidden=!more;document.getElementById('documentEditMoreButton').textContent=more?'− Menos información':'+ Más información';var favoriteButton=document.getElementById('documentEditFavorite');if(favoriteButton)setFavoriteSwitch(favoriteButton,d.fav===true);show('documentEdit','right');};
+window.openEditDocument=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;editingId=d.id;category=d.category;image=await documentImageUrl(d);window.__vkCurrentDocumentId=d.id;document.getElementById('documentEditImage').src=image;document.getElementById('documentEditName').value=d.name||'';document.getElementById('documentEditExpiry').value=date(d.expiry);document.getElementById('documentEditIssuedBy').value=d.issuedBy||'';document.getElementById('documentEditNumber').value=d.number||'';document.getElementById('documentEditHolder').value=d.holder||'';document.getElementById('documentEditCountry').value=d.country||'';var more=!!(d.issuedBy||d.country||d.holder);var moreBlock=document.getElementById('documentEditMore');var moreButton=document.getElementById('documentEditMoreButton');if(moreBlock)moreBlock.hidden=!more;if(moreButton)moreButton.textContent=more?'− Menos información':'+ Más información';visual('documentEdit',d.category);var favoriteButton=document.getElementById('documentEditFavorite');if(favoriteButton)setFavoriteSwitch(favoriteButton,d.fav===true);show('documentEdit','right');};
 window.toggleDocumentEditFavorite=function(){var button=document.getElementById('documentEditFavorite');if(!button)return;var value=button.getAttribute('aria-checked')!=='true';setFavoriteSwitch(button,value);};
 window.openDocumentEditSource=function(){if(editingId)modal('documentSourceSheet',true);};
 window.formatDocumentExpiry=function(el){
@@ -8176,7 +8178,7 @@ function isValidDocumentExpiry(v){
   return d.getFullYear()===year&&d.getMonth()===month-1&&d.getDate()===day;
 }
 
-window.saveDocument=async function(docId,name,expiry,issuedBy,country,fav){
+window.saveDocument=async function(docId,name,expiry,issuedBy,country,fav,number,holder){number=String(number||"").trim();holder=String(holder||"").trim();
   name=String(name||'').trim();
   var rawExpiry=String(expiry||'').trim();
   if(!isValidDocumentExpiry(rawExpiry)){
@@ -8239,7 +8241,7 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country,fav){
           docType:category||vault[vkEntryIndex].docType,
           expiry:expiry,
           issuer:issuedBy,
-          country:country,
+          country:country,number:number,holder:holder,
           attachmentRef:attachmentRef,
           fav:fav===true,
           updatedAt:now
@@ -8250,7 +8252,7 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country,fav){
           docType:category||'other',
           expiry:expiry,
           issuer:issuedBy,
-          country:country,
+          country:country,number:number,holder:holder,
           attachmentRef:attachmentRef,
           fav:fav===true
         });
@@ -8267,9 +8269,9 @@ window.saveDocument=async function(docId,name,expiry,issuedBy,country,fav){
       if(isEdit){
         var i=items.findIndex(function(x){return x.id===docId;});
         if(i<0){showDocuments('left');return false;}
-        items[i]=Object.assign({},items[i],{category:category||items[i].category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:'',updatedAt:now});
+        items[i]=Object.assign({},items[i],{category:category||items[i].category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,number:number,holder:holder,attachmentRef:attachmentRef,image:'',updatedAt:now});
       }else{
-        items.push({id:docId,category:category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,attachmentRef:attachmentRef,image:'',createdAt:now,updatedAt:now});
+        items.push({id:docId,category:category,name:name,expiry:expiry,issuedBy:issuedBy,country:country,number:number,holder:holder,attachmentRef:attachmentRef,image:'',createdAt:now,updatedAt:now});
       }
       write(items);
     }

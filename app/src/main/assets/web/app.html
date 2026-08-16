@@ -23,6 +23,7 @@
 <link rel="stylesheet" href="csp-base.css">
 
 <link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="document-fields-icons.css">
 <link rel="stylesheet" href="components.css">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="csp-overrides.css">
@@ -982,13 +983,18 @@
 
 <section id="documentEdit" class="screen vk-document-form-screen">
   <header class="vk-document-editor-topbar"><button type="button" class="vk-note-back" aria-label="Volver al detalle" onclick="showDocumentDetail(window.__vkCurrentDocumentId)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button></header>
-  <form id="documentEditForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(window.__vkCurrentDocumentId,documentEditName.value,documentEditExpiry.value,documentEditIssuedBy.value,documentEditCountry.value,document.getElementById('documentEditFavorite')?.getAttribute('aria-checked')==='true')">
+  <form id="documentEditForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(window.__vkCurrentDocumentId,documentEditName.value,documentEditExpiry.value,documentEditIssuedBy.value,documentEditCountry.value,document.getElementById('documentEditFavorite')?.getAttribute('aria-checked')==='true',documentEditNumber.value,documentEditHolder.value)">
     <h1 class="vk-document-screen-title">Editar documento</h1><div class="vk-document-category-line"><span id="documentEditCategoryIcon"></span><strong id="documentEditCategory"></strong></div>
     <article class="vk-document-form-card"><span class="vk-document-preview-label" role="button" tabindex="0" aria-label="Abrir vista previa del documento" onclick="viewCurrentDocumentEditImage()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();viewCurrentDocumentEditImage();}">Vista previa</span><img id="documentEditImage" class="vk-document-form-image" alt="Documento" role="button" tabindex="0" aria-label="Abrir vista previa del documento" onclick="viewCurrentDocumentEditImage()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();viewCurrentDocumentEditImage();}"><button type="button" class="vk-document-replace-button" onclick="openDocumentEditSource()">Repetir escaneo/importar</button>
-      <label class="vk-document-field"><span>Nombre</span><input id="documentEditName" type="text" maxlength="150"></label>
-      <label class="vk-document-field"><span>Caduca</span><input id="documentEditExpiry" type="text" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" oninput="formatDocumentExpiry(this)"></label>
+      <input id="documentEditName" type="hidden">
+      <label class="vk-document-field"><span>Número</span><span class="vk-document-field-input-icon"><svg class="vk-document-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></svg><input id="documentEditNumber" type="text" maxlength="50"></span></label>
+      <label class="vk-document-field"><span>Caduca</span><span class="vk-document-field-input-icon"><svg class="vk-document-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><input id="documentEditExpiry" type="text" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" oninput="formatDocumentExpiry(this)"></span></label>
       <button id="documentEditMoreButton" type="button" class="vk-document-more-button" onclick="toggleDocumentMoreInfo('documentEdit')">+ Más información</button>
-      <div id="documentEditMore" class="vk-document-more-fields" hidden><label class="vk-document-field"><span>Emitido por</span><input id="documentEditIssuedBy" type="text" maxlength="150"></label><label class="vk-document-field"><span>País</span><input id="documentEditCountry" type="text" maxlength="100"></label></div>
+      <div id="documentEditMore" hidden>
+        <label class="vk-document-field"><span>Emitido por</span><span class="vk-document-field-input-icon"><svg class="vk-document-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4s2 2 7 2v7.226a5.997 5.997 0 0 1-2.755 5.045L12 21l-4.245-2.729A5.999 5.999 0 0 1 5 13.225V6c5 0 7-2 7-2Z"/></svg><input id="documentEditIssuedBy" type="text" maxlength="150"></span></label>
+        <label class="vk-document-field"><span>País</span><span class="vk-document-field-input-icon"><svg class="vk-document-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/></svg><input id="documentEditCountry" type="text" maxlength="100"></span></label>
+        <label class="vk-document-field"><span>Titular</span><span class="vk-document-field-input-icon"><svg class="vk-document-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M6 20c0-4 2-6 6-6s6 2 6 6"/></svg><input id="documentEditHolder" type="text" maxlength="150"></span></label>
+      </div>
     </article>
     <div class="vk-note-favorite">
       <span>Añadir a favoritos</span>
