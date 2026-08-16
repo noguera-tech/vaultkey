@@ -558,6 +558,27 @@ public final class MainActivity extends Activity {
             webView.goBack();
             return;
         }
+
+        if (webView != null) {
+            webView.evaluateJavascript(
+                    "(function(){" +
+                            "try{" +
+                            "return !!(window.closeDocumentViewer&&" +
+                            "window.closeDocumentViewer());" +
+                            "}catch(e){return false;}" +
+                            "})();",
+                    result -> {
+                        if (!"true".equals(result)) {
+                            exitFromBack();
+                        }
+                    });
+            return;
+        }
+
+        exitFromBack();
+    }
+
+    private void exitFromBack() {
         coverSensitiveContent();
         super.onBackPressed();
     }

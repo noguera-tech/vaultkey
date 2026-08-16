@@ -8298,7 +8298,58 @@ window.deleteDocument=async function(docId){
   }
   window.__vkCurrentDocumentId=null;editingId=null;image='';category='';count();toast('Documento eliminado','ok');showDocuments('left');
 };
-window.viewDocumentImage=async function(docId){var d=read().find(function(x){return x.id===docId;});if(!d)return;var src=await documentImageUrl(d);if(!src)return;var w=window.open('','_blank');if(!w){toast('El navegador bloqueó la vista del documento','err');return;}w.document.write('<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(d.name||'Documento')+'</title><style>html,body{margin:0;min-height:100%;background:#111827;display:grid;place-items:center}img{max-width:100%;max-height:100vh;object-fit:contain}</style></head><body><img src="'+src.replace(/"/g,'&quot;')+'"></body></html>');w.document.close();};
+var documentViewerObjectUrl='';
+
+function releaseDocumentViewerObjectUrl(){
+  if(!documentViewerObjectUrl)return;
+  try{URL.revokeObjectURL(documentViewerObjectUrl);}catch(e){}
+  documentViewerObjectUrl='';
+}
+
+window.viewDocumentImage=async function(docId){
+  var d=read().find(function(x){return x.id===docId;});
+  if(!d)return;
+
+  releaseDocumentViewerObjectUrl();
+
+  try{
+    var src=await documentImageUrl(d);
+    if(!src)return;
+
+    if(/^blob:/i.test(src)){
+      documentViewerObjectUrl=src;
+    }
+
+    var imageNode=document.getElementById('documentViewerImage');
+    var titleNode=document.getElementById('documentViewerTitle');
+
+    if(!imageNode){
+      releaseDocumentViewerObjectUrl();
+      return;
+    }
+    if(titleNode)titleNode.textContent=d.name||'Documento';
+
+    imageNode.src=src;
+    show('documentViewer','right');
+  }catch(e){
+    releaseDocumentViewerObjectUrl();
+    toast('No se pudo abrir el documento','err');
+  }
+};
+
+window.closeDocumentViewer=function(){
+  var viewer=document.getElementById('documentViewer');
+  if(!viewer||getComputedStyle(viewer).display==='none'){
+    return false;
+  }
+
+  var imageNode=document.getElementById('documentViewerImage');
+  if(imageNode)imageNode.removeAttribute('src');
+
+  releaseDocumentViewerObjectUrl();
+  show('documentDetail','left');
+  return true;
+};
 window.toggleDocumentMoreInfo=function(prefix){var b=document.getElementById(prefix+'More'),a=document.getElementById(prefix+'MoreButton');if(!b)return;b.hidden=!b.hidden;if(a)a.textContent=b.hidden?'+ Más información':'− Menos información';};
 document.addEventListener('click',function(e){var r=e.target.closest&&e.target.closest('.vk-document-row[data-document-id]');if(r)showDocumentDetail(r.getAttribute('data-document-id'));});
 document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('[data-doc-icon]').forEach(function(n){n.innerHTML=icon(n.getAttribute('data-doc-icon'));});var s=document.getElementById('documentsSearch');if(s&&!bound){bound=true;s.addEventListener('input',render);}count();});
