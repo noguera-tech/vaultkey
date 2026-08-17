@@ -23,6 +23,7 @@
 <link rel="stylesheet" href="csp-base.css">
 
 <link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="document-fields-icons.css">
 <link rel="stylesheet" href="components.css">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="csp-overrides.css">
@@ -917,13 +918,13 @@
 </div>
 
 <div id="documentSourceSheet" class="vk-document-modal" hidden>
-  <div class="vk-document-modal-backdrop" onclick="closeDocumentSourceSheet()"></div>
+  <div class="vk-document-modal-backdrop" onclick="cancelDocumentSourceSelection()"></div>
   <section class="vk-document-source-sheet" role="dialog" aria-modal="true">
     <div class="vk-document-sheet-handle"></div><h2>Añadir documento</h2>
     <button type="button" class="vk-document-source-option" onclick="openDocumentSource('scan')"><strong>Escanear</strong><svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M4 7V4h3M17 4h3v3M20 17v3h-3M7 20H4v-3"/></svg></button>
     <button type="button" class="vk-document-source-option" onclick="openDocumentSource('import')"><strong>Importar</strong><svg viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M12 18v-6M9 15l3-3 3 3"/></svg></button>
     <div class="vk-document-source-divider"></div>
-    <button type="button" class="vk-document-sheet-cancel" onclick="closeDocumentSourceSheet()">Cancelar</button>
+    <button type="button" class="vk-document-sheet-cancel" onclick="cancelDocumentSourceSelection()">Cancelar</button>
   </section>
   <input id="documentScanInput" type="file" accept="image/*" capture="environment" hidden onchange="handleDocumentFile(event)">
   <input id="documentImportInput" type="file" accept="image/*" hidden onchange="handleDocumentFile(event)">
@@ -936,13 +937,18 @@
 
 <section id="documentCreate" class="screen vk-document-form-screen">
   <header class="vk-document-editor-topbar"><button type="button" class="vk-note-back" aria-label="Volver" onclick="show('documentPreview','left')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button></header>
-  <form id="documentCreateForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(null,documentCreateName.value,documentCreateExpiry.value,documentCreateIssuedBy.value,documentCreateCountry.value,document.getElementById('documentCreateFavorite')?.getAttribute('aria-checked')==='true')">
+  <form id="documentCreateForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(null,documentCreateName.value,documentCreateExpiry.value,documentCreateIssuedBy.value,documentCreateCountry.value,document.getElementById('documentCreateFavorite')?.getAttribute('aria-checked')==='true',documentCreateNumber.value,documentCreateHolder.value)">
     <h1 class="vk-document-screen-title">Añadir documento</h1><div class="vk-document-category-line"><span id="documentCreateCategoryIcon"></span><strong id="documentCreateCategory"></strong></div>
     <article class="vk-document-form-card"><span class="vk-document-preview-label">Vista previa</span><img id="documentCreateImage" class="vk-document-form-image" alt="Documento">
-      <label class="vk-document-field"><span>Nombre</span><input id="documentCreateName" type="text" maxlength="150"></label>
+      <label class="vk-document-field"><span>Nombre del documento</span><span class="vk-document-field-input-icon"><img src="figma-document-field-hash.svg" class="vk-document-field-icon" alt=""><input id="documentCreateName" type="text" maxlength="150"></span></label>
+      <label class="vk-document-field"><span id="documentCreateNumberLabel">Número</span><span class="vk-document-field-input-icon"><img src="figma-document-field-hash.svg" class="vk-document-field-icon" alt=""><input id="documentCreateNumber" type="text" maxlength="50"></span></label>
+      <label class="vk-document-field"><span>Caduca</span><span class="vk-document-field-input-icon"><img src="figma-document-field-calendar.svg" class="vk-document-field-icon" alt=""><input id="documentCreateExpiry" type="text" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" oninput="formatDocumentExpiry(this)"></span></label>
       <button id="documentCreateMoreButton" type="button" class="vk-document-more-button" onclick="toggleDocumentMoreInfo('documentCreate')">+ Más información</button>
-      <label class="vk-document-field"><span>Caduca</span><input id="documentCreateExpiry" type="text" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" oninput="formatDocumentExpiry(this)"></label>
-      <div id="documentCreateMore" class="vk-document-more-fields" hidden><label class="vk-document-field"><span>Emitido por</span><input id="documentCreateIssuedBy" type="text" maxlength="150"></label><label class="vk-document-field"><span>País</span><input id="documentCreateCountry" type="text" maxlength="100"></label></div>
+      <div id="documentCreateMore" class="vk-document-more-fields" hidden>
+        <label class="vk-document-field"><span id="documentCreateIssuedByLabel">Emitido por</span><span class="vk-document-field-input-icon"><img src="figma-document-field-shield.svg" class="vk-document-field-icon" alt=""><input id="documentCreateIssuedBy" type="text" maxlength="150"></span></label>
+        <label class="vk-document-field"><span>País</span><span class="vk-document-field-input-icon"><img src="figma-document-field-globe.svg" class="vk-document-field-icon" alt=""><input id="documentCreateCountry" type="text" maxlength="100"></span></label>
+        <label class="vk-document-field"><span>Titular</span><span class="vk-document-field-input-icon"><img src="figma-document-field-person.svg" class="vk-document-field-icon" alt=""><input id="documentCreateHolder" type="text" maxlength="150"></span></label>
+      </div>
     </article>
     <div class="vk-note-favorite">
       <span>Añadir a favoritos</span>
@@ -968,15 +974,32 @@
   </div>
 </section>
 
+<section id="documentViewer" class="screen vk-document-preview-screen">
+  <header class="vk-document-editor-topbar">
+    <button type="button" class="vk-note-back" aria-label="Volver al documento" onclick="closeDocumentViewer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+  </header>
+  <div class="vk-document-preview-content">
+    <h1 id="documentViewerTitle" class="vk-document-screen-title">Documento</h1>
+    <img id="documentViewerImage" class="vk-document-preview-image" alt="Documento">
+  </div>
+</section>
+
 <section id="documentEdit" class="screen vk-document-form-screen">
   <header class="vk-document-editor-topbar"><button type="button" class="vk-note-back" aria-label="Volver al detalle" onclick="showDocumentDetail(window.__vkCurrentDocumentId)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button></header>
-  <form id="documentEditForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(window.__vkCurrentDocumentId,documentEditName.value,documentEditExpiry.value,documentEditIssuedBy.value,documentEditCountry.value,document.getElementById('documentEditFavorite')?.getAttribute('aria-checked')==='true')">
+  <form id="documentEditForm" class="vk-document-form" onsubmit="event.preventDefault();saveDocument(window.__vkCurrentDocumentId,documentEditName.value,documentEditExpiry.value,documentEditIssuedBy.value,documentEditCountry.value,document.getElementById('documentEditFavorite')?.getAttribute('aria-checked')==='true',documentEditNumber.value,documentEditHolder.value)">
     <h1 class="vk-document-screen-title">Editar documento</h1><div class="vk-document-category-line"><span id="documentEditCategoryIcon"></span><strong id="documentEditCategory"></strong></div>
-    <article class="vk-document-form-card"><span class="vk-document-preview-label">Vista previa</span><img id="documentEditImage" class="vk-document-form-image" alt="Documento"><button type="button" class="vk-document-replace-button" onclick="openDocumentEditSource()">Repetir escaneo/importar</button>
-      <label class="vk-document-field"><span>Nombre</span><input id="documentEditName" type="text" maxlength="150"></label>
-      <label class="vk-document-field"><span>Caduca</span><input id="documentEditExpiry" type="text" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" oninput="formatDocumentExpiry(this)"></label>
+    <article class="vk-document-form-card"><span class="vk-document-preview-label" role="button" tabindex="0" aria-label="Abrir vista previa del documento" onclick="viewCurrentDocumentEditImage()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();viewCurrentDocumentEditImage();}">Vista previa</span><img id="documentEditImage" class="vk-document-form-image" alt="Documento" role="button" tabindex="0" aria-label="Abrir vista previa del documento" onclick="viewCurrentDocumentEditImage()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();viewCurrentDocumentEditImage();}"><button type="button" class="vk-document-replace-button" onclick="openDocumentEditSource()">Repetir escaneo/importar</button>
+      <label class="vk-document-field"><span>Nombre del documento</span><span class="vk-document-field-input-icon"><img src="figma-document-field-hash.svg" class="vk-document-field-icon" alt=""><input id="documentEditName" type="text" maxlength="150"></span></label>
+      <label class="vk-document-field"><span id="documentEditNumberLabel">Número</span><span class="vk-document-field-input-icon"><img src="figma-document-field-hash.svg" class="vk-document-field-icon" alt=""><input id="documentEditNumber" type="text" maxlength="50"></span></label>
+      <label class="vk-document-field"><span>Caduca</span><span class="vk-document-field-input-icon"><img src="figma-document-field-calendar.svg" class="vk-document-field-icon" alt=""><input id="documentEditExpiry" type="text" placeholder="DD/MM/AAAA" maxlength="10" inputmode="numeric" oninput="formatDocumentExpiry(this)"></span></label>
       <button id="documentEditMoreButton" type="button" class="vk-document-more-button" onclick="toggleDocumentMoreInfo('documentEdit')">+ Más información</button>
-      <div id="documentEditMore" class="vk-document-more-fields" hidden><label class="vk-document-field"><span>Emitido por</span><input id="documentEditIssuedBy" type="text" maxlength="150"></label><label class="vk-document-field"><span>País</span><input id="documentEditCountry" type="text" maxlength="100"></label></div>
+      <div id="documentEditMore" hidden>
+        <label class="vk-document-field"><span id="documentEditIssuedByLabel">Emitido por</span><span class="vk-document-field-input-icon"><img src="figma-document-field-shield.svg" class="vk-document-field-icon" alt=""><input id="documentEditIssuedBy" type="text" maxlength="150"></span></label>
+        <label class="vk-document-field"><span>País</span><span class="vk-document-field-input-icon"><img src="figma-document-field-globe.svg" class="vk-document-field-icon" alt=""><input id="documentEditCountry" type="text" maxlength="100"></span></label>
+        <label class="vk-document-field"><span>Titular</span><span class="vk-document-field-input-icon"><img src="figma-document-field-person.svg" class="vk-document-field-icon" alt=""><input id="documentEditHolder" type="text" maxlength="150"></span></label>
+      </div>
     </article>
     <div class="vk-note-favorite">
       <span>Añadir a favoritos</span>

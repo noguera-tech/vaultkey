@@ -29,8 +29,23 @@ if ($resultBody -notmatch 'fileChooserResultDelivered\s*=\s*true') {
 }
 
 Assert-SourceMatch `
-    '(?s)if \(resultCode == RESULT_OK && pendingCameraUri != null\).*?callback\.onReceiveValue\(new Uri\[\]\{pendingCameraUri\}\).*?else.*?FileChooserParams\.parseResult\(resultCode, data\)' `
+    '(?s)boolean cameraCaptureDelivered = callback != null &&\s*resultCode == RESULT_OK && pendingCameraUri != null &&\s*pendingCameraFile != null;.*?if \(cameraCaptureDelivered\) \{\s*callback\.onReceiveValue\(new Uri\[\]\{pendingCameraUri\}\);\s*\} else \{\s*callback\.onReceiveValue\(\s*WebChromeClient\.FileChooserParams\.parseResult\(resultCode, data\)' `
     'No estan cubiertos tanto el resultado de camara aceptado como el resultado cancelado/selector.'
+Assert-SourceMatch `
+    '(?s)if \(cameraCaptureDelivered\) \{\s*schedulePendingCameraCleanup\(\);\s*\} else \{\s*clearPendingCameraFile\(\);\s*\}' `
+    'El resultado de camara no diferencia limpieza diferida en exito y limpieza inmediata en cancelacion.'
+Assert-SourceMatch `
+    '(?s)private void clearPendingCameraFile\(\).*?pendingCameraFile = null;.*?cameraOutputUri = null;.*?!file\.delete\(\)' `
+    'No existe una limpieza segura del JPEG temporal de camara.'
+Assert-SourceMatch `
+    '(?s)File outputFile = File\.createTempFile\(.*?"vaultkey-scan-".*?"\.jpg".*?\);\s*pendingCameraFile = outputFile;' `
+    'La captura de camara no conserva la referencia al JPEG temporal.'
+Assert-SourceMatch `
+    '(?s)catch \(IOException \| RuntimeException error\).*?clearPendingCameraFile\(\);\s*fileChooserCallback = null;' `
+    'El error al abrir la camara no limpia el JPEG temporal.'
+Assert-SourceMatch `
+    '(?s)protected void onDestroy\(\).*?clearPendingCameraFile\(\);.*?clearPendingLocalBackup\(\);' `
+    'onDestroy no limpia el JPEG temporal de camara.'
 Assert-SourceMatch `
     '(?s)protected void onResume\(\).*?if \(!awaitingOwnActivityResult\) coverSensitiveContent\(\);' `
     'onResume dejo de respetar awaitingOwnActivityResult.'
@@ -44,4 +59,4 @@ Assert-SourceMatch `
     '(?s)fileChooserResultDelivered = false;\s*awaitingOwnActivityResult = true;\s*startActivityForResult\(intent, FILE_CHOOSER_REQUEST\)' `
     'El selector de archivos no inicializa la guarda correctamente.'
 
-Write-Output 'PASS: guarda de resultado de camara/selector retenida hasta recuperar foco.'
+Write-Output 'PASS: guarda de camara/selector y limpieza de JPEG temporal protegidas.'

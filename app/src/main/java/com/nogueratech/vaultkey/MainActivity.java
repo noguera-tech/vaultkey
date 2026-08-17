@@ -10,6 +10,8 @@ import android.content.IntentSender;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -58,6 +60,7 @@ public final class MainActivity extends Activity {
     private static final int FILE_CHOOSER_REQUEST = 4107;
     private static final int DRIVE_AUTHORIZATION_REQUEST = 4108;
     private static final int LOCAL_BACKUP_SAVE_REQUEST = 4109;
+    private static final long CAMERA_TEMP_CLEANUP_DELAY_MS = 120_000L;
     private static final String LOCAL_ORIGIN = "https://appassets.androidplatform.net";
     private static final String ASSET_PREFIX = "/assets/web/";
     private static final String NATIVE_DRIVE_CONNECT_PATH = "/native/drive/connect";
@@ -67,11 +70,14 @@ public final class MainActivity extends Activity {
     private static final String DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
     private static final String START_URL = LOCAL_ORIGIN + ASSET_PREFIX + "index.html";
 
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Runnable cameraTempCleanup = this::clearPendingCameraFile;
     private WebView webView;
     private View privacyScreen;
     private boolean pageReady;
     private ValueCallback<Uri[]> fileChooserCallback;
     private Uri cameraOutputUri;
+    private File pendingCameraFile;
     private boolean awaitingOwnActivityResult;
     private boolean fileChooserResultDelivered;
     private boolean driveAuthorizationResultDelivered;
@@ -200,6 +206,7 @@ public final class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         coverSensitiveContent();
+        clearPendingCameraFile();
         clearPendingLocalBackup();
         if (fileChooserCallback != null) {
             fileChooserCallback.onReceiveValue(null);
@@ -224,15 +231,23 @@ public final class MainActivity extends Activity {
 
             Uri pendingCameraUri = cameraOutputUri;
             cameraOutputUri = null;
+            boolean cameraCaptureDelivered = callback != null &&
+                    resultCode == RESULT_OK && pendingCameraUri != null &&
+                    pendingCameraFile != null;
 
             if (callback != null) {
-                if (resultCode == RESULT_OK && pendingCameraUri != null) {
+                if (cameraCaptureDelivered) {
                     callback.onReceiveValue(new Uri[]{pendingCameraUri});
                 } else {
                     callback.onReceiveValue(
                             WebChromeClient.FileChooserParams.parseResult(resultCode, data)
                     );
                 }
+            }
+            if (cameraCaptureDelivered) {
+                schedulePendingCameraCleanup();
+            } else {
+                clearPendingCameraFile();
             }
             fileChooserResultDelivered = true;
             return;
@@ -287,6 +302,21 @@ public final class MainActivity extends Activity {
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void clearPendingCameraFile() {
+        mainHandler.removeCallbacks(cameraTempCleanup);
+        File file = pendingCameraFile;
+        pendingCameraFile = null;
+        cameraOutputUri = null;
+        if (file != null && file.exists() && !file.delete()) {
+            Log.w(TAG, "No se pudo borrar el JPEG temporal de la camara");
+        }
+    }
+
+    private void schedulePendingCameraCleanup() {
+        mainHandler.removeCallbacks(cameraTempCleanup);
+        mainHandler.postDelayed(cameraTempCleanup, CAMERA_TEMP_CLEANUP_DELAY_MS);
     }
 
     private void clearPendingLocalBackup() {
@@ -528,6 +558,27 @@ public final class MainActivity extends Activity {
             webView.goBack();
             return;
         }
+
+        if (webView != null) {
+            webView.evaluateJavascript(
+                    "(function(){" +
+                            "try{" +
+                            "return !!(window.closeDocumentViewer&&" +
+                            "window.closeDocumentViewer());" +
+                            "}catch(e){return false;}" +
+                            "})();",
+                    result -> {
+                        if (!"true".equals(result)) {
+                            exitFromBack();
+                        }
+                    });
+            return;
+        }
+
+        exitFromBack();
+    }
+
+    private void exitFromBack() {
         coverSensitiveContent();
         super.onBackPressed();
     }
@@ -541,8 +592,8 @@ public final class MainActivity extends Activity {
         public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback,
                                          FileChooserParams params) {
             if (fileChooserCallback != null) fileChooserCallback.onReceiveValue(null);
+            clearPendingCameraFile();
             fileChooserCallback = callback;
-            cameraOutputUri = null;
 
             boolean cameraRequested = false;
             String[] acceptTypes = params != null ? params.getAcceptTypes() : null;
@@ -569,6 +620,7 @@ public final class MainActivity extends Activity {
                             ".jpg",
                             scanDir
                     );
+                    pendingCameraFile = outputFile;
 
                     cameraOutputUri = VaultKeyFileProvider.getUriForFile(
                             MainActivity.this,
@@ -594,7 +646,7 @@ public final class MainActivity extends Activity {
                 } catch (IOException | RuntimeException error) {
                     awaitingOwnActivityResult = false;
                     fileChooserResultDelivered = false;
-                    cameraOutputUri = null;
+                    clearPendingCameraFile();
                     fileChooserCallback = null;
                     callback.onReceiveValue(null);
 

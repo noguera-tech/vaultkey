@@ -1,0 +1,21 @@
+/* Document Fields Icons - BUG-01-R03.2-B */
+
+.vk-document-field-input-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.vk-document-field-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: #3B82F6;
+  stroke-width: 2;
+}
+
+.vk-document-field-input-icon input {
+  flex: 1;
+  min-width: 0;
+}
