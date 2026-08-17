@@ -188,9 +188,18 @@ public final class MainActivity extends Activity {
         if (!hasFocus) {
             if (!awaitingOwnActivityResult) coverSensitiveContent();
         } else {
+            boolean returningFromFileChooser =
+                    pageReady &&
+                    awaitingOwnActivityResult &&
+                    fileChooserResultDelivered;
+
             revealContentIfReady();
-            webView.invalidate();
-            webView.requestLayout();
+
+            if (!returningFromFileChooser) {
+                webView.invalidate();
+                webView.requestLayout();
+            }
+
             if (pageReady && awaitingOwnActivityResult &&
                     (fileChooserResultDelivered || driveAuthorizationResultDelivered ||
                             localBackupResultDelivered)) {
