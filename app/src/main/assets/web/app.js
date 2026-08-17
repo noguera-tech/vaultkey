@@ -561,29 +561,6 @@ window._vk2UnlockOk=async function(dekKey){
   setTimeout(function(){try{checkAutofillSetupBanner();}catch(e){}},1500);
 };
 // VK 2.0 — cambio de credenciales
-window.vk2ChangeMaster=async function(){
-  if(typeof vkCredentials==='undefined'||!vkStore.hasVault()){toast('No disponible.');return;}
-  const cur=prompt('Contraseña maestra actual:');if(!cur)return;
-  const nxt=prompt('Nueva contraseña maestra (mín. 12 caracteres):');
-  if(!nxt||nxt.length<12){toast('Contraseña demasiado corta.');return;}
-  const nxt2=prompt('Confirma la nueva contraseña:');
-  if(nxt!==nxt2){toast('Las contraseñas no coinciden.');return;}
-  vkCredentials.changeMaster({store:vkStore,crypto:vkCrypto,currentMaster:cur,newMaster:nxt})
-    .then(function(){toast('Contraseña maestra cambiada.');})
-    .catch(function(){toast('Contraseña actual incorrecta.');});
-};
-window.vk2ChangePIN=async function(){
-  if(typeof vkCredentials==='undefined'||!vkStore.hasVault()){toast('No disponible.');return;}
-  const m=prompt('Contraseña maestra:');if(!m)return;
-  const np=prompt('Nuevo PIN (6 dígitos):');
-  if(!np||!/^[0-9]{6}$/.test(np)){toast('PIN inválido.');return;}
-  const np2=prompt('Confirma el nuevo PIN:');
-  if(np!==np2){toast('Los PIN no coinciden.');return;}
-  vkCredentials.changePIN({store:vkStore,crypto:vkCrypto,master:m,newPin:np})
-    .then(function(){toast('PIN cambiado.');})
-    .catch(function(){toast('Contraseña maestra incorrecta.');});
-};
-// VK2 — adaptadores de display (Módulo 3)
 function vk2EntryTitle(e){ return e.title||e.service||e.wifiSsid||''; }
 function vk2EntryUser(e){  return e.username||e.user||e.email||''; }
 function vk2EntryPass(e){  return e.password||e.pass||''; }
@@ -1352,13 +1329,6 @@ function loadNoteReminder(e){
   const msgEl=$('eReminderMsg');if(msgEl&&r.msg)msgEl.value=r.msg;
 }
 
-function confirmRecoverySaved(){
-  vibe([30,20,60]);
-  const btn=$('recoveryCloseBtn');
-  if(btn)btn.style.display='';
-  localStorage.setItem('vk_recovery_saved','1');
-  closeModals();
-}
 
 function registerFailedPin(){
   vibe([40,30,40]);soundPinErr();
