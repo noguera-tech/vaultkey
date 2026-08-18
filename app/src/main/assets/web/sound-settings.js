@@ -1,5 +1,5 @@
 /* ============================================================
-   VaultKey · A11-R01.3 — Ajustes de Sonidos
+   VaultKey · A11-R01.4 — Ajustes de Sonidos
    Fidelidad visual: Figma 764:677.
    UI aislada sobre el motor sonoro existente de app.js.
    No toca cifrado, bóveda, backups ni credenciales.
@@ -277,7 +277,9 @@
 
     var scrim = document.createElement('div');
     scrim.className = 'vk-sheet__scrim';
-    setStyles(scrim, { background: '#000000', opacity: '0' });
+    setStyles(scrim, { background: 'transparent', opacity: '0' });
+    scrim.style.setProperty('background', 'transparent', 'important');
+    scrim.style.setProperty('opacity', '0', 'important');
     scrim.addEventListener('click', function (event) {
       event.preventDefault();
       event.stopPropagation();
@@ -462,14 +464,14 @@
 
     var profiles = document.getElementById('soundProfileCard');
     if (profiles) {
-      profiles.style.opacity = draftEnabled ? '1' : '0.55';
+      profiles.style.opacity = '1';
       profiles.style.pointerEvents = draftEnabled ? 'auto' : 'none';
     }
 
     var preview = document.getElementById('soundPreviewButton');
     if (preview) {
       preview.disabled = !draftEnabled;
-      preview.style.opacity = draftEnabled ? '1' : '0.55';
+      preview.style.opacity = '1';
     }
 
     var rows = document.querySelectorAll('#soundProfileCard [data-sound-style]');
@@ -666,7 +668,7 @@
     var suppressNestedLockSound = false;
 
     var guardedSoundLock = function () {
-      if (suppressNestedLockSound) return;
+      if (suppressNestedLockSound || document.hidden) return;
       originalSoundLock.apply(this, arguments);
       externalLockSoundPending = true;
       Promise.resolve().then(function () { externalLockSoundPending = false; });

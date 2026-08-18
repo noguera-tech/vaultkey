@@ -160,18 +160,22 @@ document.addEventListener('click', function (e) {
 
 /* ---------- Extensiones UI aisladas ---------- */
 (function loadSoundSettingsExtension() {
-  function load() {
+  function loadAsync() {
     if (document.querySelector('script[data-vk-extension="sound-settings"]')) return;
     var script = document.createElement('script');
     script.src = 'sound-settings.js';
-    script.defer = true;
     script.setAttribute('data-vk-extension', 'sound-settings');
     document.head.appendChild(script);
   }
 
+  if (document.querySelector('script[data-vk-extension="sound-settings"]')) return;
+
+  /* Durante el parseo, cargar de forma bloqueante para que la extensión
+     registre sus guards antes del DOMContentLoaded de app.js. */
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', load, { once: true });
-  } else {
-    load();
+    document.write('<script src="sound-settings.js" data-vk-extension="sound-settings"><\/script>');
+    return;
   }
+
+  loadAsync();
 })();
