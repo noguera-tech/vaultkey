@@ -270,6 +270,7 @@
     var sheet = document.createElement('div');
     sheet.id = 'soundSettingsSheet';
     sheet.className = 'vk-sheet';
+    setStyles(sheet, { background: 'var(--vk-sheet-base)' });
     sheet.setAttribute('aria-hidden', 'true');
     sheet.setAttribute('role', 'dialog');
     sheet.setAttribute('aria-modal', 'true');
@@ -277,8 +278,8 @@
 
     var scrim = document.createElement('div');
     scrim.className = 'vk-sheet__scrim';
-    setStyles(scrim, { background: 'rgba(0,0,0,0.35)', opacity: '1' });
-    scrim.style.setProperty('background', 'rgba(0,0,0,0.35)', 'important');
+    setStyles(scrim, { background: 'var(--vk-sheet-scrim)', opacity: '1' });
+    scrim.style.setProperty('background', 'var(--vk-sheet-scrim)', 'important');
     scrim.style.setProperty('opacity', '1', 'important');
     scrim.addEventListener('click', function (event) {
       event.preventDefault();
@@ -298,7 +299,7 @@
       padding: '0 0 env(safe-area-inset-bottom, 0px)',
       border: '0',
       borderRadius: '24px 24px 0 0',
-      background: 'rgba(36,50,70,0.35)',
+      background: 'var(--vk-sheet-panel)',
       fontFamily: "Inter, Roboto, system-ui, -apple-system, sans-serif"
     });
 
