@@ -1676,6 +1676,130 @@
 </section>
 
 <!-- ============================================================
+     Ayuda / FAQ — Figma 773:746 (lista) + 773:851 (estado abierto)
+     ============================================================ -->
+<section
+  id="helpSettings"
+  class="screen vk-help-screen"
+  aria-labelledby="helpSettingsTitle"
+  hidden
+>
+  <header class="vk-help-header">
+    <button type="button" class="vk-help-back" aria-label="Volver a Información" onclick="show('informationSettings','left')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m15 18-6-6 6-6"></path>
+      </svg>
+    </button>
+  </header>
+
+  <main class="vk-help-content">
+    <h1 id="helpSettingsTitle" class="vk-help-title">Ayuda</h1>
+    <p class="vk-help-intro">Preguntas frecuentes sobre el uso y la<br>protección de tu bóveda.</p>
+
+    <div class="vk-help-list">
+      <article class="vk-help-item">
+        <button type="button" class="vk-help-question" aria-expanded="false" onclick="toggleHelpFaq(this)">
+          <span>¿Dónde se guardan mis datos?</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+        </button>
+        <div class="vk-help-answer" hidden><p>Tus datos se guardan cifrados en tu dispositivo. VaultKey no necesita una cuenta propia ni envía el contenido de tu bóveda a servidores propios de VaultKey.</p></div>
+      </article>
+
+      <article class="vk-help-item">
+        <button type="button" class="vk-help-question" aria-expanded="false" onclick="toggleHelpFaq(this)">
+          <span>¿Qué ocurre si olvido mi PIN?</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+        </button>
+        <div class="vk-help-answer" hidden><p>VaultKey no conoce tu PIN y no puede recuperarlo por ti. Si pierdes el acceso, la recuperación dependerá de los métodos válidos que tengas disponibles y de disponer de una copia de seguridad cifrada creada previamente.</p></div>
+      </article>
+
+      <article class="vk-help-item">
+        <button type="button" class="vk-help-question" aria-expanded="false" onclick="toggleHelpFaq(this)">
+          <span>¿Cómo hago una copia de seguridad?</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+        </button>
+        <div class="vk-help-answer" hidden><p>Desde Ajustes → Respaldos puedes crear una copia local cifrada o utilizar Google Drive cuando esa opción esté configurada. Guarda siempre las copias en una ubicación segura.</p></div>
+      </article>
+
+      <article class="vk-help-item">
+        <button type="button" class="vk-help-question" aria-expanded="false" onclick="toggleHelpFaq(this)">
+          <span>¿Las copias locales y las de Google Drive están cifradas?</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+        </button>
+        <div class="vk-help-answer" hidden><p>Sí. Las copias de VaultKey se generan cifradas. Google Drive actúa como almacenamiento de la copia y no recibe tu PIN ni la clave necesaria para descifrar la bóveda.</p></div>
+      </article>
+
+      <article class="vk-help-item">
+        <button type="button" class="vk-help-question" aria-expanded="false" onclick="toggleHelpFaq(this)">
+          <span>¿Cómo restauro una copia de seguridad?</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+        </button>
+        <div class="vk-help-answer" hidden><p>Utiliza Restaurar copia desde Ajustes → Respaldos y selecciona una copia compatible de VaultKey. Conserva las credenciales necesarias para recuperar esa copia: una copia cifrada necesita los datos de acceso o recuperación que correspondan a ella. El procedimiento completo se documentará en el Manual de usuario.</p></div>
+      </article>
+
+      <article class="vk-help-item">
+        <button type="button" class="vk-help-question" aria-expanded="false" onclick="toggleHelpFaq(this)">
+          <span>¿Google Drive es obligatorio?</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+        </button>
+        <div class="vk-help-answer" hidden><p>No. Google Drive es opcional. Puedes utilizar VaultKey y mantener tu bóveda local sin conectarlo. Si decides usarlo, VaultKey solicita acceso únicamente para las funciones necesarias relacionadas con sus archivos de respaldo.</p></div>
+      </article>
+
+      <article class="vk-help-item">
+        <button type="button" class="vk-help-question" aria-expanded="false" onclick="toggleHelpFaq(this)">
+          <span>¿Cómo organizo mis datos?</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+        </button>
+        <div class="vk-help-answer" hidden><p>VaultKey permite clasificar los elementos mediante categorías y filtros para facilitar su localización. Cada elemento conserva la categoría seleccionada al guardarlo.</p></div>
+      </article>
+
+      <article class="vk-help-item">
+        <button type="button" class="vk-help-question" aria-expanded="false" onclick="toggleHelpFaq(this)">
+          <span>¿Puedo importar o exportar información?</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+        </button>
+        <div class="vk-help-answer" hidden><p>VaultKey dispone de funciones de importación, exportación y copias de seguridad compatibles. Utiliza únicamente archivos que conozcas y evita importar archivos dañados, modificados o de procedencia desconocida.</p></div>
+      </article>
+
+      <article class="vk-help-item">
+        <button type="button" class="vk-help-question" aria-expanded="false" onclick="toggleHelpFaq(this)">
+          <span>¿VaultKey puede ver mis contraseñas?</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+        </button>
+        <div class="vk-help-answer" hidden><p>VaultKey está diseñado para mantener el contenido de la bóveda cifrado y bajo tu control. El contenido de tu bóveda no se envía a servidores propios de VaultKey.</p></div>
+      </article>
+
+      <article class="vk-help-item">
+        <button type="button" class="vk-help-question" aria-expanded="false" onclick="toggleHelpFaq(this)">
+          <span>¿Qué ocurre cuando VaultKey pasa a segundo plano?</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+        </button>
+        <div class="vk-help-answer" hidden><p>VaultKey aplica medidas de protección visual y puede bloquear la sesión para reducir la exposición accidental de información sensible. El tiempo de bloqueo automático puede configurarse desde Seguridad.</p></div>
+      </article>
+
+      <article class="vk-help-item">
+        <button type="button" class="vk-help-question" aria-expanded="false" onclick="toggleHelpFaq(this)">
+          <span>¿Está disponible el desbloqueo biométrico?</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+        </button>
+        <div class="vk-help-answer" hidden><p>No por el momento. El desbloqueo biométrico está deshabilitado actualmente y no forma parte de la funcionalidad activa de esta versión.</p></div>
+      </article>
+
+      <article class="vk-help-item">
+        <button type="button" class="vk-help-question" aria-expanded="false" onclick="toggleHelpFaq(this)">
+          <span>¿Dónde consulto la Política de Privacidad y los Términos?</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+        </button>
+        <div class="vk-help-answer" hidden><p>Puedes acceder desde Ajustes → Información → Privacidad para consultar la información vigente sobre almacenamiento, copias, servicios externos y tratamiento de datos.</p></div>
+      </article>
+    </div>
+
+    <aside class="vk-help-important">
+      <strong>Importante</strong><span>: Ayuda resume dudas habituales. Los procedimientos completos de recuperación, cambio de credenciales, Kit de emergencia e importación/restauración de backups se documentarán en el Manual de usuario tras auditar el flujo real de recuperación.</span>
+    </aside>
+  </main>
+</section>
+<!-- ============================================================
      Notificaciones — Figma 217:1590
      ============================================================ -->
 <section

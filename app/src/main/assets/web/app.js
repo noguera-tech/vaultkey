@@ -874,7 +874,7 @@ if(!window.__vkInformationActionsBound){
     event.preventDefault();
     switch(action){
       case 'help':
-        toast('Próximamente');
+        openHelpSettings();
         break;
       case 'manual':
         toast('Próximamente');
@@ -8433,3 +8433,31 @@ document.addEventListener('click',function(e){var r=e.target.closest&&e.target.c
 document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('[data-doc-icon]').forEach(function(n){n.innerHTML=icon(n.getAttribute('data-doc-icon'));});var s=document.getElementById('documentsSearch');if(s&&!bound){bound=true;s.addEventListener('input',render);}count();});
 window.vkDocuments={read:read,render:render,updateCount:count};
 })();
+// ============================================================
+// T1 — Ayuda / FAQ interna (Figma 773:746 + 773:851)
+// ============================================================
+function closeAllHelpFaq(){
+  document.querySelectorAll('#helpSettings .vk-help-question').forEach(function(button){
+    button.setAttribute('aria-expanded','false');
+    const answer=button.closest('.vk-help-item')?.querySelector('.vk-help-answer');
+    if(answer)answer.hidden=true;
+  });
+}
+function openHelpSettings(){
+  closeAllHelpFaq();
+  const content=document.querySelector('#helpSettings .vk-help-content');
+  if(content)content.scrollTop=0;
+  show('helpSettings','right');
+}
+function toggleHelpFaq(button){
+  if(!button)return;
+  const wasOpen=button.getAttribute('aria-expanded')==='true';
+  closeAllHelpFaq();
+  if(wasOpen)return;
+  const item=button.closest('.vk-help-item');
+  const answer=item?.querySelector('.vk-help-answer');
+  button.setAttribute('aria-expanded','true');
+  if(answer)answer.hidden=false;
+}
+window.openHelpSettings=openHelpSettings;
+window.toggleHelpFaq=toggleHelpFaq;
