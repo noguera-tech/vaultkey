@@ -277,6 +277,9 @@
 
     var scrim = document.createElement('div');
     scrim.className = 'vk-sheet__scrim';
+    setStyles(scrim, { background: 'rgba(0,0,0,0.35)', opacity: '1' });
+    scrim.style.setProperty('background', 'rgba(0,0,0,0.35)', 'important');
+    scrim.style.setProperty('opacity', '1', 'important');
     scrim.addEventListener('click', function (event) {
       event.preventDefault();
       event.stopPropagation();
