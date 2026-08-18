@@ -1,5 +1,6 @@
 /* ============================================================
-   VaultKey · A11-R01.2 — Ajustes de Sonidos
+   VaultKey · A11-R01.3 — Ajustes de Sonidos
+   Fidelidad visual: Figma 764:677.
    UI aislada sobre el motor sonoro existente de app.js.
    No toca cifrado, bóveda, backups ni credenciales.
    ============================================================ */
@@ -10,31 +11,29 @@
   var SOUND_KEY = 'vk_sound';
   var STYLE_KEY = 'vk_sound_style';
   var ALLOWED_STYLES = ['suave', 'minimo', 'cristal'];
-  var STYLE_LABELS = {
-    suave: 'Suave',
-    minimo: 'Minimal',
-    cristal: 'Cristal'
-  };
-
   var draftEnabled = false;
   var draftStyle = 'suave';
   var previewCtx = null;
 
-  // Identidades elegidas en la prueba física A11-R01.2.
-  // copy/success/preview conservan exactamente la firma escuchada;
-  // el resto de acciones reutiliza la misma identidad con variaciones
-  // discretas de altura para mantener semántica sin cambiar timbre.
+  var ICON_ASSETS = {
+    suave: 'assets/sound-waves-horizontal.svg',
+    minimo: 'assets/sound-audio-lines.svg',
+    cristal: 'assets/sound-gem.svg',
+    play: 'assets/sound-play.svg'
+  };
+
+  // Misma identidad elegida en la prueba física; solo aumenta la ganancia.
   var SOUND_IDENTITIES = {
     suave: [
-      { freq: 495, type: 'triangle', vol: 0.022, attack: 0.002, duration: 0.040, t: 0 },
-      { freq: 620, type: 'sine',     vol: 0.020, attack: 0.002, duration: 0.050, t: 38 }
+      { freq: 495, type: 'triangle', vol: 0.066, attack: 0.002, duration: 0.040, t: 0 },
+      { freq: 620, type: 'sine',     vol: 0.060, attack: 0.002, duration: 0.050, t: 38 }
     ],
     minimo: [
-      { freq: 480, type: 'sine', vol: 0.018, attack: 0.002, duration: 0.025, t: 0 }
+      { freq: 480, type: 'sine', vol: 0.054, attack: 0.002, duration: 0.025, t: 0 }
     ],
     cristal: [
-      { freq: 640, type: 'triangle', vol: 0.018, attack: 0.002, duration: 0.032, t: 0 },
-      { freq: 860, type: 'sine',     vol: 0.014, attack: 0.002, duration: 0.038, t: 35 }
+      { freq: 640, type: 'triangle', vol: 0.054, attack: 0.002, duration: 0.032, t: 0 },
+      { freq: 860, type: 'sine',     vol: 0.042, attack: 0.002, duration: 0.038, t: 35 }
     ]
   };
 
@@ -75,6 +74,11 @@
     draftStyle = normalizedStyle();
   }
 
+  function setStyles(el, styles) {
+    Object.keys(styles).forEach(function (key) { el.style[key] = styles[key]; });
+    return el;
+  }
+
   function findSoundCard() {
     var root = document.getElementById('interactionSettings');
     if (!root) return null;
@@ -93,95 +97,169 @@
     if (status) status.textContent = soundIsEnabled() ? 'Activado' : 'Desactivado';
   }
 
-  function setStyles(el, styles) {
-    Object.keys(styles).forEach(function (key) { el.style[key] = styles[key]; });
-    return el;
+  function makeAssetIcon(assetKey) {
+    var img = document.createElement('img');
+    img.src = ICON_ASSETS[assetKey];
+    img.alt = '';
+    img.setAttribute('aria-hidden', 'true');
+    img.width = 24;
+    img.height = 24;
+    setStyles(img, {
+      display: 'block',
+      width: '24px',
+      height: '24px',
+      flex: '0 0 24px',
+      objectFit: 'contain'
+    });
+    return img;
   }
 
-  function makeIcon(name) {
-    var ns = 'http://www.w3.org/2000/svg';
-    var svg = document.createElementNS(ns, 'svg');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('width', '24');
-    svg.setAttribute('height', '24');
-    svg.setAttribute('fill', 'none');
-    svg.setAttribute('stroke', 'currentColor');
-    svg.setAttribute('stroke-width', '2');
-    svg.setAttribute('stroke-linecap', 'round');
-    svg.setAttribute('stroke-linejoin', 'round');
-    svg.setAttribute('aria-hidden', 'true');
-    setStyles(svg, { flex: '0 0 24px', color: 'var(--vk-text)' });
+  function makeRadio() {
+    var radio = document.createElement('span');
+    radio.className = 'vk-sound-radio';
+    radio.setAttribute('aria-hidden', 'true');
+    setStyles(radio, {
+      position: 'relative',
+      display: 'block',
+      width: '22px',
+      height: '22px',
+      minWidth: '22px',
+      marginLeft: 'auto',
+      borderRadius: '50%',
+      background: '#d9d9d9'
+    });
 
-    function path(d) {
-      var p = document.createElementNS(ns, 'path');
-      p.setAttribute('d', d);
-      svg.appendChild(p);
-    }
-    function line(x1, y1, x2, y2) {
-      var l = document.createElementNS(ns, 'line');
-      l.setAttribute('x1', x1); l.setAttribute('y1', y1);
-      l.setAttribute('x2', x2); l.setAttribute('y2', y2);
-      svg.appendChild(l);
-    }
-    function polygon(points) {
-      var p = document.createElementNS(ns, 'polygon');
-      p.setAttribute('points', points);
-      svg.appendChild(p);
-    }
-
-    if (name === 'waves-horizontal') {
-      path('M2 12h2'); path('M6 8v8'); path('M10 5v14');
-      path('M14 8v8'); path('M18 10v4'); path('M22 12h-2');
-    } else if (name === 'audio-lines') {
-      path('M2 10v3'); path('M6 6v11'); path('M10 3v18');
-      path('M14 8v7'); path('M18 5v13'); path('M22 10v3');
-    } else if (name === 'gem') {
-      polygon('6 3 18 3 22 9 12 21 2 9');
-      line('2', '9', '22', '9');
-      path('m10 3-2 6 4 12 4-12-2-6');
-    } else if (name === 'play') {
-      polygon('6 3 20 12 6 21 6 3');
-    }
-    return svg;
+    var dot = document.createElement('span');
+    dot.className = 'vk-sound-radio__dot';
+    setStyles(dot, {
+      position: 'absolute',
+      width: '8px',
+      height: '8px',
+      left: '7px',
+      top: '7px',
+      borderRadius: '50%',
+      background: '#1a1a1a',
+      opacity: '0'
+    });
+    radio.appendChild(dot);
+    return radio;
   }
 
-  function makeProfileRow(styleId, label, iconName) {
+  function makeProfileRow(styleId, label, assetKey, isLast) {
     var button = document.createElement('button');
     button.type = 'button';
-    button.className = 'vk-row';
     button.setAttribute('data-sound-style', styleId);
     button.setAttribute('aria-pressed', 'false');
     setStyles(button, {
-      minHeight: '41px',
-      padding: '8px 16px',
+      boxSizing: 'border-box',
+      display: 'flex',
+      alignItems: 'center',
+      width: '100%',
+      height: isLast ? '42px' : '43px',
+      padding: '0 20px 0 14px',
+      gap: '29px',
+      border: '0',
+      borderBottom: isLast ? '0' : '1px solid rgba(58,74,96,0.8)',
+      background: 'transparent',
+      color: '#ffffff',
+      font: 'inherit',
       cursor: 'pointer',
-      gap: '16px'
+      textAlign: 'left'
     });
 
-    button.appendChild(makeIcon(iconName));
+    button.appendChild(makeAssetIcon(assetKey));
 
-    var text = document.createElement('span');
-    text.className = 'vk-row__body';
-    var title = document.createElement('strong');
-    title.className = 'vk-row__title';
+    var title = document.createElement('span');
     title.textContent = label;
-    text.appendChild(title);
-
-    var radio = document.createElement('span');
-    radio.setAttribute('aria-hidden', 'true');
-    radio.textContent = '○';
-    setStyles(radio, {
-      marginLeft: 'auto',
-      fontSize: '26px',
-      lineHeight: '1',
-      color: 'var(--vk-text-muted)'
+    setStyles(title, {
+      fontSize: '16px',
+      lineHeight: '20px',
+      fontWeight: '600',
+      color: '#ffffff',
+      whiteSpace: 'nowrap'
     });
+    button.appendChild(title);
+    button.appendChild(makeRadio());
 
-    button.appendChild(text);
-    button.appendChild(radio);
     button.addEventListener('click', function () {
       draftStyle = styleId;
       syncSheet();
+    });
+    return button;
+  }
+
+  function makeToggle() {
+    var label = document.createElement('label');
+    setStyles(label, {
+      position: 'relative',
+      display: 'block',
+      width: '48px',
+      height: '28px',
+      marginLeft: 'auto',
+      flex: '0 0 48px',
+      borderRadius: '14px',
+      background: '#334155',
+      cursor: 'pointer'
+    });
+
+    var input = document.createElement('input');
+    input.id = 'soundSettingsToggle';
+    input.type = 'checkbox';
+    input.setAttribute('aria-label', 'Activar sonidos');
+    setStyles(input, {
+      position: 'absolute',
+      inset: '0',
+      width: '100%',
+      height: '100%',
+      margin: '0',
+      opacity: '0',
+      cursor: 'pointer'
+    });
+
+    var knob = document.createElement('span');
+    knob.className = 'vk-sound-toggle-knob';
+    setStyles(knob, {
+      position: 'absolute',
+      left: '5px',
+      top: '4px',
+      width: '20px',
+      height: '20px',
+      borderRadius: '50%',
+      background: '#d9d9d9',
+      transition: 'transform 150ms ease',
+      pointerEvents: 'none'
+    });
+
+    input.addEventListener('change', function () {
+      draftEnabled = input.checked;
+      syncSheet();
+    });
+
+    label.appendChild(input);
+    label.appendChild(knob);
+    return label;
+  }
+
+  function makeActionButton(label, primary) {
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = label;
+    setStyles(button, {
+      boxSizing: 'border-box',
+      width: '85px',
+      minWidth: '85px',
+      height: '42.578px',
+      minHeight: '42.578px',
+      padding: '0',
+      borderRadius: '16px',
+      border: primary ? '1px solid #1e1e1e' : '1px solid #3a4a60',
+      background: primary ? '#f59e0b' : 'transparent',
+      color: '#ffffff',
+      fontSize: '14px',
+      lineHeight: '17px',
+      fontWeight: '400',
+      cursor: 'pointer',
+      flex: '0 0 85px'
     });
     return button;
   }
@@ -199,93 +277,133 @@
 
     var scrim = document.createElement('div');
     scrim.className = 'vk-sheet__scrim';
-    scrim.setAttribute('data-vk-close', '');
+    setStyles(scrim, { background: '#000000', opacity: '0' });
+    scrim.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      loadDraftFromSaved();
+      closeSoundSettings();
+    });
 
     var panel = document.createElement('div');
     panel.className = 'vk-sheet__panel';
     setStyles(panel, {
+      boxSizing: 'border-box',
+      height: 'calc(394px + env(safe-area-inset-bottom, 0px))',
+      minHeight: 'calc(394px + env(safe-area-inset-bottom, 0px))',
+      maxHeight: 'calc(100vh - 16px)',
+      overflow: 'hidden',
+      padding: '0 0 env(safe-area-inset-bottom, 0px)',
+      border: '0',
       borderRadius: '24px 24px 0 0',
-      padding: '8px 24px 30px',
-      background: 'var(--vk-card)'
+      background: 'rgba(36,50,70,0.35)',
+      fontFamily: "Inter, Roboto, system-ui, -apple-system, sans-serif"
     });
-
-    var handle = document.createElement('div');
-    handle.className = 'vk-sheet__handle';
 
     var title = document.createElement('div');
     title.id = 'soundSettingsTitle';
     title.textContent = 'SONIDOS';
     setStyles(title, {
-      marginTop: '2px',
+      position: 'absolute',
+      top: '5px',
+      left: '24px',
+      right: '24px',
+      height: '20px',
       textAlign: 'center',
       fontSize: '14px',
-      fontWeight: '600',
-      color: '#ffffff'
+      lineHeight: '20px',
+      fontWeight: '500',
+      color: '#a7b6c9'
     });
 
     var subtitle = document.createElement('div');
-    subtitle.textContent = 'Respuesta sonora de VaultKey';
+    subtitle.textContent = 'Respuesta sonora de Vaultkey';
     setStyles(subtitle, {
-      margin: '14px 8px 4px',
+      position: 'absolute',
+      top: '39px',
+      left: '32px',
       fontSize: '12px',
-      color: 'var(--vk-text-muted)'
+      lineHeight: '15px',
+      fontWeight: '500',
+      color: '#a7b6c9',
+      whiteSpace: 'nowrap'
     });
 
     var toggleCard = document.createElement('div');
-    toggleCard.className = 'vk-card';
-    var toggleRow = document.createElement('div');
-    toggleRow.className = 'vk-row';
-    setStyles(toggleRow, { minHeight: '40px', padding: '7px 16px' });
+    setStyles(toggleCard, {
+      boxSizing: 'border-box',
+      position: 'absolute',
+      top: '59px',
+      left: '24px',
+      right: '24px',
+      height: '40px',
+      display: 'flex',
+      alignItems: 'center',
+      padding: '0 24px',
+      border: '1px solid rgba(58,74,96,0.6)',
+      borderRadius: '12px',
+      background: '#243246'
+    });
 
     var toggleText = document.createElement('span');
-    toggleText.className = 'vk-row__body';
-    var toggleTitle = document.createElement('strong');
-    toggleTitle.className = 'vk-row__title';
-    toggleTitle.textContent = 'Activar sonidos';
-    toggleText.appendChild(toggleTitle);
-
-    var toggle = document.createElement('label');
-    toggle.className = 'vk-toggle';
-    var input = document.createElement('input');
-    input.id = 'soundSettingsToggle';
-    input.type = 'checkbox';
-    input.setAttribute('aria-label', 'Activar sonidos');
-    var track = document.createElement('span');
-    track.className = 'vk-toggle__track';
-    toggle.appendChild(input);
-    toggle.appendChild(track);
-    toggleRow.appendChild(toggleText);
-    toggleRow.appendChild(toggle);
-    toggleCard.appendChild(toggleRow);
-
-    input.addEventListener('change', function () {
-      draftEnabled = input.checked;
-      syncSheet();
+    toggleText.textContent = 'Activar sonidos';
+    setStyles(toggleText, {
+      fontSize: '16px',
+      lineHeight: '20px',
+      fontWeight: '400',
+      color: '#ffffff'
     });
+    toggleCard.appendChild(toggleText);
+    toggleCard.appendChild(makeToggle());
 
     var profiles = document.createElement('div');
     profiles.id = 'soundProfileCard';
-    profiles.className = 'vk-card';
-    setStyles(profiles, { marginTop: '16px' });
-    profiles.appendChild(makeProfileRow('suave', 'Suave', 'waves-horizontal'));
-    profiles.appendChild(makeProfileRow('minimo', 'Minimal', 'audio-lines'));
-    profiles.appendChild(makeProfileRow('cristal', 'Cristal', 'gem'));
+    setStyles(profiles, {
+      boxSizing: 'border-box',
+      position: 'absolute',
+      top: '115px',
+      left: '24px',
+      right: '24px',
+      height: '128px',
+      overflow: 'hidden',
+      border: '1px solid rgba(58,74,96,0.6)',
+      borderRadius: '12px',
+      background: '#243246'
+    });
+    profiles.appendChild(makeProfileRow('suave', 'Suave', 'suave', false));
+    profiles.appendChild(makeProfileRow('minimo', 'Minimal', 'minimo', false));
+    profiles.appendChild(makeProfileRow('cristal', 'Cristal', 'cristal', true));
 
     var preview = document.createElement('button');
     preview.id = 'soundPreviewButton';
     preview.type = 'button';
-    preview.className = 'vk-row vk-card';
     setStyles(preview, {
-      marginTop: '10px',
-      minHeight: '40px',
-      padding: '7px 16px',
+      boxSizing: 'border-box',
+      position: 'absolute',
+      top: '253px',
+      left: '24px',
+      right: '24px',
+      height: '40px',
+      display: 'flex',
+      alignItems: 'center',
+      padding: '0 15px',
+      gap: '29px',
+      border: '1px solid rgba(58,74,96,0.6)',
+      borderRadius: '12px',
+      background: '#243246',
+      color: '#ffffff',
       cursor: 'pointer',
-      gap: '16px'
+      font: 'inherit'
     });
-    preview.appendChild(makeIcon('play'));
-    var previewText = document.createElement('strong');
-    previewText.className = 'vk-row__title';
+    preview.appendChild(makeAssetIcon('play'));
+    var previewText = document.createElement('span');
     previewText.textContent = 'Probar sonido';
+    setStyles(previewText, {
+      fontSize: '16px',
+      lineHeight: '20px',
+      fontWeight: '600',
+      color: '#ffffff'
+    });
     preview.appendChild(previewText);
     preview.addEventListener('click', function () {
       if (!draftEnabled) return;
@@ -293,36 +411,25 @@
     });
 
     var actions = document.createElement('div');
-    actions.className = 'vk-actions';
     setStyles(actions, {
-      justifyContent: 'center',
+      position: 'absolute',
+      top: '317px',
+      left: '0',
+      right: '0',
+      height: '43px',
+      display: 'flex',
       alignItems: 'center',
-      gap: '65px',
-      marginTop: '24px',
-      paddingBottom: '2px'
+      justifyContent: 'center',
+      gap: '65px'
     });
 
-    var cancel = document.createElement('button');
-    cancel.type = 'button';
-    cancel.className = 'vk-btn vk-btn--secondary';
-    cancel.textContent = 'Cancelar';
-    setStyles(cancel, {
-      flex: '0 0 85px', width: '85px', minWidth: '85px', minHeight: '43px',
-      padding: '0 7px', borderRadius: '14px', whiteSpace: 'nowrap', fontSize: '13px'
-    });
+    var cancel = makeActionButton('Cancelar', false);
     cancel.addEventListener('click', function () {
       loadDraftFromSaved();
       closeSoundSettings();
     });
 
-    var save = document.createElement('button');
-    save.type = 'button';
-    save.className = 'vk-btn vk-btn--primary';
-    save.textContent = 'Guardar';
-    setStyles(save, {
-      flex: '0 0 85px', width: '85px', minWidth: '85px', minHeight: '43px',
-      padding: '0 7px', borderRadius: '14px', whiteSpace: 'nowrap', fontSize: '13px'
-    });
+    var save = makeActionButton('Guardar', true);
     save.addEventListener('click', function () {
       localStorage.setItem(SOUND_KEY, draftEnabled ? '1' : '0');
       localStorage.setItem(STYLE_KEY, draftStyle);
@@ -333,8 +440,6 @@
 
     actions.appendChild(cancel);
     actions.appendChild(save);
-
-    panel.appendChild(handle);
     panel.appendChild(title);
     panel.appendChild(subtitle);
     panel.appendChild(toggleCard);
@@ -348,7 +453,12 @@
 
   function syncSheet() {
     var input = document.getElementById('soundSettingsToggle');
-    if (input) input.checked = draftEnabled;
+    if (input) {
+      input.checked = draftEnabled;
+      var knob = input.parentElement && input.parentElement.querySelector('.vk-sound-toggle-knob');
+      if (knob) knob.style.transform = draftEnabled ? 'translateX(18px)' : 'translateX(0)';
+      if (input.parentElement) input.parentElement.style.background = draftEnabled ? '#3b82f6' : '#334155';
+    }
 
     var profiles = document.getElementById('soundProfileCard');
     if (profiles) {
@@ -366,11 +476,8 @@
     for (var i = 0; i < rows.length; i++) {
       var active = rows[i].getAttribute('data-sound-style') === draftStyle;
       rows[i].setAttribute('aria-pressed', active ? 'true' : 'false');
-      var radio = rows[i].lastElementChild;
-      if (radio) {
-        radio.textContent = active ? '•' : '○';
-        radio.style.color = active ? 'var(--vk-primary)' : 'var(--vk-text-muted)';
-      }
+      var dot = rows[i].querySelector('.vk-sound-radio__dot');
+      if (dot) dot.style.opacity = active ? '1' : '0';
     }
   }
 
@@ -454,7 +561,7 @@
     osc.type = tone.type || 'sine';
     osc.frequency.setValueAtTime(tone.freq || 440, now);
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(tone.vol || 0.018, now + attack);
+    gain.gain.linearRampToValueAtTime(tone.vol || 0.054, now + attack);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
     osc.start(now);
     osc.stop(now + duration + 0.01);
@@ -492,14 +599,14 @@
   }
 
   function installSelectedSoundProfiles() {
-    if (typeof window.playStyle !== 'function' || window.playStyle.__vkA11R012) return;
+    if (typeof window.playStyle !== 'function' || window.playStyle.__vkA11R013) return;
     var originalPlayStyle = window.playStyle;
     var wrapped = function (action) {
       var style = localStorage.getItem(STYLE_KEY) || 'suave';
       if (ALLOWED_STYLES.indexOf(style) === -1) return originalPlayStyle.apply(this, arguments);
       playIdentity(style, action, false);
     };
-    wrapped.__vkA11R012 = true;
+    wrapped.__vkA11R013 = true;
     window.playStyle = wrapped;
   }
 
@@ -522,7 +629,6 @@
       }
       return original.apply(this, arguments);
     };
-
     wrapped.__vkDeduped = true;
     window.soundCopy = wrapped;
   }
@@ -598,6 +704,17 @@
     }
   }
 
+  function installHealthPanelSound() {
+    if (typeof window.showHealthPanel !== 'function' || window.showHealthPanel.__vkSoundOpen) return;
+    var originalShowHealthPanel = window.showHealthPanel;
+    var wrapped = function () {
+      if (typeof window.soundOpen === 'function') window.soundOpen();
+      return originalShowHealthPanel.apply(this, arguments);
+    };
+    wrapped.__vkSoundOpen = true;
+    window.showHealthPanel = wrapped;
+  }
+
   function init() {
     normalizedStyle();
     loadDraftFromSaved();
@@ -608,12 +725,13 @@
     installPinNavigationSilence();
     installLockSoundGuard();
     installSheetLifecycleGuard();
+    installHealthPanelSound();
     updateSoundCardStatus();
   }
 
   window.openSoundSettings = openSoundSettings;
 
-   if (document.readyState === 'loading') {
+  if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init, { once: true });
   } else {
     init();
