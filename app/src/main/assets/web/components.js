@@ -157,3 +157,21 @@ document.addEventListener('click', function (e) {
     }));
   }
 });
+
+/* ---------- Extensiones UI aisladas ---------- */
+(function loadSoundSettingsExtension() {
+  function load() {
+    if (document.querySelector('script[data-vk-extension="sound-settings"]')) return;
+    var script = document.createElement('script');
+    script.src = 'sound-settings.js';
+    script.defer = true;
+    script.setAttribute('data-vk-extension', 'sound-settings');
+    document.head.appendChild(script);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', load, { once: true });
+  } else {
+    load();
+  }
+})();
