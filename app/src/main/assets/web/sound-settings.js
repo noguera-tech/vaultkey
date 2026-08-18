@@ -718,6 +718,26 @@
     window.showHealthPanel = wrapped;
   }
 
+  function installDirectOpenSounds() {
+    [
+      'openCreatePicker',
+      'openBackupSheet',
+      'openGen',
+      'openTypePicker',
+      'repeatDocumentSelection',
+      'openDocumentEditSource'
+    ].forEach(function (name) {
+      var original = window[name];
+      if (typeof original !== 'function' || original.__vkSoundOpen) return;
+      var wrapped = function () {
+        if (typeof window.soundOpen === 'function') window.soundOpen();
+        return original.apply(this, arguments);
+      };
+      wrapped.__vkSoundOpen = true;
+      window[name] = wrapped;
+    });
+  }
+
   function init() {
     normalizedStyle();
     loadDraftFromSaved();
@@ -729,6 +749,7 @@
     installLockSoundGuard();
     installSheetLifecycleGuard();
     installHealthPanelSound();
+    installDirectOpenSounds();
     updateSoundCardStatus();
   }
 
