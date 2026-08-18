@@ -286,16 +286,25 @@
 
   function installCopySoundDeduplication() {
     if (typeof window.soundCopy !== 'function' || window.soundCopy.__vkDeduped) return;
+
     var original = window.soundCopy;
-    var lastPlayed = 0;
+    var suppressNextQuickCopySound = false;
+
+    document.addEventListener('click', function (event) {
+      var button = event.target && event.target.closest
+        ? event.target.closest('button[aria-label="Copiar usuario"], button[aria-label="Copiar contraseña"]')
+        : null;
+      if (button) suppressNextQuickCopySound = true;
+    }, true);
+
     var wrapped = function () {
-      var now = (window.performance && typeof window.performance.now === 'function')
-        ? window.performance.now()
-        : Date.now();
-      if (now - lastPlayed < 140) return;
-      lastPlayed = now;
+      if (suppressNextQuickCopySound) {
+        suppressNextQuickCopySound = false;
+        return;
+      }
       return original.apply(this, arguments);
     };
+
     wrapped.__vkDeduped = true;
     window.soundCopy = wrapped;
   }
